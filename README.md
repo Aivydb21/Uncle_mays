@@ -84,7 +84,7 @@ See our [Contributing Guidelines](CONTRIBUTING.md) for more.
 
 ## 📜 License
 
-Licensed under the **[MIT License](LICENSE)** – free to use, modify, and share! ✅
+Licensed under the **[Apache 2.0 Licence](LICENSE)** – free to use, modify, and share! ✅
 
 ---
 
