@@ -10,6 +10,14 @@ export const metadata: Metadata = {
   title: "UNCLE MAY'S Produce & Provisions - Supporting Black Farmers",
   description: "Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local area and Southern United States delivered to your door, while supporting our community. Heritage since 1930.",
   
+  // Viewport for mobile responsiveness
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  
   // Open Graph / Facebook Meta Tags
   openGraph: {
     type: 'website',

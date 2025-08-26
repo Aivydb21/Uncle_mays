@@ -104,32 +104,32 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
   return (
     <div className={className}>
       {isHero && (
-        <div className="text-center mb-8">
-          <h3 className="text-2xl font-bold mb-3 text-foreground">Stay Connected</h3>
-          <p className="text-muted-foreground">
+        <div className="text-center mb-6 sm:mb-8">
+          <h3 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-foreground">Stay Connected</h3>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Join our community and get updates on Uncle Mays Produce
           </p>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {/* Status Messages */}
         {submitStatus === 'success' && (
-          <div className="mb-6 p-4 rounded-xl text-sm bg-green-50 text-green-800 border border-green-200 shadow-sm">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl text-sm bg-green-50 text-green-800 border border-green-200 shadow-sm">
             <div className="flex items-center space-x-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              <span className="font-medium">{statusMessage}</span>
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
+              <span className="font-medium text-sm sm:text-base">{statusMessage}</span>
             </div>
           </div>
         )}
         
         {submitStatus === 'error' && (
-          <div className="mb-6 p-4 rounded-xl text-sm bg-red-50 text-red-800 border border-red-200 shadow-sm">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 rounded-xl text-sm bg-red-50 text-red-800 border border-red-200 shadow-sm">
             <div className="flex items-center space-x-2">
-              <div className="w-5 h-5 rounded-full bg-red-600 flex items-center justify-center">
+              <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-red-600 flex items-center justify-center">
                 <span className="text-white text-xs font-bold">!</span>
               </div>
-              <span className="font-medium">{statusMessage}</span>
+              <span className="font-medium text-sm sm:text-base">{statusMessage}</span>
             </div>
           </div>
         )}
@@ -144,7 +144,7 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={isSubmitting}
-            className="w-full h-12 text-base border-amber-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition-all duration-200"
+            className="w-full h-12 sm:h-14 text-base border-amber-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition-all duration-200"
           />
         </div>
         
@@ -159,7 +159,7 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
             required
             maxLength={10}
             disabled={isSubmitting}
-            className="w-full h-12 text-base border-amber-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition-all duration-200"
+            className="w-full h-12 sm:h-14 text-base border-amber-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition-all duration-200"
           />
         </div>
 
@@ -168,31 +168,31 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
           <div className="space-y-3">
             <label className="text-sm font-medium text-amber-900">I'm interested in:</label>
             <div className="space-y-3">
-              <label className="flex items-center space-x-3 p-3 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors cursor-pointer group">
+              <label className="flex items-start sm:items-center space-x-3 p-3 sm:p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={interests.includes('popups')}
                   onChange={(e) => handleInterestChange('popups', e.target.checked)}
                   disabled={isSubmitting}
-                  className="w-4 h-4 rounded border-amber-300 text-amber-600 focus:ring-2 focus:ring-amber-200 transition-all duration-200"
+                  className="w-5 h-5 sm:w-6 sm:h-6 mt-0.5 sm:mt-0 rounded border-amber-300 text-amber-600 focus:ring-2 focus:ring-amber-200 transition-all duration-200 flex-shrink-0"
                 />
-                <div className="flex items-center space-x-2">
-                  <MapPin className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
-                  <span className="text-sm text-amber-800">Pop-up store notifications in Hyde Park & Chicago</span>
+                <div className="flex items-center space-x-2 min-w-0">
+                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 group-hover:scale-110 transition-transform flex-shrink-0" />
+                  <span className="text-sm sm:text-base text-amber-800 leading-relaxed">Pop-up store notifications in Hyde Park & Chicago</span>
                 </div>
               </label>
               
-              <label className="flex items-center space-x-3 p-3 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors cursor-pointer group">
+              <label className="flex items-start sm:items-center space-x-3 p-3 sm:p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors cursor-pointer group">
                 <input
                   type="checkbox"
                   checked={interests.includes('delivery')}
                   onChange={(e) => handleInterestChange('delivery', e.target.checked)}
                   disabled={isSubmitting}
-                  className="w-4 h-4 rounded border-amber-300 text-amber-600 focus:ring-2 focus:ring-amber-200 transition-all duration-200"
+                  className="w-5 h-5 sm:w-6 sm:h-6 mt-0.5 sm:mt-0 rounded border-amber-300 text-amber-600 focus:ring-2 focus:ring-amber-200 transition-all duration-200 flex-shrink-0"
                 />
-                <div className="flex items-center space-x-2">
-                  <Leaf className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
-                  <span className="text-sm text-amber-800">Produce box delivery from Black farmers</span>
+                <div className="flex items-center space-x-2 min-w-0">
+                  <Leaf className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 group-hover:scale-110 transition-transform flex-shrink-0" />
+                  <span className="text-sm sm:text-base text-amber-800 leading-relaxed">Produce box delivery from Black farmers</span>
                 </div>
               </label>
             </div>
@@ -203,7 +203,7 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
         <Button
           type="submit"
           disabled={isSubmitting || !email || !zipCode}
-          className={`w-full h-12 font-medium text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 ${
+          className={`w-full h-12 sm:h-14 font-medium text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 ${
             isCTA 
               ? 'bg-white text-amber-700 hover:bg-white/90 border border-amber-200' 
               : 'bg-amber-600 hover:bg-amber-700 text-white'
@@ -211,20 +211,20 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
         >
           {isSubmitting ? (
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-              <span>Saving to Google Sheets...</span>
+              <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm sm:text-base">Saving to Google Sheets...</span>
             </div>
           ) : (
             <div className="flex items-center space-x-2">
-              <Users className="w-4 h-4" />
-              <span>{isCTA ? 'Join Uncle Mays Community' : 'Join Our Community'}</span>
+              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-sm sm:text-base">{isCTA ? 'Join Uncle Mays Community' : 'Join Our Community'}</span>
             </div>
           )}
         </Button>
       </form>
 
       {isHero && (
-        <p className="text-sm text-muted-foreground mt-6 text-center">
+        <p className="text-xs sm:text-sm text-muted-foreground mt-4 sm:mt-6 text-center">
           Supporting Black farmers and community. Unsubscribe anytime.
         </p>
       )}

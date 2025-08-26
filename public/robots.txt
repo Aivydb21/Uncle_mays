@@ -10,3 +10,4 @@ Crawl-delay: 1
 # Disallow admin or private areas (if you add them later)
 # Disallow: /admin/
 # Disallow: /private/
+
