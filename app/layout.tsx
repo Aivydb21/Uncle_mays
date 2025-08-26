@@ -101,29 +101,7 @@ export const metadata: Metadata = {
     canonical: 'https://unclemays.com', // Update with your actual domain
   },
   
-  // Open Graph additional properties
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://unclemays.com', // Update with your actual domain
-    siteName: "UNCLE MAY'S Produce & Provisions",
-    title: "UNCLE MAY'S Produce & Provisions - Supporting Black Farmers",
-    description: "Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local area and Southern United States delivered to your door, while supporting our community. Heritage since 1930.",
-    images: [
-      {
-        url: '/uncle-mays-logo.png', // Your logo for social sharing
-        width: 1200,
-        height: 630,
-        alt: "UNCLE MAY'S Produce & Provisions Logo",
-      },
-      {
-        url: '/hero-farmers.jpg', // Hero image for social sharing
-        width: 1200,
-        height: 630,
-        alt: "Fresh produce from Black farmers",
-      }
-    ],
-  },
+
 }
 
 export default function RootLayout({

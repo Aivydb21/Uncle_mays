@@ -38,8 +38,8 @@ export function FacebookPixel({ pixelId }: FacebookPixelProps) {
       // Add noscript fallback
       const noscript = document.createElement('noscript')
       const img = document.createElement('img')
-      img.height = '1'
-      img.width = '1'
+      img.height = 1
+      img.width = 1
       img.style.display = 'none'
       img.src = `https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`
       noscript.appendChild(img)
