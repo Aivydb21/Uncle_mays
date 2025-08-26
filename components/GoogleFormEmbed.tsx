@@ -25,10 +25,10 @@ export function GoogleFormEmbed({ variant = 'hero', className = '' }: GoogleForm
           <iframe 
             src="https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?embedded=true" 
             width="100%" 
-            height={isHero ? "946" : "600"} 
-            frameBorder="0" 
-            marginHeight="0" 
-            marginWidth="0"
+            height={isHero ? 946 : 600} 
+            frameBorder=0 
+            marginHeight=0 
+            marginWidth=0
             className="rounded-lg shadow-lg border border-border/50"
             title="Uncle Mays Produce Subscription Form"
           >
