@@ -25,6 +25,19 @@ export function GoogleAnalytics({ measurementId }: GoogleAnalyticsProps) {
           gtag('config', '${measurementId}', {
             page_title: 'Uncle Mays Produce - Demand Testing',
             page_location: window.location.href,
+            // Enhanced SEO tracking
+            custom_map: {
+              'custom_parameter_1': 'business_type',
+              'custom_parameter_2': 'location',
+              'custom_parameter_3': 'industry'
+            }
+          });
+          
+          // Set custom dimensions for better analytics
+          gtag('config', '${measurementId}', {
+            business_type: 'Black-Owned Grocery Store',
+            location: 'Chicago, IL',
+            industry: 'Fresh Produce & Community Business'
           });
         `}
       </Script>
@@ -68,3 +81,4 @@ export function useAnalytics() {
     trackPageView,
   }
 }
+

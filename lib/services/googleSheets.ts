@@ -9,13 +9,33 @@ export interface SubscriptionData {
 }
 
 export class GoogleSheetsService {
-  private static sheets = google.sheets({ version: 'v4' })
+  private static sheets: any
   private static spreadsheetId: string
   private static range: string
 
   static initialize(spreadsheetId: string, sheetName: string = 'Sheet1') {
     this.spreadsheetId = spreadsheetId
-    this.range = `${sheetName}!A:F`
+    this.range = sheetName
+    
+    // Set up Google Sheets authentication
+    const auth = new google.auth.GoogleAuth({
+      credentials: {
+        private_key: process.env.GOOGLE_SHEETS_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        client_email: process.env.GOOGLE_SHEETS_CLIENT_EMAIL,
+      },
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    })
+
+    this.sheets = google.sheets({ version: 'v4', auth })
+  }
+
+  // Helper method to get properly formatted range
+  private static getFormattedRange(suffix: string = ''): string {
+    // For Google Sheets API, just use the sheet name without quotes
+    const sheetName = this.range
+    const result = suffix ? `${sheetName}!${suffix}` : sheetName
+    console.log('🔧 Range formatting:', { original: this.range, sheetName, suffix, result })
+    return result
   }
 
   static async createSubscription(data: SubscriptionData): Promise<boolean> {
@@ -60,13 +80,13 @@ export class GoogleSheetsService {
 
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.spreadsheetId,
-        range: this.range
+        range: this.getFormattedRange('A:F')
       })
 
       const rows = response.data.values || []
       
       // Check if email already exists (skip header row)
-      return rows.slice(1).some(row => row[0] === email)
+      return rows.slice(1).some((row: any[]) => row[0] === email)
     } catch (error) {
       console.error('❌ Error checking existing subscription:', error)
       return false
@@ -81,18 +101,18 @@ export class GoogleSheetsService {
 
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.spreadsheetId,
-        range: this.range
+        range: this.getFormattedRange('A:F')
       })
 
       const rows = response.data.values || []
-      const rowIndex = rows.findIndex(row => row[0] === email)
+      const rowIndex = rows.findIndex((row: any[]) => row[0] === email)
       
       if (rowIndex === -1) {
         return false
       }
 
       // Update the row (add 1 because sheets are 1-indexed)
-      const updateRange = `${this.range.split('!')[0]}!A${rowIndex + 1}:F${rowIndex + 1}`
+      const updateRange = `${this.getFormattedRange()}!A${rowIndex + 1}:F${rowIndex + 1}`
       
       const updateValues = [
         [
@@ -130,13 +150,13 @@ export class GoogleSheetsService {
 
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.spreadsheetId,
-        range: this.range
+        range: this.getFormattedRange('A:F')
       })
 
       const rows = response.data.values || []
       
       // Skip header row and convert to SubscriptionData objects
-      return rows.slice(1).map(row => ({
+      return rows.slice(1).map((row: any[]) => ({
         email: row[0] || '',
         zipCode: row[1] || '',
         interests: row[2] ? row[2].split(', ') : [],
@@ -150,3 +170,4 @@ export class GoogleSheetsService {
     }
   }
 }
+

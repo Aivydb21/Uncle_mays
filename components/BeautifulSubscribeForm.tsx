@@ -47,41 +47,47 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
     trackFormSubmission(variant, interests)
 
     try {
-      // Prepare form data for Google Apps Script
-      const formData = new FormData()
-      formData.append('email', email)
-      formData.append('zipCode', zipCode)
-      formData.append('interests', interests.join(', '))
-      formData.append('source', variant)
-      formData.append('timestamp', new Date().toISOString())
-
-      // Submit to Google Apps Script
-      const response = await fetch('https://script.google.com/macros/s/AKfycbxr0sA18La-21spx3hs6mu7-2TEyhgm4AZmg13qguwcOzFE5YaD90gJ5srFFGilMt3ZMw/exec', {
+      // Submit to our local API endpoint
+      const response = await fetch('/api/subscribe', {
         method: 'POST',
-        body: formData,
-        mode: 'no-cors' // Required for Google Apps Script
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          zipCode,
+          interests,
+          source: variant
+        })
       })
 
-      // Since we're using no-cors, we can't read the response
-      // But we'll assume success if no error was thrown
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
       
-      // Success - reset form and show message
-      setSubmitStatus('success')
-      setStatusMessage('Thank you for subscribing! We\'ll keep you updated on Uncle Mays Produce.')
-      
-      // Reset form
-      setEmail('')
-      setZipCode('')
-      setInterests([])
-      
-      // Log the submission
-      console.log('✅ Form submitted successfully to Google Sheets:', {
-        email,
-        zipCode,
-        interests,
-        source: variant,
-        timestamp: new Date().toISOString()
-      })
+      if (result.success) {
+        // Success - reset form and show message
+        setSubmitStatus('success')
+        setStatusMessage(result.message || 'Thank you for subscribing! We\'ll keep you updated on Uncle Mays Produce.')
+        
+        // Reset form
+        setEmail('')
+        setZipCode('')
+        setInterests([])
+        
+        // Log the submission
+        console.log('✅ Form submitted successfully to Google Sheets:', {
+          email,
+          zipCode,
+          interests,
+          source: variant,
+          timestamp: new Date().toISOString()
+        })
+      } else {
+        throw new Error(result.error || 'Failed to subscribe')
+      }
       
     } catch (error) {
       console.error('Form submission error:', error)

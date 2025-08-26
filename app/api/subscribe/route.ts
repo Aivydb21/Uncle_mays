@@ -23,12 +23,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize Google Sheets service
-    const spreadsheetId = process.env.SPREADSHEET_ID
-    const sheetName = process.env.SHEET_NAME || 'Sheet1'
+    const spreadsheetId = process.env.GOOGLE_SHEETS_SPREADSHEET_ID
+    const sheetName = process.env.GOOGLE_SHEETS_SHEET_NAME || 'Sheet1'
     
     if (!spreadsheetId) {
       return NextResponse.json(
-        { error: 'Google Sheets not configured. Please set SPREADSHEET_ID.' },
+        { error: 'Google Sheets not configured. Please set GOOGLE_SHEETS_SPREADSHEET_ID.' },
         { status: 500 }
       )
     }
