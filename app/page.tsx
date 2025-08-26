@@ -352,9 +352,7 @@ export default function ProduceBoxDemandTesting() {
               </CardContent>
             </Card>
           </div>
-          <p className="text-amber-700 mt-12 sm:mt-16 text-lg sm:text-xl px-4">
-            These are test prices to gauge interest. Final pricing will be shared with our community first.
-          </p>
+
         </div>
       </section>
 
