@@ -132,8 +132,8 @@ export default function ProduceBoxDemandTesting() {
         </div>
         
         <div className="relative z-10 max-w-6xl mx-auto text-center">
-          <Badge variant="secondary" className="mb-6 sm:mb-8 lg:mb-10 px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 text-sm sm:text-base font-medium shadow-lg bg-amber-100 text-amber-800 border-amber-200">
-            🌱 Black-Owned • Community-Focused • Farm-Fresh
+          <Badge variant="secondary" className="mb-6 sm:mb-8 lg:mb-10 px-4 sm:px-6 lg:px-8 py-2 sm:py-3 lg:py-4 text-sm sm:text-base font-medium shadow-lg bg-amber-100 text-amber-800 border-amber-200 text-center max-w-full overflow-hidden">
+            Black-Owned • Community-Focused • Farm-Fresh
           </Badge>
           
           {/* Main Branding */}
@@ -170,7 +170,7 @@ export default function ProduceBoxDemandTesting() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 sm:mb-8 text-amber-900">Why UNCLE MAY'S?</h2>
             <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-6 mb-6 sm:mb-8">
               <div className="hidden sm:block w-16 lg:w-20 h-px bg-amber-300"></div>
-              <span className="text-amber-600 text-lg sm:text-xl font-medium">🌾 Heritage & Community 🌾</span>
+              <span className="text-amber-600 text-lg sm:text-xl font-medium">Heritage & Community</span>
               <div className="hidden sm:block w-16 lg:w-20 h-px bg-amber-300"></div>
             </div>
             <p className="text-lg sm:text-xl text-amber-700 max-w-3xl mx-auto leading-relaxed px-4">
@@ -250,7 +250,7 @@ export default function ProduceBoxDemandTesting() {
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 sm:mb-8 text-amber-900">Our Heritage Since 1930</h2>
               <div className="flex flex-col sm:flex-row justify-start items-center sm:space-x-4 mb-6 sm:mb-8 space-y-3 sm:space-y-0">
                 <div className="hidden sm:block w-12 lg:w-16 h-px bg-amber-300"></div>
-                <span className="text-amber-600 text-lg sm:text-xl font-medium">🌾 Generations of Community 🌾</span>
+                <span className="text-amber-600 text-lg sm:text-xl font-medium">Generations of Community</span>
               </div>
               <p className="text-lg sm:text-xl text-amber-700 mb-8 sm:mb-10 leading-relaxed">
                 For nearly a century, Uncle May's has been at the heart of our community, connecting families with 
@@ -293,11 +293,11 @@ export default function ProduceBoxDemandTesting() {
       <section className="py-12 sm:py-16 lg:py-24 px-4 sm:px-6 bg-gradient-to-b from-amber-50/50 to-background">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 sm:mb-8 text-amber-900">Produce Box Options</h2>
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-6 mb-6 sm:mb-8">
-            <div className="hidden sm:block w-12 lg:w-16 h-px bg-amber-300"></div>
-            <span className="text-amber-600 text-lg sm:text-xl font-medium">🌾 Fresh from Black Farmers 🌾</span>
-            <div className="hidden sm:block w-12 lg:w-16 h-px bg-amber-300"></div>
-          </div>
+                      <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-6 mb-6 sm:mb-8">
+              <div className="hidden sm:block w-12 lg:w-16 h-px bg-amber-300"></div>
+              <span className="text-amber-600 text-lg sm:text-xl font-medium">Fresh from Black Farmers</span>
+              <div className="hidden sm:block w-12 lg:w-16 h-px bg-amber-300"></div>
+            </div>
           <p className="text-lg sm:text-xl md:text-2xl text-amber-700 mb-12 sm:mb-16 max-w-3xl mx-auto px-4">Help us understand what works best for your family</p>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 max-w-4xl mx-auto">
@@ -416,11 +416,11 @@ export default function ProduceBoxDemandTesting() {
       <section className="py-12 sm:py-16 lg:py-24 px-4 sm:px-6 bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 sm:mb-8">Join the Movement</h2>
-          <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-6 mb-6 sm:mb-8">
-            <div className="hidden sm:block w-12 lg:w-16 h-px bg-amber-300"></div>
-            <span className="text-amber-200 text-lg sm:text-xl font-medium">🌾 Heritage & Community 🌾</span>
-            <div className="hidden sm:block w-12 lg:w-16 h-px bg-amber-300"></div>
-          </div>
+                      <div className="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-6 mb-6 sm:mb-8">
+              <div className="hidden sm:block w-12 lg:w-16 h-px bg-amber-300"></div>
+              <span className="text-amber-200 text-lg sm:text-xl font-medium">Heritage & Community</span>
+              <div className="hidden sm:block w-12 lg:w-16 h-px bg-amber-300"></div>
+            </div>
           <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-12 sm:mb-16 opacity-95 font-light px-4">
             Be part of building Chicago's first Black American grocery experience. Get notified about pop-ups
             and produce boxes.
