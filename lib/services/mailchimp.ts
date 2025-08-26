@@ -1,21 +1,15 @@
 import mailchimp from '@mailchimp/mailchimp_marketing'
 
-if (!process.env.MAILCHIMP_API_KEY) {
-  throw new Error('MAILCHIMP_API_KEY is required')
-}
+// Only configure Mailchimp if all required environment variables are present
+let mailchimpConfigured = false
 
-if (!process.env.MAILCHIMP_SERVER_PREFIX) {
-  throw new Error('MAILCHIMP_SERVER_PREFIX is required')
+if (process.env.MAILCHIMP_API_KEY && process.env.MAILCHIMP_SERVER_PREFIX && process.env.MAILCHIMP_LIST_ID) {
+  mailchimp.setConfig({
+    apiKey: process.env.MAILCHIMP_API_KEY,
+    server: process.env.MAILCHIMP_SERVER_PREFIX,
+  })
+  mailchimpConfigured = true
 }
-
-if (!process.env.MAILCHIMP_LIST_ID) {
-  throw new Error('MAILCHIMP_LIST_ID is required')
-}
-
-mailchimp.setConfig({
-  apiKey: process.env.MAILCHIMP_API_KEY,
-  server: process.env.MAILCHIMP_SERVER_PREFIX,
-})
 
 export interface MailchimpSubscriber {
   email: string
@@ -27,6 +21,12 @@ export interface MailchimpSubscriber {
 export class MailchimpService {
   static async addSubscriber(data: MailchimpSubscriber): Promise<boolean> {
     try {
+      // Check if Mailchimp is configured
+      if (!mailchimpConfigured) {
+        console.log('⚠️ Mailchimp not configured, skipping subscriber addition')
+        return false
+      }
+
       // Prepare merge fields for Mailchimp
       const mergeFields: any = {
         ZIPCODE: data.zipCode,
