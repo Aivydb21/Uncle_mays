@@ -12,7 +12,6 @@ declare global {
 export function FacebookPixel() {
   const pathname = usePathname()
   const [pixelId, setPixelId] = useState<string | null>(null)
-  const hasTrackedInitialPageView = useRef(false)
 
   useEffect(() => {
     // Fetch pixel ID from API
@@ -49,7 +48,6 @@ export function FacebookPixel() {
         s.parentNode.insertBefore(t,s)}(window, document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '${pixelId}');
-        fbq('track', 'PageView');
       `
       document.head.appendChild(script)
 
@@ -69,13 +67,9 @@ export function FacebookPixel() {
   useEffect(() => {
     if (!pixelId || typeof window === 'undefined' || !window.fbq) return
 
-    // Only track PageView if pixel is loaded and this isn't the initial load
-    // Skip the first call to avoid duplicate PageView on initial load
-    if (window.fbq.loaded && hasTrackedInitialPageView.current) {
+    // Track PageView when pixel is loaded and ready
+    if (window.fbq.loaded) {
       window.fbq('track', 'PageView')
-    } else if (window.fbq.loaded && !hasTrackedInitialPageView.current) {
-      // Mark that we've tracked the initial PageView
-      hasTrackedInitialPageView.current = true
     }
   }, [pathname, pixelId]) // Depend on both for route changes
 
