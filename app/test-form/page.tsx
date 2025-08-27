@@ -43,6 +43,32 @@ export default function TestForm() {
       setEmail('')
       setZipCode('')
       
+      // Track Facebook conversion (Lead event)
+      try {
+        await fetch('/api/facebook-conversions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            eventType: 'lead',
+            eventData: {
+              email: email,
+              content_name: 'Test Form Submission',
+              content_category: 'Test Form',
+              custom_data: {
+                source: 'test-form',
+                zipCode: zipCode
+              }
+            }
+          })
+        })
+        console.log('✅ Facebook conversion event sent successfully')
+      } catch (fbError) {
+        console.warn('⚠️ Facebook conversion tracking failed:', fbError)
+        // Don't fail the form submission if Facebook tracking fails
+      }
+      
     } catch (error) {
       console.error('❌ Form error:', error)
       setStatus(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
@@ -109,4 +135,5 @@ export default function TestForm() {
     </div>
   )
 }
+
 

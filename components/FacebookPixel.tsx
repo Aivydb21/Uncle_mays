@@ -1,11 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
-
-interface FacebookPixelProps {
-  pixelId: string
-}
 
 declare global {
   interface Window {
@@ -13,10 +9,30 @@ declare global {
   }
 }
 
-export function FacebookPixel({ pixelId }: FacebookPixelProps) {
+export function FacebookPixel() {
   const pathname = usePathname()
+  const [pixelId, setPixelId] = useState<string | null>(null)
 
   useEffect(() => {
+    // Fetch pixel ID from API
+    const fetchPixelId = async () => {
+      try {
+        const response = await fetch('/api/facebook-pixel-config')
+        if (response.ok) {
+          const data = await response.json()
+          setPixelId(data.pixelId)
+        }
+      } catch (error) {
+        console.warn('Failed to fetch Facebook Pixel ID:', error)
+      }
+    }
+
+    fetchPixelId()
+  }, [])
+
+  useEffect(() => {
+    if (!pixelId) return
+
     // Initialize Facebook Pixel
     if (typeof window !== 'undefined' && !window.fbq) {
       // Load Facebook Pixel script

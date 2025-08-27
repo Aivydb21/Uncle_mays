@@ -43,51 +43,78 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
     setSubmitStatus('idle')
     setStatusMessage('')
 
-    // Track form submission for analytics
-    trackFormSubmission(variant, interests)
+            // Track form submission for analytics
+        trackFormSubmission(variant, interests)
 
-    try {
-      // Submit to our local API endpoint
-      const response = await fetch('/api/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          zipCode,
-          interests,
-          source: variant
-        })
-      })
+        try {
+          // Submit to our local API endpoint
+          const response = await fetch('/api/subscribe', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email,
+              zipCode,
+              interests,
+              source: variant
+            })
+          })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+          }
 
-      const result = await response.json()
-      
-      if (result.success) {
-        // Success - reset form and show message
-        setSubmitStatus('success')
-        setStatusMessage(result.message || 'Thank you for subscribing! We\'ll keep you updated on Uncle Mays Produce.')
-        
-        // Reset form
-        setEmail('')
-        setZipCode('')
-        setInterests([])
-        
-        // Log the submission
-        console.log('✅ Form submitted successfully to Google Sheets:', {
-          email,
-          zipCode,
-          interests,
-          source: variant,
-          timestamp: new Date().toISOString()
-        })
-      } else {
-        throw new Error(result.error || 'Failed to subscribe')
-      }
+          const result = await response.json()
+          
+          if (result.success) {
+            // Success - reset form and show message
+            setSubmitStatus('success')
+            setStatusMessage(result.message || 'Thank you for subscribing! We\'ll keep you updated on Uncle Mays Produce.')
+            
+            // Reset form
+            setEmail('')
+            setZipCode('')
+            setInterests([])
+            
+            // Track Facebook conversion (Lead event)
+            try {
+              await fetch('/api/facebook-conversions', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  eventType: 'lead',
+                  eventData: {
+                    email: email,
+                    content_name: 'Newsletter Subscription',
+                    content_category: variant === 'hero' ? 'Hero Form' : 'CTA Form',
+                    custom_data: {
+                      interests: interests.join(', '),
+                      zipCode: zipCode,
+                      source: variant
+                    }
+                  }
+                })
+              })
+              console.log('✅ Facebook conversion event sent successfully')
+            } catch (fbError) {
+              console.warn('⚠️ Facebook conversion tracking failed:', fbError)
+              // Don't fail the form submission if Facebook tracking fails
+            }
+            
+            // Log the submission
+            console.log('✅ Form submitted successfully to Google Sheets:', {
+              email,
+              zipCode,
+              interests,
+              source: variant,
+              timestamp: new Date().toISOString()
+            })
+          } else {
+            throw new Error(result.error || 'Failed to subscribe')
+          }
       
     } catch (error) {
       console.error('Form submission error:', error)
