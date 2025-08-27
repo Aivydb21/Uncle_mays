@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -296,6 +297,14 @@ export default function ProduceBoxDemandTesting() {
           </div>
           <div className="border-t border-amber-200 mt-12 pt-8 text-center text-sm text-amber-600">
             © 2025 UNCLE MAY'S Produce. Building community through fresh, local produce since 1930.
+            <div className="mt-4">
+              <Link 
+                href="/privacy-policy" 
+                className="text-amber-600 hover:text-amber-800 underline transition-colors duration-200"
+              >
+                Privacy Policy
+              </Link>
+            </div>
           </div>
         </div>
       </footer>
