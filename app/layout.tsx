@@ -10,6 +10,18 @@ export const metadata: Metadata = {
   title: "UNCLE MAY'S Produce & Provisions - Supporting Black Farmers",
   description: "Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local area and Southern United States delivered to your door, while supporting our community. Heritage since 1930.",
   
+  // Favicon and App Icons
+  icons: {
+    icon: [
+      { url: '/uncle-mays-logo.png', sizes: '32x32', type: 'image/png' },
+      { url: '/uncle-mays-logo.png', sizes: '16x16', type: 'image/png' }
+    ],
+    apple: [
+      { url: '/uncle-mays-logo.png', sizes: '180x180', type: 'image/png' }
+    ],
+    shortcut: '/uncle-mays-logo.png'
+  },
+  
   // Viewport for mobile responsiveness
   viewport: {
     width: 'device-width',
