@@ -5,7 +5,8 @@ import { BeautifulSubscribeForm } from "@/components/BeautifulSubscribeForm"
 
 import Image from "next/image"
 
-export default function ProduceBoxDemandTesting() {
+export default function Home() {
+  // Test deployment - Vercel deployment test
   return (
     <>
       {/* Structured Data for SEO and Social Media */}
