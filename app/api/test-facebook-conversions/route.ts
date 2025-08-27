@@ -6,25 +6,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { testEventCode } = body
 
-    // Create a test purchase event similar to your sample payload
+    // Create a test purchase event that matches the FacebookConversionEvent interface
     const testEvent = {
       event_name: 'Purchase',
       event_time: Math.floor(Date.now() / 1000),
       action_source: 'website',
       user_data: {
-        em: ['7b17fb0bd173f625b58636fb796407c22b3d16fc78302d79f0fd30c2fc2fc068'],
-        ph: [null]
-      },
-      attribution_data: {
-        attribution_share: '0.3'
+        em: ['7b17fb0bd173f625b58636fb796407c22b3d16fc78302d79f0fd30c2fc2fc068']
       },
       custom_data: {
         currency: 'USD',
-        value: '142.52'
-      },
-      original_event_data: {
-        event_name: 'Purchase',
-        event_time: Math.floor(Date.now() / 1000)
+        value: '142.52',
+        content_name: 'Test Purchase',
+        content_category: 'Test'
       }
     }
 
