@@ -10,16 +10,20 @@ export const metadata: Metadata = {
   title: "UNCLE MAY'S Produce & Provisions - Supporting Black Farmers",
   description: "Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local area and Southern United States delivered to your door, while supporting our community. Heritage since 1930.",
   
-  // Favicon and App Icons
+  // Favicon and App Icons - Multiple formats for maximum compatibility
   icons: {
     icon: [
-      { url: '/uncle-mays-logo.png', sizes: '32x32', type: 'image/png' },
-      { url: '/uncle-mays-logo.png', sizes: '16x16', type: 'image/png' }
+      { url: '/uncle-mays-logo.png', sizes: 'any', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '16x16 32x32', type: 'image/x-icon' }
     ],
     apple: [
       { url: '/uncle-mays-logo.png', sizes: '180x180', type: 'image/png' }
     ],
-    shortcut: '/uncle-mays-logo.png'
+    shortcut: '/favicon.ico',
+    other: [
+      { rel: 'icon', url: '/favicon.ico', sizes: '16x16 32x32', type: 'image/x-icon' },
+      { rel: 'icon', url: '/uncle-mays-logo.png', sizes: 'any', type: 'image/png' }
+    ]
   },
   
   // Viewport for mobile responsiveness
@@ -131,6 +135,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Explicit favicon links for maximum browser compatibility */}
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/uncle-mays-logo.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/uncle-mays-logo.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/uncle-mays-logo.png" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+      </head>
       <body className={inter.className}>
         {children}
         <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ''} />
