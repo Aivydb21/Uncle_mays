@@ -1,228 +1,148 @@
-interface FacebookConversionEvent {
-  event_name: string
-  event_time: number
-  action_source: string
-  user_data: {
-    em?: string[]
-    ph?: string[]
-    external_id?: string[]
-    client_ip_address?: string
-    client_user_agent?: string
-    fbc?: string
-    fbp?: string
-  }
-  custom_data?: {
-    currency?: string
-    value?: string | number
-    content_name?: string
-    content_category?: string
-    content_ids?: string[]
-    content_type?: string
-    [key: string]: any
-  }
-  event_source_url?: string
-  event_id?: string
+interface FacebookConversionData {
+  eventType: string
+  eventData: any
 }
 
-interface FacebookConversionsPayload {
-  data: FacebookConversionEvent[]
-  access_token: string
-  test_event_code?: string
+interface FacebookAPIResponse {
+  success: boolean
+  message?: string
+  error?: string
 }
 
 export class FacebookConversionsAPI {
   private accessToken: string
   private pixelId: string
-  private baseUrl = 'https://graph.facebook.com/v18.0'
 
-  constructor(accessToken: string, pixelId: string) {
-    this.accessToken = accessToken
-    this.pixelId = pixelId
+  constructor() {
+    this.accessToken = process.env.FACEBOOK_ACCESS_TOKEN || ''
+    this.pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || ''
   }
 
-  private async sendEvent(payload: FacebookConversionsPayload): Promise<any> {
-    const url = `${this.baseUrl}/${this.pixelId}/events`
-    
+  private async sendToFacebookAPI(eventData: any): Promise<FacebookAPIResponse> {
+    if (!this.accessToken || !this.pixelId) {
+      throw new Error('Facebook access token or pixel ID not configured')
+    }
+
     try {
-      console.log('Sending Facebook event to:', url)
-      console.log('Payload:', JSON.stringify(payload, null, 2))
-      
-      const response = await fetch(url, {
+      const response = await fetch(`https://graph.facebook.com/v18.0/${this.pixelId}/events`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          access_token: this.accessToken,
+          data: [eventData]
+        })
       })
 
-      const responseText = await response.text()
-      console.log('Facebook API response status:', response.status)
-      console.log('Facebook API response body:', responseText)
-
       if (!response.ok) {
-        throw new Error(`Facebook API error: ${response.status} ${response.statusText}: ${responseText}`)
+        const errorText = await response.text()
+        throw new Error(`Facebook API error: ${response.status} - ${errorText}`)
       }
 
-      const result = responseText ? JSON.parse(responseText) : {}
-      return result
+      const result = await response.json()
+      return { success: true, message: 'Event sent successfully', ...result }
     } catch (error) {
-      console.error('Error sending Facebook conversion event:', error)
-      throw error
+      console.error('Facebook API error:', error)
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      }
     }
   }
 
-  // Hash email for privacy using SHA256
-  private async hashEmail(email: string): Promise<string> {
-    const encoder = new TextEncoder()
-    const data = encoder.encode(email.toLowerCase().trim())
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-    const hashArray = Array.from(new Uint8Array(hashBuffer))
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-    return hashHex
-  }
-
-  // Send a purchase event
-  async trackPurchase(data: {
-    email: string
-    value: number
-    currency?: string
-    content_ids?: string[]
-    content_name?: string
-    content_category?: string
-    event_id?: string
-    fbc?: string
-    fbp?: string
-  }): Promise<any> {
-    const hashedEmail = await this.hashEmail(data.email)
-    
-    const event: FacebookConversionEvent = {
+  async trackPurchase(eventData: any): Promise<FacebookAPIResponse> {
+    const facebookEvent = {
       event_name: 'Purchase',
       event_time: Math.floor(Date.now() / 1000),
       action_source: 'website',
+      event_source_url: eventData.event_source_url || 'https://unclemays.com',
       user_data: {
-        em: [hashedEmail],
-        fbc: data.fbc,
-        fbp: data.fbp,
+        em: eventData.email ? this.hashEmail(eventData.email) : undefined,
+        ph: eventData.phone ? this.hashPhone(eventData.phone) : undefined,
+        external_id: eventData.external_id,
+        client_ip_address: eventData.client_ip_address,
+        client_user_agent: eventData.client_user_agent,
+        fbc: eventData.fbc,
+        fbp: eventData.fbp
       },
       custom_data: {
-        currency: data.currency || 'USD',
-        value: data.value.toString(),
-        content_ids: data.content_ids,
-        content_name: data.content_name,
-        content_category: data.content_category,
-      },
-      event_id: data.event_id,
+        value: eventData.value || 0,
+        currency: eventData.currency || 'USD',
+        content_name: eventData.content_name || 'Produce Box',
+        content_category: eventData.content_category || 'Groceries',
+        content_ids: eventData.content_ids || [],
+        content_type: eventData.content_type || 'product',
+        delivery_category: eventData.delivery_category || 'home_delivery'
+      }
     }
 
-    const payload: FacebookConversionsPayload = {
-      data: [event],
-      access_token: this.accessToken,
-    }
-
-    return this.sendEvent(payload)
+    return this.sendToFacebookAPI(facebookEvent)
   }
 
-  // Send a lead event
-  async trackLead(data: {
-    email: string
-    value?: number
-    currency?: string
-    content_name?: string
-    content_category?: string
-    event_id?: string
-    fbc?: string
-    fbp?: string
-  }): Promise<any> {
-    const hashedEmail = await this.hashEmail(data.email)
-    
-    const event: FacebookConversionEvent = {
+  async trackLead(eventData: any): Promise<FacebookAPIResponse> {
+    const facebookEvent = {
       event_name: 'Lead',
       event_time: Math.floor(Date.now() / 1000),
       action_source: 'website',
+      event_source_url: eventData.event_source_url || 'https://unclemays.com',
       user_data: {
-        em: [hashedEmail],
-        fbc: data.fbc,
-        fbp: data.fbp,
+        em: eventData.email ? this.hashEmail(eventData.email) : undefined,
+        ph: eventData.phone ? this.hashPhone(eventData.phone) : undefined,
+        external_id: eventData.external_id,
+        client_ip_address: eventData.client_ip_address,
+        client_user_agent: eventData.client_user_agent,
+        fbc: eventData.fbc,
+        fbp: eventData.fbp
       },
       custom_data: {
-        currency: data.currency || 'USD',
-        value: data.value?.toString() || '0',
-        content_name: data.content_name,
-        content_category: data.content_category,
-      },
-      event_id: data.event_id,
+        value: eventData.value || 1.00,
+        currency: eventData.currency || 'USD',
+        content_name: eventData.content_name || 'Newsletter Subscription',
+        content_category: eventData.content_category || 'Lead Generation',
+        content_ids: eventData.content_ids || [],
+        content_type: eventData.content_type || 'product_group'
+      }
     }
 
-    const payload: FacebookConversionsPayload = {
-      data: [event],
-      access_token: this.accessToken,
-    }
-
-    return this.sendEvent(payload)
+    return this.sendToFacebookAPI(facebookEvent)
   }
 
-  // Send a custom event
-  async trackCustomEvent(data: {
-    event_name: string
-    email?: string
-    value?: number
-    currency?: string
-    custom_data?: Record<string, any>
-    event_id?: string
-    fbc?: string
-    fbp?: string
-  }): Promise<any> {
-    const hashedEmail = data.email ? await this.hashEmail(data.email) : undefined
-    
-    const event: FacebookConversionEvent = {
-      event_name: data.event_name,
+  async trackCustomEvent(eventData: any): Promise<FacebookAPIResponse> {
+    const facebookEvent = {
+      event_name: eventData.event_name || 'CustomEvent',
       event_time: Math.floor(Date.now() / 1000),
       action_source: 'website',
+      event_source_url: eventData.event_source_url || 'https://unclemays.com',
       user_data: {
-        em: hashedEmail ? [hashedEmail] : undefined,
-        fbc: data.fbc,
-        fbp: data.fbp,
+        em: eventData.email ? this.hashEmail(eventData.email) : undefined,
+        ph: eventData.phone ? this.hashPhone(eventData.phone) : undefined,
+        external_id: eventData.external_id,
+        client_ip_address: eventData.client_ip_address,
+        client_user_agent: eventData.client_user_agent,
+        fbc: eventData.fbc,
+        fbp: eventData.fbp
       },
-      custom_data: {
-        currency: data.currency || 'USD',
-        value: data.value?.toString(),
-        ...data.custom_data,
-      },
-      event_id: data.event_id,
+      custom_data: eventData.custom_data || {}
     }
 
-    const payload: FacebookConversionsPayload = {
-      data: [event],
-      access_token: this.accessToken,
-    }
-
-    return this.sendEvent(payload)
+    return this.sendToFacebookAPI(facebookEvent)
   }
 
-  // Test event (for development)
-  async testEvent(event: FacebookConversionEvent, testEventCode: string): Promise<any> {
-    const payload: FacebookConversionsPayload = {
-      data: [event],
-      access_token: this.accessToken,
-      test_event_code: testEventCode,
-    }
+  // Simple hashing functions for user data (in production, use proper cryptographic hashing)
+  private hashEmail(email: string): string {
+    // This is a simple hash for demo purposes
+    // In production, use proper SHA256 hashing
+    return btoa(email.toLowerCase().trim())
+  }
 
-    return this.sendEvent(payload)
+  private hashPhone(phone: string): string {
+    // This is a simple hash for demo purposes
+    // In production, use proper SHA256 hashing
+    return btoa(phone.replace(/\D/g, ''))
   }
 }
 
-// Utility function to create the service instance
 export function createFacebookConversionsAPI(): FacebookConversionsAPI {
-  const accessToken = process.env.FACEBOOK_ACCESS_TOKEN
-  const pixelId = process.env.FACEBOOK_PIXEL_ID
-
-  if (!accessToken) {
-    throw new Error('FACEBOOK_ACCESS_TOKEN environment variable is required')
-  }
-
-  if (!pixelId) {
-    throw new Error('FACEBOOK_PIXEL_ID environment variable is required')
-  }
-
-  return new FacebookConversionsAPI(accessToken, pixelId)
+  return new FacebookConversionsAPI()
 }

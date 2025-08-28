@@ -146,7 +146,7 @@ export default function RootLayout({
       <body className={inter.className}>
         {children}
         <GoogleAnalytics measurementId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ''} />
-        <FacebookPixel />
+        <FacebookPixel pixelId={process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || ''} />
       </body>
     </html>
   )

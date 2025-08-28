@@ -1,7 +1,11 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+
+interface FacebookPixelProps {
+  pixelId: string
+}
 
 declare global {
   interface Window {
@@ -9,32 +13,11 @@ declare global {
   }
 }
 
-export function FacebookPixel() {
+export function FacebookPixel({ pixelId }: FacebookPixelProps) {
   const pathname = usePathname()
-  const [pixelId, setPixelId] = useState<string | null>(null)
 
   useEffect(() => {
-    // Fetch pixel ID from API
-    const fetchPixelId = async () => {
-      try {
-        const response = await fetch('/api/facebook-pixel-config')
-        if (response.ok) {
-          const data = await response.json()
-          setPixelId(data.pixelId)
-        }
-      } catch (error) {
-        console.warn('Failed to fetch Facebook Pixel ID:', error)
-      }
-    }
-
-    fetchPixelId()
-  }, [])
-
-  // Initialize Facebook Pixel (only once)
-  useEffect(() => {
-    if (!pixelId) return
-
-    // Initialize Facebook Pixel only if not already initialized
+    // Initialize Facebook Pixel
     if (typeof window !== 'undefined' && !window.fbq) {
       // Load Facebook Pixel script
       const script = document.createElement('script')
@@ -48,6 +31,7 @@ export function FacebookPixel() {
         s.parentNode.insertBefore(t,s)}(window, document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '${pixelId}');
+        fbq('track', 'PageView');
       `
       document.head.appendChild(script)
 
@@ -61,17 +45,12 @@ export function FacebookPixel() {
       noscript.appendChild(img)
       document.head.appendChild(noscript)
     }
-  }, [pixelId]) // Only depend on pixelId, not pathname
 
-  // Track page view on route change (separate effect)
-  useEffect(() => {
-    if (!pixelId || typeof window === 'undefined' || !window.fbq) return
-
-    // Track PageView when pixel is loaded and ready
-    if (window.fbq.loaded) {
+    // Track page view on route change
+    if (typeof window !== 'undefined' && window.fbq) {
       window.fbq('track', 'PageView')
     }
-  }, [pathname, pixelId]) // Depend on both for route changes
+  }, [pixelId, pathname])
 
   // Track custom events
   const trackEvent = (eventName: string, parameters?: any) => {
