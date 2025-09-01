@@ -146,3 +146,4 @@ export class FacebookConversionsAPI {
 export function createFacebookConversionsAPI(): FacebookConversionsAPI {
   return new FacebookConversionsAPI()
 }
+

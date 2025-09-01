@@ -1,6 +1,11 @@
 User-agent: *
 Allow: /
 
+# Prevent test and debug pages from being indexed
+Disallow: /test-facebook/
+Disallow: /test-form/
+Disallow: /api/
+
 # Sitemap location
 Sitemap: https://unclemays.com/sitemap.xml
 
