@@ -1,17 +1,21 @@
 import Link from 'next/link'
-import Head from 'next/head'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: "Privacy Policy - UNCLE MAY'S Produce & Provisions",
+  description: "Privacy policy for UNCLE MAY'S Produce & Provisions. Learn how we protect your personal information and data privacy.",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  alternates: {
+    canonical: 'https://unclemays.com/privacy-policy',
+  },
+}
 
 export default function PrivacyPolicyPage() {
   return (
-    <>
-      <Head>
-        <title>Privacy Policy - UNCLE MAY'S Produce & Provisions</title>
-        <meta name="description" content="Privacy policy for UNCLE MAY'S Produce & Provisions. Learn how we protect your personal information and data privacy." />
-        <meta name="robots" content="index, follow" />
-        <link rel="canonical" href="https://unclemays.com/privacy-policy" />
-      </Head>
-      
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
@@ -119,7 +123,6 @@ export default function PrivacyPolicyPage() {
           </div>
         </div>
       </div>
-    </>
   )
 }
 

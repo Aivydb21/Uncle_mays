@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Head from 'next/head'
 
 export default function TestForm() {
   const [email, setEmail] = useState('')
@@ -79,15 +78,7 @@ export default function TestForm() {
   }
 
   return (
-    <>
-      <Head>
-        <title>Form Test Page - UNCLE MAY'S Produce</title>
-        <meta name="description" content="Test subscription form functionality for UNCLE MAY'S Produce & Provisions. Debug form submissions and API integration." />
-        <meta name="robots" content="noindex, nofollow" />
-        <link rel="canonical" href="https://unclemays.com/test-form" />
-      </Head>
-      
-      <div className="min-h-screen bg-amber-50 py-12 px-4">
+    <div className="min-h-screen bg-amber-50 py-12 px-4">
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold text-amber-900 mb-6">Form Test Page</h1>
           
@@ -142,7 +133,6 @@ export default function TestForm() {
           </div>
         </div>
       </div>
-    </>
   )
 }
 

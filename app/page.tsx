@@ -5,6 +5,26 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Leaf, Star, CheckCircle, MapPin, Users } from "lucide-react"
 import { BeautifulSubscribeForm } from "@/components/BeautifulSubscribeForm"
+import { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "UNCLE MAY'S Produce & Provisions - Supporting Black Farmers",
+  description: "Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local area and Southern United States delivered to your door, while supporting our community. Heritage since 1930.",
+  alternates: {
+    canonical: 'https://unclemays.com/',
+  },
+  openGraph: {
+    title: "UNCLE MAY'S Produce & Provisions - Supporting Black Farmers",
+    description: "Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local area and Southern United States delivered to your door, while supporting our community. Heritage since 1930.",
+    url: 'https://unclemays.com/',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "UNCLE MAY'S Produce & Provisions - Supporting Black Farmers",
+    description: "Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local area and Southern United States delivered to your door, while supporting our community. Heritage since 1930.",
+  },
+}
 
 export default function ProduceBoxDemandTesting() {
   return (

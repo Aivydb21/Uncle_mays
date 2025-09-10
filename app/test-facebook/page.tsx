@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Head from 'next/head'
 
 export default function TestFacebookPage() {
   const [testEventCode, setTestEventCode] = useState('')
@@ -46,15 +45,7 @@ export default function TestFacebookPage() {
   }
 
   return (
-    <>
-      <Head>
-        <title>Facebook Conversions Test - UNCLE MAY'S Produce</title>
-        <meta name="description" content="Test Facebook conversion tracking for UNCLE MAY'S Produce & Provisions. Debug and verify Facebook pixel events." />
-        <meta name="robots" content="noindex, nofollow" />
-        <link rel="canonical" href="https://unclemays.com/test-facebook" />
-      </Head>
-      
-      <div className="min-h-screen bg-amber-50 py-12 px-4">
+    <div className="min-h-screen bg-amber-50 py-12 px-4">
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold text-amber-900 mb-6">Facebook Conversions API Test</h1>
           
@@ -127,7 +118,6 @@ export default function TestFacebookPage() {
           </div>
         </div>
       </div>
-    </>
   )
 }
 

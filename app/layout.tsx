@@ -121,9 +121,7 @@ export const metadata: Metadata = {
   },
   
   // Additional SEO meta tags
-  alternates: {
-    canonical: 'https://unclemays.com', // Update with your actual domain
-  },
+  // Note: Individual pages should set their own canonical URLs
   
 
 }
