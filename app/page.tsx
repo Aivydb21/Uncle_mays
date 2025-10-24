@@ -312,12 +312,6 @@ export default function ProduceBoxDemandTesting() {
                         >
                           <span className="text-lg font-medium">LinkedIn</span>
                         </a>
-            <a 
-              href="mailto:info@unclemays.com"
-              className="text-amber-600 hover:text-amber-800 transition-colors duration-200"
-            >
-              <span className="text-lg font-medium">Email</span>
-            </a>
           </div>
           
           
@@ -336,6 +330,12 @@ export default function ProduceBoxDemandTesting() {
               >
                 Investor Portal
               </Link>
+              <a 
+                href="mailto:info@unclemays.com"
+                className="text-amber-600 hover:text-amber-800 underline transition-colors duration-200"
+              >
+                Contact Us
+              </a>
             </div>
           </div>
         </div>
