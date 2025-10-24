@@ -91,7 +91,7 @@ export default function ProduceBoxDemandTesting() {
         <div className="max-w-4xl mx-auto mt-16">
           <div className="relative rounded-2xl overflow-hidden shadow-2xl">
             <img 
-              src="/hero-woman-selecting-produce.jpg" 
+              src="/hero-woman-selecting-produce.png" 
               alt="A young woman carefully selecting fresh produce at Uncle May's Produce" 
               className="w-full h-96 md:h-[500px] object-cover"
             />
@@ -114,7 +114,7 @@ export default function ProduceBoxDemandTesting() {
           <div className="max-w-4xl mx-auto mb-16">
             <div className="relative rounded-2xl overflow-hidden shadow-xl">
               <img 
-                src="/store-interior.jpg" 
+                src="/store-interior.png" 
                 alt="Interior of Uncle May's Produce store with fresh produce displays" 
                 className="w-full h-80 md:h-96 object-cover"
               />
