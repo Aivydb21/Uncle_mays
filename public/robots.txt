@@ -4,7 +4,6 @@ Allow: /
 # Prevent test and debug pages from being indexed
 Disallow: /test-facebook/
 Disallow: /test-form/
-Disallow: /investors/
 Disallow: /api/
 
 # Sitemap location
