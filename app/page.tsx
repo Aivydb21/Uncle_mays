@@ -88,7 +88,7 @@ export default function ProduceBoxDemandTesting() {
         </div>
         
         {/* Hero Visual */}
-        <div className="max-w-4xl mx-auto mt-16">
+        <div className="max-w-3xl mx-auto mt-16">
           <div className="relative rounded-2xl overflow-hidden shadow-2xl">
             <img 
               src="/hero-woman-selecting-produce.jpg" 
@@ -112,7 +112,7 @@ export default function ProduceBoxDemandTesting() {
           </div>
           
           {/* Store Visual */}
-          <div className="max-w-4xl mx-auto mb-16">
+          <div className="max-w-3xl mx-auto mb-16">
             <div className="relative rounded-2xl overflow-hidden shadow-xl">
               <img 
                 src="/store-interior.jpg" 
@@ -174,7 +174,7 @@ export default function ProduceBoxDemandTesting() {
           </div>
           
           {/* Heritage Visual */}
-          <div className="max-w-3xl mx-auto mb-16">
+          <div className="max-w-2xl mx-auto mb-16">
             <div className="relative rounded-2xl overflow-hidden shadow-xl">
               <img 
                 src="/gardener-heritage.jpg" 
