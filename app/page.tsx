@@ -93,7 +93,7 @@ export default function ProduceBoxDemandTesting() {
             <img 
               src="/hero-woman-selecting-produce.png" 
               alt="A young woman carefully selecting fresh produce at Uncle May's Produce" 
-              className="w-full h-96 md:h-[500px] object-cover"
+              className="w-full h-80 sm:h-96 md:h-[450px] lg:h-[500px] xl:h-[600px] object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
           </div>
@@ -116,7 +116,7 @@ export default function ProduceBoxDemandTesting() {
               <img 
                 src="/store-interior.png" 
                 alt="Interior of Uncle May's Produce store with fresh produce displays" 
-                className="w-full h-80 md:h-96 object-cover"
+                className="w-full h-72 sm:h-80 md:h-96 lg:h-[400px] xl:h-[450px] object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
             </div>
