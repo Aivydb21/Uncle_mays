@@ -35,7 +35,7 @@ export default function ProduceBoxDemandTesting() {
       <section className="relative bg-gradient-to-b from-amber-50 via-yellow-50 to-background py-24 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <Badge variant="secondary" className="mb-8 px-6 py-3 text-sm font-medium shadow-sm bg-amber-100 text-amber-800 border-amber-200">
-            🌱 Black-Owned • Community-Focused • Farm-Fresh
+            Black-Owned • Community-Focused • Farm-Fresh
           </Badge>
           
           {/* Main Headline */}
