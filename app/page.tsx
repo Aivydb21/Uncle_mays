@@ -140,20 +140,6 @@ export default function ProduceBoxDemandTesting() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <div className="text-center p-6 bg-amber-50 rounded-xl border border-amber-200">
-              <div className="text-3xl font-bold text-amber-900 mb-2">100%</div>
-              <p className="text-amber-700 font-medium">sourced from local Black growers and makers</p>
-            </div>
-            <div className="text-center p-6 bg-amber-50 rounded-xl border border-amber-200">
-              <div className="text-3xl font-bold text-amber-900 mb-2">Chicago</div>
-              <p className="text-amber-700 font-medium">launch in progress</p>
-            </div>
-            <div className="text-center p-6 bg-amber-50 rounded-xl border border-amber-200">
-              <div className="text-3xl font-bold text-amber-900 mb-2">$25,000</div>
-              <p className="text-amber-700 font-medium">awarded by World Business Chicago's TechRise competition</p>
-            </div>
-          </div>
 
           <div className="text-center mb-12">
             <blockquote className="text-xl text-amber-800 italic max-w-3xl mx-auto leading-relaxed">
