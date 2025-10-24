@@ -27,21 +27,6 @@ export default function ProduceBoxDemandTesting() {
             </div>
           </div>
           
-          {/* Investor Portal Button */}
-          <div className="flex items-center">
-            <Button 
-              asChild
-              variant="outline"
-              className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400 px-6 py-2"
-            >
-              <Link 
-                href="/investors"
-                className="flex items-center space-x-2"
-              >
-                <span>💼 Investor Portal</span>
-              </Link>
-            </Button>
-          </div>
           
         </div>
       </header>
@@ -331,6 +316,22 @@ export default function ProduceBoxDemandTesting() {
             >
               <span className="text-lg font-medium">Email</span>
             </a>
+          </div>
+          
+          {/* Investor Portal Button */}
+          <div className="text-center mb-8">
+            <Button
+              asChild
+              variant="outline"
+              className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400 px-6 py-2"
+            >
+              <Link
+                href="/investors"
+                className="flex items-center space-x-2"
+              >
+                <span>💼 Investor Portal</span>
+              </Link>
+            </Button>
           </div>
           
           <div className="border-t border-amber-200 pt-8 text-center text-sm text-amber-600">
