@@ -18,12 +18,11 @@ export default function ProduceBoxDemandTesting() {
           <div className="flex items-center space-x-4 mb-4 md:mb-0">
             {/* Logo/Brand Area */}
             <div className="text-center md:text-left">
-              <div className="text-3xl md:text-4xl font-bold text-amber-900 tracking-wider">
-                UNCLE MAY'S
-              </div>
-              <div className="text-sm md:text-base text-amber-700 font-medium">
-                Produce & Provisions
-              </div>
+              <img 
+                src="/uncle-mays-logo.png" 
+                alt="UNCLE MAY'S Produce & Provisions" 
+                className="h-16 md:h-20 w-auto object-contain"
+              />
             </div>
           </div>
           
@@ -292,6 +291,11 @@ export default function ProduceBoxDemandTesting() {
       <footer className="py-16 px-4 border-t border-amber-200 bg-gradient-to-b from-amber-50/50 to-background">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
+            <img 
+              src="/uncle-mays-logo.png" 
+              alt="UNCLE MAY'S Produce & Provisions" 
+              className="h-12 w-auto object-contain mx-auto mb-4"
+            />
             <h3 className="font-semibold mb-4 text-amber-900 text-lg">Follow Uncle May's Produce</h3>
             <p className="text-sm text-amber-700 leading-relaxed max-w-2xl mx-auto">
               Follow Uncle May's Produce as we build Chicago's next neighborhood grocery experience.
