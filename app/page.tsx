@@ -278,7 +278,7 @@ export default function ProduceBoxDemandTesting() {
           </div>
           
           <p className="text-sm text-amber-600 max-w-2xl mx-auto">
-            Backed by Chicago food innovation, community development, and retail experts.
+            Backed by Chicago's premier food institutions and networks.
           </p>
         </div>
       </section>
