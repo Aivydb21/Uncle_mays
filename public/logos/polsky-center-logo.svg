@@ -1,11 +1,13 @@
 <svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
-  <text x="100" y="30" text-anchor="middle" fill="#8B0000" font-family="Arial, sans-serif" font-size="24" font-weight="bold">
-    POLSKY CENTER
-  </text>
-  <text x="100" y="50" text-anchor="middle" fill="#333" font-family="Arial, sans-serif" font-size="12">
-    University of Chicago
-  </text>
-  <text x="100" y="65" text-anchor="middle" fill="#666" font-family="Arial, sans-serif" font-size="10">
-    Entrepreneurship & Innovation
-  </text>
+  <g>
+    <text x="100" y="25" text-anchor="middle" fill="#8B0000" font-family="Arial, sans-serif" font-size="18" font-weight="bold">
+      POLSKY CENTER
+    </text>
+    <text x="100" y="45" text-anchor="middle" fill="#333333" font-family="Arial, sans-serif" font-size="10">
+      University of Chicago
+    </text>
+    <text x="100" y="60" text-anchor="middle" fill="#666666" font-family="Arial, sans-serif" font-size="8">
+      Entrepreneurship &amp; Innovation
+    </text>
+  </g>
 </svg>
