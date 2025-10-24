@@ -317,14 +317,14 @@ export default function ProduceBoxDemandTesting() {
             >
               <span className="text-lg font-medium">Instagram</span>
             </a>
-            <a 
-              href="https://linkedin.com/company/unclemaysproduce" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-amber-600 hover:text-amber-800 transition-colors duration-200"
-            >
-              <span className="text-lg font-medium">LinkedIn</span>
-            </a>
+                        <a
+                          href="https://www.linkedin.com/company/108028133/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-amber-600 hover:text-amber-800 transition-colors duration-200"
+                        >
+                          <span className="text-lg font-medium">LinkedIn</span>
+                        </a>
             <a 
               href="mailto:info@unclemays.com"
               className="text-amber-600 hover:text-amber-800 transition-colors duration-200"
