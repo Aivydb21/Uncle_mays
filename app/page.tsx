@@ -205,9 +205,6 @@ export default function ProduceBoxDemandTesting() {
               </CardContent>
             </Card>
           </div>
-          <p className="text-amber-700 mt-12 text-lg">
-            These are test prices to gauge interest. Final pricing will be shared with our community first.
-          </p>
         </div>
       </section>
 
@@ -296,14 +293,6 @@ export default function ProduceBoxDemandTesting() {
                 Chicago's first Black American grocery store, connecting our community with Black farmers
                 across the local area and Southern United States.
               </p>
-            </div>
-            <div>
-              <h4 className="font-medium mb-4 text-amber-900">Our Mission</h4>
-              <div className="space-y-3 text-sm text-amber-700">
-                <div>Supporting Black Farmers</div>
-                <div>Community Impact</div>
-                <div>Fresh Local Produce</div>
-              </div>
             </div>
           </div>
           <div className="border-t border-amber-200 mt-12 pt-8 text-center text-sm text-amber-600">
