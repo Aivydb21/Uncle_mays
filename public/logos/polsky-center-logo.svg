@@ -1,17 +1,12 @@
 <svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
   <rect width="200" height="80" fill="white"/>
-  <text x="100" y="25" text-anchor="middle" fill="black" font-family="Arial, sans-serif" font-size="28" font-weight="bold">
-    POLSKY
+  <text x="100" y="30" text-anchor="middle" fill="black" font-family="Arial, sans-serif" font-size="24" font-weight="bold">
+    POLSKY CENTER
   </text>
-  <text x="100" y="40" text-anchor="middle" fill="black" font-family="Arial, sans-serif" font-size="10">
-    Center for Entrepreneurship and Innovation
+  <text x="100" y="50" text-anchor="middle" fill="#666" font-family="Arial, sans-serif" font-size="12">
+    University of Chicago
   </text>
-  <line x1="20" y1="45" x2="180" y2="45" stroke="red" stroke-width="1"/>
-  <text x="100" y="60" text-anchor="middle" fill="red" font-family="Arial, sans-serif" font-size="10" font-weight="bold">
-    THE UNIVERSITY OF CHICAGO
+  <text x="100" y="65" text-anchor="middle" fill="#666" font-family="Arial, sans-serif" font-size="10">
+    Entrepreneurship & Innovation
   </text>
-  <!-- Stylized O with stripes -->
-  <circle cx="100" cy="25" r="12" fill="none" stroke="black" stroke-width="3"/>
-  <line x1="94" y1="19" x2="106" y2="31" stroke="red" stroke-width="2"/>
-  <line x1="94" y1="31" x2="106" y2="19" stroke="#1e40af" stroke-width="2"/>
 </svg>

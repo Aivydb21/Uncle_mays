@@ -320,30 +320,21 @@ export default function ProduceBoxDemandTesting() {
             </a>
           </div>
           
-          {/* Investor Portal Button */}
-          <div className="text-center mb-8">
-            <Button
-              asChild
-              variant="outline"
-              className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400 px-6 py-2"
-            >
-              <Link
-                href="/investors"
-                className="flex items-center space-x-2"
-              >
-                <span>💼 Investor Portal</span>
-              </Link>
-            </Button>
-          </div>
           
           <div className="border-t border-amber-200 pt-8 text-center text-sm text-amber-600">
             © 2025 UNCLE MAY'S Produce. Building community through fresh, local produce.
-            <div className="mt-4">
+            <div className="mt-4 flex justify-center space-x-6">
               <Link 
                 href="/privacy-policy" 
                 className="text-amber-600 hover:text-amber-800 underline transition-colors duration-200"
               >
                 Privacy Policy
+              </Link>
+              <Link 
+                href="/investors" 
+                className="text-amber-600 hover:text-amber-800 underline transition-colors duration-200"
+              >
+                Investor Portal
               </Link>
             </div>
           </div>
