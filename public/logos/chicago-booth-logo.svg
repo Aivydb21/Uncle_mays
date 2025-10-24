@@ -1,0 +1,23 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="80" fill="white"/>
+  <text x="50" y="20" text-anchor="middle" fill="black" font-family="Arial, sans-serif" font-size="12" font-weight="bold">
+    CHICAGO BOOTH
+  </text>
+  <text x="120" y="20" text-anchor="middle" fill="#666" font-family="Arial, sans-serif" font-size="10">
+    Rustandy Center
+  </text>
+  <text x="120" y="32" text-anchor="middle" fill="#666" font-family="Arial, sans-serif" font-size="8">
+    for Social Sector Innovation
+  </text>
+  <!-- Crest icon -->
+  <rect x="60" y="8" width="8" height="8" fill="#666"/>
+  <!-- Color bar -->
+  <rect x="20" y="40" width="160" height="8" fill="url(#colorGradient)"/>
+  <defs>
+    <linearGradient id="colorGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#16a34a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#eab308;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

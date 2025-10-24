@@ -245,19 +245,35 @@ export default function ProduceBoxDemandTesting() {
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-16 text-amber-900">Recognized by</h2>
           
-          {/* Placeholder for logos - you can add actual logo images here */}
+          {/* Organization Logos */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center mb-8">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 w-full h-24 flex items-center justify-center">
-              <span className="text-amber-700 font-semibold text-sm">Polsky Center</span>
+            <div className="bg-white border border-amber-200 rounded-lg p-4 w-full h-24 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+              <img 
+                src="/logos/polsky-center-logo.svg" 
+                alt="Polsky Center for Entrepreneurship and Innovation - The University of Chicago"
+                className="max-h-16 w-auto object-contain"
+              />
             </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 w-full h-24 flex items-center justify-center">
-              <span className="text-amber-700 font-semibold text-sm">World Business Chicago</span>
+            <div className="bg-white border border-amber-200 rounded-lg p-4 w-full h-24 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+              <img 
+                src="/logos/world-business-chicago-logo.svg" 
+                alt="World Business Chicago"
+                className="max-h-16 w-auto object-contain"
+              />
             </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 w-full h-24 flex items-center justify-center">
-              <span className="text-amber-700 font-semibold text-sm">TechRise</span>
+            <div className="bg-white border border-amber-200 rounded-lg p-4 w-full h-24 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+              <img 
+                src="/logos/techrise-logo.svg" 
+                alt="TechRise Powered by P33"
+                className="max-h-16 w-auto object-contain"
+              />
             </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 w-full h-24 flex items-center justify-center">
-              <span className="text-amber-700 font-semibold text-sm">Naturally Chicago</span>
+            <div className="bg-white border border-amber-200 rounded-lg p-4 w-full h-24 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow">
+              <img 
+                src="/logos/naturally-chicago-logo.svg" 
+                alt="Naturally Chicago"
+                className="max-h-16 w-auto object-contain"
+              />
             </div>
           </div>
           
