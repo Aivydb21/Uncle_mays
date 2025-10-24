@@ -25,10 +25,7 @@ export default function ProduceBoxDemandTesting() {
               />
               <div className="text-center md:text-left">
                 <div className="text-2xl md:text-3xl font-bold text-amber-900 tracking-wider">
-                  UNCLE MAY'S
-                </div>
-                <div className="text-sm md:text-base text-amber-700 font-medium">
-                  Produce & Provisions
+                  UNCLE MAY'S PRODUCE
                 </div>
               </div>
             </div>
