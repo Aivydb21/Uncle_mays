@@ -86,6 +86,18 @@ export default function ProduceBoxDemandTesting() {
             </div>
           </div>
         </div>
+        
+        {/* Hero Visual */}
+        <div className="max-w-4xl mx-auto mt-16">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+            <img 
+              src="/hero-woman-selecting-produce.jpg" 
+              alt="A young woman carefully selecting fresh produce at Uncle May's Produce" 
+              className="w-full h-96 md:h-[500px] object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+          </div>
+        </div>
       </section>
 
       {/* What We're Building Section */}
@@ -96,6 +108,18 @@ export default function ProduceBoxDemandTesting() {
             <p className="text-lg text-amber-700 max-w-3xl mx-auto leading-relaxed">
               Uncle May's Produce is a modern neighborhood grocery experience. We source from Black farmers and food makers and bring that food directly to you — through curated produce boxes and seasonal pop-up markets in your neighborhood.
             </p>
+          </div>
+          
+          {/* Store Visual */}
+          <div className="max-w-4xl mx-auto mb-16">
+            <div className="relative rounded-2xl overflow-hidden shadow-xl">
+              <img 
+                src="/store-interior.jpg" 
+                alt="Interior of Uncle May's Produce store with fresh produce displays" 
+                className="w-full h-80 md:h-96 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+            </div>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8 mb-12">
@@ -145,6 +169,18 @@ export default function ProduceBoxDemandTesting() {
             <p className="text-lg text-amber-700 max-w-3xl mx-auto leading-relaxed">
               Big grocery chains are not serving our neighborhoods with the quality, dignity, and ownership we deserve. Uncle May's is changing that by building a grocery model that keeps value in the community — from soil to shelf.
             </p>
+          </div>
+          
+          {/* Heritage Visual */}
+          <div className="max-w-3xl mx-auto mb-16">
+            <div className="relative rounded-2xl overflow-hidden shadow-xl">
+              <img 
+                src="/gardener-heritage.jpg" 
+                alt="An older Black man tending to his garden, representing the heritage and community connection of Uncle May's Produce" 
+                className="w-full h-80 md:h-96 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+            </div>
           </div>
           
 
