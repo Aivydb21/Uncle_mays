@@ -94,26 +94,29 @@ export default function ProduceBoxDemandTesting() {
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-10 mb-12">
-            <div className="text-center">
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="bg-white border border-amber-200 rounded-xl p-8 text-center shadow-sm hover:shadow-md transition-shadow">
               <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
                 <Leaf className="w-8 h-8 text-amber-700" />
               </div>
               <h3 className="text-lg font-semibold text-amber-900 mb-3">Fresh produce grown by Black farmers</h3>
+              <p className="text-amber-700 text-sm leading-relaxed">Directly sourced from local Black growers, ensuring the freshest quality while supporting our community's agricultural heritage.</p>
             </div>
 
-            <div className="text-center">
+            <div className="bg-white border border-amber-200 rounded-xl p-8 text-center shadow-sm hover:shadow-md transition-shadow">
               <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
                 <Users className="w-8 h-8 text-amber-700" />
               </div>
               <h3 className="text-lg font-semibold text-amber-900 mb-3">Prepared foods + culturally-rooted flavors</h3>
+              <p className="text-amber-700 text-sm leading-relaxed">Authentic recipes and prepared foods that celebrate our cultural traditions and bring families together around the table.</p>
             </div>
 
-            <div className="text-center">
+            <div className="bg-white border border-amber-200 rounded-xl p-8 text-center shadow-sm hover:shadow-md transition-shadow">
               <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
                 <MapPin className="w-8 h-8 text-amber-700" />
               </div>
               <h3 className="text-lg font-semibold text-amber-900 mb-3">Circulating dollars back into our community</h3>
+              <p className="text-amber-700 text-sm leading-relaxed">Every purchase strengthens our local economy, creating jobs and opportunities that benefit our neighborhoods directly.</p>
             </div>
           </div>
 
