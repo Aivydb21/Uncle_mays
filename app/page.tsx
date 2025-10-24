@@ -41,7 +41,7 @@ export default function ProduceBoxDemandTesting() {
           {/* Main Headline */}
           <div className="mb-8">
             <h1 className="text-5xl md:text-7xl font-bold text-amber-900 mb-6 leading-tight">
-              Fresh. Local. Ours.
+              Black Farmers. Fresh Food. Your Door.
             </h1>
             <p className="text-xl md:text-2xl text-amber-800 mb-4 max-w-3xl mx-auto leading-relaxed font-medium">
               Be first to get Uncle May's Produce — curated boxes from Black farmers and limited pop-up market events across Chicago.
