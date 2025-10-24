@@ -44,15 +44,6 @@ export default function ProduceBoxDemandTesting() {
             </div>
           </div>
           
-          {/* Heritage Badge */}
-          <div className="flex items-center space-x-3">
-            <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200 px-3 py-1">
-              🌾 Since 1930
-            </Badge>
-            <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200 px-3 py-1">
-              🏘️ Hyde Park
-            </Badge>
-          </div>
         </div>
       </header>
 
