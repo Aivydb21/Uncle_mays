@@ -51,14 +51,12 @@ export default function ProduceBoxDemandTesting() {
               variant="outline"
               className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:border-amber-400 px-6 py-2"
             >
-              <a 
-                href="https://publuu.com/flip-book/996063/2195625" 
-                target="_blank" 
-                rel="noopener noreferrer"
+              <Link 
+                href="/investors"
                 className="flex items-center space-x-2"
               >
                 <span>💼 Investor Portal</span>
-              </a>
+              </Link>
             </Button>
           </div>
           
