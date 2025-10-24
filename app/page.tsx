@@ -1,3 +1,5 @@
+'use client'
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -5,26 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Leaf, Star, CheckCircle, MapPin, Users } from "lucide-react"
 import { BeautifulSubscribeForm } from "@/components/BeautifulSubscribeForm"
-import { Metadata } from "next"
 
-export const metadata: Metadata = {
-  title: "UNCLE MAY'S Produce & Provisions - Supporting Black Farmers",
-  description: "Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local area and Southern United States delivered to your door, while supporting our community. Heritage since 1930.",
-  alternates: {
-    canonical: 'https://unclemays.com/',
-  },
-  openGraph: {
-    title: "UNCLE MAY'S Produce & Provisions - Supporting Black Farmers",
-    description: "Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local area and Southern United States delivered to your door, while supporting our community. Heritage since 1930.",
-    url: 'https://unclemays.com/',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: "UNCLE MAY'S Produce & Provisions - Supporting Black Farmers",
-    description: "Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local area and Southern United States delivered to your door, while supporting our community. Heritage since 1930.",
-  },
-}
 
 export default function ProduceBoxDemandTesting() {
   return (
@@ -70,249 +53,288 @@ export default function ProduceBoxDemandTesting() {
             🌱 Black-Owned • Community-Focused • Farm-Fresh
           </Badge>
           
-          {/* Main Branding */}
+          {/* Main Headline */}
           <div className="mb-8">
-            <h1 className="text-5xl md:text-7xl font-bold text-amber-900 mb-4 leading-tight tracking-wider">
-              UNCLE MAY'S
+            <h1 className="text-5xl md:text-7xl font-bold text-amber-900 mb-6 leading-tight">
+              Fresh. Local. Ours.
             </h1>
-            <div className="text-3xl md:text-4xl font-bold text-amber-700 mb-2">
-              Produce & Provisions
-            </div>
-            <div className="text-xl md:text-2xl font-semibold text-amber-600">
-              Supporting Black Farmers
-            </div>
+            <p className="text-xl md:text-2xl text-amber-800 mb-4 max-w-3xl mx-auto leading-relaxed font-medium">
+              Be first to get Uncle May's Produce — curated boxes from Black farmers and limited pop-up market events across Chicago.
+            </p>
+            <p className="text-lg text-amber-700 mb-12 max-w-2xl mx-auto">
+              We're launching soon. Tell us how you want in.
+            </p>
           </div>
-          
-          <p className="text-xl md:text-2xl text-amber-800 mb-12 max-w-3xl mx-auto leading-relaxed font-light">
-            Chicago's first Black American grocery store. Get fresh produce from Black farmers across the local
-            area and Southern United States delivered to your door, while supporting our community.
-          </p>
 
-          {/* Beautiful Custom Form */}
-          <div className="bg-white/80 backdrop-blur-sm p-10 rounded-2xl shadow-xl max-w-2xl mx-auto mb-16 border border-amber-200">
-            <BeautifulSubscribeForm variant="hero" />
+          {/* CTA Buttons */}
+          <div className="space-y-4 mb-16">
+            <Button 
+              size="lg"
+              className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              onClick={() => {
+                // Track hero CTA click
+                if (typeof window !== 'undefined' && (window as any).gtag) {
+                  (window as any).gtag('event', 'hero_cta_click', {
+                    event_category: 'engagement',
+                    event_label: 'Join Early Access List'
+                  });
+                }
+                // Scroll to signup form
+                document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Join the Early Access List →
+            </Button>
+            <div>
+              <button 
+                className="text-amber-600 hover:text-amber-800 text-sm font-medium underline transition-colors duration-200"
+                onClick={() => {
+                  document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+              >
+                See how it works ↓
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Value Proposition Cards */}
+      {/* What We're Building Section */}
       <section className="py-20 px-4 bg-gradient-to-b from-amber-50/30 to-background">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-amber-900">Why UNCLE MAY'S?</h2>
-            <div className="flex justify-center items-center space-x-4 mb-6">
-              <div className="w-16 h-px bg-amber-300"></div>
-              <span className="text-amber-600 text-lg">🌾 Heritage & Community 🌾</span>
-              <div className="w-16 h-px bg-amber-300"></div>
-            </div>
-            <p className="text-lg text-amber-700 max-w-2xl mx-auto">
-              Building on nearly a century of tradition, we're bringing fresh produce and community connection to Hyde Park
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-amber-900">What we're building</h2>
+            <p className="text-lg text-amber-700 max-w-3xl mx-auto leading-relaxed">
+              Uncle May's Produce is a modern neighborhood grocery experience. We source from Black farmers and food makers and bring that food directly to you — through curated produce boxes and seasonal pop-up markets in your neighborhood.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-10">
-            <Card className="text-center border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white/80">
+          <div className="grid md:grid-cols-3 gap-10 mb-12">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
+                <Leaf className="w-8 h-8 text-amber-700" />
+              </div>
+              <h3 className="text-lg font-semibold text-amber-900 mb-3">Fresh produce grown by Black farmers</h3>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
+                <Users className="w-8 h-8 text-amber-700" />
+              </div>
+              <h3 className="text-lg font-semibold text-amber-900 mb-3">Prepared foods + culturally-rooted flavors</h3>
+            </div>
+
+            <div className="text-center">
+              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
+                <MapPin className="w-8 h-8 text-amber-700" />
+              </div>
+              <h3 className="text-lg font-semibold text-amber-900 mb-3">Circulating dollars back into our community</h3>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <button 
+              className="text-amber-600 hover:text-amber-800 font-medium underline transition-colors duration-200"
+              onClick={() => {
+                document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Get Early Access →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Why This Matters Section */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-amber-900">Why this matters</h2>
+            <p className="text-lg text-amber-700 max-w-3xl mx-auto leading-relaxed">
+              Big grocery chains are not serving our neighborhoods with the quality, dignity, and ownership we deserve. Uncle May's is changing that by building a grocery model that keeps value in the community — from soil to shelf.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="text-center p-6 bg-amber-50 rounded-xl border border-amber-200">
+              <div className="text-3xl font-bold text-amber-900 mb-2">100%</div>
+              <p className="text-amber-700 font-medium">sourced from local Black growers and makers</p>
+            </div>
+            <div className="text-center p-6 bg-amber-50 rounded-xl border border-amber-200">
+              <div className="text-3xl font-bold text-amber-900 mb-2">Chicago</div>
+              <p className="text-amber-700 font-medium">launch in progress</p>
+            </div>
+            <div className="text-center p-6 bg-amber-50 rounded-xl border border-amber-200">
+              <div className="text-3xl font-bold text-amber-900 mb-2">$25,000</div>
+              <p className="text-amber-700 font-medium">awarded by World Business Chicago's TechRise competition</p>
+            </div>
+          </div>
+
+          <div className="text-center mb-12">
+            <blockquote className="text-xl text-amber-800 italic max-w-3xl mx-auto leading-relaxed">
+              "We're not asking for permission from grocery chains. We're building our own supply chain."
+            </blockquote>
+            <cite className="text-amber-600 font-medium mt-4 block">– Anthony Ivy, Founder & CEO</cite>
+          </div>
+
+          <div className="text-center">
+            <Button 
+              size="lg"
+              className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              onClick={() => {
+                document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Notify Me When You Launch →
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works - Two Offers */}
+      <section id="how-it-works" className="py-20 px-4 bg-gradient-to-b from-amber-50/50 to-background">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 text-amber-900">How it works</h2>
+            <p className="text-lg text-amber-700 max-w-2xl mx-auto">
+              Choose how you want to experience Uncle May's. We're building both options based on your demand.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Produce Box Card */}
+            <Card className="border-2 border-amber-200 shadow-xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <CardHeader className="pb-6">
-                <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
-                  <Users className="w-8 h-8 text-amber-700" />
+                <CardTitle className="text-2xl text-amber-900">The Uncle May's Produce Box</CardTitle>
+                <CardDescription className="text-base text-amber-700 leading-relaxed">
+                  A rotating box of fresh produce and goods from Black farmers and food makers. Limited drops. Pick up or local delivery.
+                </CardDescription>
+                <div className="mt-4">
+                  <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                    First drop is invite-only
+                  </Badge>
                 </div>
-                <CardTitle className="text-xl text-amber-900">Supporting Black Farmers</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base text-amber-700 leading-relaxed">
-                  Every purchase directly supports Black farmers from Chicago and across the Southern United States,
-                  building wealth within our community.
-                </CardDescription>
+                <button 
+                  className="text-amber-600 hover:text-amber-800 font-medium underline transition-colors duration-200"
+                  onClick={() => {
+                    document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  I want a box →
+                </button>
               </CardContent>
             </Card>
 
-            <Card className="text-center border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white/80">
+            {/* Pop-Up Markets Card */}
+            <Card className="border-2 border-amber-200 shadow-xl bg-white hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
               <CardHeader className="pb-6">
-                <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
-                  <MapPin className="w-8 h-8 text-amber-700" />
+                <CardTitle className="text-2xl text-amber-900">Pop-Up Grocery Events</CardTitle>
+                <CardDescription className="text-base text-amber-700 leading-relaxed">
+                  Seasonal markets, tastings, and prepared food — meet the growers, shop culturally-rooted staples, and feel the full Uncle May's experience.
+                </CardDescription>
+                <div className="mt-4">
+                  <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+                    South Side locations first
+                  </Badge>
                 </div>
-                <CardTitle className="text-xl text-amber-900">Hyde Park & Beyond</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base text-amber-700 leading-relaxed">
-                  Starting in Hyde Park, Chicago, we're building the first scalable Black American grocery experience
-                  with pop-ups and delivery.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white/80">
-              <CardHeader className="pb-6">
-                <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-amber-200">
-                  <Leaf className="w-8 h-8 text-amber-700" />
-                </div>
-                <CardTitle className="text-xl text-amber-900">Farm Fresh Quality</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-base text-amber-700 leading-relaxed">
-                  Handpicked seasonal produce from trusted Black-owned farms, delivered fresh to preserve flavor,
-                  nutrition, and cultural heritage.
-                </CardDescription>
+                <button 
+                  className="text-amber-600 hover:text-amber-800 font-medium underline transition-colors duration-200"
+                  onClick={() => {
+                    document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                >
+                  Tell me when you're live →
+                </button>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* Pricing Preview */}
-      <section className="py-20 px-4 bg-gradient-to-b from-amber-50/50 to-background">
+      {/* Recognized By Section */}
+      <section className="py-20 px-4 bg-white">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-amber-900">Produce Box Options</h2>
-          <div className="flex justify-center items-center space-x-4 mb-6">
-            <div className="w-12 h-px bg-amber-300"></div>
-            <span className="text-amber-600 text-lg">🌾 Fresh from Black Farmers 🌾</span>
-            <div className="w-12 h-px bg-amber-300"></div>
+          <h2 className="text-4xl md:text-5xl font-bold mb-16 text-amber-900">Recognized by</h2>
+          
+          {/* Placeholder for logos - you can add actual logo images here */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center justify-items-center mb-8">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 w-full h-24 flex items-center justify-center">
+              <span className="text-amber-700 font-semibold text-sm">Polsky Center</span>
+            </div>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 w-full h-24 flex items-center justify-center">
+              <span className="text-amber-700 font-semibold text-sm">World Business Chicago</span>
+            </div>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 w-full h-24 flex items-center justify-center">
+              <span className="text-amber-700 font-semibold text-sm">TechRise</span>
+            </div>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 w-full h-24 flex items-center justify-center">
+              <span className="text-amber-700 font-semibold text-sm">Naturally Chicago</span>
+            </div>
           </div>
-          <p className="text-xl text-amber-700 mb-12 max-w-2xl mx-auto">Help us understand what works best for your family</p>
-          <div className="grid md:grid-cols-2 gap-10 max-w-3xl mx-auto">
-            <Card className="relative border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white/80">
-              <CardHeader className="pb-6">
-                <CardTitle className="text-2xl text-amber-900">Community Box</CardTitle>
-                <div className="text-4xl font-bold text-amber-600 mb-2">$25</div>
-                <CardDescription className="text-base text-amber-700">Perfect for 1-2 people</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                  <span className="text-sm text-amber-700">5-7 seasonal items from Black farmers</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                  <span className="text-sm text-amber-700">Traditional Southern recipes included</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                  <span className="text-sm text-amber-700">Chicago area delivery</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="relative border-2 border-amber-400 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-b from-amber-50/50 to-white/80">
-              <Badge className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-amber-600 text-white px-4 py-2 text-sm font-medium shadow-lg">
-                Most Interest
-              </Badge>
-              <CardHeader className="pb-6">
-                <CardTitle className="text-2xl text-amber-900">Family Heritage Box</CardTitle>
-                <div className="text-4xl font-bold text-amber-600 mb-2">$45</div>
-                <CardDescription className="text-base text-amber-700">Great for 3-5 people</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                  <span className="text-sm text-amber-700">10-12 seasonal items from Black farmers</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                  <span className="text-sm text-amber-700">Traditional Southern recipes included</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                  <span className="text-sm text-amber-700">Chicago area delivery</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
-                  <span className="text-sm text-amber-700">Farmer spotlight stories</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          
+          <p className="text-sm text-amber-600 max-w-2xl mx-auto">
+            Backed by Chicago food innovation, community development, and retail experts.
+          </p>
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="py-20 px-4">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-16 text-amber-900">Our Community Speaks</h2>
-          <div className="grid md:grid-cols-3 gap-10">
-            <Card className="border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white/80">
-              <CardContent className="pt-8">
-                <div className="flex justify-center mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-500 text-amber-500 mx-0.5" />
-                  ))}
-                </div>
-                <p className="text-base mb-6 text-amber-700 leading-relaxed italic">
-                  "Finally, a way to support Black farmers while getting amazing fresh produce. This is what our
-                  community needs!"
-                </p>
-                <div className="text-base font-semibold text-amber-900">Keisha J.</div>
-                <div className="text-sm text-amber-600">Hyde Park Resident</div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white/80">
-              <CardContent className="pt-8">
-                <div className="flex justify-center mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-500 text-amber-500 mx-0.5" />
-                  ))}
-                </div>
-                <p className="text-base mb-6 text-amber-700 leading-relaxed italic">
-                  "Love the mission and the quality. It's about time we had something like this in Chicago. Can't wait
-                  for the pop-ups!"
-                </p>
-                <div className="text-base font-semibold text-amber-900">Marcus T.</div>
-                <div className="text-sm text-amber-600">South Side Chicago</div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-amber-200 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white/80">
-              <CardContent className="pt-8">
-                <div className="flex justify-center mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-500 text-amber-500 mx-0.5" />
-                  ))}
-                </div>
-                <p className="text-base mb-6 text-amber-700 leading-relaxed italic">
-                  "The produce reminds me of my grandmother's garden down South. Supporting Black farmers feels so
-                  good."
-                </p>
-                <div className="text-base font-semibold text-amber-900">Angela M.</div>
-                <div className="text-sm text-amber-600">Community Member</div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="py-20 px-4 bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 text-white">
+      {/* Signup Form Section */}
+      <section id="signup-form" className="py-20 px-4 bg-gradient-to-br from-amber-600 via-amber-700 to-amber-800 text-white">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">Join the Movement</h2>
-          <div className="flex justify-center items-center space-x-4 mb-6">
-            <div className="w-12 h-px bg-amber-300"></div>
-            <span className="text-amber-200 text-lg">🌾 Heritage & Community 🌾</span>
-            <div className="w-12 h-px bg-amber-300"></div>
-          </div>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">Be the first to shop with us</h2>
           <p className="text-xl md:text-2xl mb-12 opacity-95 font-light">
-            Be part of building Chicago's first Black American grocery experience. Get notified about pop-ups
-            and produce boxes.
+            Sign up for early access to produce boxes and pop-up locations. No cost today. We'll reach out before the next drop goes live.
           </p>
           <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl max-w-2xl mx-auto border border-amber-300/30">
             <BeautifulSubscribeForm variant="cta" />
           </div>
+          <p className="text-sm text-amber-200 mt-6 max-w-xl mx-auto">
+            We'll only email you about launch dates, pickup locations, and box availability. No spam.
+          </p>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="py-16 px-4 border-t border-amber-200 bg-gradient-to-b from-amber-50/50 to-background">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-10">
-            <div>
-              <h3 className="font-semibold mb-6 text-amber-900 text-lg">UNCLE MAY'S Produce</h3>
-              <p className="text-sm text-amber-700 leading-relaxed">
-                Chicago's first Black American grocery store, connecting our community with Black farmers
-                across the local area and Southern United States.
-              </p>
-            </div>
+          <div className="text-center mb-8">
+            <h3 className="font-semibold mb-4 text-amber-900 text-lg">Follow Uncle May's Produce</h3>
+            <p className="text-sm text-amber-700 leading-relaxed max-w-2xl mx-auto">
+              Follow Uncle May's Produce as we build Chicago's next neighborhood grocery experience.
+            </p>
           </div>
-          <div className="border-t border-amber-200 mt-12 pt-8 text-center text-sm text-amber-600">
-            © 2025 UNCLE MAY'S Produce. Building community through fresh, local produce since 1930.
+          
+          <div className="flex justify-center space-x-6 mb-8">
+            <a 
+              href="https://instagram.com/unclemaysproduce" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-amber-600 hover:text-amber-800 transition-colors duration-200"
+            >
+              <span className="text-lg font-medium">Instagram</span>
+            </a>
+            <a 
+              href="https://linkedin.com/company/unclemaysproduce" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-amber-600 hover:text-amber-800 transition-colors duration-200"
+            >
+              <span className="text-lg font-medium">LinkedIn</span>
+            </a>
+            <a 
+              href="mailto:info@unclemays.com"
+              className="text-amber-600 hover:text-amber-800 transition-colors duration-200"
+            >
+              <span className="text-lg font-medium">Email</span>
+            </a>
+          </div>
+          
+          <div className="border-t border-amber-200 pt-8 text-center text-sm text-amber-600">
+            © 2025 UNCLE MAY'S Produce. Building community through fresh, local produce.
             <div className="mt-4">
               <Link 
                 href="/privacy-policy" 

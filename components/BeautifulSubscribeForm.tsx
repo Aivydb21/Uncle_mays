@@ -13,6 +13,7 @@ interface BeautifulSubscribeFormProps {
 }
 
 export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: BeautifulSubscribeFormProps) {
+  const [firstName, setFirstName] = useState('')
   const [email, setEmail] = useState('')
   const [zipCode, setZipCode] = useState('')
   const [interests, setInterests] = useState<string[]>([])
@@ -33,7 +34,7 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!email || !zipCode) {
+    if (!firstName || !email || !zipCode) {
       setSubmitStatus('error')
       setStatusMessage('Please fill in all required fields.')
       return
@@ -54,6 +55,7 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+              firstName,
               email,
               zipCode,
               interests,
@@ -70,9 +72,10 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
           if (result.success) {
             // Success - reset form and show message
             setSubmitStatus('success')
-            setStatusMessage(result.message || 'Thank you for subscribing! We\'ll keep you updated on Uncle Mays Produce.')
+            setStatusMessage(result.message || 'Locked in. You\'ll get first notice before we open slots in your area.')
             
             // Reset form
+            setFirstName('')
             setEmail('')
             setZipCode('')
             setInterests([])
@@ -106,6 +109,7 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
             
             // Log the submission
             console.log('✅ Form submitted successfully to Google Sheets:', {
+              firstName,
               email,
               zipCode,
               interests,
@@ -161,9 +165,23 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
           </div>
         )}
 
+        {/* First Name Input */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-amber-900">First Name *</label>
+          <Input
+            type="text"
+            placeholder="Enter your first name"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+            disabled={isSubmitting}
+            className="w-full h-12 sm:h-14 text-base border-amber-200 focus:border-amber-400 focus:ring-2 focus:ring-amber-200 transition-all duration-200"
+          />
+        </div>
+
         {/* Email Input */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-amber-900">Email Address *</label>
+          <label className="text-sm font-medium text-amber-900">Email *</label>
           <Input
             type="email"
             placeholder="Enter your email address"
@@ -177,10 +195,10 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
         
         {/* Zip Code Input */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-amber-900">Zip Code *</label>
+          <label className="text-sm font-medium text-amber-900">ZIP Code *</label>
           <Input
             type="text"
-            placeholder="Enter your zip code"
+            placeholder="Enter your ZIP code"
             value={zipCode}
             onChange={(e) => setZipCode(e.target.value)}
             required
@@ -191,45 +209,57 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
         </div>
 
         {/* Interests Section */}
-        {isHero && (
+        <div className="space-y-3">
+          <label className="text-sm font-medium text-amber-900">Interest:</label>
           <div className="space-y-3">
-            <label className="text-sm font-medium text-amber-900">I'm interested in:</label>
-            <div className="space-y-3">
-              <label className="flex items-start sm:items-center space-x-3 p-3 sm:p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={interests.includes('popups')}
-                  onChange={(e) => handleInterestChange('popups', e.target.checked)}
-                  disabled={isSubmitting}
-                  className="w-5 h-5 sm:w-6 sm:h-6 mt-0.5 sm:mt-0 rounded border-amber-300 text-amber-600 focus:ring-2 focus:ring-amber-200 transition-all duration-200 flex-shrink-0"
-                />
-                <div className="flex items-center space-x-2 min-w-0">
-                  <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 group-hover:scale-110 transition-transform flex-shrink-0" />
-                  <span className="text-sm sm:text-base text-amber-800 leading-relaxed">Pop-up store notifications in Hyde Park & Chicago</span>
-                </div>
-              </label>
-              
-              <label className="flex items-start sm:items-center space-x-3 p-3 sm:p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors cursor-pointer group">
-                <input
-                  type="checkbox"
-                  checked={interests.includes('delivery')}
-                  onChange={(e) => handleInterestChange('delivery', e.target.checked)}
-                  disabled={isSubmitting}
-                  className="w-5 h-5 sm:w-6 sm:h-6 mt-0.5 sm:mt-0 rounded border-amber-300 text-amber-600 focus:ring-2 focus:ring-amber-200 transition-all duration-200 flex-shrink-0"
-                />
-                <div className="flex items-center space-x-2 min-w-0">
-                  <Leaf className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 group-hover:scale-110 transition-transform flex-shrink-0" />
-                  <span className="text-sm sm:text-base text-amber-800 leading-relaxed">Produce box delivery from Black farmers</span>
-                </div>
-              </label>
-            </div>
+            <label className="flex items-start sm:items-center space-x-3 p-3 sm:p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={interests.includes('produce-box')}
+                onChange={(e) => handleInterestChange('produce-box', e.target.checked)}
+                disabled={isSubmitting}
+                className="w-5 h-5 sm:w-6 sm:h-6 mt-0.5 sm:mt-0 rounded border-amber-300 text-amber-600 focus:ring-2 focus:ring-amber-200 transition-all duration-200 flex-shrink-0"
+              />
+              <div className="flex items-center space-x-2 min-w-0">
+                <Leaf className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 group-hover:scale-110 transition-transform flex-shrink-0" />
+                <span className="text-sm sm:text-base text-amber-800 leading-relaxed">Produce Box</span>
+              </div>
+            </label>
+            
+            <label className="flex items-start sm:items-center space-x-3 p-3 sm:p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={interests.includes('pop-up-market')}
+                onChange={(e) => handleInterestChange('pop-up-market', e.target.checked)}
+                disabled={isSubmitting}
+                className="w-5 h-5 sm:w-6 sm:h-6 mt-0.5 sm:mt-0 rounded border-amber-300 text-amber-600 focus:ring-2 focus:ring-amber-200 transition-all duration-200 flex-shrink-0"
+              />
+              <div className="flex items-center space-x-2 min-w-0">
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 group-hover:scale-110 transition-transform flex-shrink-0" />
+                <span className="text-sm sm:text-base text-amber-800 leading-relaxed">Pop-Up Market</span>
+              </div>
+            </label>
+
+            <label className="flex items-start sm:items-center space-x-3 p-3 sm:p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={interests.includes('both')}
+                onChange={(e) => handleInterestChange('both', e.target.checked)}
+                disabled={isSubmitting}
+                className="w-5 h-5 sm:w-6 sm:h-6 mt-0.5 sm:mt-0 rounded border-amber-300 text-amber-600 focus:ring-2 focus:ring-amber-200 transition-all duration-200 flex-shrink-0"
+              />
+              <div className="flex items-center space-x-2 min-w-0">
+                <Users className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 group-hover:scale-110 transition-transform flex-shrink-0" />
+                <span className="text-sm sm:text-base text-amber-800 leading-relaxed">Both</span>
+              </div>
+            </label>
           </div>
-        )}
+        </div>
 
         {/* Submit Button */}
         <Button
           type="submit"
-          disabled={isSubmitting || !email || !zipCode}
+          disabled={isSubmitting || !firstName || !email || !zipCode}
           className={`w-full h-12 sm:h-14 font-medium text-base shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 ${
             isCTA 
               ? 'bg-white text-amber-700 hover:bg-white/90 border border-amber-200' 
@@ -239,12 +269,12 @@ export function BeautifulSubscribeForm({ variant = 'hero', className = '' }: Bea
           {isSubmitting ? (
             <div className="flex items-center space-x-2">
               <div className="w-4 h-4 sm:w-5 sm:h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-sm sm:text-base">Saving to Google Sheets...</span>
+              <span className="text-sm sm:text-base">Reserving your spot...</span>
             </div>
           ) : (
             <div className="flex items-center space-x-2">
               <Users className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="text-sm sm:text-base">{isCTA ? 'Join Uncle Mays Community' : 'Join Our Community'}</span>
+              <span className="text-sm sm:text-base">Reserve My Spot →</span>
             </div>
           )}
         </Button>

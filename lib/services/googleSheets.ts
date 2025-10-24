@@ -1,6 +1,7 @@
 import { google } from 'googleapis'
 
 export interface SubscriptionData {
+  firstName: string
   email: string
   zipCode: string
   interests: string[]
@@ -46,6 +47,7 @@ export class GoogleSheetsService {
 
       const values = [
         [
+          data.firstName,
           data.email,
           data.zipCode,
           data.interests.join(', '),
@@ -80,13 +82,13 @@ export class GoogleSheetsService {
 
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.spreadsheetId,
-        range: this.getFormattedRange('A:F')
+        range: this.getFormattedRange('A:G')
       })
 
       const rows = response.data.values || []
       
       // Check if email already exists (skip header row)
-      return rows.slice(1).some((row: any[]) => row[0] === email)
+      return rows.slice(1).some((row: any[]) => row[1] === email)
     } catch (error) {
       console.error('❌ Error checking existing subscription:', error)
       return false
@@ -101,26 +103,27 @@ export class GoogleSheetsService {
 
       const response = await this.sheets.spreadsheets.values.get({
         spreadsheetId: this.spreadsheetId,
-        range: this.getFormattedRange('A:F')
+        range: this.getFormattedRange('A:G')
       })
 
       const rows = response.data.values || []
-      const rowIndex = rows.findIndex((row: any[]) => row[0] === email)
+      const rowIndex = rows.findIndex((row: any[]) => row[1] === email)
       
       if (rowIndex === -1) {
         return false
       }
 
       // Update the row (add 1 because sheets are 1-indexed)
-      const updateRange = `${this.getFormattedRange()}!A${rowIndex + 1}:F${rowIndex + 1}`
+      const updateRange = `${this.getFormattedRange()}!A${rowIndex + 1}:G${rowIndex + 1}`
       
       const updateValues = [
         [
+          data.firstName || rows[rowIndex][0],
           email,
-          data.zipCode || rows[rowIndex][1],
-          data.interests?.join(', ') || rows[rowIndex][2],
-          data.source || rows[rowIndex][3],
-          rows[rowIndex][4], // Keep original timestamp
+          data.zipCode || rows[rowIndex][2],
+          data.interests?.join(', ') || rows[rowIndex][3],
+          data.source || rows[rowIndex][4],
+          rows[rowIndex][5], // Keep original timestamp
           'Active'
         ]
       ]

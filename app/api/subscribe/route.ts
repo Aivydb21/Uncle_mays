@@ -7,11 +7,19 @@ export async function POST(request: NextRequest) {
     console.log('🔄 Starting subscription process...')
     
     const body = await request.json()
-    const { email, zipCode, interests, source = 'hero' } = body
+    const { firstName, email, zipCode, interests, source = 'hero' } = body
     
-    console.log('📝 Received data:', { email, zipCode, interests, source })
+    console.log('📝 Received data:', { firstName, email, zipCode, interests, source })
 
     // Basic validation
+    if (!firstName || firstName.trim().length === 0) {
+      console.log('❌ Invalid first name:', firstName)
+      return NextResponse.json(
+        { error: 'Valid first name is required' },
+        { status: 400 }
+      )
+    }
+
     if (!email || !email.includes('@')) {
       console.log('❌ Invalid email:', email)
       return NextResponse.json(
@@ -70,7 +78,7 @@ export async function POST(request: NextRequest) {
     if (existingSubscription) {
       console.log('🔄 Updating existing subscription...')
       try {
-        const updated = await GoogleSheetsService.updateSubscription(email, { zipCode, interests })
+        const updated = await GoogleSheetsService.updateSubscription(email, { firstName, zipCode, interests })
         if (updated) {
           console.log('✅ Existing subscription updated:', email)
         } else {
@@ -87,6 +95,7 @@ export async function POST(request: NextRequest) {
       console.log('🆕 Creating new subscription...')
       try {
         const subscriptionData: SubscriptionData = {
+          firstName,
           email,
           zipCode,
           interests: interests || [],
