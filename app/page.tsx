@@ -17,12 +17,20 @@ export default function ProduceBoxDemandTesting() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between">
           <div className="flex items-center space-x-4 mb-4 md:mb-0">
             {/* Logo/Brand Area */}
-            <div className="text-center md:text-left">
+            <div className="flex items-center space-x-4">
               <img 
                 src="/uncle-mays-logo.png" 
                 alt="UNCLE MAY'S Produce & Provisions" 
-                className="h-16 md:h-20 w-auto object-contain"
+                className="h-12 md:h-16 w-auto object-contain"
               />
+              <div className="text-center md:text-left">
+                <div className="text-2xl md:text-3xl font-bold text-amber-900 tracking-wider">
+                  UNCLE MAY'S
+                </div>
+                <div className="text-sm md:text-base text-amber-700 font-medium">
+                  Produce & Provisions
+                </div>
+              </div>
             </div>
           </div>
           
