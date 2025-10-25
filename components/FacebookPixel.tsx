@@ -17,6 +17,8 @@ export function FacebookPixel({ pixelId }: FacebookPixelProps) {
   const pathname = usePathname()
 
   useEffect(() => {
+    console.log('Facebook Pixel: Initializing with pixelId:', pixelId)
+    
     // Initialize Facebook Pixel
     if (typeof window !== 'undefined' && !window.fbq) {
       // Load Facebook Pixel script
@@ -48,7 +50,10 @@ export function FacebookPixel({ pixelId }: FacebookPixelProps) {
 
     // Track page view on route change
     if (typeof window !== 'undefined' && window.fbq) {
+      console.log('Facebook Pixel: Tracking PageView')
       window.fbq('track', 'PageView')
+    } else {
+      console.log('Facebook Pixel: fbq not available for PageView tracking')
     }
   }, [pixelId, pathname])
 
