@@ -47,33 +47,53 @@ export default function ProduceBoxDemandTesting() {
             <h1 className="text-5xl md:text-7xl font-bold text-amber-900 mb-6 leading-tight">
               Black Farmers. Fresh Food. Your Door.
             </h1>
-            <p className="text-xl md:text-2xl text-amber-800 mb-4 max-w-3xl mx-auto leading-relaxed font-medium">
-              Be first to get Uncle May's Produce — curated boxes from Black farmers and limited pop-up market events across Chicago.
-            </p>
-            <p className="text-lg text-amber-700 mb-12 max-w-2xl mx-auto">
-              We're launching soon. Tell us how you want in.
-            </p>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="space-y-4 mb-16">
+          {/* Primary CTA - Moved Higher */}
+          <div className="mb-8">
             <Button 
               size="lg"
-              className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 mb-4"
               onClick={() => {
                 // Track hero CTA click
                 if (typeof window !== 'undefined' && (window as any).gtag) {
                   (window as any).gtag('event', 'hero_cta_click', {
                     event_category: 'engagement',
-                    event_label: 'Join Early Access List'
+                    event_label: 'Reserve Your Spot'
+                  });
+                }
+                // Track Facebook event
+                if (typeof window !== 'undefined' && (window as any).fbq) {
+                  (window as any).fbq('track', 'Lead', {
+                    content_name: 'Hero CTA Click',
+                    content_category: 'Hero Section',
+                    value: 1.00,
+                    currency: 'USD'
                   });
                 }
                 // Scroll to signup form
                 document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Join the Early Access List →
+              Reserve your spot for our first produce box or pop-up event →
             </Button>
+            
+            {/* Social Proof Line */}
+            <p className="text-lg text-amber-700 font-medium">
+              Join 500+ Chicagoans waiting for our first produce drop.
+            </p>
+          </div>
+
+          {/* Supporting Text */}
+          <div className="mb-16">
+            <p className="text-xl md:text-2xl text-amber-800 mb-4 max-w-3xl mx-auto leading-relaxed font-medium">
+              Be first to get Uncle May's Produce — curated boxes from Black farmers and limited pop-up market events across Chicago.
+            </p>
+            <p className="text-lg text-amber-700 mb-8 max-w-2xl mx-auto">
+              We're launching soon. Tell us how you want in.
+            </p>
+            
+            {/* Secondary CTA */}
             <div>
               <button 
                 className="text-amber-600 hover:text-amber-800 text-sm font-medium underline transition-colors duration-200"
