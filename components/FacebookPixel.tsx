@@ -19,8 +19,15 @@ export function FacebookPixel({ pixelId }: FacebookPixelProps) {
   useEffect(() => {
     console.log('Facebook Pixel: Initializing with pixelId:', pixelId)
     
+    if (!pixelId) {
+      console.log('Facebook Pixel: No pixelId provided')
+      return
+    }
+    
     // Initialize Facebook Pixel
     if (typeof window !== 'undefined' && !window.fbq) {
+      console.log('Facebook Pixel: Loading script...')
+      
       // Load Facebook Pixel script
       const script = document.createElement('script')
       script.innerHTML = `
@@ -36,6 +43,7 @@ export function FacebookPixel({ pixelId }: FacebookPixelProps) {
         fbq('track', 'PageView');
       `
       document.head.appendChild(script)
+      console.log('Facebook Pixel: Script added to head')
 
       // Add noscript fallback
       const noscript = document.createElement('noscript')
@@ -46,14 +54,12 @@ export function FacebookPixel({ pixelId }: FacebookPixelProps) {
       img.src = `https://www.facebook.com/tr?id=${pixelId}&ev=PageView&noscript=1`
       noscript.appendChild(img)
       document.head.appendChild(noscript)
-    }
-
-    // Track page view on route change
-    if (typeof window !== 'undefined' && window.fbq) {
-      console.log('Facebook Pixel: Tracking PageView')
+      console.log('Facebook Pixel: Noscript fallback added')
+    } else if (typeof window !== 'undefined' && window.fbq) {
+      console.log('Facebook Pixel: Already loaded, tracking PageView')
       window.fbq('track', 'PageView')
     } else {
-      console.log('Facebook Pixel: fbq not available for PageView tracking')
+      console.log('Facebook Pixel: Window not available')
     }
   }, [pixelId, pathname])
 
