@@ -1,0 +1,10 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <g>
+    <text x="100" y="35" text-anchor="middle" fill="#2d5016" font-family="serif" font-size="22" font-style="italic">
+      Naturally
+    </text>
+    <text x="100" y="55" text-anchor="middle" fill="#2d5016" font-family="Arial, sans-serif" font-size="14" font-weight="bold">
+      CHICAGO
+    </text>
+  </g>
+</svg>
