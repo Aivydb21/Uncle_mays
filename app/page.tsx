@@ -508,6 +508,24 @@ export default function ProduceBoxDemandTesting() {
               >
                 Contact Us
               </a>
+              <a 
+                href="https://airtable.com/appHgPTKlcuFKajQp/pagSDGTyRCEaBKrNK/form"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-amber-600 hover:text-amber-800 underline transition-colors duration-200"
+                onClick={() => {
+                  // Track Facebook event
+                  if (typeof window !== 'undefined' && (window as any).fbq) {
+                    (window as any).fbq('track', 'CustomEvent', {
+                      event_name: 'Footer Link Click',
+                      content_name: 'Vendor Onboarding',
+                      content_category: 'Footer'
+                    });
+                  }
+                }}
+              >
+                Become a Vendor
+              </a>
             </div>
           </div>
         </div>
