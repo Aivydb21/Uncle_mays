@@ -1,36 +1,224 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Uncle Mays Produce
 
-## Getting Started
+A modern, responsive e-commerce website for Uncle Mays Produce - a premium subscription produce box service celebrating Black farming heritage across America. Fresh produce delivered directly from Black farmers to your table.
 
-First, run the development server:
+## 🌟 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Premium Subscription Boxes**: Three subscription tiers (Starter, Family, Community)
+- **Stripe Integration**: Seamless checkout process for all product boxes
+- **Responsive Design**: Fully optimized for desktop, tablet, and mobile devices
+- **Modern UI/UX**: Beautiful, earth-toned design with smooth animations
+- **SEO Optimized**: Complete meta tags, Open Graph, and Twitter Card support
+- **Legal Compliance**: Comprehensive Privacy Policy and Terms of Service
+- **Contact Information**: Easy access to email, phone, and physical address
+
+## 🚀 Tech Stack
+
+- **Framework**: React 18.3.1
+- **Build Tool**: Vite 7.2.4
+- **Language**: TypeScript 5.8.3
+- **Styling**: Tailwind CSS 3.4.17
+- **UI Components**: shadcn/ui (Radix UI primitives)
+- **Routing**: React Router DOM 6.30.1
+- **Animations**: Framer Motion 12.23.24
+- **Icons**: Lucide React 0.462.0
+- **State Management**: TanStack Query 5.83.0
+- **Forms**: React Hook Form 7.61.1
+
+## 📋 Prerequisites
+
+- Node.js 18+ (recommended: use [nvm](https://github.com/nvm-sh/nvm#installing-and-updating))
+- npm or yarn package manager
+
+## 🛠️ Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Aivydb21/uncle-mays-roots.git
+   cd uncle-mays-roots
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+   - Navigate to `http://localhost:8080`
+   - The site will automatically reload when you make changes
+
+## 📁 Project Structure
+
+```
+um_website/
+├── public/                 # Static assets
+│   ├── uncle-mays-logo.png # Company logo
+│   ├── favicon.ico         # Browser favicon
+│   └── robots.txt          # SEO robots file
+├── src/
+│   ├── assets/             # Image assets
+│   │   ├── heritage.jpg
+│   │   ├── hero-produce.jpg
+│   │   └── produce-box.jpg
+│   ├── components/         # React components
+│   │   ├── Hero.tsx        # Hero section
+│   │   ├── Mission.tsx     # Mission statement
+│   │   ├── HowItWorks.tsx  # How it works section
+│   │   ├── Awards.tsx      # Awards section
+│   │   ├── Pricing.tsx     # Pricing/Subscription boxes
+│   │   ├── Footer.tsx      # Footer component
+│   │   ├── Navigation.tsx  # Navigation header
+│   │   ├── Layout.tsx      # Page layout wrapper
+│   │   └── ui/            # shadcn/ui components
+│   ├── pages/              # Page components
+│   │   ├── Index.tsx       # Home page
+│   │   ├── About.tsx       # About page
+│   │   ├── FAQ.tsx         # FAQ page
+│   │   ├── Privacy.tsx     # Privacy Policy
+│   │   ├── Terms.tsx       # Terms of Service
+│   │   └── NotFound.tsx    # 404 page
+│   ├── App.tsx             # Main app component
+│   ├── main.tsx           # Entry point
+│   └── index.css          # Global styles
+├── index.html             # HTML template
+├── vite.config.ts        # Vite configuration
+├── tailwind.config.ts    # Tailwind CSS configuration
+└── package.json          # Dependencies and scripts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎯 Available Scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `npm run dev` - Start development server (runs on port 8080)
+- `npm run build` - Build for production (outputs to `dist/` folder)
+- `npm run build:dev` - Build in development mode
+- `npm run preview` - Preview production build locally
+- `npm run lint` - Run ESLint to check code quality
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚢 Deployment
 
-## Learn More
+### Build for Production
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This creates an optimized production build in the `dist/` directory.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Deployment Options
 
-## Deploy on Vercel
+#### Option 1: Vercel (Recommended)
+1. Install Vercel CLI: `npm i -g vercel`
+2. Run: `vercel`
+3. Follow the prompts to deploy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+#### Option 2: Netlify
+1. Drag and drop the `dist` folder to [Netlify Drop](https://app.netlify.com/drop)
+2. Or connect your GitHub repository for continuous deployment
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+#### Option 3: Lovable
+1. Open [Lovable Project](https://lovable.dev/projects/3d1db82d-323e-4d69-9a38-404be734ce30)
+2. Click Share → Publish
+3. Configure your custom domain if needed
+
+### Custom Domain Setup
+
+1. **Vercel/Netlify**: Add your domain in project settings
+2. **DNS Configuration**: Point your domain's A/CNAME records to the hosting provider
+3. **SSL Certificate**: Automatically provided by most hosting platforms
+
+## 🔧 Configuration
+
+### Stripe Checkout Links
+
+Update Stripe checkout URLs in `src/components/Pricing.tsx`:
+
+```typescript
+const plans = [
+  {
+    name: "Starter Box",
+    stripeUrl: "https://buy.stripe.com/YOUR_LINK_HERE",
+    // ...
+  },
+  // ...
+];
+```
+
+### Contact Information
+
+Update contact details in:
+- `src/components/Footer.tsx` - Footer contact section
+- `src/pages/Privacy.tsx` - Privacy Policy contact
+- `src/pages/Terms.tsx` - Terms of Service contact
+
+### Logo
+
+Place your logo file at: `public/uncle-mays-logo.png`
+
+Supported formats: PNG, JPG, SVG, WebP
+
+## 📱 Pages
+
+- **Home** (`/`) - Landing page with hero, mission, how it works, awards, and pricing
+- **About** (`/about`) - Company story, values, and mission
+- **FAQ** (`/faq`) - Frequently asked questions
+- **Privacy Policy** (`/privacy`) - Privacy policy and data handling
+- **Terms of Service** (`/terms`) - Terms and conditions
+
+## 🎨 Design System
+
+The website uses a custom earth-toned color palette defined in `src/index.css`:
+
+- **Primary Colors**: Warm browns and earth tones
+- **Typography**: Playfair Display (headings) and Work Sans (body)
+- **Components**: shadcn/ui components with custom styling
+
+## 📞 Contact
+
+- **Email**: info@unclemays.com
+- **Phone**: (312) 972-2595
+- **Address**: 73 W Monroe Ave #3002, Chicago, IL 60603
+
+## 📄 License
+
+This project is private and proprietary.
+
+## 🤝 Contributing
+
+This is a private project. For questions or suggestions, please contact info@unclemays.com.
+
+## 📚 Additional Resources
+
+- [Vite Documentation](https://vitejs.dev/)
+- [React Documentation](https://react.dev/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/)
+- [shadcn/ui Documentation](https://ui.shadcn.com/)
+- [React Router Documentation](https://reactrouter.com/)
+
+## 🐛 Troubleshooting
+
+### Port Already in Use
+If port 8080 is already in use, modify `vite.config.ts`:
+```typescript
+server: {
+  port: 3000, // Change to available port
+}
+```
+
+### Build Errors
+1. Clear node_modules: `rm -rf node_modules && npm install`
+2. Clear Vite cache: `rm -rf node_modules/.vite`
+3. Rebuild: `npm run build`
+
+### Logo Not Showing
+1. Verify logo file exists at `public/uncle-mays-logo.png`
+2. Check file permissions
+3. Hard refresh browser (Ctrl+Shift+R or Cmd+Shift+R)
+
+---
+
+**Built with ❤️ for Uncle Mays Produce**
