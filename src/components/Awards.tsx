@@ -1,21 +1,16 @@
 import { motion } from "framer-motion";
-import { Award, Trophy, Star } from "lucide-react";
+import { Award, Trophy } from "lucide-react";
 
 const awards = [
   {
     icon: Trophy,
-    organization: "World Business Chicago",
-    title: "Innovation Award Winner",
-  },
-  {
-    icon: Star,
-    organization: "TechRise",
-    title: "Technology Excellence",
+    organization: "World Business Chicago / TechRise",
+    title: "Food Innovation Award",
   },
   {
     icon: Award,
     organization: "Naturally Chicago",
-    title: "Community Impact Award",
+    title: "Top 5 Chicago Food Startups",
   },
 ];
 
@@ -36,7 +31,7 @@ export const Awards = () => {
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {awards.map((award, index) => (
             <motion.div
               key={index}
