@@ -9,7 +9,7 @@ const awards = [
   },
   {
     icon: Award,
-    organization: "Naturally Chicago",
+    organization: "Naturally Chicago / Seed Co.",
     title: "Top 5 Chicago Food Startups",
   },
 ];
