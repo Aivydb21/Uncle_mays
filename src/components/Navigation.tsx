@@ -13,7 +13,6 @@ export const Navigation = () => {
     { path: "/about", label: "About" },
     { path: "/", label: "Pricing", hash: "#pricing" },
     { path: "/faq", label: "FAQ" },
-    { path: "/investors", label: "Investors" },
   ];
 
   const isActive = (path: string) => {

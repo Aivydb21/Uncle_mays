@@ -58,6 +58,16 @@ export const Footer = () => {
                   FAQ
                 </Link>
               </li>
+              <li>
+                <a 
+                  href="https://publuu.com/flip-book/996063/2263639" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  Investors
+                </a>
+              </li>
             </ul>
           </div>
 
