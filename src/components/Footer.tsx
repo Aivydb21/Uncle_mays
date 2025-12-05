@@ -8,11 +8,7 @@ export const Footer = () => {
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <img 
-                src="/uncle-mays-logo.png" 
-                alt="Uncle Mays Produce Logo" 
-                className="h-14 w-auto object-contain"
-              />
+              <span className="text-2xl font-bold text-background">Uncle May's Produce</span>
             </div>
             <p className="text-background/70 mb-6 max-w-md leading-relaxed">
               Celebrating Black farming heritage through premium subscription produce boxes. 

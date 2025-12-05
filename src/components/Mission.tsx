@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import heritageImage from "@/assets/heritage.jpg";
+import farmerImage from "@/assets/farmer.jpg";
 
 export const Mission = () => {
   return (
@@ -50,8 +50,8 @@ export const Mission = () => {
           >
             <div className="rounded-2xl overflow-hidden shadow-medium">
               <img
-                src={heritageImage}
-                alt="Hands holding soil with growing plant representing agricultural heritage"
+                src={farmerImage}
+                alt="Black farmer representing agricultural heritage and excellence"
                 className="w-full h-[500px] object-cover"
               />
             </div>
