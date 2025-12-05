@@ -31,7 +31,7 @@ const plans = [
       "Free delivery",
     ],
     popular: true,
-    stripeUrl: "https://buy.stripe.com/14A3cvablej2fwb00I9Zm04",
+    stripeUrl: "https://buy.stripe.com/4gM7sL2ITej2gAf3cU9Zm07",
   },
   {
     name: "Community Box",
@@ -46,7 +46,7 @@ const plans = [
       "Free delivery",
       "Customization options",
     ],
-    stripeUrl: "https://buy.stripe.com/dRm00jerB3Eo97N8xe9Zm05",
+    stripeUrl: "https://buy.stripe.com/5kQ28r0AL6QA83J4gY9Zm06",
   },
 ];
 
