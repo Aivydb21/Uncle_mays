@@ -16,7 +16,7 @@ const plans = [
       "Recipe cards included",
       "Support Black farmers",
     ],
-    stripeUrl: "https://buy.stripe.com/eVqaEX6Z9b6QbfV8xe9Zm00",
+    stripeUrl: "https://buy.stripe.com/14AfZh2IT0sces75l29Zm03",
   },
   {
     name: "Family Box",
@@ -31,7 +31,7 @@ const plans = [
       "Free delivery",
     ],
     popular: true,
-    stripeUrl: "https://buy.stripe.com/9B66oHcjt8YI97NeVC9Zm01",
+    stripeUrl: "https://buy.stripe.com/14A3cvablej2fwb00I9Zm04",
   },
   {
     name: "Community Box",
@@ -46,7 +46,7 @@ const plans = [
       "Free delivery",
       "Customization options",
     ],
-    stripeUrl: "https://buy.stripe.com/4gMdR9erB7UEgAf6p69Zm02",
+    stripeUrl: "https://buy.stripe.com/dRm00jerB3Eo97N8xe9Zm05",
   },
 ];
 
