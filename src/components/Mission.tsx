@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
-import farmerImage from "@/assets/farmer.jpg";
+// Using Unsplash placeholder - replace with your own image at src/assets/farmer.jpg when ready
+// Current placeholder: https://images.unsplash.com/photo-1625246333195-78d9c38ad449
+const farmerImage = "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop&auto=format";
 
 export const Mission = () => {
   return (
