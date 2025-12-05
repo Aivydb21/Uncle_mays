@@ -102,24 +102,25 @@ export const Pricing = () => {
                   href={plan.stripeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold h-11 px-6 py-2 transition-all duration-300 ${
+                  className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
                     plan.popular 
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-soft" 
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium" 
                       : "border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-soft"
                   }`}
                   style={{
-                    display: 'block',
+                    display: 'flex',
                     textDecoration: 'none',
                     cursor: 'pointer',
                     zIndex: 9999,
-                    position: 'relative'
+                    position: 'relative',
+                    textAlign: 'center'
                   }}
                   onClick={(e) => {
                     e.stopPropagation();
                     // Let the browser handle navigation naturally
                   }}
                 >
-                  Subscribe Now
+                  <span className="text-center">Subscribe Now</span>
                 </a>
               </div>
             </div>

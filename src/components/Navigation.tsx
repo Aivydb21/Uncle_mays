@@ -41,7 +41,9 @@ export const Navigation = () => {
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-6">
         <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-          <span className="text-2xl font-bold text-foreground">Uncle May's Produce</span>
+          <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Uncle May's Produce
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -77,6 +79,7 @@ export const Navigation = () => {
           })}
           <Button 
             size="sm"
+            className="font-semibold px-6"
             onClick={() => {
               if (location.pathname !== "/") {
                 window.location.href = "/#pricing";
@@ -147,7 +150,7 @@ export const Navigation = () => {
                 );
               })}
               <Button 
-                className="w-full mt-4"
+                className="w-full mt-4 font-semibold"
                 onClick={() => {
                   setIsOpen(false);
                   if (location.pathname !== "/") {

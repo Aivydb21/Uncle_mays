@@ -44,11 +44,11 @@ export const Hero = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            className="flex flex-col sm:flex-row gap-4"
+            className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start"
           >
             <Button 
               size="lg" 
-              className="group text-lg"
+              className="group text-lg font-semibold px-8 py-6 rounded-xl"
               onClick={() => {
                 const pricingSection = document.getElementById('pricing');
                 if (pricingSection) {
@@ -56,10 +56,15 @@ export const Hero = () => {
                 }
               }}
             >
-              Get Started
+              <span className="text-center">Get Started</span>
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
-            <Button size="lg" variant="outline" className="text-lg" asChild>
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="text-lg font-semibold px-8 py-6 rounded-xl border-2" 
+              asChild
+            >
               <Link to="/about">Learn More</Link>
             </Button>
           </motion.div>
