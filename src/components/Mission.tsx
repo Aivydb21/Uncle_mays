@@ -19,7 +19,7 @@ export const Mission = () => {
               Rooted in <span className="text-primary">Heritage</span>
             </h2>
             <p className="text-lg text-foreground/80 mb-6 leading-relaxed">
-              Uncle Mays Produce celebrates and supports local Chicago Black farmers 
+              Uncle Mays Produce celebrates and supports Chicago Black farmers 
               who have been stewards of the land for generations. Every box connects you directly 
               to our community of dedicated farmers right here in Chicago.
             </p>
