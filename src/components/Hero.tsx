@@ -25,7 +25,7 @@ export const Hero = () => {
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               Fresh from{" "}
-              <span className="text-primary">Black Farmers</span>
+              <span className="text-primary">Local Chicago Black Farmers</span>
               <br />
               to Your Table
             </h1>
@@ -37,7 +37,8 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl md:text-2xl mb-8 text-foreground/80 font-light"
           >
-            Premium produce boxes celebrating the rich agricultural heritage of Black American farmers across the United States.
+            Premium organic produce boxes from local Chicago Black farmers. 
+            Free from harmful chemicals, unlike many grocery chains.
           </motion.p>
 
           <motion.div

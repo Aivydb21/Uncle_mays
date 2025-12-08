@@ -32,7 +32,7 @@ export const HowItWorks = () => {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">How It Works</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Fresh produce from Black farmers, delivered to your door in three simple steps.
+            Fresh organic produce from local Chicago Black farmers, delivered to your door in three simple steps.
           </p>
         </motion.div>
 

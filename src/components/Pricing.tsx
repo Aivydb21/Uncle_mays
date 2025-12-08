@@ -14,7 +14,7 @@ const plans = [
       "5-7 seasonal items",
       "Weekly deliveries",
       "Recipe cards included",
-      "Support Black farmers",
+      "Support local Chicago Black farmers",
     ],
     stripeUrl: "https://buy.stripe.com/14AfZh2IT0sces75l29Zm03",
   },
@@ -64,7 +64,8 @@ export const Pricing = () => {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Box</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Flexible purchase options to fit your lifestyle and support Black farmers.
+            Flexible purchase options to fit your lifestyle and support local Chicago Black farmers. 
+            All produce is organic and free from harmful chemicals.
           </p>
         </motion.div>
 

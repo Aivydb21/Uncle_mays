@@ -19,19 +19,24 @@ export const Mission = () => {
               Rooted in <span className="text-primary">Heritage</span>
             </h2>
             <p className="text-lg text-foreground/80 mb-6 leading-relaxed">
-              Uncle Mays Produce celebrates and supports the rich legacy of Black American farmers 
-              who have been stewards of the land for generations. Every box connects you to a 
-              network of dedicated farmers across the United States.
+              Uncle Mays Produce celebrates and supports local Chicago Black farmers 
+              who have been stewards of the land for generations. Every box connects you directly 
+              to our community of dedicated farmers right here in Chicago.
             </p>
             <p className="text-lg text-foreground/80 mb-6 leading-relaxed">
-              We believe in building bridges between growers and communities, ensuring that fresh, 
-              nutritious produce is accessible while honoring the agricultural traditions that have 
-              shaped our nation.
+              We believe in building bridges between local growers and our community, ensuring that fresh, 
+              organic produce free from harmful chemicals is accessible while honoring the agricultural 
+              traditions that have shaped our city. Unlike many grocery chains, our produce is grown 
+              without pesticides and harmful chemicals.
             </p>
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3">
                 <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <p className="text-foreground/70">Supporting Black farmers nationwide</p>
+                <p className="text-foreground/70">Supporting local Chicago Black farmers</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
+                <p className="text-foreground/70">100% organic produce, free from harmful chemicals</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
