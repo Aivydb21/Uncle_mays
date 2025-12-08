@@ -37,7 +37,7 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl md:text-2xl mb-8 text-foreground/80 font-light"
           >
-            Premium subscription produce boxes celebrating the rich agricultural heritage of Black American farmers across the United States.
+            Premium produce boxes celebrating the rich agricultural heritage of Black American farmers across the United States.
           </motion.p>
 
           <motion.div

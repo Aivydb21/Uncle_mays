@@ -12,7 +12,7 @@ const plans = [
     description: "Perfect for individuals or couples",
     features: [
       "5-7 seasonal items",
-      "Bi-weekly deliveries",
+      "Weekly deliveries",
       "Recipe cards included",
       "Support Black farmers",
     ],
@@ -64,7 +64,7 @@ export const Pricing = () => {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Box</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Flexible subscription plans to fit your lifestyle and support Black farmers.
+            Flexible purchase options to fit your lifestyle and support Black farmers.
           </p>
         </motion.div>
 
@@ -120,7 +120,7 @@ export const Pricing = () => {
                     // Let the browser handle navigation naturally
                   }}
                 >
-                  <span className="text-center">Subscribe Now</span>
+                  <span className="text-center">Purchase Now</span>
                 </a>
               </div>
             </div>
