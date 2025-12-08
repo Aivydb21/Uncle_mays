@@ -17,7 +17,7 @@ const plans = [
       "Recipe cards included",
       "Support local Chicago Black farmers",
     ],
-    stripeUrl: "https://buy.stripe.com/14AfZh2IT0sces75l29Zm03",
+    stripeUrl: "https://buy.stripe.com/cNidR983d5Mw83JcNu9Zm08",
   },
   {
     name: "Family Box",
@@ -33,7 +33,7 @@ const plans = [
       "Free delivery",
     ],
     popular: true,
-    stripeUrl: "https://buy.stripe.com/4gM7sL2ITej2gAf3cU9Zm07",
+    stripeUrl: "https://buy.stripe.com/dRmbJ1erB2AkcjZeVC9Zm09",
   },
   {
     name: "Community Box",
@@ -49,7 +49,7 @@ const plans = [
       "Free delivery",
       "Customization options",
     ],
-    stripeUrl: "https://buy.stripe.com/5kQ28r0AL6QA83J4gY9Zm06",
+    stripeUrl: "https://buy.stripe.com/8x25kD5V5b6QabR7ta9Zm0a",
   },
 ];
 
