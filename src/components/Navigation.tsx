@@ -41,7 +41,7 @@ export const Navigation = () => {
     <>
       {/* Beta Badge */}
       <div className="sticky top-0 z-50 w-full bg-secondary text-secondary-foreground py-2 text-center text-sm font-semibold">
-        <span>BETA - Testing Final Version</span>
+        <span>BETA VERSION</span>
       </div>
       <nav className="sticky top-8 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-6">
