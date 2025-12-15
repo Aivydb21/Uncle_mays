@@ -14,7 +14,7 @@ const plans = [
     features: [
       "5-7 seasonal items",
       "Weekly deliveries",
-      "Recipe cards included",
+      "12-15 lbs of produce",
       "Support local Chicago Black farmers",
     ],
     stripeUrl: "https://buy.stripe.com/cNidR983d5Mw83JcNu9Zm08",
@@ -28,7 +28,7 @@ const plans = [
     features: [
       "12-15 seasonal items",
       "Weekly deliveries available",
-      "Recipe cards & meal plans",
+      "22-26 lbs of produce",
       "Priority farmer selection",
       "Free delivery",
     ],
@@ -44,7 +44,7 @@ const plans = [
     features: [
       "20-25 seasonal items",
       "Weekly deliveries",
-      "Exclusive recipe content",
+      "30-35 lbs of produce",
       "Meet your farmers events",
       "Free delivery",
       "Customization options",
