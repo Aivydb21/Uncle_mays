@@ -25,7 +25,7 @@ export const Hero = () => {
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               Fresh from{" "}
-              <span className="text-primary">Local Black Farmers</span>
+              <span className="text-primary">Black Farmers</span>
               <br />
               to Your Table
             </h1>
