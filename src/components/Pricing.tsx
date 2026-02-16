@@ -7,8 +7,7 @@ import produceBoxImage from "@/assets/produce-box.jpg";
 const plans = [
   {
     name: "Starter Box",
-    price: "$28",
-    originalPrice: "$35",
+    price: "$35",
     frequency: "per delivery",
     description: "Perfect for individuals or couples",
     features: [
@@ -21,8 +20,7 @@ const plans = [
   },
   {
     name: "Family Box",
-    price: "$52",
-    originalPrice: "$65",
+    price: "$65",
     frequency: "per delivery",
     description: "Ideal for families of 3-5",
     features: [
@@ -37,8 +35,7 @@ const plans = [
   },
   {
     name: "Community Box",
-    price: "$76",
-    originalPrice: "$95",
+    price: "$95",
     frequency: "per delivery",
     description: "For large families or sharing",
     features: [
@@ -65,11 +62,6 @@ export const Pricing = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <div className="mb-4">
-            <div className="inline-block bg-secondary text-secondary-foreground px-6 py-2 rounded-full text-base font-bold mb-4 shadow-medium">
-              🎉 LAUNCH SPECIAL: 20% OFF 🎉
-            </div>
-          </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Box</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Flexible purchase options to fit your lifestyle and support local Chicago Black farmers. 
@@ -98,17 +90,9 @@ export const Pricing = () => {
                 <div className="mb-6">
                   <div className="flex items-baseline gap-2 mb-1">
                     <span className="text-5xl font-bold text-primary">{plan.price}</span>
-                    {plan.originalPrice && (
-                      <span className="text-xl text-muted-foreground line-through">{plan.originalPrice}</span>
-                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">{plan.frequency}</span>
-                    {plan.originalPrice && (
-                      <span className="bg-secondary/20 text-secondary px-2 py-1 rounded text-sm font-semibold">
-                        20% OFF
-                      </span>
-                    )}
                   </div>
                 </div>
                 <ul className="space-y-3 mb-8 flex-grow">

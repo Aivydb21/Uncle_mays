@@ -31,16 +31,6 @@ export const Hero = () => {
             </h1>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mb-6"
-          >
-            <div className="inline-block bg-secondary text-secondary-foreground px-6 py-3 rounded-full text-lg font-bold mb-4 shadow-medium">
-              🎉 LAUNCH SPECIAL: 20% OFF ALL BOXES 🎉
-            </div>
-          </motion.div>
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
