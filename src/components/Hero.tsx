@@ -48,18 +48,15 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start"
           >
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
+              asChild
               className="group text-lg font-semibold px-8 py-6 rounded-xl"
-              onClick={() => {
-                const pricingSection = document.getElementById('pricing');
-                if (pricingSection) {
-                  pricingSection.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
             >
-              <span className="text-center">Get Your Box</span>
+              <Link to="/investors">
+              <span className="text-center">Join the Waitlist</span>
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Link>
             </Button>
             <Button 
               size="lg" 
@@ -94,10 +91,6 @@ export const Hero = () => {
             <div className="flex items-center gap-2">
               <div className="h-1 w-12 bg-primary rounded-full" />
               <span className="text-sm font-medium text-muted-foreground">Award-Winning</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-1 w-12 bg-secondary rounded-full" />
-              <span className="text-sm font-medium text-muted-foreground">Chicago-Based</span>
             </div>
           </motion.div>
         </div>

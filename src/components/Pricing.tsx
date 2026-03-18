@@ -1,60 +1,11 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
 import produceBoxImage from "@/assets/produce-box.jpg";
 import { Link } from "react-router-dom";
 
-const plans = [
-  {
-    name: "Starter Box",
-    price: "$35",
-    frequency: "per delivery",
-    description: "Perfect for individuals or couples",
-    features: [
-      "5-7 seasonal items",
-      "Weekly deliveries",
-      "12-15 lbs of produce",
-      "Support local Chicago Black farmers",
-    ],
-    stripeUrl: "https://buy.stripe.com/cNidR983d5Mw83JcNu9Zm08",
-  },
-  {
-    name: "Family Box",
-    price: "$65",
-    frequency: "per delivery",
-    description: "Ideal for families of 3-5",
-    features: [
-      "12-15 seasonal items",
-      "Weekly deliveries available",
-      "22-26 lbs of produce",
-      "Priority farmer selection",
-      "Free delivery",
-    ],
-    popular: true,
-    stripeUrl: "https://buy.stripe.com/dRmbJ1erB2AkcjZeVC9Zm09",
-  },
-  {
-    name: "Community Box",
-    price: "$95",
-    frequency: "per delivery",
-    description: "For large families or sharing",
-    features: [
-      "20-25 seasonal items",
-      "Weekly deliveries",
-      "30-35 lbs of produce",
-      "Meet your farmers events",
-      "Free delivery",
-      "Customization options",
-    ],
-    stripeUrl: "https://buy.stripe.com/8x25kD5V5b6QabR7ta9Zm0a",
-  },
-];
-
 export const Pricing = () => {
-  
   return (
-    <section id="pricing" className="py-24 bg-muted/30 relative" style={{ zIndex: 1 }}>
+    <section id="waitlist" className="py-24 bg-muted/30 relative" style={{ zIndex: 1 }}>
       <div className="container px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -63,74 +14,12 @@ export const Pricing = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Box</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">Join the Waitlist</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Get your box through retail today. Each order strengthens our proprietary food demand data - so sourcing and distribution improve as the platform scales.
+            Retail is the acquisition engine for data, demand, and supply. Join the waitlist to access the platform
+            as it scales with Black farmers, Black food brands, and distribution partners.
           </p>
         </motion.div>
-
-        <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-          {plans.map((plan, index) => (
-            <div
-              key={index}
-              className="relative z-10"
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-secondary text-white px-6 py-1.5 rounded-full text-sm font-semibold z-20">
-                  Most Popular
-                </div>
-              )}
-              <div
-                className={`bg-card rounded-2xl p-8 shadow-soft h-full flex flex-col relative z-10 ${
-                  plan.popular ? "border-2 border-secondary shadow-medium" : ""
-                }`}
-              >
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className="text-muted-foreground mb-6">{plan.description}</p>
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-5xl font-bold text-primary">{plan.price}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">{plan.frequency}</span>
-                  </div>
-                </div>
-                <ul className="space-y-3 mb-8 flex-grow">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-foreground/80">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <a
-                  href={plan.stripeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
-                    plan.popular 
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium" 
-                      : "border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-soft"
-                  }`}
-                  style={{
-                    display: 'flex',
-                    textDecoration: 'none',
-                    cursor: 'pointer',
-                    zIndex: 9999,
-                    position: 'relative',
-                    textAlign: 'center'
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // Let the browser handle navigation naturally
-                  }}
-                >
-                  <span className="text-center">Purchase Now</span>
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
 
         <div className="max-w-4xl mx-auto mb-16 mt-10 rounded-2xl bg-card border border-border/50 p-8 shadow-soft">
           <h3 className="text-3xl font-bold text-center mb-3">For investors and partners</h3>
@@ -156,7 +45,7 @@ export const Pricing = () => {
         >
           <img
             src={produceBoxImage}
-            alt="Fresh produce box with colorful vegetables"
+            alt="Fresh produce"
             className="w-full h-64 object-cover"
           />
         </motion.div>
