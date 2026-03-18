@@ -49,10 +49,10 @@ export const VendorNetwork = () => {
             Partner With Us
           </a>
           <Link
-            to="/about"
+            to="/investors"
             className="inline-flex items-center justify-center rounded-xl text-base font-semibold h-12 px-8 py-3 transition-all duration-300 border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-soft"
           >
-            Learn About the Platform
+            Investors
           </Link>
         </div>
       </div>

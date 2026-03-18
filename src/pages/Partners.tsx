@@ -34,7 +34,7 @@ const Partners = () => {
                   </a>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="border-2">
-                  <Link to="/about">Learn About the Platform</Link>
+                  <Link to="/investors">For Investors</Link>
                 </Button>
               </div>
             </motion.div>

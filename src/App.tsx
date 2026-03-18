@@ -5,10 +5,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { FacebookPixel } from "@/components/FacebookPixel";
 import Index from "./pages/Index";
-import About from "./pages/About";
 import Investors from "./pages/Investors";
 import Partners from "./pages/Partners";
-import FAQ from "./pages/FAQ";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
@@ -29,10 +27,8 @@ const App = () => (
         <FacebookPixel />
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
           <Route path="/investors" element={<Investors />} />
           <Route path="/partners" element={<Partners />} />
-          <Route path="/faq" element={<FAQ />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="*" element={<NotFound />} />
