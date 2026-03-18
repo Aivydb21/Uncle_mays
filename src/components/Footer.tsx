@@ -31,24 +31,12 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a 
-                  href="/#pricing" 
-                  onClick={(e) => {
-                    if (window.location.pathname !== "/") {
-                      e.preventDefault();
-                      window.location.href = "/#pricing";
-                    } else {
-                      e.preventDefault();
-                      const pricingSection = document.getElementById('pricing');
-                      if (pricingSection) {
-                        pricingSection.scrollIntoView({ behavior: 'smooth' });
-                      }
-                    }
-                  }}
+                <Link
+                  to="/investors"
                   className="text-background/70 hover:text-background transition-colors"
                 >
-                  Pricing
-                </a>
+                  Join the Waitlist
+                </Link>
               </li>
               <li>
                 <Link to="/faq" className="text-background/70 hover:text-background transition-colors">
@@ -68,7 +56,7 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
                 <MapPin className="h-5 w-5 text-background/70 flex-shrink-0 mt-0.5" />
-                <span className="text-background/70">73 W Monroe Ave #3002<br />Chicago, IL 60603</span>
+                <span className="text-background/70">Address available upon request</span>
               </li>
               <li className="flex items-start gap-2">
                 <Mail className="h-5 w-5 text-background/70 flex-shrink-0 mt-0.5" />

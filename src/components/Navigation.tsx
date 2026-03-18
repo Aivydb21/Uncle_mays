@@ -11,7 +11,6 @@ export const Navigation = () => {
   const navLinks = [
     { path: "/", label: "Home" },
     { path: "/about", label: "About" },
-    { path: "/", label: "Pricing", hash: "#pricing" },
     { path: "/faq", label: "FAQ" },
     { path: "/investors", label: "Investors" },
     { path: "/partners", label: "Partners" },
@@ -22,21 +21,6 @@ export const Navigation = () => {
       return location.pathname === "/";
     }
     return location.pathname.startsWith(path);
-  };
-
-  const handlePricingClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (location.pathname !== "/") {
-      // If not on home page, navigate first then scroll
-      e.preventDefault();
-      window.location.href = "/#pricing";
-    } else {
-      // If on home page, just scroll
-      e.preventDefault();
-      const pricingSection = document.getElementById('pricing');
-      if (pricingSection) {
-        pricingSection.scrollIntoView({ behavior: 'smooth' });
-      }
-    }
   };
 
   return (
@@ -52,20 +36,6 @@ export const Navigation = () => {
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
           {navLinks.map((link) => {
-            if (link.hash) {
-              return (
-                <a
-                  key={link.path + link.hash}
-                  href={link.path + link.hash}
-                  onClick={handlePricingClick}
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    location.pathname === "/" ? "text-primary" : "text-foreground/60"
-                  }`}
-                >
-                  {link.label}
-                </a>
-              );
-            }
             return (
               <Link
                 key={link.path}
@@ -80,21 +50,8 @@ export const Navigation = () => {
               </Link>
             );
           })}
-          <Button 
-            size="sm"
-            className="font-semibold px-6"
-            onClick={() => {
-              if (location.pathname !== "/") {
-                window.location.href = "/#pricing";
-              } else {
-                const pricingSection = document.getElementById('pricing');
-                if (pricingSection) {
-                  pricingSection.scrollIntoView({ behavior: 'smooth' });
-                }
-              }
-            }}
-          >
-            Get Your Box
+          <Button size="sm" className="font-semibold px-6" asChild>
+            <Link to="/investors">Join the Waitlist</Link>
           </Button>
         </div>
 
@@ -120,23 +77,6 @@ export const Navigation = () => {
           >
             <div className="container px-6 py-4 space-y-4">
               {navLinks.map((link) => {
-                if (link.hash) {
-                  return (
-                    <a
-                      key={link.path + link.hash}
-                      href={link.path + link.hash}
-                      onClick={(e) => {
-                        setIsOpen(false);
-                        handlePricingClick(e);
-                      }}
-                      className={`block text-base font-medium transition-colors hover:text-primary ${
-                        location.pathname === "/" ? "text-primary" : "text-foreground/60"
-                      }`}
-                    >
-                      {link.label}
-                    </a>
-                  );
-                }
                 return (
                   <Link
                     key={link.path}
@@ -152,21 +92,12 @@ export const Navigation = () => {
                   </Link>
                 );
               })}
-              <Button 
+              <Button
                 className="w-full mt-4 font-semibold"
-                onClick={() => {
-                  setIsOpen(false);
-                  if (location.pathname !== "/") {
-                    window.location.href = "/#pricing";
-                  } else {
-                    const pricingSection = document.getElementById('pricing');
-                    if (pricingSection) {
-                      pricingSection.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }
-                }}
+                asChild
+                onClick={() => setIsOpen(false)}
               >
-                Get Your Box
+                <Link to="/investors">Join the Waitlist</Link>
               </Button>
             </div>
           </motion.div>

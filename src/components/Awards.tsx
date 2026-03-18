@@ -4,13 +4,13 @@ import { Award, Trophy } from "lucide-react";
 const awards = [
   {
     icon: Trophy,
-    organization: "World Business Chicago / TechRise",
+    organization: "World Business / TechRise",
     title: "Food Innovation Award",
   },
   {
     icon: Award,
-    organization: "Naturally Chicago / Seed Co.",
-    title: "Top 5 Chicago Food Startups",
+    organization: "Naturally / Seed Co.",
+    title: "Top 5 Food Startups",
   },
 ];
 

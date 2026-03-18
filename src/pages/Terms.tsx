@@ -56,8 +56,8 @@ const Terms = () => {
                     <div>
                       <h3 className="text-xl font-semibold mb-2">Subscription Plans</h3>
                       <p>
-                        We offer various subscription plans with different delivery frequencies and box sizes. By subscribing, 
-                        you agree to receive regular deliveries of produce boxes according to your selected plan.
+                        We offer various subscription options with different delivery frequencies. By subscribing,
+                        you agree to receive regular deliveries of products according to your selected option.
                       </p>
                     </div>
                     <div>
@@ -290,7 +290,7 @@ const Terms = () => {
                       </a>
                     </p>
                     <p>
-                      <strong>Address:</strong> 73 W Monroe Ave #3002, Chicago, IL 60603
+                      <strong>Address:</strong> 73 W Monroe Ave #3002, IL 60603
                     </p>
                   </div>
                 </div>

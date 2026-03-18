@@ -4,13 +4,13 @@ import { Package, Truck, Heart } from "lucide-react";
 const steps = [
   {
     icon: Package,
-    title: "Choose Your Box",
-    description: "Buy fresh produce through retail - built around Black farmers and partners.",
+    title: "Shop through retail",
+    description: "Buy Black food through retail touchpoints - where demand becomes real signals.",
   },
   {
     icon: Truck,
     title: "Your purchase becomes demand data",
-    description: "Every order strengthens proprietary demand signals captured from real retail behavior.",
+    description: "Every purchase strengthens proprietary demand signals captured from real retail behavior.",
   },
   {
     icon: Heart,
