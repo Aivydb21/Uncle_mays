@@ -15,9 +15,9 @@ export const PlatformExplanation = () => {
               Retail stores + vendor network + proprietary food data.
             </h2>
             <p className="text-lg text-foreground/80 leading-relaxed mb-6">
-              We unify fragmented supply and demand through a single system. Retail is
-              the acquisition engine for data, demand, and supply - so distribution can
-              scale with real purchasing signals.
+              The components work together as a single operating layer. Retail touchpoints
+              capture real demand signals. Proprietary food data turns those signals into
+              sourcing, pricing intelligence, and distribution decisions that improve over time.
             </p>
             <div className="space-y-4">
               <div className="rounded-2xl bg-card border border-border/50 p-6 shadow-soft">

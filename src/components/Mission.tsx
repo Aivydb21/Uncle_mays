@@ -23,10 +23,8 @@ export const Mission = () => {
               to Black farmers and brands through retail that people can trust.
             </p>
             <p className="text-lg text-foreground/80 mb-6 leading-relaxed">
-              Retail stores + vendor network create the rare combination competitors can't
-              replicate: the consumer interface and the supplier network at scale. Retail is the
-              acquisition engine for data, demand, and supply. We unify fragmented supply and
-              demand through a single system.
+              Retail is the consumer interface. Paired with a scalable vendor network,
+              it gives us durable control over the demand dataset that powers long-term advantage.
             </p>
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3">

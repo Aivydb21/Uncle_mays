@@ -16,7 +16,7 @@ export const BrokenEcosystem = () => {
             </h2>
             <p className="text-lg text-foreground/80 mb-6 leading-relaxed">
               Black food demand is real. But the signals are fragmented across retail,
-                suppliers, and distribution - so sourcing, pricing intelligence, and inventory
+              suppliers, and distribution - so sourcing, pricing intelligence, and inventory
               decisions happen without a unified view of what communities actually want.
             </p>
             <div className="space-y-3">
@@ -55,8 +55,8 @@ export const BrokenEcosystem = () => {
               </p>
               <h3 className="text-2xl font-bold mb-4">A single system that unifies supply + demand.</h3>
               <p className="text-foreground/70 leading-relaxed">
-                We unify fragmented supply and demand through a single system - built to
-                connect consumers, Black farmers, Black food brands, and distribution over time.
+                A system of record that connects demand signals to sourcing, pricing intelligence,
+                and distribution decisions over time.
               </p>
             </div>
           </motion.div>
