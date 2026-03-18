@@ -16,15 +16,16 @@ export const Pricing = () => {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Join the Waitlist</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Retail is the acquisition engine for data, demand, and supply. Join the waitlist to access the platform
-            as it scales with Black farmers, Black food brands, and distribution partners.
+            Join the waitlist to access the platform as it grows. Each retail signal strengthens the proprietary demand
+            dataset that powers sourcing, pricing intelligence, and distribution decisions.
           </p>
         </motion.div>
 
         <div className="max-w-4xl mx-auto mb-16 mt-10 rounded-2xl bg-card border border-border/50 p-8 shadow-soft">
           <h3 className="text-3xl font-bold text-center mb-3">For investors and partners</h3>
           <p className="text-center text-muted-foreground mb-6">
-            Retail stores + vendor network + proprietary food data. We unify fragmented supply and demand through a single system.
+            Retail stores + vendor network + proprietary food data. This combination powers the system of record that connects demand
+            to supply decisions as the network expands.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" variant="default" className="w-full sm:w-auto">

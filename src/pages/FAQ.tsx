@@ -62,7 +62,11 @@ const FAQ = () => {
         <section className="py-24 bg-background">
           <div className="container px-6">
             <div className="max-w-4xl mx-auto">
-              <Accordion type="single" collapsible className="w-full">
+              <Accordion
+                type="multiple"
+                defaultValue={faqs.map((_, index) => `item-${index}`)}
+                className="w-full"
+              >
                 {faqs.map((faq, index) => (
                   <AccordionItem key={index} value={`item-${index}`}>
                     <AccordionTrigger className="text-left">
