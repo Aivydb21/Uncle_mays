@@ -13,8 +13,7 @@ export const Footer = () => {
               </span>
             </div>
             <p className="text-background/70 mb-6 max-w-md leading-relaxed">
-              Celebrating Black farming heritage through premium subscription produce boxes. 
-              Fresh from our farmers to your table.
+              Retail that people trust - built to power a proprietary data and distribution system for Black food consumption.
             </p>
           </div>
 
@@ -27,8 +26,8 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/" className="text-background/70 hover:text-background transition-colors">
-                  Our Farmers
+                <Link to="/partners" className="text-background/70 hover:text-background transition-colors">
+                  Partners
                 </Link>
               </li>
               <li>
@@ -57,14 +56,9 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a 
-                  href="https://publuu.com/flip-book/996063/2263639" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-background/70 hover:text-background transition-colors"
-                >
+                <Link to="/investors" className="text-background/70 hover:text-background transition-colors">
                   Investors
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

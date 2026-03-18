@@ -5,17 +5,17 @@ const steps = [
   {
     icon: Package,
     title: "Choose Your Box",
-    description: "Select from our curated subscription plans tailored to your household size and preferences.",
+    description: "Buy fresh produce through retail - built around Black farmers and partners.",
   },
   {
     icon: Truck,
-    title: "We Deliver Fresh",
-    description: "Receive farm-fresh produce at your doorstep, harvested at peak ripeness from our partner farmers.",
+    title: "Your purchase becomes demand data",
+    description: "Every order strengthens proprietary demand signals captured from real retail behavior.",
   },
   {
     icon: Heart,
-    title: "Support & Enjoy",
-    description: "Savor quality produce while directly supporting Black farmers and celebrating agricultural heritage.",
+    title: "Demand powers sourcing & distribution",
+    description: "That dataset compounds - so vendor network decisions improve as the platform scales.",
   },
 ];
 
@@ -30,9 +30,9 @@ export const HowItWorks = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">How It Works</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">Retail is the acquisition engine.</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Fresh organic produce from local Chicago Black farmers, delivered to your door in three simple steps.
+            Every purchase creates proprietary demand signals. That dataset compounds - so sourcing and distribution improve as the platform scales.
           </p>
         </motion.div>
 

@@ -13,6 +13,8 @@ export const Navigation = () => {
     { path: "/about", label: "About" },
     { path: "/", label: "Pricing", hash: "#pricing" },
     { path: "/faq", label: "FAQ" },
+    { path: "/investors", label: "Investors" },
+    { path: "/partners", label: "Partners" },
   ];
 
   const isActive = (path: string) => {
@@ -92,7 +94,7 @@ export const Navigation = () => {
               }
             }}
           >
-            Get Started
+            Get Your Box
           </Button>
         </div>
 
@@ -164,7 +166,7 @@ export const Navigation = () => {
                   }
                 }}
               >
-                Get Started
+                Get Your Box
               </Button>
             </div>
           </motion.div>

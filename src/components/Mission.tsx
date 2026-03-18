@@ -16,35 +16,34 @@ export const Mission = () => {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Rooted in <span className="text-primary">Heritage</span>
+              Rooted in community. Built for a <span className="text-primary">compounding data moat</span>.
             </h2>
             <p className="text-lg text-foreground/80 mb-6 leading-relaxed">
-              Uncle Mays Produce celebrates and supports Black farmers across the country
-              who have been stewards of the land for generations. Every box connects you directly 
-              to our community of dedicated farmers right here in Chicago.
+              Uncle May's Produce exists to strengthen Black food consumption - connecting families
+              to Black farmers and brands through retail that people can trust.
             </p>
             <p className="text-lg text-foreground/80 mb-6 leading-relaxed">
-              We believe in building bridges between local growers and our community, ensuring that fresh, 
-              organic produce free from harmful chemicals is accessible while honoring the agricultural 
-              traditions that have shaped our city. Unlike many grocery chains, our produce is grown 
-              without pesticides and harmful chemicals.
+              Retail stores + vendor network create the rare combination competitors can't
+              replicate: the consumer interface and the supplier network at scale. Retail is the
+              acquisition engine for data, demand, and supply. We unify fragmented supply and
+              demand through a single system.
             </p>
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3">
                 <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <p className="text-foreground/70">Supporting local Chicago Black farmers</p>
+                <p className="text-foreground/70">The first scalable consumer interface for Black food demand.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <p className="text-foreground/70">100% organic produce, free from harmful chemicals</p>
+                <p className="text-foreground/70">Compounding data moat.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <p className="text-foreground/70">Celebrating agricultural heritage and excellence</p>
+                <p className="text-foreground/70">No competitor owns both the consumer interface and supplier network at scale.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <p className="text-foreground/70">Delivering farm-fresh quality to your door</p>
+                <p className="text-foreground/70">This dataset cannot be replicated without owning both the consumer interface and the supplier network.</p>
               </div>
             </div>
           </motion.div>
@@ -65,7 +64,7 @@ export const Mission = () => {
             </div>
             <div className="absolute -bottom-6 -left-6 bg-secondary text-white p-6 rounded-xl shadow-medium">
               <p className="text-3xl font-bold">100+</p>
-              <p className="text-sm">Partner Farmers</p>
+              <p className="text-sm">Black Farmer Partners</p>
             </div>
           </motion.div>
         </div>

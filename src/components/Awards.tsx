@@ -25,9 +25,9 @@ export const Awards = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Award-Winning Excellence</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">Validation, built with partners.</h2>
           <p className="text-xl text-primary-foreground/80 max-w-2xl mx-auto">
-            Recognized for our commitment to quality, innovation, and community impact.
+            Recognized for quality and impact - while we build the infrastructure platform that compounds advantage over time.
           </p>
         </motion.div>
 

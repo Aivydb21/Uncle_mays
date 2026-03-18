@@ -8,18 +8,18 @@ const About = () => {
   const values = [
     {
       icon: Leaf,
-      title: "Supporting Black Farmers",
-      description: "We partner with Black farmers across America to bring you the freshest produce while supporting their agricultural legacy.",
+      title: "Support Black Farmers",
+      description: "We partner with Black farmers - and turn retail demand into better purchasing signals that strengthen the network.",
     },
     {
       icon: Heart,
       title: "Community First",
-      description: "Every purchase strengthens our community, creating jobs and opportunities that benefit our neighborhoods directly.",
+      description: "Retail touchpoints create trusted access today - and compounding advantage over time through proprietary food demand data.",
     },
     {
       icon: Users,
-      title: "Heritage & Excellence",
-      description: "We celebrate the rich agricultural traditions of Black American farmers who have been stewards of the land for generations.",
+      title: "Heritage, at scale",
+      description: "We build a system designed for Black food at scale - rooted in the people who grew it, powered by proprietary food data.",
     },
   ];
 
@@ -36,10 +36,10 @@ const About = () => {
               className="max-w-3xl mx-auto text-center"
             >
               <h1 className="text-5xl md:text-7xl font-bold mb-6">
-                About Uncle Mays Produce
+                Retail today. Infrastructure for Black food consumption.
               </h1>
               <p className="text-xl text-primary-foreground/80">
-                Celebrating Black farming heritage through premium subscription produce boxes.
+                Uncle May's is building the first data and distribution system for Black food consumption in the U.S. - where retail demand becomes a compounding data moat and smarter distribution over time.
               </p>
             </motion.div>
           </div>

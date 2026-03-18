@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import produceBoxImage from "@/assets/produce-box.jpg";
+import { Link } from "react-router-dom";
 
 const plans = [
   {
@@ -64,8 +65,7 @@ export const Pricing = () => {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Box</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Flexible purchase options to fit your lifestyle and support local Chicago Black farmers. 
-            All produce is organic and free from harmful chemicals.
+            Get your box through retail today. Each order strengthens our proprietary food demand data - so sourcing and distribution improve as the platform scales.
           </p>
         </motion.div>
 
@@ -130,6 +130,21 @@ export const Pricing = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        <div className="max-w-4xl mx-auto mb-16 mt-10 rounded-2xl bg-card border border-border/50 p-8 shadow-soft">
+          <h3 className="text-3xl font-bold text-center mb-3">For investors and partners</h3>
+          <p className="text-center text-muted-foreground mb-6">
+            Retail stores + vendor network + proprietary food data. We unify fragmented supply and demand through a single system.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" variant="default" className="w-full sm:w-auto">
+              <Link to="/investors">Join the Waitlist</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto border-2">
+              <Link to="/partners">Partner With Us</Link>
+            </Button>
+          </div>
         </div>
 
         <motion.div
