@@ -207,7 +207,7 @@ const Privacy = () => {
                       </a>
                     </p>
                     <p>
-                      <strong>Address:</strong> 73 W Monroe Ave #3002, IL 60603
+                      <strong>Address:</strong> 73 W Monroe Ave #3002, Chicago, IL 60603
                     </p>
                   </div>
                 </div>
