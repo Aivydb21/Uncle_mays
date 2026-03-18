@@ -12,62 +12,32 @@ export const VendorNetwork = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">For Black farmers and food brands</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">Who the platform serves</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Access to demand, then distribution - powered by proprietary food data and a vendor network designed to scale.
+            Retail signals demand. The platform connects farmers, brands, and distribution so the right products reach the right communities.
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           <div className="bg-card rounded-2xl p-8 shadow-soft border border-border/50">
             <h3 className="text-2xl font-bold mb-3">Farmers</h3>
-            <p className="text-foreground/70 leading-relaxed mb-6">
-              Clear purchasing signals that align production with what communities actually want.
+            <p className="text-foreground/70 leading-relaxed">
+              Clear demand signals for better planning and stronger matching to community needs.
             </p>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <span className="text-foreground/80">Better route-to-market planning</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <span className="text-foreground/80">Demand visibility that compounds</span>
-              </li>
-            </ul>
           </div>
 
           <div className="bg-card rounded-2xl p-8 shadow-soft border border-border/50">
             <h3 className="text-2xl font-bold mb-3">Brands</h3>
-            <p className="text-foreground/70 leading-relaxed mb-6">
-              Retail touchpoints where demand is real - so you can reach customers and grow sustainably.
+            <p className="text-foreground/70 leading-relaxed">
+              A route to distribution powered by real retail demand, not guesswork.
             </p>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <span className="text-foreground/80">Distribution decisions guided by data</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <span className="text-foreground/80">A vendor network built for scale</span>
-              </li>
-            </ul>
           </div>
 
           <div className="bg-card rounded-2xl p-8 shadow-soft border border-border/50">
             <h3 className="text-2xl font-bold mb-3">Distribution partners</h3>
-            <p className="text-foreground/70 leading-relaxed mb-6">
-              Smarter inventory and sourcing that match demand instead of guesswork.
+            <p className="text-foreground/70 leading-relaxed">
+              Better sourcing and planning when demand is measurable and consistent.
             </p>
-            <ul className="space-y-3">
-              <li className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <span className="text-foreground/80">Pricing intelligence informed by real demand</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <span className="text-foreground/80">Inventory optimization as the network grows</span>
-              </li>
-            </ul>
           </div>
         </div>
 

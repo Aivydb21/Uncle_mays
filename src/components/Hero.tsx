@@ -24,7 +24,7 @@ export const Hero = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="inline-flex items-center rounded-full bg-secondary/20 px-5 py-2 text-sm font-semibold text-secondary-foreground mb-4">
-              Retail is the wedge. Demand is the compounding asset.
+              First store opens soon. Retail signals demand.
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               The first data and distribution system for Black food consumption in the U.S.
@@ -37,9 +37,8 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-xl md:text-2xl mb-8 text-foreground/80 font-light"
           >
-            Retail stores + vendor network + proprietary food data. We unify fragmented
-            supply and demand through a single system. Retail is the acquisition engine
-            for data, demand, and supply.
+            Retail signals demand. That powers sourcing, pricing, and distribution through the platform.
+            First store opens soon.
           </motion.p>
 
           <motion.div
