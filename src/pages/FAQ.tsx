@@ -1,11 +1,5 @@
 import { motion } from "framer-motion";
 import { Layout } from "@/components/Layout";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 
 const FAQ = () => {
   const faqs = [
@@ -62,22 +56,14 @@ const FAQ = () => {
         <section className="py-24 bg-background">
           <div className="container px-6">
             <div className="max-w-4xl mx-auto">
-              <Accordion
-                type="multiple"
-                defaultValue={faqs.map((_, index) => `item-${index}`)}
-                className="w-full"
-              >
+              <div className="divide-y divide-border/60 overflow-hidden rounded-2xl border border-border/50 bg-card">
                 {faqs.map((faq, index) => (
-                  <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger className="text-left">
-                      {faq.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="text-foreground/70 leading-relaxed">
-                      {faq.answer}
-                    </AccordionContent>
-                  </AccordionItem>
+                  <div key={index} className="p-6 md:p-8">
+                    <h3 className="text-2xl font-semibold mb-3">{faq.question}</h3>
+                    <p className="text-foreground/70 leading-relaxed">{faq.answer}</p>
+                  </div>
                 ))}
-              </Accordion>
+              </div>
             </div>
           </div>
         </section>
