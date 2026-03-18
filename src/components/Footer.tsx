@@ -56,7 +56,7 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
                 <MapPin className="h-5 w-5 text-background/70 flex-shrink-0 mt-0.5" />
-                <span className="text-background/70">Address available upon request</span>
+                <span className="text-background/70">73 W Monroe Ave #3002, Chicago, IL 60603</span>
               </li>
               <li className="flex items-start gap-2">
                 <Mail className="h-5 w-5 text-background/70 flex-shrink-0 mt-0.5" />

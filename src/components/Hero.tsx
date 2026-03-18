@@ -68,28 +68,7 @@ export const Hero = () => {
             </Button>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="mt-8 flex flex-col sm:flex-row gap-3"
-          >
-            <Button size="sm" variant="outline" asChild className="justify-start border-2">
-              <Link to="/partners">For Vendors/Farmers: Partner With Us</Link>
-            </Button>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="mt-12 flex flex-wrap gap-8 items-center"
-          >
-            <div className="flex items-center gap-2">
-              <div className="h-1 w-12 bg-primary rounded-full" />
-              <span className="text-sm font-medium text-muted-foreground">Award-Winning</span>
-            </div>
-          </motion.div>
+          {/* Keep hero CTAs minimal: waitlist + platform */}
         </div>
       </div>
     </section>
