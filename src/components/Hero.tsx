@@ -63,7 +63,7 @@ export const Hero = () => {
               className="text-lg font-semibold px-8 py-6 rounded-xl border-2" 
               asChild
             >
-              <Link to="/about">Learn About the Platform</Link>
+              <Link to="/partners">Partner With Us</Link>
             </Button>
           </motion.div>
 
