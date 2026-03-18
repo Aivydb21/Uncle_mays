@@ -23,11 +23,11 @@ export const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
+            <div className="inline-flex items-center rounded-full bg-secondary/20 px-5 py-2 text-sm font-semibold text-secondary-foreground mb-4">
+              Retail is the wedge. Demand is the compounding asset.
+            </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Fresh from{" "}
-              <span className="text-primary">Black Farmers</span>
-              <br />
-              to Your Table
+              The first data and distribution system for Black food consumption in the U.S.
             </h1>
           </motion.div>
 
@@ -37,8 +37,9 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-xl md:text-2xl mb-8 text-foreground/80 font-light"
           >
-            Premium organic produce boxes from local Chicago Black farmers. 
-            Free from harmful chemicals, unlike many grocery chains.
+            Retail stores + vendor network + proprietary food data. We unify fragmented
+            supply and demand through a single system. Retail is the acquisition engine
+            for data, demand, and supply.
           </motion.p>
 
           <motion.div
@@ -57,7 +58,7 @@ export const Hero = () => {
                 }
               }}
             >
-              <span className="text-center">Get Started</span>
+              <span className="text-center">Get Your Box</span>
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
             <Button 
@@ -66,7 +67,21 @@ export const Hero = () => {
               className="text-lg font-semibold px-8 py-6 rounded-xl border-2" 
               asChild
             >
-              <Link to="/about">Learn More</Link>
+              <Link to="/about">Learn About the Platform</Link>
+            </Button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="mt-8 flex flex-col sm:flex-row gap-3"
+          >
+            <Button size="sm" variant="ghost" asChild className="justify-start">
+              <Link to="/investors">For Investors: Join the Waitlist</Link>
+            </Button>
+            <Button size="sm" variant="outline" asChild className="justify-start border-2">
+              <Link to="/partners">For Vendors/Farmers: Partner With Us</Link>
             </Button>
           </motion.div>
 
