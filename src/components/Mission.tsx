@@ -16,32 +16,25 @@ export const Mission = () => {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Rooted in community. Built for a <span className="text-primary">compounding data moat</span>.
+              Platform first. First store opens soon.
             </h2>
             <p className="text-lg text-foreground/80 mb-6 leading-relaxed">
-              Uncle May's Produce exists to strengthen Black food consumption - connecting families
-              to Black farmers and brands through retail that people can trust.
-            </p>
-            <p className="text-lg text-foreground/80 mb-6 leading-relaxed">
-              Retail is the consumer interface. Paired with a scalable vendor network,
-              it gives us durable control over the demand dataset that powers long-term advantage.
+              We are building the infrastructure platform for Black food consumption.
+              The first store opens soon to create demand signals that improve sourcing,
+              pricing, and distribution over time.
             </p>
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3">
                 <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <p className="text-foreground/70">The first scalable consumer interface for Black food demand.</p>
+                <p className="text-foreground/70">Retail connects people to Black food brands.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <p className="text-foreground/70">Compounding data moat.</p>
+                <p className="text-foreground/70">Demand signals power a proprietary system.</p>
               </div>
               <div className="flex items-start gap-3">
                 <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <p className="text-foreground/70">No competitor owns both the consumer interface and supplier network at scale.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="h-2 w-2 bg-primary rounded-full mt-2 flex-shrink-0" />
-                <p className="text-foreground/70">This dataset cannot be replicated without owning both the consumer interface and the supplier network.</p>
+                <p className="text-foreground/70">Vendors and distribution scale with real demand.</p>
               </div>
             </div>
           </motion.div>
@@ -59,10 +52,6 @@ export const Mission = () => {
                 alt="Black farmer representing agricultural heritage and excellence"
                 className="w-full h-[500px] object-cover"
               />
-            </div>
-            <div className="absolute -bottom-6 -left-6 bg-secondary text-white p-6 rounded-xl shadow-medium">
-              <p className="text-3xl font-bold">100+</p>
-              <p className="text-sm">Black Farmer Partners</p>
             </div>
           </motion.div>
         </div>
