@@ -74,9 +74,6 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="mt-8 flex flex-col sm:flex-row gap-3"
           >
-            <Button size="sm" variant="ghost" asChild className="justify-start">
-              <Link to="/investors">For Investors: Join the Waitlist</Link>
-            </Button>
             <Button size="sm" variant="outline" asChild className="justify-start border-2">
               <Link to="/partners">For Vendors/Farmers: Partner With Us</Link>
             </Button>
