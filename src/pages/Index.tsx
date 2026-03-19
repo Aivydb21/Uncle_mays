@@ -8,6 +8,9 @@ import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
 
 const Index = () => {
+  const WAITLIST_FORM_URL =
+    "https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=sharing&ouid=110071880161586206166";
+
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sent">("idle");
 
@@ -239,7 +242,7 @@ const Index = () => {
                 e.preventDefault();
                 if (!email.trim()) return;
                 setStatus("sent");
-                window.location.href = mailtoHref;
+                  window.location.href = WAITLIST_FORM_URL;
               }}
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
@@ -255,6 +258,18 @@ const Index = () => {
                 {status === "sent" ? "Request sent" : "Request updates"}
               </Button>
             </form>
+
+              <p className="mt-6 text-sm text-muted-foreground">
+                Prefer to join directly?{" "}
+                <a
+                  href={WAITLIST_FORM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Use the waitlist form
+                </a>
+              </p>
           </motion.div>
         </div>
       </section>
