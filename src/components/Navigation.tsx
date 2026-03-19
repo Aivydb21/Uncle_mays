@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+const WAITLIST_FORM_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=sharing&ouid=110071880161586206166";
+
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
@@ -47,12 +50,14 @@ export const Navigation = () => {
               </Link>
             );
           })}
-          <Link
-            to="/investors"
+          <a
+            href={WAITLIST_FORM_URL}
             className="text-sm font-semibold px-6 py-2 rounded-md bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             Join the Waitlist
-          </Link>
+          </a>
         </div>
 
         {/* Mobile Menu Button */}
@@ -92,13 +97,15 @@ export const Navigation = () => {
                   </Link>
                 );
               })}
-              <Link
-                to="/investors"
+              <a
+                href={WAITLIST_FORM_URL}
                 onClick={() => setIsOpen(false)}
                 className="block w-full mt-4 font-semibold px-4 py-2 text-center rounded-md bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Join the Waitlist
-              </Link>
+              </a>
             </div>
           </motion.div>
         )}

@@ -210,7 +210,9 @@ const Index = () => {
                 Support the build of retail-first infrastructure that evolves into a compounding data and distribution platform.
               </p>
               <Button asChild size="lg" variant="outline" className="w-full border-2">
-                <a href="/investors">Request Pitch Book</a>
+                <a href="mailto:anthony@unclemays.com?subject=Request%20Pitch%20Book%20-%20Uncle%20May%27s%20Produce">
+                  Request Pitch Book
+                </a>
               </Button>
             </div>
           </div>

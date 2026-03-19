@@ -29,12 +29,12 @@ export const Footer = () => {
                 </a>
               </li>
               <li>
-                <Link
-                  to="/investors"
+                <a
+                  href="mailto:anthony@unclemays.com?subject=Request%20Pitch%20Book%20-%20Uncle%20May%27s%20Produce"
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   Request Pitch Book
-                </Link>
+                </a>
               </li>
               <li>
                 <a

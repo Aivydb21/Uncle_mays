@@ -26,7 +26,7 @@ export const Hero = () => {
               First store opens soon.
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              The first data and distribution system for Black food.
+              The first data and distribution system for Black food
             </h1>
           </motion.div>
 
