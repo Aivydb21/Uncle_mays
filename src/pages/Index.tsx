@@ -186,8 +186,6 @@ const Index = () => {
               >
                 <a
                   href="mailto:info@unclemays.com?subject=Partner%20With%20Us%20-%20Uncle%20May%27s%20Produce"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   Partner With Us
                 </a>
@@ -202,8 +200,6 @@ const Index = () => {
               <Button asChild size="lg" variant="outline" className="w-full border-2">
                 <a
                   href="mailto:anthony@unclemays.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
                 >
                   Request Pitch Book
                 </a>
