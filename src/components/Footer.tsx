@@ -36,14 +36,6 @@ export const Footer = () => {
                   Request Pitch Book
                 </a>
               </li>
-              <li>
-                <a
-                  href="mailto:info@unclemays.com?subject=Partner%20With%20Us%20-%20Uncle%20May%27s%20Produce"
-                  className="text-background/70 hover:text-background transition-colors"
-                >
-                  Partner With Us
-                </a>
-              </li>
             </ul>
           </div>
 
