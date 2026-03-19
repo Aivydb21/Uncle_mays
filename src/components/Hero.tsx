@@ -24,10 +24,10 @@ export const Hero = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="inline-flex items-center rounded-full bg-secondary/20 px-5 py-2 text-sm font-semibold text-secondary-foreground mb-4">
-              First store opens soon. Retail signals demand.
+              First store opens soon.
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              The first data and distribution system for Black food consumption in the U.S.
+              The first data and distribution system for Black food.
             </h1>
           </motion.div>
 
@@ -37,8 +37,7 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-xl md:text-2xl mb-8 text-foreground/80 font-light"
           >
-            Retail signals demand. That powers sourcing, pricing, and distribution through the platform.
-            First store opens soon.
+            That powers sourcing, pricing, and distribution through the platform. First store opens soon.
           </motion.p>
 
           <motion.div
@@ -56,14 +55,6 @@ export const Hero = () => {
               <span className="text-center">Join the Waitlist</span>
               <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="text-lg font-semibold px-8 py-6 rounded-xl border-2" 
-              asChild
-            >
-              <Link to="/partners">Partner With Us</Link>
             </Button>
           </motion.div>
 

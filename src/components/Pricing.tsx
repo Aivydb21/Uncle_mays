@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 export const Pricing = () => {
@@ -19,13 +18,13 @@ export const Pricing = () => {
           </p>
         </motion.div>
 
-        <div className="max-w-4xl mx-auto mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-          <Button asChild size="lg" variant="default" className="w-full sm:w-auto">
-            <Link to="/investors">Join the Waitlist</Link>
-          </Button>
-          <Button asChild size="lg" variant="outline" className="w-full sm:w-auto border-2">
-            <Link to="/partners">Partner With Us</Link>
-          </Button>
+        <div className="max-w-4xl mx-auto mt-10 flex justify-center">
+          <Link
+            to="/investors"
+            className="inline-flex items-center justify-center rounded-xl text-base font-semibold h-12 px-8 py-3 transition-all duration-300 bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium"
+          >
+            Join the Waitlist
+          </Link>
         </div>
       </div>
     </section>
