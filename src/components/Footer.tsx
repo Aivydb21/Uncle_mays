@@ -21,17 +21,28 @@ export const Footer = () => {
             <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
             <ul className="space-y-3">
               <li>
-                <Link
-                  to="/investors"
+                <a
+                  href="#boxes"
                   className="text-background/70 hover:text-background transition-colors"
                 >
-                  Join the Waitlist
-                </Link>
+                  Shop Produce Boxes
+                </a>
               </li>
               <li>
-                <Link to="/investors" className="text-background/70 hover:text-background transition-colors">
-                  Investors
-                </Link>
+                <a
+                  href="mailto:anthony@unclemays.com?subject=Request%20Pitch%20Book%20-%20Uncle%20May%27s%20Produce"
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  Request Pitch Book
+                </a>
+              </li>
+              <li>
+                <a
+                  href="mailto:info@unclemays.com?subject=Partner%20With%20Us%20-%20Uncle%20May%27s%20Produce"
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  Partner With Us
+                </a>
               </li>
             </ul>
           </div>

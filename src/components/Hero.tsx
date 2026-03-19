@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-produce.jpg";
 
 export const Hero = () => {
@@ -27,7 +26,7 @@ export const Hero = () => {
               First store opens soon.
             </div>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              The first data and distribution system for Black food.
+              The first data and distribution system for Black food
             </h1>
           </motion.div>
 
@@ -37,7 +36,7 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-xl md:text-2xl mb-8 text-foreground/80 font-light"
           >
-            That powers sourcing, pricing, and distribution through the platform. First store opens soon.
+            We connect Black farmers, vendors, and consumers through a modern grocery ecosystem - starting with fresh produce and scaling to national retail.
           </motion.p>
 
           <motion.div
@@ -51,14 +50,25 @@ export const Hero = () => {
               asChild
               className="group text-lg font-semibold px-8 py-6 rounded-xl"
             >
-              <Link to="/investors">
-              <span className="text-center">Join the Waitlist</span>
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Link>
+              <a href="#boxes">Shop Produce Boxes</a>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-lg font-semibold px-8 py-6 rounded-xl border-2"
+              asChild
+            >
+              <Link to="/investors">Invest / Partner With Us</Link>
             </Button>
           </motion.div>
 
-          {/* Keep hero CTAs minimal: waitlist + platform */}
+          <div className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground/70">
+            <span className="font-semibold text-foreground/90">Black farmers</span>
+            <span aria-hidden="true">•</span>
+            <span className="font-semibold text-foreground/90">Vendor network</span>
+            <span aria-hidden="true">•</span>
+            <span className="font-semibold text-foreground/90">Proprietary data</span>
+          </div>
         </div>
       </div>
     </section>
