@@ -58,7 +58,7 @@ export const Hero = () => {
               className="text-lg font-semibold px-8 py-6 rounded-xl border-2"
               asChild
             >
-              <Link to="/investors">Invest / Partner With Us</Link>
+              <Link to="/investors">Invest</Link>
             </Button>
           </motion.div>
 

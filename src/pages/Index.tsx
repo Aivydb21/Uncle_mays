@@ -162,7 +162,7 @@ const Index = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             <div className="bg-card rounded-2xl p-8 shadow-soft border border-border/50">
               <h3 className="text-2xl font-semibold mb-3">Customers</h3>
               <p className="text-foreground/70 leading-relaxed mb-6">
@@ -170,25 +170,6 @@ const Index = () => {
               </p>
               <Button asChild size="lg" className="w-full">
                 <a href="#boxes">Shop Produce Boxes</a>
-              </Button>
-            </div>
-
-            <div className="bg-card rounded-2xl p-8 shadow-soft border border-border/50">
-              <h3 className="text-2xl font-semibold mb-3">Partners</h3>
-              <p className="text-foreground/70 leading-relaxed mb-6">
-                Help routes become real - with demand that improves sourcing and distribution decisions.
-              </p>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="w-full border-2"
-              >
-                <a
-                  href="mailto:info@unclemays.com?subject=Partner%20With%20Us%20-%20Uncle%20May%27s%20Produce"
-                >
-                  Partner With Us
-                </a>
               </Button>
             </div>
 
