@@ -43,7 +43,7 @@ const Investors = () => {
               </p>
 
               <a
-                href="mailto:anthony@unclemays.com?subject=Request%20Pitch%20Book%20-%20Uncle%20May%27s%20Produce"
+                href="mailto:anthony@unclemays.com"
                 className="inline-flex items-center justify-center rounded-xl text-base font-semibold h-12 px-8 py-3 transition-all duration-300 bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium"
               >
                 Request the Pitch Book

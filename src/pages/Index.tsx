@@ -1,28 +1,11 @@
-import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Package, Truck, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Layout } from "@/components/Layout";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
 
 const Index = () => {
-  const WAITLIST_FORM_URL =
-    "https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=sharing&ouid=110071880161586206166";
-
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sent">("idle");
-
-  const mailtoHref = useMemo(() => {
-    const trimmed = email.trim();
-    const subject = "Uncle Mays - Request Updates";
-    const body = trimmed
-      ? `Please add me to updates.\n\nEmail: ${trimmed}\n`
-      : `Please add me to updates.\n`;
-    return `mailto:info@unclemays.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  }, [email]);
-
   return (
     <Layout>
       <Hero />
@@ -213,49 +196,12 @@ const Index = () => {
                 Support the build of retail-first infrastructure that evolves into a compounding data and distribution platform.
               </p>
               <Button asChild size="lg" variant="outline" className="w-full border-2">
-                <a href="mailto:anthony@unclemays.com?subject=Request%20Pitch%20Book%20-%20Uncle%20May%27s%20Produce">
+                <a href="mailto:anthony@unclemays.com">
                   Request Pitch Book
                 </a>
               </Button>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* 8. EMAIL CAPTURE */}
-      <section className="py-24 bg-background">
-        <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Get Updates</h2>
-            <p className="text-xl text-foreground/80 leading-relaxed mb-10">
-              Join the list for launch updates and early access as the grocery ecosystem scales.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                type="email"
-                placeholder="Email address"
-                className="h-12 text-base sm:w-80"
-              />
-              <Button asChild size="lg" className="h-12 px-8">
-                <a
-                  href={WAITLIST_FORM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Request updates
-                </a>
-              </Button>
-            </div>
-          </motion.div>
         </div>
       </section>
     </Layout>
