@@ -237,39 +237,24 @@ const Index = () => {
               Join the list for launch updates and early access as the grocery ecosystem scales.
             </p>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (!email.trim()) return;
-                setStatus("sent");
-                  window.location.href = WAITLIST_FORM_URL;
-              }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Input
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
                 placeholder="Email address"
                 className="h-12 text-base sm:w-80"
-                required
               />
-              <Button type="submit" size="lg" className="h-12 px-8">
-                {status === "sent" ? "Request sent" : "Request updates"}
-              </Button>
-            </form>
-
-              <p className="mt-6 text-sm text-muted-foreground">
-                Prefer to join directly?{" "}
+              <Button asChild size="lg" className="h-12 px-8">
                 <a
                   href={WAITLIST_FORM_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline"
                 >
-                  Use the waitlist form
+                  Request updates
                 </a>
-              </p>
+              </Button>
+            </div>
           </motion.div>
         </div>
       </section>
