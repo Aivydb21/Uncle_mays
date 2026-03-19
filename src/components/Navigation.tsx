@@ -11,7 +11,6 @@ export const Navigation = () => {
   const navLinks = [
     { path: "/", label: "Home" },
     { path: "/investors", label: "Investors" },
-    { path: "/partners", label: "Partners" },
   ];
 
   const isActive = (path: string) => {
@@ -48,9 +47,12 @@ export const Navigation = () => {
               </Link>
             );
           })}
-          <Button size="sm" className="font-semibold px-6" asChild>
-            <Link to="/investors">Join the Waitlist</Link>
-          </Button>
+          <Link
+            to="/investors"
+            className="text-sm font-semibold px-6 py-2 rounded-md bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
+          >
+            Join the Waitlist
+          </Link>
         </div>
 
         {/* Mobile Menu Button */}
@@ -90,13 +92,13 @@ export const Navigation = () => {
                   </Link>
                 );
               })}
-              <Button
-                className="w-full mt-4 font-semibold"
-                asChild
+              <Link
+                to="/investors"
                 onClick={() => setIsOpen(false)}
+                className="block w-full mt-4 font-semibold px-4 py-2 text-center rounded-md bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
               >
-                <Link to="/investors">Join the Waitlist</Link>
-              </Button>
+                Join the Waitlist
+              </Link>
             </div>
           </motion.div>
         )}

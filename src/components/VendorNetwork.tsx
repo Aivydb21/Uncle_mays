@@ -14,7 +14,7 @@ export const VendorNetwork = () => {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Who the platform serves</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Retail signals demand. The platform connects farmers, brands, and distribution so the right products reach the right communities.
+            The platform connects farmers, brands, and distribution so the right products reach the right communities.
           </p>
         </motion.div>
 
@@ -41,17 +41,14 @@ export const VendorNetwork = () => {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto mt-12 flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="max-w-6xl mx-auto mt-12 flex flex-col sm:flex-row gap-3 justify-center text-center">
           <a
             href="mailto:info@unclemays.com?subject=Partner%20With%20Us%20-%20Uncle%20May%27s%20Produce"
-            className="inline-flex items-center justify-center rounded-xl text-base font-semibold h-12 px-8 py-3 transition-all duration-300 bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium"
+            className="text-base font-semibold text-primary underline underline-offset-4"
           >
             Partner With Us
           </a>
-          <Link
-            to="/investors"
-            className="inline-flex items-center justify-center rounded-xl text-base font-semibold h-12 px-8 py-3 transition-all duration-300 border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-soft"
-          >
+          <Link to="/investors" className="text-base font-semibold text-primary underline underline-offset-4">
             Investors
           </Link>
         </div>
