@@ -44,8 +44,6 @@ const Investors = () => {
 
               <a
                 href="mailto:anthony@unclemays.com"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-xl text-base font-semibold h-12 px-8 py-3 transition-all duration-300 bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium"
               >
                 Request the Pitch Book
