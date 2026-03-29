@@ -74,7 +74,7 @@ export const Hero = () => {
             <span aria-hidden="true">•</span>
             <span className="inline-flex items-center gap-1 font-semibold text-foreground/90">
               <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-              Loved by Chicago families
+              Rooted in Chicago community
             </span>
           </motion.div>
         </div>

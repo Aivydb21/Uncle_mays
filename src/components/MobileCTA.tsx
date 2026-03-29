@@ -31,7 +31,7 @@ export const MobileCTA = () => {
           <div className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs text-muted-foreground truncate">
-                Fresh produce from Black farmers — delivered to your door.
+                Fresh produce from Black farmers, delivered to your door.
               </p>
             </div>
             <Button

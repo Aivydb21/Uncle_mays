@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Leaf, MapPin, RotateCcw, ShieldCheck, HelpCircle, Users, Instagram, ShoppingBag, Bell, Package } from "lucide-react";
+import { Leaf, MapPin, RotateCcw, ShieldCheck, HelpCircle, Users, Instagram, ShoppingBag, Bell, Package, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/Layout";
 import { Hero } from "@/components/Hero";
@@ -10,7 +10,7 @@ const farmers = [
     name: "Roots & Soil Farm",
     location: "Pembroke Township, IL",
     specialty: "Root vegetables, greens, sweet corn",
-    fact: "Family-operated for 3 generations — one of the oldest Black-owned farms in Illinois.",
+    fact: "Family-operated for 3 generations, one of the oldest Black-owned farms in Illinois.",
   },
   {
     name: "South Side Harvest Co.",
@@ -29,29 +29,29 @@ const farmers = [
 const faqs = [
   {
     q: "How does delivery work?",
-    a: "We deliver directly to your Chicago address. After placing your order, you'll receive a confirmation email with your estimated delivery window. We deliver across Chicago — enter your address at checkout to confirm your area.",
+    a: "We deliver directly to your Chicago address every Sunday. Place your order any day of the week and it will be delivered the following Sunday. You'll receive a confirmation email with your delivery window as soon as your order is placed.",
   },
   {
     q: "What's actually in the box?",
-    a: "Every box is seasonal and rotating — so you get what's freshest, not what's been sitting in a warehouse. A Starter Box typically includes 5–7 items like sweet corn, heirloom tomatoes, collard greens, squash, and fresh herbs. The contents vary each delivery.",
+    a: "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. A Starter Box typically includes 5–7 items like sweet corn, heirloom tomatoes, collard greens, squash, and fresh herbs. The contents vary each delivery.",
   },
   {
     q: "How much does a box cost?",
-    a: "Boxes start at $35 for a Starter Box (5–7 seasonal items, 12–15 lbs), $65 for a Family Box (12–15 items, 22–26 lbs), and $95 for a Community Box (20–25 items, 30–35 lbs). No subscription required — order when you want.",
+    a: "Boxes start at $35 for a Starter Box (5–7 seasonal items, 12–15 lbs), $65 for a Family Box (12–15 items, 22–26 lbs), and $95 for a Community Box (20–25 items, 30–35 lbs). No subscription required. Order when you want.",
   },
   {
     q: "Do I need a subscription?",
-    a: "No. Every box is a one-time purchase — order when it works for you. If you'd like regular deliveries, reach out to info@unclemays.com and we can set up a recurring schedule.",
+    a: "No. Every box is a one-time purchase. Order when it works for you. If you'd like regular deliveries, reach out to info@unclemays.com and we can set up a recurring schedule.",
   },
   {
     q: "What if I have an issue with my order?",
-    a: "We stand behind every box. If anything is wrong with your delivery — missing items, quality issues, anything — email us at info@unclemays.com and we'll make it right, no questions asked.",
+    a: "We stand behind every box. If anything is wrong with your delivery (missing items, quality issues, anything), email us at info@unclemays.com and we'll make it right, no questions asked.",
   },
 ];
 
 const testimonials = [
   {
-    quote: "Finally — fresh produce from people who actually look like me, grown by people who look like me. Can't wait for the first drop.",
+    quote: "Finally, fresh produce from people who actually look like me, grown by people who look like me. Can't wait for the first drop.",
     name: "Keisha M.",
     location: "South Shore, Chicago",
   },
@@ -95,7 +95,7 @@ const Index = () => {
                 step: "01",
                 title: "Choose Your Box",
                 description:
-                  "Pick the box size that works for your household — Starter, Family, or Community. All boxes are one-time purchases. No subscription required.",
+                  "Pick the box size that works for your household: Starter, Family, or Community. All boxes are one-time purchases. No subscription required.",
               },
               {
                 icon: Package,
@@ -109,7 +109,7 @@ const Index = () => {
                 step: "03",
                 title: "Delivered to Your Door",
                 description:
-                  "We deliver straight to your Chicago address. You'll get a confirmation and delivery window by email as soon as your order is placed.",
+                  "We deliver straight to your Chicago address every Sunday. You'll get a confirmation and delivery window by email as soon as your order is placed.",
               },
             ].map((step, idx) => (
               <motion.div
@@ -162,7 +162,7 @@ const Index = () => {
                 icon: MapPin,
                 title: "Chicago-Wide Delivery",
                 description:
-                  "We deliver across Chicago — no pickup required. Fresh produce arrives at your door on your schedule.",
+                  "We deliver across Chicago. No pickup required. Fresh produce arrives at your door every Sunday.",
               },
               {
                 icon: RotateCcw,
@@ -174,7 +174,7 @@ const Index = () => {
                 icon: ShieldCheck,
                 title: "No Subscription",
                 description:
-                  "Order when you want. No lock-in, no commitment. Boxes start at $35 — pay only when you order.",
+                  "Order when you want. No lock-in, no commitment. Boxes start at $35. Pay only when you order.",
               },
             ].map((feature, idx) => (
               <motion.div
@@ -204,7 +204,7 @@ const Index = () => {
           >
             <h3 className="text-2xl font-bold mb-2 text-center">Sample Starter Box</h3>
             <p className="text-muted-foreground text-center mb-6">
-              A taste of what to expect — contents rotate each delivery based on what's freshest.
+              Contents rotate each delivery based on what's freshest. Here's a sample.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
@@ -230,10 +230,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 4. PRODUCT / BOXES */}
-      <Pricing />
-
-      {/* 5. WHY UNCLE MAY'S — Mission & Trust */}
+      {/* 4. WHY UNCLE MAY'S — Mission & Trust (moved above pricing) */}
       <section className="py-24 bg-foreground text-background">
         <div className="container px-6">
           <div className="max-w-4xl mx-auto">
@@ -247,14 +244,14 @@ const Index = () => {
               <h2 className="text-4xl md:text-5xl font-bold mb-6">Why Uncle May's</h2>
               <p className="text-xl text-background/80 leading-relaxed">
                 There is a $100B+ market for Black food that has never had a dedicated supply chain.
-                Uncle May's is building it — starting with the most direct connection possible: fresh
+                Uncle May's is building it, starting with the most direct connection possible: fresh
                 produce from Black farmers to Black households in Chicago.
               </p>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-6">
               {[
-                "Every dollar you spend goes directly to Black farmers — not middlemen.",
+                "Every dollar you spend goes directly to Black farmers, not middlemen.",
                 "Sourced from farms within Illinois and the surrounding region.",
                 "Seasonal rotation means better quality and lower cost than year-round imports.",
                 "Building the demand data that helps Black farmers grow sustainable businesses.",
@@ -276,7 +273,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 6. FARMER PROFILES */}
+      {/* 5. FARMER PROFILES (moved above pricing) */}
       <section className="py-24 bg-background">
         <div className="container px-6">
           <motion.div
@@ -318,7 +315,44 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 7. SOCIAL PROOF — Customer Testimonials */}
+      {/* 6. PRODUCT / BOXES (now after mission & farmers) */}
+      <Pricing />
+
+      {/* 7. EMAIL CAPTURE */}
+      <section className="py-20 bg-background">
+        <div className="container px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="max-w-2xl mx-auto text-center"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
+              <Mail className="h-4 w-4" />
+              Stay in the loop
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Not ready to order yet?
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+              Join our list to get first access to seasonal box drops, farmer spotlights, and what's coming out of the ground this week. Good food news from Chicago, nothing else.
+            </p>
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=header"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button size="lg" className="text-base font-semibold px-8 py-5 rounded-xl">
+                Join the Mailing List
+              </Button>
+            </a>
+            <p className="text-xs text-muted-foreground mt-3">Free to join. Unsubscribe anytime.</p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 8. SOCIAL PROOF — Community Voices */}
       <section className="py-24 bg-muted/20">
         <div className="container px-6">
           <motion.div
@@ -330,9 +364,9 @@ const Index = () => {
           >
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
               <Users className="h-4 w-4" />
-              Loved by Chicago families
+              Rooted in Chicago community
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">What Customers Are Saying</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">From our Chicago community</h2>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -356,7 +390,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 8. FAQ */}
+      {/* 9. FAQ */}
       <section className="py-24 bg-background">
         <div className="container px-6">
           <motion.div
@@ -395,7 +429,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 9. GET INVOLVED */}
+      {/* 10. GET INVOLVED */}
       <section className="py-24 bg-muted/20">
         <div className="container px-6">
           <motion.div
@@ -407,7 +441,7 @@ const Index = () => {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">Get Involved</h2>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              Whether you're here to eat better or back the build — there's a place for you.
+              Whether you're here to eat better or back the build, there's a place for you.
             </p>
           </motion.div>
 
@@ -447,7 +481,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 10. BOTTOM CTA */}
+      {/* 11. BOTTOM CTA */}
       <section className="py-20 bg-foreground text-background">
         <div className="container px-6">
           <motion.div
@@ -461,7 +495,7 @@ const Index = () => {
               Ready to eat better?
             </h2>
             <p className="text-xl text-background/80 mb-8">
-              Fresh produce from Black farmers, delivered straight to your Chicago door. Order today — no subscription, no commitment.
+              Fresh produce from Black farmers, delivered straight to your Chicago door. Order today. No subscription, no commitment.
             </p>
             <div className="flex flex-col items-center gap-3">
               <Button
@@ -472,7 +506,7 @@ const Index = () => {
                 <a href="#boxes">Shop Produce Boxes</a>
               </Button>
               <p className="text-sm text-background/60">
-                Boxes from $35. Delivered across Chicago.
+                Boxes from $35. Delivered across Chicago every Sunday.
               </p>
             </div>
             <div className="mt-10 flex justify-center gap-4">

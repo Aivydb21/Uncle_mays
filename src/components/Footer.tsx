@@ -41,22 +41,6 @@ export const Footer = () => {
                   Shop Produce Boxes
                 </a>
               </li>
-              <li>
-                <Link
-                  to="/investors"
-                  className="text-background/70 hover:text-background transition-colors"
-                >
-                  Investors
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="mailto:info@unclemays.com"
-                  className="text-background/70 hover:text-background transition-colors"
-                >
-                  Request Pitch Book
-                </a>
-              </li>
             </ul>
           </div>
 
