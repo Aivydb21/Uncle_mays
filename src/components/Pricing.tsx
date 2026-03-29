@@ -59,10 +59,13 @@ export const Pricing = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Start With the Box</h2>
+          {/* Urgency banner */}
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
+            First Drop: Summer 2026 — Boxes Are Limited
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Box</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Fresh produce boxes are the first step in building a scalable grocery ecosystem for Black food. Each purchase
-            connects real demand to smarter sourcing, pricing, and distribution decisions over time.
+            Seasonal, rotating produce from Black farmers — delivered to your Chicago neighborhood. Early access members get first pick of every drop.
           </p>
         </motion.div>
 
@@ -119,7 +122,7 @@ export const Pricing = () => {
                     // Let the browser handle navigation naturally
                   }}
                 >
-                  <span className="text-center">Purchase Now</span>
+                  <span className="text-center">Get My Box</span>
                 </a>
               </div>
             </div>

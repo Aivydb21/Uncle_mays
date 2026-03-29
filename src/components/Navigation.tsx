@@ -52,11 +52,11 @@ export const Navigation = () => {
           })}
           <a
             href={WAITLIST_FORM_URL}
-            className="text-sm font-semibold px-6 py-2 rounded-md bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
+            className="text-sm font-semibold px-6 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Join the Waitlist
+            Claim My Spot — Free
           </a>
         </div>
 
@@ -100,11 +100,11 @@ export const Navigation = () => {
               <a
                 href={WAITLIST_FORM_URL}
                 onClick={() => setIsOpen(false)}
-                className="block w-full mt-4 font-semibold px-4 py-2 text-center rounded-md bg-primary/10 text-primary hover:bg-primary/15 transition-colors"
+                className="block w-full mt-4 font-semibold px-4 py-2 text-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Join the Waitlist
+                Claim My Spot — Free
               </a>
             </div>
           </motion.div>
