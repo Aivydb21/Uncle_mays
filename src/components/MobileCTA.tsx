@@ -2,14 +2,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
-const WAITLIST_FORM_URL =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=sharing&ouid=110071880161586206166";
-
 /**
  * MobileCTA — sticky bottom bar shown on mobile only.
  * Appears after the user scrolls past the hero (~300px).
- * Increases mobile conversion by keeping the waitlist CTA
- * thumb-reachable at all times.
+ * Keeps the shop CTA thumb-reachable at all times on mobile.
  */
 export const MobileCTA = () => {
   const [visible, setVisible] = useState(false);
@@ -35,7 +31,7 @@ export const MobileCTA = () => {
           <div className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs text-muted-foreground truncate">
-                500+ Chicagoans already in. First Drop: Summer 2026.
+                Fresh produce from Black farmers — delivered to your door.
               </p>
             </div>
             <Button
@@ -43,9 +39,7 @@ export const MobileCTA = () => {
               className="flex-shrink-0 font-semibold text-sm px-4 py-2 rounded-lg"
               asChild
             >
-              <a href={WAITLIST_FORM_URL} target="_blank" rel="noopener noreferrer">
-                Join — Free
-              </a>
+              <a href="#boxes">Order Now</a>
             </Button>
           </div>
         </motion.div>

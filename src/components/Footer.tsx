@@ -2,9 +2,6 @@ import { Link } from "react-router-dom";
 import { Mail, MapPin, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const WAITLIST_FORM_URL =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=sharing&ouid=110071880161586206166";
-
 export const Footer = () => {
   return (
     <footer className="bg-foreground text-background py-16">
@@ -17,20 +14,18 @@ export const Footer = () => {
               </span>
             </div>
             <p className="text-background/70 mb-6 max-w-md leading-relaxed">
-              Fresh produce from Black farmers, dropped in Chicago neighborhoods. Join the waitlist — it's free.
+              Fresh produce from Black farmers, delivered across Chicago. No subscription. No commitment. Just good food.
             </p>
-            {/* Footer CTA */}
+            {/* Footer shop CTA */}
             <div className="flex flex-col gap-2 max-w-xs">
               <Button
                 asChild
                 className="bg-background text-foreground hover:bg-background/90 font-semibold"
               >
-                <a href={WAITLIST_FORM_URL} target="_blank" rel="noopener noreferrer">
-                  Join the Waitlist — Free
-                </a>
+                <a href="#boxes">Shop Produce Boxes</a>
               </Button>
               <p className="text-xs text-background/50">
-                Join 500+ Chicagoans already on the list.
+                Boxes from $35. Delivered across Chicago.
               </p>
             </div>
           </div>
@@ -47,14 +42,12 @@ export const Footer = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href={WAITLIST_FORM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  to="/investors"
                   className="text-background/70 hover:text-background transition-colors"
                 >
-                  Join the Waitlist
-                </a>
+                  Investors
+                </Link>
               </li>
               <li>
                 <a

@@ -1,12 +1,9 @@
 import { motion } from "framer-motion";
-import { Leaf, MapPin, RotateCcw, ShieldCheck, Clock, HelpCircle, Users, Instagram } from "lucide-react";
+import { Leaf, MapPin, RotateCcw, ShieldCheck, HelpCircle, Users, Instagram, ShoppingBag, Bell, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/Layout";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
-
-const WAITLIST_FORM_URL =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=sharing&ouid=110071880161586206166";
 
 const farmers = [
   {
@@ -31,24 +28,24 @@ const farmers = [
 
 const faqs = [
   {
-    q: "Will this actually launch?",
-    a: "Yes — our first drop is confirmed for Summer 2026. Boxes are limited and early access members get first pick. Sign up now to lock your spot.",
+    q: "How does delivery work?",
+    a: "We deliver directly to your Chicago address. After placing your order, you'll receive a confirmation email with your estimated delivery window. We deliver across Chicago — enter your address at checkout to confirm your area.",
+  },
+  {
+    q: "What's actually in the box?",
+    a: "Every box is seasonal and rotating — so you get what's freshest, not what's been sitting in a warehouse. A Starter Box typically includes 5–7 items like sweet corn, heirloom tomatoes, collard greens, squash, and fresh herbs. The contents vary each delivery.",
   },
   {
     q: "How much does a box cost?",
-    a: "Boxes start at $35 for a Starter Box (5–7 seasonal items, 12–15 lbs). Family Boxes are $65 and Community Boxes are $95. No subscription required — you choose your box each drop.",
+    a: "Boxes start at $35 for a Starter Box (5–7 seasonal items, 12–15 lbs), $65 for a Family Box (12–15 items, 22–26 lbs), and $95 for a Community Box (20–25 items, 30–35 lbs). No subscription required — order when you want.",
   },
   {
-    q: "Where do I pick up my box?",
-    a: "We'll drop in Chicago neighborhoods — exact pickup locations are confirmed by email before each drop. We'll ask for your ZIP code after you join so we can route your first drop closest to you.",
+    q: "Do I need a subscription?",
+    a: "No. Every box is a one-time purchase — order when it works for you. If you'd like regular deliveries, reach out to info@unclemays.com and we can set up a recurring schedule.",
   },
   {
-    q: "What if I don't like what's in the box?",
-    a: "Every box is seasonal and rotating — so you'll never get the same box twice. If you ever have an issue with your order, reach out to info@unclemays.com and we'll make it right.",
-  },
-  {
-    q: "Will you spam my inbox?",
-    a: "Never. We will only email you about upcoming drops, your pickup location, and occasional farmer spotlights. Unsubscribe anytime — no hard feelings.",
+    q: "What if I have an issue with my order?",
+    a: "We stand behind every box. If anything is wrong with your delivery — missing items, quality issues, anything — email us at info@unclemays.com and we'll make it right, no questions asked.",
   },
 ];
 
@@ -75,7 +72,7 @@ const Index = () => {
     <Layout>
       <Hero />
 
-      {/* 2. HOW IT WORKS — Consumer-facing 3 steps */}
+      {/* 2. HOW IT WORKS — Live ordering flow */}
       <section className="py-24 bg-background">
         <div className="container px-6">
           <motion.div
@@ -87,29 +84,32 @@ const Index = () => {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4">How It Works</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Three simple steps from signup to fresh produce on your doorstep.
+              From order to your door in three simple steps.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {[
               {
+                icon: ShoppingBag,
                 step: "01",
-                title: "Join the Waitlist — Free",
+                title: "Choose Your Box",
                 description:
-                  "Sign up in 30 seconds. No credit card, no commitment. You're reserving your spot for the first drop.",
+                  "Pick the box size that works for your household — Starter, Family, or Community. All boxes are one-time purchases. No subscription required.",
               },
               {
+                icon: Package,
                 step: "02",
-                title: "Get Notified Before Each Drop",
+                title: "We Pack It Fresh",
                 description:
-                  "We'll email you before every drop with what's in the box, the price, and your nearest pickup location.",
+                  "Your box is packed with seasonal produce sourced directly from Black farmers. Every item is selected for freshness at time of packing.",
               },
               {
+                icon: Bell,
                 step: "03",
-                title: "Claim Your Box",
+                title: "Delivered to Your Door",
                 description:
-                  "Choose your box size, pay only when you're ready, and pick up fresh produce from a neighborhood location near you.",
+                  "We deliver straight to your Chicago address. You'll get a confirmation and delivery window by email as soon as your order is placed.",
               },
             ].map((step, idx) => (
               <motion.div
@@ -123,6 +123,9 @@ const Index = () => {
                 <div className="text-6xl font-bold text-primary/10 absolute top-6 right-6 leading-none select-none">
                   {step.step}
                 </div>
+                <div className="bg-primary/10 w-14 h-14 rounded-full flex items-center justify-center mb-5">
+                  <step.icon className="h-7 w-7 text-primary" />
+                </div>
                 <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
                 <p className="text-foreground/70 leading-relaxed">{step.description}</p>
               </motion.div>
@@ -131,7 +134,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 3. WHAT'S IN THE BOX — Features & Benefits */}
+      {/* 3. WHAT YOU'RE GETTING — Features & Benefits */}
       <section className="py-24 bg-muted/20">
         <div className="container px-6">
           <motion.div
@@ -157,9 +160,9 @@ const Index = () => {
               },
               {
                 icon: MapPin,
-                title: "Chicago Neighborhood Drops",
+                title: "Chicago-Wide Delivery",
                 description:
-                  "Pick up at a location near you — no long drives, no shipping delays. Local by design.",
+                  "We deliver across Chicago — no pickup required. Fresh produce arrives at your door on your schedule.",
               },
               {
                 icon: RotateCcw,
@@ -169,9 +172,9 @@ const Index = () => {
               },
               {
                 icon: ShieldCheck,
-                title: "Boxes Starting at $35",
+                title: "No Subscription",
                 description:
-                  "From a Starter Box for individuals to a Community Box for large families. No subscription required.",
+                  "Order when you want. No lock-in, no commitment. Boxes start at $35 — pay only when you order.",
               },
             ].map((feature, idx) => (
               <motion.div
@@ -200,7 +203,9 @@ const Index = () => {
             className="bg-card rounded-2xl p-8 shadow-soft border border-border/50 max-w-3xl mx-auto"
           >
             <h3 className="text-2xl font-bold mb-2 text-center">Sample Starter Box</h3>
-            <p className="text-muted-foreground text-center mb-6">A taste of what to expect — varies by season and drop.</p>
+            <p className="text-muted-foreground text-center mb-6">
+              A taste of what to expect — contents rotate each delivery based on what's freshest.
+            </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
                 "Sweet corn (4 ears)",
@@ -216,54 +221,60 @@ const Index = () => {
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground text-center mt-4">
-              Contents rotate each drop based on what's freshest from our farmers.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 4. URGENCY — First Drop */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/20 px-5 py-2 text-sm font-semibold mb-6">
-              <Clock className="h-4 w-4" />
-              First Drop: Summer 2026
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Boxes Are Limited. Early Access Members Get First Pick.
-            </h2>
-            <p className="text-xl text-primary-foreground/80 mb-8">
-              We're dropping a limited number of boxes in the first round. Sign up now to lock your spot — waitlist is free and takes 30 seconds.
-            </p>
-            <div className="flex flex-col items-center gap-3">
-              <Button
-                size="lg"
-                variant="secondary"
-                className="text-lg font-semibold px-10 py-6 rounded-xl"
-                asChild
-              >
-                <a href={WAITLIST_FORM_URL} target="_blank" rel="noopener noreferrer">
-                  Claim My Early Access Spot
-                </a>
+            <div className="mt-6 text-center">
+              <Button asChild size="sm" className="px-6">
+                <a href="#boxes">Order a Box</a>
               </Button>
-              <p className="text-sm text-primary-foreground/70">
-                Free to join. No credit card. Unsubscribe anytime.
-              </p>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* 5. PRODUCT / BOXES */}
+      {/* 4. PRODUCT / BOXES */}
       <Pricing />
+
+      {/* 5. WHY UNCLE MAY'S — Mission & Trust */}
+      <section className="py-24 bg-foreground text-background">
+        <div className="container px-6">
+          <div className="max-w-4xl mx-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="mb-12"
+            >
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">Why Uncle May's</h2>
+              <p className="text-xl text-background/80 leading-relaxed">
+                There is a $100B+ market for Black food that has never had a dedicated supply chain.
+                Uncle May's is building it — starting with the most direct connection possible: fresh
+                produce from Black farmers to Black households in Chicago.
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {[
+                "Every dollar you spend goes directly to Black farmers — not middlemen.",
+                "Sourced from farms within Illinois and the surrounding region.",
+                "Seasonal rotation means better quality and lower cost than year-round imports.",
+                "Building the demand data that helps Black farmers grow sustainable businesses.",
+              ].map((point, idx) => (
+                <motion.div
+                  key={point}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.08 }}
+                  className="flex items-start gap-3"
+                >
+                  <div className="h-2.5 w-2.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                  <p className="text-background/80 leading-relaxed">{point}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* 6. FARMER PROFILES */}
       <section className="py-24 bg-background">
@@ -307,7 +318,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 7. SOCIAL PROOF — Community Testimonials */}
+      {/* 7. SOCIAL PROOF — Customer Testimonials */}
       <section className="py-24 bg-muted/20">
         <div className="container px-6">
           <motion.div
@@ -319,12 +330,9 @@ const Index = () => {
           >
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
               <Users className="h-4 w-4" />
-              500+ Chicagoans already on the waitlist
+              Loved by Chicago families
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Your Neighbors Are In</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              You won't be an early guinea pig — you're joining a community that's been waiting for this.
-            </p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">What Customers Are Saying</h2>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -348,7 +356,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 8. FAQ — Objection Handling */}
+      {/* 8. FAQ */}
       <section className="py-24 bg-background">
         <div className="container px-6">
           <motion.div
@@ -360,7 +368,7 @@ const Index = () => {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Your Questions, Answered</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              No fine print. Here's everything you need to know before you sign up.
+              Everything you need to know before you order.
             </p>
           </motion.div>
 
@@ -411,18 +419,13 @@ const Index = () => {
               transition={{ duration: 0.6 }}
               className="bg-card rounded-2xl p-8 shadow-soft border border-border/50"
             >
-              <h3 className="text-2xl font-semibold mb-3">Customers</h3>
+              <h3 className="text-2xl font-semibold mb-3">Order Fresh Produce</h3>
               <p className="text-foreground/70 leading-relaxed mb-6">
-                Join the waitlist free, get notified before the first drop, and claim your box of fresh produce from Black farmers.
+                Choose your box, place your order online, and get fresh produce from Black farmers delivered to your Chicago door. No subscription. No commitment.
               </p>
               <Button asChild size="lg" className="w-full">
-                <a href={WAITLIST_FORM_URL} target="_blank" rel="noopener noreferrer">
-                  Claim My Early Access Spot
-                </a>
+                <a href="#boxes">Shop Produce Boxes</a>
               </Button>
-              <p className="text-xs text-muted-foreground text-center mt-3">
-                Free to join. Join 500+ Chicagoans already on the list.
-              </p>
             </motion.div>
 
             <motion.div
@@ -432,21 +435,19 @@ const Index = () => {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="bg-card rounded-2xl p-8 shadow-soft border border-border/50"
             >
-              <h3 className="text-2xl font-semibold mb-3">Investors</h3>
+              <h3 className="text-2xl font-semibold mb-3">Invest</h3>
               <p className="text-foreground/70 leading-relaxed mb-6">
                 Back the build of retail-first infrastructure that evolves into a compounding data and distribution platform for Black food.
               </p>
               <Button asChild size="lg" variant="outline" className="w-full border-2">
-                <a href="mailto:anthony@unclemays.com">
-                  Request Pitch Book
-                </a>
+                <a href="mailto:anthony@unclemays.com">Request Pitch Book</a>
               </Button>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* 10. BOTTOM CTA — Repeat signup with social proof */}
+      {/* 10. BOTTOM CTA */}
       <section className="py-20 bg-foreground text-background">
         <div className="container px-6">
           <motion.div
@@ -457,10 +458,10 @@ const Index = () => {
             className="max-w-2xl mx-auto text-center"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Still on the fence?
+              Ready to eat better?
             </h2>
             <p className="text-xl text-background/80 mb-8">
-              Join 500+ Chicagoans already on the waitlist. It's free, takes 30 seconds, and you can unsubscribe anytime.
+              Fresh produce from Black farmers, delivered straight to your Chicago door. Order today — no subscription, no commitment.
             </p>
             <div className="flex flex-col items-center gap-3">
               <Button
@@ -468,12 +469,10 @@ const Index = () => {
                 className="text-lg font-semibold px-10 py-6 rounded-xl bg-background text-foreground hover:bg-background/90"
                 asChild
               >
-                <a href={WAITLIST_FORM_URL} target="_blank" rel="noopener noreferrer">
-                  Claim My Early Access Spot
-                </a>
+                <a href="#boxes">Shop Produce Boxes</a>
               </Button>
               <p className="text-sm text-background/60">
-                Free to join. No credit card. Unsubscribe anytime.
+                Boxes from $35. Delivered across Chicago.
               </p>
             </div>
             <div className="mt-10 flex justify-center gap-4">

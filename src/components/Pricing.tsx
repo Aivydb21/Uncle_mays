@@ -59,13 +59,13 @@ export const Pricing = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          {/* Urgency banner */}
+          {/* Live availability badge */}
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
-            First Drop: Summer 2026 — Boxes Are Limited
+            Available Now — Delivering Across Chicago
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Box</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Seasonal, rotating produce from Black farmers — delivered to your Chicago neighborhood. Early access members get first pick of every drop.
+            Seasonal, rotating produce sourced directly from Black farmers and delivered to your Chicago door. No subscription. Order when you want.
           </p>
         </motion.div>
 

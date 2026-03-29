@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const WAITLIST_FORM_URL =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=sharing&ouid=110071880161586206166";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,12 +49,10 @@ export const Navigation = () => {
             );
           })}
           <a
-            href={WAITLIST_FORM_URL}
+            href="#boxes"
             className="text-sm font-semibold px-6 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-            target="_blank"
-            rel="noopener noreferrer"
           >
-            Claim My Spot — Free
+            Order Now
           </a>
         </div>
 
@@ -98,13 +94,11 @@ export const Navigation = () => {
                 );
               })}
               <a
-                href={WAITLIST_FORM_URL}
+                href="#boxes"
                 onClick={() => setIsOpen(false)}
                 className="block w-full mt-4 font-semibold px-4 py-2 text-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
-                target="_blank"
-                rel="noopener noreferrer"
               >
-                Claim My Spot — Free
+                Order Now
               </a>
             </div>
           </motion.div>
