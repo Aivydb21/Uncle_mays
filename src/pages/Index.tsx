@@ -440,7 +440,7 @@ const Index = () => {
                 Back the build of retail-first infrastructure that evolves into a compounding data and distribution platform for Black food.
               </p>
               <Button asChild size="lg" variant="outline" className="w-full border-2">
-                <a href="mailto:anthony@unclemays.com">Request Pitch Book</a>
+                <a href="mailto:info@unclemays.com">Request Pitch Book</a>
               </Button>
             </motion.div>
           </div>

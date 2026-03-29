@@ -51,7 +51,7 @@ export const Footer = () => {
               </li>
               <li>
                 <a
-                  href="mailto:anthony@unclemays.com"
+                  href="mailto:info@unclemays.com"
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   Request Pitch Book

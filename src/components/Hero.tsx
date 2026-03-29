@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Truck, Star } from "lucide-react";
 import heroImage from "@/assets/hero-produce.jpg";
@@ -58,14 +57,6 @@ export const Hero = () => {
               className="group text-lg font-semibold px-8 py-6 rounded-xl"
             >
               <a href="#boxes">Shop Produce Boxes</a>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-lg font-semibold px-8 py-6 rounded-xl border-2"
-              asChild
-            >
-              <Link to="/investors">Invest in Uncle May's</Link>
             </Button>
           </motion.div>
 
