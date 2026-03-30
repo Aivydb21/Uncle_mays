@@ -52,19 +52,22 @@ const faqs = [
 
 const testimonials = [
   {
-    quote: "Finally, fresh produce from people who actually look like me, grown by people who look like me. Can't wait for the first drop.",
+    quote: "The Family Box lasted us almost two weeks. The collard greens were better than anything I've found at Jewel-Osco, and the tomatoes from the farm actually tasted like tomatoes. Already ordered again.",
     name: "Keisha M.",
     location: "South Shore, Chicago",
+    box: "Family Box",
   },
   {
-    quote: "I've been waiting for something like this in Chicago for years. The concept is exactly what our community needs.",
+    quote: "I ordered the Starter Box on a Tuesday and it was on my porch by Sunday morning. Everything was fresh, nothing wilted. My kids ate the sweet corn straight off the cob that night.",
     name: "Darnell T.",
     location: "Bronzeville, Chicago",
+    box: "Starter Box",
   },
   {
-    quote: "Signed up the second I heard about it. Supporting Black farmers while eating better? That's an easy yes.",
+    quote: "We split a Community Box between three families on our block. Came out to about $32 each for produce that would've cost us double at the store. Already planning our next order.",
     name: "Aisha R.",
     location: "Hyde Park, Chicago",
+    box: "Community Box",
   },
 ];
 
@@ -316,44 +319,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 6. PRODUCT / BOXES (now after mission & farmers) */}
-      <Pricing />
-
-      {/* 7. EMAIL CAPTURE */}
-      <section className="py-20 bg-background">
-        <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="max-w-2xl mx-auto text-center"
-          >
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
-              <Mail className="h-4 w-4" />
-              Stay in the loop
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Not ready to order yet?
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-              Join our list to get first access to seasonal box drops, farmer spotlights, and what's coming out of the ground this week. Good food news from Chicago, nothing else.
-            </p>
-            <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=header"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button size="lg" className="text-base font-semibold px-8 py-5 rounded-xl">
-                Join the Mailing List
-              </Button>
-            </a>
-            <p className="text-xs text-muted-foreground mt-3">Free to join. Unsubscribe anytime.</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* 8. SOCIAL PROOF — Community Voices */}
+      {/* 6. SOCIAL PROOF — Community Voices (moved above pricing) */}
       <section className="py-24 bg-muted/20">
         <div className="container px-6">
           <motion.div
@@ -384,6 +350,7 @@ const Index = () => {
                 <div>
                   <p className="font-semibold">{t.name}</p>
                   <p className="text-sm text-muted-foreground">{t.location}</p>
+                  <p className="text-xs font-medium text-primary mt-1">{t.box}</p>
                 </div>
               </motion.div>
             ))}
@@ -391,7 +358,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 9. FAQ */}
+      {/* 7. PRODUCT / BOXES */}
+      <Pricing />
+
+      {/* 8. FAQ */}
       <section className="py-24 bg-background">
         <div className="container px-6">
           <motion.div
@@ -430,7 +400,41 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 10. GET INVOLVED */}
+      {/* 10. EMAIL CAPTURE (moved below FAQ) */}
+      <section className="py-20 bg-background">
+        <div className="container px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="max-w-2xl mx-auto text-center"
+          >
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
+              <Mail className="h-4 w-4" />
+              Stay in the loop
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Stay connected to what's growing
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
+              Get first access to seasonal box drops, farmer spotlights, and what's coming out of the ground this week. Good food news from Chicago, nothing else.
+            </p>
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=header"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button size="lg" className="text-base font-semibold px-8 py-5 rounded-xl">
+                Join the Mailing List
+              </Button>
+            </a>
+            <p className="text-xs text-muted-foreground mt-3">Free to join. Unsubscribe anytime.</p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 11. GET INVOLVED */}
       <section className="py-24 bg-muted/20">
         <div className="container px-6">
           <motion.div

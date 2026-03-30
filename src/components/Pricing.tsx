@@ -11,10 +11,11 @@ const plans = [
     name: "Starter Box",
     price: "$35",
     frequency: "per delivery",
+    priceAnchor: "~$2.33/lb delivered",
     description: "Perfect for individuals or couples",
     features: [
       "5-7 seasonal items",
-      "Weekly deliveries",
+      "Order anytime — delivered Sundays",
       "12-15 lbs of produce",
       "Support local Black farmers",
     ],
@@ -24,10 +25,11 @@ const plans = [
     name: "Family Box",
     price: "$65",
     frequency: "per delivery",
+    priceAnchor: "~$2.50/lb delivered",
     description: "Ideal for families of 3-5",
     features: [
       "12-15 seasonal items",
-      "Weekly deliveries available",
+      "Order anytime — delivered Sundays",
       "22-26 lbs of produce",
       "Priority farmer selection",
       "Free delivery",
@@ -39,10 +41,11 @@ const plans = [
     name: "Community Box",
     price: "$95",
     frequency: "per delivery",
+    priceAnchor: "~$2.71/lb delivered",
     description: "For large families or sharing",
     features: [
       "20-25 seasonal items",
-      "Weekly deliveries",
+      "Order anytime — delivered Sundays",
       "30-35 lbs of produce",
       "Meet your farmers events",
       "Free delivery",
@@ -119,6 +122,7 @@ export const Pricing = () => {
                   <div className="flex items-center gap-2">
                     <span className="text-muted-foreground">{plan.frequency}</span>
                   </div>
+                  <p className="text-xs font-medium text-primary/80 mt-1">{plan.priceAnchor}</p>
                 </div>
                 <ul className="space-y-3 mb-8 flex-grow">
                   {plan.features.map((feature, i) => (
