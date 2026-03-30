@@ -38,7 +38,7 @@ const faqs = [
   },
   {
     q: "How much does a box cost?",
-    a: "The Starter Box is $35 (~12–15 lbs of produce). The Family Box is $65 and includes 22–26 lbs of produce, a dozen eggs, and one meat choice. The Community Box is $95 and includes 30–35 lbs of produce, two dozen eggs, and two protein choices. No subscription required — order when you want.",
+    a: "The Starter Box is $35 (~12–15 lbs of produce). The Family Box is $65 and includes 22–26 lbs of produce, a dozen eggs, and one meat choice. The Community Box is $95 and includes 30–35 lbs of produce, two dozen eggs, and two protein choices. No subscription required. Order when you want.",
   },
   {
     q: "Do I need a subscription?",
