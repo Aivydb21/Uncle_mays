@@ -249,7 +249,7 @@ const Index = () => {
               <p className="text-xl text-background/80 leading-relaxed">
                 There is a $100B+ market for Black food that has never had a dedicated supply chain.
                 Uncle May's is building it, starting with the most direct connection possible: fresh
-                produce from Black farmers to Black households in Chicago.
+                produce from Black farmers to Chicago.
               </p>
             </motion.div>
 
@@ -434,59 +434,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 11. GET INVOLVED */}
-      <section className="py-24 bg-muted/20">
-        <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="text-center max-w-3xl mx-auto mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Get Involved</h2>
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              Whether you're here to eat better or back the build, there's a place for you.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="bg-card rounded-2xl p-8 shadow-soft border border-border/50"
-            >
-              <h3 className="text-2xl font-semibold mb-3">Order Fresh Produce</h3>
-              <p className="text-foreground/70 leading-relaxed mb-6">
-                Choose your box, place your order online, and get fresh produce from Black farmers delivered to your Chicago door. No subscription. No commitment.
-              </p>
-              <Button asChild size="lg" className="w-full">
-                <a href="#boxes">Shop Produce Boxes</a>
-              </Button>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="bg-card rounded-2xl p-8 shadow-soft border border-border/50"
-            >
-              <h3 className="text-2xl font-semibold mb-3">Invest</h3>
-              <p className="text-foreground/70 leading-relaxed mb-6">
-                Back the build of retail-first infrastructure that evolves into a compounding data and distribution platform for Black food.
-              </p>
-              <Button asChild size="lg" variant="outline" className="w-full border-2">
-                <a href="mailto:info@unclemays.com">Request Pitch Book</a>
-              </Button>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* 11. BOTTOM CTA */}
+      {/* BOTTOM CTA */}
       <section className="py-20 bg-foreground text-background">
         <div className="container px-6">
           <motion.div

@@ -40,7 +40,7 @@ const organizationSchema = {
   url: "https://unclemays.com",
   logo: "https://www.unclemays.com/uncle-mays-logo.png",
   description:
-    "Uncle May's Produce connects Black farmers directly to Black households in Chicago through curated seasonal produce boxes. Delivering every Sunday. Boxes from $35, no subscription required.",
+    "Uncle May's Produce connects Black farmers directly to Chicago through curated seasonal produce boxes. Delivering every Sunday. Boxes from $35, no subscription required.",
   contactPoint: {
     "@type": "ContactPoint",
     telephone: "+1-312-972-2595",

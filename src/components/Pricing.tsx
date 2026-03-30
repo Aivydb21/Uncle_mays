@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronDown, ShieldCheck } from "lucide-react";
+import { motion } from "framer-motion";
+import { Check, ShieldCheck } from "lucide-react";
 
 const produceBoxImage = "/images/produce-box.jpg";
 
@@ -55,27 +54,7 @@ const plans = [
   },
 ];
 
-const miniFaqs = [
-  {
-    q: "When will my box arrive?",
-    a: "Orders deliver every Sunday. Place yours any day of the week and it ships the following Sunday. No cutoff stress.",
-  },
-  {
-    q: "What's actually in the box?",
-    a: "Every box is seasonal and rotating. You get what's freshest, not what's been sitting in a warehouse. A Starter Box typically includes sweet corn, heirloom tomatoes, collard greens, squash, and fresh herbs.",
-  },
-  {
-    q: "Is this a subscription?",
-    a: "No. Every box is a one-time purchase. Order when it works for you. No lock-in, no cancellation needed.",
-  },
-  {
-    q: "What if something arrives wrong?",
-    a: "Email us at info@unclemays.com and we'll make it right. Full credit or replacement, no questions asked.",
-  },
-];
-
 export const Pricing = () => {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   return (
     <section id="boxes" className="py-24 bg-muted/30 relative" style={{ zIndex: 1 }}>
@@ -181,54 +160,6 @@ export const Pricing = () => {
             </a>{" "}
             and we'll make it right. Full credit or replacement, no questions asked.
           </p>
-        </motion.div>
-
-        {/* Mini FAQ Accordion */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="max-w-3xl mx-auto mb-16"
-        >
-          <p className="text-center text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-5">
-            Quick answers before you order
-          </p>
-          <div className="space-y-2">
-            {miniFaqs.map((faq, idx) => (
-              <div
-                key={idx}
-                className="bg-card border border-border/50 rounded-xl overflow-hidden"
-              >
-                <button
-                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full flex items-center justify-between px-6 py-4 text-left hover:bg-muted/30 transition-colors"
-                  aria-expanded={openFaq === idx}
-                >
-                  <span className="font-medium text-sm">{faq.q}</span>
-                  <ChevronDown
-                    className={`h-4 w-4 text-muted-foreground flex-shrink-0 ml-4 transition-transform duration-200 ${
-                      openFaq === idx ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-                <AnimatePresence initial={false}>
-                  {openFaq === idx && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <p className="px-6 pb-4 text-sm text-foreground/70 leading-relaxed">
-                        {faq.a}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
-          </div>
         </motion.div>
 
         {/* Produce box image */}
