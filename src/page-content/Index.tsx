@@ -1,7 +1,8 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { Leaf, MapPin, RotateCcw, ShieldCheck, HelpCircle, Users, Instagram, ShoppingBag, Bell, Package, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Layout } from "@/components/Layout";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
 
@@ -69,7 +70,7 @@ const testimonials = [
 
 const Index = () => {
   return (
-    <Layout>
+    <>
       <Hero />
 
       {/* 2. HOW IT WORKS — Live ordering flow */}
@@ -523,7 +524,7 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

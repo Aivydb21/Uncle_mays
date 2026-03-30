@@ -1,10 +1,10 @@
-import { Layout } from "@/components/Layout";
+"use client";
+
 import { motion } from "framer-motion";
 
 const Terms = () => {
   return (
-    <Layout>
-      <div className="min-h-screen">
+    <div className="min-h-screen">
         <section className="relative py-24 bg-primary text-primary-foreground">
           <div className="container px-6">
             <motion.div
@@ -299,7 +299,6 @@ const Terms = () => {
           </div>
         </section>
       </div>
-    </Layout>
   );
 };
 

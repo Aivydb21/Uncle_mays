@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { Mail, MapPin, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -22,7 +22,7 @@ export const Footer = () => {
                 asChild
                 className="bg-background text-foreground hover:bg-background/90 font-semibold"
               >
-                <a href="#boxes">Shop Produce Boxes</a>
+                <a href="/#boxes">Shop Produce Boxes</a>
               </Button>
               <p className="text-xs text-background/50">
                 Boxes from $35. Delivered across Chicago.
@@ -35,7 +35,7 @@ export const Footer = () => {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="#boxes"
+                  href="/#boxes"
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   Shop Produce Boxes
@@ -81,10 +81,10 @@ export const Footer = () => {
               © 2026 Uncle Mays Produce. All rights reserved.
             </p>
             <div className="flex gap-6">
-              <Link to="/privacy" className="text-background/60 hover:text-background text-sm transition-colors">
+              <Link href="/privacy" className="text-background/60 hover:text-background text-sm transition-colors">
                 Privacy Policy
               </Link>
-              <Link to="/terms" className="text-background/60 hover:text-background text-sm transition-colors">
+              <Link href="/terms" className="text-background/60 hover:text-background text-sm transition-colors">
                 Terms of Service
               </Link>
             </div>

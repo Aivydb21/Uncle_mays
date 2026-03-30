@@ -1,7 +1,10 @@
+"use client";
+
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronDown, ShieldCheck } from "lucide-react";
-import produceBoxImage from "@/assets/produce-box.jpg";
+
+const produceBoxImage = "/images/produce-box.jpg";
 
 const plans = [
   {

@@ -1,10 +1,10 @@
+"use client";
+
 import { motion } from "framer-motion";
-import { Layout } from "@/components/Layout";
 
 const Investors = () => {
   return (
-    <Layout>
-      <div className="min-h-screen">
+    <div className="min-h-screen">
         <section className="relative py-24 bg-primary text-primary-foreground">
           <div className="container px-6">
             <motion.div
@@ -52,7 +52,6 @@ const Investors = () => {
           </div>
         </section>
       </div>
-    </Layout>
   );
 };
 

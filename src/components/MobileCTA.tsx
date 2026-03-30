@@ -1,3 +1,5 @@
+"use client";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -39,7 +41,7 @@ export const MobileCTA = () => {
               className="flex-shrink-0 font-semibold text-sm px-4 py-2 rounded-lg"
               asChild
             >
-              <a href="#boxes">Order Now</a>
+              <a href="/#boxes">Order Now</a>
             </Button>
           </div>
         </motion.div>

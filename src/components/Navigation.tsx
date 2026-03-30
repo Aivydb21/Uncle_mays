@@ -1,5 +1,8 @@
+"use client";
+
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,25 +10,24 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
+  const pathname = usePathname() ?? "/";
 
   const navLinks = [
     { path: "/", label: "Home" },
-    { path: "/investors", label: "Investors" },
   ];
 
   const isActive = (path: string) => {
     if (path === "/") {
-      return location.pathname === "/";
+      return pathname === "/";
     }
-    return location.pathname.startsWith(path);
+    return pathname.startsWith(path);
   };
 
   return (
     <>
       <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-6">
-          <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+          <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Uncle May's Produce
             </span>
@@ -37,7 +39,7 @@ export const Navigation = () => {
             return (
               <Link
                 key={link.path}
-                to={link.path}
+                href={link.path}
                 className={`text-sm font-medium transition-colors hover:text-primary ${
                   isActive(link.path)
                     ? "text-primary"
@@ -49,7 +51,7 @@ export const Navigation = () => {
             );
           })}
           <a
-            href="#boxes"
+            href="/#boxes"
             className="text-sm font-semibold px-6 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
             Order Now
@@ -81,7 +83,7 @@ export const Navigation = () => {
                 return (
                   <Link
                     key={link.path}
-                    to={link.path}
+                    href={link.path}
                     onClick={() => setIsOpen(false)}
                     className={`block text-base font-medium transition-colors hover:text-primary ${
                       isActive(link.path)
@@ -94,7 +96,7 @@ export const Navigation = () => {
                 );
               })}
               <a
-                href="#boxes"
+                href="/#boxes"
                 onClick={() => setIsOpen(false)}
                 className="block w-full mt-4 font-semibold px-4 py-2 text-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
               >
@@ -108,4 +110,3 @@ export const Navigation = () => {
     </>
   );
 };
-

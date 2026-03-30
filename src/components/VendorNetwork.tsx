@@ -1,5 +1,7 @@
+"use client";
+
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 export const VendorNetwork = () => {
   return (
@@ -43,7 +45,7 @@ export const VendorNetwork = () => {
 
         <div className="max-w-6xl mx-auto mt-12 flex justify-center text-center">
           <Link
-            to="/investors"
+            href="/investors"
             className="text-base font-semibold text-primary underline underline-offset-4"
           >
             Investors

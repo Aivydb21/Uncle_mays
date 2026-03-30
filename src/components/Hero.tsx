@@ -1,7 +1,10 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Truck, Star } from "lucide-react";
-import heroImage from "@/assets/hero-produce.jpg";
+
+const heroImage = "/images/hero-produce.jpg";
 
 export const Hero = () => {
   return (

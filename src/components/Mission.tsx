@@ -1,8 +1,7 @@
+"use client";
+
 import { motion } from "framer-motion";
-// TODO: Replace with farmer.jpg when you have the image
-// For now, using heritage.jpg as placeholder - add your farmer image to src/assets/farmer.jpg
-import heritageImage from "@/assets/heritage.jpg";
-const farmerImage = heritageImage; // Temporary - replace with farmer.jpg import when ready
+const farmerImage = "/images/heritage.jpg";
 
 export const Mission = () => {
   return (
