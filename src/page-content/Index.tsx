@@ -34,11 +34,11 @@ const faqs = [
   },
   {
     q: "What's actually in the box?",
-    a: "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. A Starter Box typically includes 5–7 items like sweet corn, heirloom tomatoes, collard greens, squash, and fresh herbs. The contents vary each delivery.",
+    a: "Every box is seasonal. The Starter Box includes 6 produce items (~12–15 lbs): sweet potatoes, russet potatoes, onions, bell peppers, mixed greens or kale, and heirloom tomatoes. The Family Box adds more produce, a dozen eggs, and your choice of one meat (whole chicken, ground beef, or pork bratwurst). The Community Box includes the full produce spread, 2 dozen eggs, and your choice of two proteins from chicken, ground beef, pork chops, lamb stew, or pork ribs.",
   },
   {
     q: "How much does a box cost?",
-    a: "Boxes start at $35 for a Starter Box (5–7 seasonal items, 12–15 lbs), $65 for a Family Box (12–15 items, 22–26 lbs), and $95 for a Community Box (20–25 items, 30–35 lbs). No subscription required. Order when you want.",
+    a: "The Starter Box is $35 (~12–15 lbs of produce). The Family Box is $65 and includes 22–26 lbs of produce, a dozen eggs, and one meat choice. The Community Box is $95 and includes 30–35 lbs of produce, two dozen eggs, and two protein choices. No subscription required — order when you want.",
   },
   {
     q: "Do I need a subscription?",
@@ -212,12 +212,12 @@ const Index = () => {
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
-                "Sweet corn (4 ears)",
+                "Sweet potatoes (2 lbs)",
+                "Russet potatoes (2 lbs)",
+                "Yellow onions (2–3 ct)",
+                "Bell peppers (3 ct)",
+                "Mixed greens or kale (1 bunch)",
                 "Heirloom tomatoes (1 lb)",
-                "Collard greens (1 bunch)",
-                "Yellow squash (2–3 ct)",
-                "Red bell peppers (2 ct)",
-                "Fresh herbs (basil or thyme)",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2 text-sm text-foreground/80">
                   <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />

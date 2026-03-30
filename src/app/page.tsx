@@ -72,7 +72,7 @@ const productListSchema = {
         "@type": "Product",
         name: "Starter Box",
         description:
-          "5–7 seasonal items, 12–15 lbs of fresh produce. Perfect for individuals or couples.",
+          "6 seasonal produce items (~12–15 lbs): sweet potatoes, russet potatoes, onions, bell peppers, mixed greens or kale, and heirloom tomatoes. Perfect for individuals or couples.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
@@ -91,7 +91,7 @@ const productListSchema = {
         "@type": "Product",
         name: "Family Box",
         description:
-          "12–15 seasonal items, 22–26 lbs of fresh produce. Ideal for families of 3–5.",
+          "9+ seasonal produce items (~22–26 lbs), 1 dozen eggs, and your choice of one meat: whole chicken (4.5 lbs), ground beef (2 lbs), or pork bratwurst (3 lbs). Ideal for families of 3–5.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
@@ -110,7 +110,7 @@ const productListSchema = {
         "@type": "Product",
         name: "Community Box",
         description:
-          "20–25 seasonal items, 30–35 lbs of fresh produce. For large families or sharing.",
+          "10+ seasonal produce items (~30–35 lbs), 2 dozen eggs, and your choice of two proteins from: whole chicken, ground beef, pork chops, lamb stew, or pork ribs. For large families or splitting across households.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
