@@ -19,7 +19,7 @@ const plans = [
       "Order anytime — delivered Sundays",
       "Sourced from Black farmers",
     ],
-    stripeUrl: "https://buy.stripe.com/cNidR983d5Mw83JcNu9Zm08",
+    stripeUrl: "https://buy.stripe.com/14AfZh2IT0sces75l29Zm03",
   },
   {
     name: "Family Box",
@@ -35,7 +35,7 @@ const plans = [
       "Order anytime — delivered Sundays",
     ],
     popular: true,
-    stripeUrl: "https://buy.stripe.com/dRmbJ1erB2AkcjZeVC9Zm09",
+    stripeUrl: "https://buy.stripe.com/4gM7sL2ITej2gAf3cU9Zm07",
   },
   {
     name: "Community Box",
@@ -50,7 +50,7 @@ const plans = [
       "2 protein choices: chicken, ground beef, pork chops, lamb stew, or pork ribs",
       "Order anytime — delivered Sundays",
     ],
-    stripeUrl: "https://buy.stripe.com/8x25kD5V5b6QabR7ta9Zm0a",
+    stripeUrl: "https://buy.stripe.com/5kQ28r0AL6QA83J4gY9Zm06",
   },
 ];
 
