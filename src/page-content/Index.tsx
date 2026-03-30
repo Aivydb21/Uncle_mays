@@ -234,50 +234,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 4. WHY UNCLE MAY'S — Mission & Trust (moved above pricing) */}
-      <section className="py-24 bg-foreground text-background">
-        <div className="container px-6">
-          <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
-              className="mb-12"
-            >
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">Why Uncle May's</h2>
-              <p className="text-xl text-background/80 leading-relaxed">
-                There is a $100B+ market for Black food that has never had a dedicated supply chain.
-                Uncle May's is building it, starting with the most direct connection possible: fresh
-                produce from Black farmers to Chicago.
-              </p>
-            </motion.div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {[
-                "Every dollar you spend goes directly to Black farmers, not middlemen.",
-                "Sourced from farms within Illinois and the surrounding region.",
-                "Seasonal rotation means better quality and lower cost than year-round imports.",
-                "Building the demand data that helps Black farmers grow sustainable businesses.",
-              ].map((point, idx) => (
-                <motion.div
-                  key={point}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: idx * 0.08 }}
-                  className="flex items-start gap-3"
-                >
-                  <div className="h-2.5 w-2.5 rounded-full bg-primary mt-2 flex-shrink-0" />
-                  <p className="text-background/80 leading-relaxed">{point}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. FARMER PROFILES (moved above pricing) */}
+      {/* 5. FARMER PROFILES */}
       <section className="py-24 bg-background">
         <div className="container px-6">
           <motion.div
