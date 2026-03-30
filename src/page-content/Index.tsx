@@ -245,9 +245,6 @@ const Index = () => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Farmers We Source From</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Real names, real farms, real impact. You know exactly who grew your food.
-            </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -276,7 +273,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 6. SOCIAL PROOF — Community Voices (moved above pricing) */}
+      {/* 6. PRODUCT / BOXES */}
+      <Pricing />
+
+      {/* 7. SOCIAL PROOF — Community Voices */}
       <section className="py-24 bg-muted/20">
         <div className="container px-6">
           <motion.div
@@ -314,9 +314,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* 7. PRODUCT / BOXES */}
-      <Pricing />
 
       {/* 8. FAQ */}
       <section className="py-24 bg-background">
