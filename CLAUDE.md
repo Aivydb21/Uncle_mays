@@ -16,7 +16,7 @@ Orders are delivered **every Sunday at the end of the order week**. If a custome
 ## Key URLs & Integrations
 - **Email capture form:** `https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=header`
 - **Primary contact email:** info@unclemays.com (use for ALL contact, investor, and support mailto: links)
-- **Instagram:** @unclemays → https://www.instagram.com/unclemays
+- **Instagram:** @unclemaysproduce → https://www.instagram.com/unclemaysproduce/
 - **Physical address:** 73 W Monroe Ave #3002, Chicago, IL 60603
 - **Phone:** +1-312-972-2595
 - **GitHub repo:** https://github.com/Aivydb21/Uncle_mays.git

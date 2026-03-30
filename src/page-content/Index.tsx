@@ -464,7 +464,7 @@ const Index = () => {
             </div>
             <div className="mt-10 flex justify-center gap-4">
               <a
-                href="https://instagram.com/unclemays"
+                href="https://www.instagram.com/unclemaysproduce/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-background/70 hover:text-background transition-colors text-sm"

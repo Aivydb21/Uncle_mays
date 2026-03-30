@@ -46,7 +46,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@unclemays",
+    site: "@unclemaysproduce",
     title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered in Chicago",
     description:
       "Curated seasonal produce boxes sourced directly from Black farmers, delivered to your Chicago door. Boxes from $35. No subscription required. Order today.",

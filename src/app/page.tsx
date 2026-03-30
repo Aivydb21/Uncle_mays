@@ -24,7 +24,7 @@ const localBusinessSchema = {
     contactType: "Customer Service",
     email: "info@unclemays.com",
   },
-  sameAs: ["https://www.instagram.com/unclemays"],
+  sameAs: ["https://www.instagram.com/unclemaysproduce/"],
   priceRange: "$$",
   areaServed: {
     "@type": "City",
@@ -55,7 +55,7 @@ const organizationSchema = {
     postalCode: "60603",
     addressCountry: "US",
   },
-  sameAs: ["https://www.instagram.com/unclemays"],
+  sameAs: ["https://www.instagram.com/unclemaysproduce/"],
 };
 
 const productListSchema = {

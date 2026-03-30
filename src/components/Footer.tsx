@@ -63,12 +63,12 @@ export const Footer = () => {
               <li className="flex items-start gap-2">
                 <Instagram className="h-5 w-5 text-background/70 flex-shrink-0 mt-0.5" />
                 <a
-                  href="https://instagram.com/unclemays"
+                  href="https://www.instagram.com/unclemaysproduce/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-background/70 hover:text-background transition-colors"
                 >
-                  @unclemays
+                  @unclemaysproduce
                 </a>
               </li>
             </ul>
