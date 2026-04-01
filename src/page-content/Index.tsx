@@ -379,7 +379,7 @@ const Index = () => {
               Get first access to seasonal box drops, farmer spotlights, and what's coming out of the ground this week. Good food news from Chicago, nothing else.
             </p>
             <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLSfmaSTz-8JuH3RXsL3sCBakVjBcqGQML6muiYeFOdLQ-FwqoA/viewform?usp=header"
+              href={process.env.NEXT_PUBLIC_EMAIL_FORM_URL!}
               target="_blank"
               rel="noopener noreferrer"
             >
