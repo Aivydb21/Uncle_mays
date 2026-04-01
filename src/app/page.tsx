@@ -169,6 +169,14 @@ const faqSchema = {
         text: "We stand behind every box. If anything is wrong with your delivery (missing items, quality issues, anything), email us at info@unclemays.com and we'll make it right, no questions asked.",
       },
     },
+    {
+      "@type": "Question",
+      name: "How do I cancel my order?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "There's nothing to cancel. Every box is a one-time purchase with no recurring charges. If you need to modify or cancel an order you've already placed, email info@unclemays.com as soon as possible and we'll take care of it.",
+      },
+    },
   ],
 };
 
