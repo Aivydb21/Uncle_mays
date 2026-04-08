@@ -30,15 +30,15 @@ const farmers = [
 const faqs = [
   {
     q: "How does delivery work?",
-    a: "We deliver directly to your Chicago address every Sunday. Place your order any day of the week and it will be delivered the following Sunday. You'll receive a confirmation email with your delivery window as soon as your order is placed.",
+    a: "We deliver directly to your Chicago address every Wednesday. Place your order any day of the week and it will be delivered the following Wednesday. You'll receive a confirmation email with your delivery window as soon as your order is placed.",
   },
   {
     q: "What's actually in the box?",
-    a: "Every box is seasonal. The Starter Box includes 6 produce items (~12–15 lbs): sweet potatoes, russet potatoes, onions, bell peppers, mixed greens or kale, and heirloom tomatoes. The Family Box adds more produce, a dozen eggs, and your choice of one meat (whole chicken, ground beef, or pork bratwurst). The Community Box includes the full produce spread, 2 dozen eggs, and your choice of two proteins from chicken, ground beef, pork chops, lamb stew, or pork ribs.",
+    a: "Every box is seasonal. The Starter Box includes 6 produce items (~12–15 lbs) from this current rotation: asparagus, kale, lettuce, radishes, sweet potatoes, and microgreens. The Family Box adds more produce, a dozen eggs, and your choice of one protein: pastured whole chicken or beef short ribs. The Community Box includes the full produce spread, 2 dozen eggs, and your choice of two proteins from whole chicken, beef short ribs, and lamb chops.",
   },
   {
     q: "How much does a box cost?",
-    a: "The Starter Box is $35 (~12–15 lbs of produce). The Family Box is $65 and includes 22–26 lbs of produce, a dozen eggs, and one meat choice. The Community Box is $95 and includes 30–35 lbs of produce, two dozen eggs, and two protein choices. No subscription required. Order when you want.",
+    a: "The Starter Box is $35 (~12–15 lbs of produce). The Family Box is $65 and includes 22–26 lbs of produce, a dozen eggs, and one protein choice (pastured whole chicken or beef short ribs). The Community Box is $95 and includes 30–35 lbs of produce, two dozen eggs, and two protein choices (whole chicken, beef short ribs, or lamb chops). No subscription required. Order when you want.",
   },
   {
     q: "Do I need a subscription?",
@@ -62,7 +62,7 @@ const testimonials = [
     box: "Family Box",
   },
   {
-    quote: "I ordered the Starter Box on a Tuesday and it was on my porch by Sunday morning. Everything was fresh, nothing wilted. My kids ate the sweet corn straight off the cob that night.",
+    quote: "I ordered the Starter Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The asparagus and greens were gone in two days.",
     name: "Darnell T.",
     location: "Bronzeville, Chicago",
     box: "Starter Box",
@@ -117,7 +117,7 @@ const Index = () => {
                 step: "03",
                 title: "Delivered to Your Door",
                 description:
-                  "We deliver straight to your Chicago address every Sunday. You'll get a confirmation and delivery window by email as soon as your order is placed.",
+                  "We deliver straight to your Chicago address every Wednesday. You'll get a confirmation and delivery window by email as soon as your order is placed.",
               },
             ].map((step, idx) => (
               <motion.div
@@ -170,7 +170,7 @@ const Index = () => {
                 icon: MapPin,
                 title: "Chicago-Wide Delivery",
                 description:
-                  "We deliver across Chicago. No pickup required. Fresh produce arrives at your door every Sunday.",
+                  "We deliver across Chicago. No pickup required. Fresh produce arrives at your door every Wednesday.",
               },
               {
                 icon: RotateCcw,
@@ -216,12 +216,12 @@ const Index = () => {
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
+                "Asparagus (1 bunch)",
+                "Rainbow chard or kale (1 bunch)",
+                "Green leaf or romaine lettuce (1 head)",
+                "Radishes (1 lb)",
                 "Sweet potatoes (2 lbs)",
-                "Russet potatoes (2 lbs)",
-                "Yellow onions (2–3 ct)",
-                "Bell peppers (3 ct)",
-                "Mixed greens or kale (1 bunch)",
-                "Heirloom tomatoes (1 lb)",
+                "Microgreens (1 clam)",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2 text-sm text-foreground/80">
                   <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
@@ -417,7 +417,7 @@ const Index = () => {
                 <a href="#boxes">Shop Produce Boxes</a>
               </Button>
               <p className="text-sm text-background/60">
-                Boxes from $35. Delivered across Chicago every Sunday.
+                Boxes from $35. Delivered across Chicago every Wednesday.
               </p>
             </div>
             <div className="mt-10 flex justify-center gap-4">

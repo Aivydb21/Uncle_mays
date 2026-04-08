@@ -14,9 +14,9 @@ const plans = [
     description: "Perfect for individuals or couples",
     features: [
       "6 seasonal produce items (~12–15 lbs)",
-      "Sweet potatoes, russet potatoes, onions",
-      "Bell peppers, mixed greens or kale, heirloom tomatoes",
-      "Order anytime. Delivered every Sunday.",
+      "Asparagus, lettuce, radishes, sweet potatoes",
+      "Rainbow chard or kale, plus rotating microgreens",
+      "Order anytime. Delivered every Wednesday.",
       "Sourced from Black farmers",
     ],
     stripeUrl: process.env.NEXT_PUBLIC_STRIPE_STARTER_URL!,
@@ -29,10 +29,10 @@ const plans = [
     description: "Ideal for families of 3–5",
     features: [
       "9+ seasonal produce items (~22–26 lbs)",
-      "Greens, squash, root vegetables & more",
+      "Greens, roots, and seasonal variety from local farms",
       "1 dozen eggs included",
-      "1 meat choice: whole chicken (4.5 lbs), ground beef (2 lbs), or pork bratwurst (3 lbs)",
-      "Order anytime. Delivered every Sunday.",
+      "1 protein choice: pastured whole chicken or beef short ribs",
+      "Order anytime. Delivered every Wednesday.",
     ],
     popular: true,
     stripeUrl: process.env.NEXT_PUBLIC_STRIPE_FAMILY_URL!,
@@ -45,17 +45,17 @@ const plans = [
     description: "For large families or splitting across households",
     features: [
       "10+ seasonal produce items (~30–35 lbs)",
-      "Full range of greens, squash & root vegetables",
+      "Full range of greens, roots, and microgreens",
       "2 dozen eggs included",
-      "2 protein choices: chicken, ground beef, pork chops, lamb stew, or pork ribs",
-      "Order anytime. Delivered every Sunday.",
+      "2 protein choices: whole chicken, beef short ribs, or lamb chops",
+      "Order anytime. Delivered every Wednesday.",
     ],
     stripeUrl: process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_URL!,
   },
 ];
 
 export const Pricing = () => {
-  const handleGetMyBox = (stripeUrl: string) => {
+  const handleOrder = (stripeUrl: string) => {
     window.location.href = stripeUrl;
   };
 
@@ -75,10 +75,10 @@ export const Pricing = () => {
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Box</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Seasonal, rotating produce sourced directly from Black farmers and delivered to your Chicago door. No subscription. Order when you want.
+            Seasonal, rotating produce sourced directly from Black farmers and delivered to your Chicago door. No subscription required. Order when you want.
           </p>
           <p className="text-sm text-muted-foreground mt-3">
-            🚚 Orders deliver every Sunday. Place yours any day and it ships the following Sunday.
+            🚚 Orders deliver every Wednesday. Place yours any day and it ships the following Wednesday.
           </p>
         </motion.div>
 
@@ -106,7 +106,7 @@ export const Pricing = () => {
                   </div>
                   <p className="text-xs font-medium text-primary/80 mt-1">{plan.priceAnchor}</p>
                   <p className="text-sm font-semibold mt-3">
-                    Order by Saturday night. Delivered this Sunday.
+                    Order by Tuesday night. Delivered this Wednesday.
                   </p>
                   <p className="text-xs text-muted-foreground mt-2">
                     100% freshness guarantee. Not happy? Full refund, no questions.
@@ -126,20 +126,16 @@ export const Pricing = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleGetMyBox(plan.stripeUrl);
+                    handleOrder(plan.stripeUrl);
                   }}
                   className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
                     plan.popular
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium"
                       : "border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-soft"
                   }`}
-                  style={{
-                    cursor: "pointer",
-                    zIndex: 9999,
-                    position: "relative",
-                  }}
+                  style={{ cursor: "pointer", zIndex: 9999, position: "relative" }}
                 >
-                  <span className="text-center">Get My Box</span>
+                  <span className="text-center">Order Now — {plan.price}</span>
                 </button>
               </div>
             </div>

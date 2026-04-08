@@ -61,7 +61,7 @@ const About = () => {
               <p className="text-foreground/80 leading-relaxed mb-4">
                 Uncle May&apos;s Produce began with a simple question. Why is it still hard for many Chicago families to
                 get truly fresh produce while Black farmers are still fighting for consistent market access? We built a
-                direct path between both sides. Families get seasonal produce boxes delivered every Sunday. Farmers get
+                direct path between both sides. Families get seasonal produce boxes delivered every Wednesday. Farmers get
                 fairer demand and more predictable income.
               </p>
               <p className="text-foreground/80 leading-relaxed mb-4">

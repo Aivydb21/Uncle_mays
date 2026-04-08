@@ -40,7 +40,7 @@ export const metadata: Metadata = {
         url: "https://www.unclemays.com/og-social.png",
         width: 1200,
         height: 630,
-        alt: "Uncle May's Produce. No subscription. No commitment. Just good food.",
+        alt: "Uncle May's Produce. No subscription. Just good food.",
       },
     ],
     url: "https://unclemays.com/",

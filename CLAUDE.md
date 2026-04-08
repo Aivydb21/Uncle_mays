@@ -11,7 +11,7 @@
 - **Stage:** Live commerce site, active Meta ads campaign running
 
 ## Delivery Schedule
-Orders are delivered **every Sunday at the end of the order week**. If a customer places an order any day of a given week, delivery is the Sunday following that week. Example: order placed Wednesday March 25, delivered Sunday March 30. This copy should appear in Pricing and FAQ contexts.
+Orders are delivered **every Wednesday** across Chicago (temporary schedule; confirm before changing copy site-wide). Customers should order **by Tuesday night** when possible for the upcoming Wednesday route. Placeholder example: order placed Monday April 6, delivered Wednesday April 8. This copy should stay aligned in Pricing, FAQ, Hero/Mobile CTA, and JSON-LD where delivery is mentioned.
 
 ## Key URLs & Integrations
 - **Primary contact email:** info@unclemays.com (use for ALL contact, investor, and support mailto: links)

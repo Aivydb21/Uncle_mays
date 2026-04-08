@@ -32,9 +32,14 @@ export const Hero = () => {
             transition={{ duration: 0.8 }}
           >
             {/* Live delivery badge */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
-              <Truck className="h-4 w-4" />
-              Now Delivering in Chicago
+            <div className="inline-flex flex-col sm:flex-row sm:items-center sm:gap-3 gap-1 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
+              <span className="inline-flex items-center gap-2">
+                <Truck className="h-4 w-4 shrink-0" />
+                Now delivering in Chicago
+              </span>
+              <span className="text-primary/90 font-medium text-xs sm:text-sm sm:border-l sm:border-primary/20 sm:pl-3">
+                Wednesday delivery · Order by Tuesday night
+              </span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">

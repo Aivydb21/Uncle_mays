@@ -14,7 +14,7 @@ export const Footer = () => {
               </span>
             </div>
             <p className="text-background/70 mb-6 max-w-md leading-relaxed">
-              Fresh produce from Black farmers, delivered across Chicago. No subscription. No commitment. Just good food.
+              Fresh produce from Black farmers, delivered across Chicago. No subscription required. Just good food.
             </p>
             {/* Footer shop CTA */}
             <div className="flex flex-col gap-2 max-w-xs">
