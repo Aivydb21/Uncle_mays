@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check, ShieldCheck } from "lucide-react";
+import { EmailCaptureModal } from "@/components/EmailCaptureModal";
 
 const produceBoxImage = "/images/produce-box.jpg";
 
@@ -54,7 +56,19 @@ const plans = [
   },
 ];
 
+interface Plan {
+  name: string;
+  stripeUrl: string;
+}
+
 export const Pricing = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
+
+  const handleGetMyBox = (plan: Plan) => {
+    setSelectedPlan(plan);
+    setModalOpen(true);
+  };
 
   return (
     <section id="boxes" className="py-24 bg-muted/30 relative" style={{ zIndex: 1 }}>
@@ -114,29 +128,24 @@ export const Pricing = () => {
                 <p className="text-xs text-muted-foreground text-center mb-4">
                   🔒 Checkout is handled securely through Stripe. Takes under 60 seconds.
                 </p>
-                <a
-                  href={plan.stripeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleGetMyBox({ name: plan.name, stripeUrl: plan.stripeUrl });
+                  }}
                   className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
                     plan.popular
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium"
                       : "border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-soft"
                   }`}
                   style={{
-                    display: "flex",
-                    textDecoration: "none",
                     cursor: "pointer",
                     zIndex: 9999,
                     position: "relative",
-                    textAlign: "center",
-                  }}
-                  onClick={(e) => {
-                    e.stopPropagation();
                   }}
                 >
                   <span className="text-center">Get My Box</span>
-                </a>
+                </button>
               </div>
             </div>
           ))}
@@ -177,6 +186,12 @@ export const Pricing = () => {
           />
         </motion.div>
       </div>
+
+      <EmailCaptureModal
+        isOpen={modalOpen}
+        plan={selectedPlan}
+        onClose={() => setModalOpen(false)}
+      />
     </section>
   );
 };
