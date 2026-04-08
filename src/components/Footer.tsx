@@ -34,6 +34,14 @@ export const Footer = () => {
             <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
             <ul className="space-y-3">
               <li>
+                <Link
+                  href="/about"
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  About Uncle May
+                </Link>
+              </li>
+              <li>
                 <a
                   href="/#boxes"
                   className="text-background/70 hover:text-background transition-colors"

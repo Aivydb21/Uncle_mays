@@ -9,14 +9,20 @@ const heroImage = "/images/hero-produce.jpg";
 export const Hero = () => {
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `linear-gradient(to right, hsl(var(--background) / 0.95), hsl(var(--background) / 0.7)), url(${heroImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
+      <div className="absolute inset-0 z-0">
+        <img
+          src={heroImage}
+          alt="Fresh seasonal produce box from Black farmers delivered in Chicago"
+          className="absolute inset-0 h-full w-full object-cover"
+          width={1920}
+          height={1080}
+          fetchPriority="high"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-r from-background/95 to-background/70"
+          aria-hidden="true"
+        />
+      </div>
 
       <div className="container relative z-10 px-6 py-20">
         <div className="max-w-3xl">
@@ -60,6 +66,14 @@ export const Hero = () => {
               className="group text-lg font-semibold px-8 py-6 rounded-xl"
             >
               <a href="#boxes">Shop Produce Boxes</a>
+            </Button>
+            <Button
+              size="lg"
+              asChild
+              variant="outline"
+              className="group text-lg font-semibold px-8 py-6 rounded-xl border-primary/40 bg-background/70 hover:bg-background"
+            >
+              <a href="/about">Read Our Story</a>
             </Button>
           </motion.div>
 

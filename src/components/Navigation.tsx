@@ -14,6 +14,7 @@ export const Navigation = () => {
 
   const navLinks = [
     { path: "/", label: "Home" },
+    { path: "/about", label: "About" },
   ];
 
   const isActive = (path: string) => {

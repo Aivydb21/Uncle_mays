@@ -37,9 +37,10 @@ export const metadata: Metadata = {
       "Curated seasonal produce boxes sourced directly from Black farmers, delivered to your Chicago door. Boxes from $35. No subscription required. Order today.",
     images: [
       {
-        url: "https://www.unclemays.com/uncle-mays-logo.png",
+        url: "https://www.unclemays.com/og-social.png",
         width: 1200,
         height: 630,
+        alt: "Uncle May's Produce. No subscription. No commitment. Just good food.",
       },
     ],
     url: "https://unclemays.com/",
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
     title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered in Chicago",
     description:
       "Curated seasonal produce boxes sourced directly from Black farmers, delivered to your Chicago door. Boxes from $35. No subscription required. Order today.",
-    images: ["https://www.unclemays.com/uncle-mays-logo.png"],
+    images: ["https://www.unclemays.com/og-social.png"],
   },
   icons: {
     icon: "/uncle-mays-logo.png",

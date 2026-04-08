@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, ShieldCheck } from "lucide-react";
-import { EmailCaptureModal } from "@/components/EmailCaptureModal";
+import { Check } from "lucide-react";
 
 const produceBoxImage = "/images/produce-box.jpg";
 
@@ -56,18 +54,9 @@ const plans = [
   },
 ];
 
-interface Plan {
-  name: string;
-  stripeUrl: string;
-}
-
 export const Pricing = () => {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
-
-  const handleGetMyBox = (plan: Plan) => {
-    setSelectedPlan(plan);
-    setModalOpen(true);
+  const handleGetMyBox = (stripeUrl: string) => {
+    window.location.href = stripeUrl;
   };
 
   return (
@@ -116,6 +105,12 @@ export const Pricing = () => {
                     <span className="text-muted-foreground">{plan.frequency}</span>
                   </div>
                   <p className="text-xs font-medium text-primary/80 mt-1">{plan.priceAnchor}</p>
+                  <p className="text-sm font-semibold mt-3">
+                    Order by Saturday night. Delivered this Sunday.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    100% freshness guarantee. Not happy? Full refund, no questions.
+                  </p>
                 </div>
                 <ul className="space-y-3 mb-8 flex-grow">
                   {plan.features.map((feature, i) => (
@@ -131,7 +126,7 @@ export const Pricing = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleGetMyBox({ name: plan.name, stripeUrl: plan.stripeUrl });
+                    handleGetMyBox(plan.stripeUrl);
                   }}
                   className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
                     plan.popular
@@ -151,26 +146,6 @@ export const Pricing = () => {
           ))}
         </div>
 
-        {/* Freshness Guarantee */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="max-w-3xl mx-auto mb-10 bg-primary/5 border border-primary/20 rounded-2xl px-8 py-5 flex items-start gap-4"
-        >
-          <ShieldCheck className="h-6 w-6 text-primary flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-foreground/80 leading-relaxed">
-            <span className="font-semibold text-foreground">Freshness guaranteed.</span>{" "}
-            Every box is packed fresh the day it ships. If anything arrives damaged or unsatisfactory,
-            email us at{" "}
-            <a href="mailto:info@unclemays.com" className="text-primary underline underline-offset-2">
-              info@unclemays.com
-            </a>{" "}
-            and we'll make it right. Full credit or replacement, no questions asked.
-          </p>
-        </motion.div>
-
         {/* Produce box image */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -187,11 +162,6 @@ export const Pricing = () => {
         </motion.div>
       </div>
 
-      <EmailCaptureModal
-        isOpen={modalOpen}
-        plan={selectedPlan}
-        onClose={() => setModalOpen(false)}
-      />
     </section>
   );
 };
