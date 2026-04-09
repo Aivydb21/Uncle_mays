@@ -89,7 +89,7 @@
 - **`Mission.tsx`** - Mission statement section
 - **`HowItWorks.tsx`** - How it works section
 - **`Awards.tsx`** - Awards and recognition section
-- **`Pricing.tsx`** - Subscription pricing plans with Stripe integration
+- **`Pricing.tsx`** - Box pricing tiers with on-site checkout links
 - **`NavLink.tsx`** - Navigation link component
 
 ### UI Components (shadcn/ui)
@@ -112,29 +112,18 @@ Located in `src/components/ui/`:
 
 ## ✨ Features & Functionality
 
-### Subscription Plans
+### Produce Boxes
 1. **Starter Box** - $35/delivery
-   - 5-7 seasonal items
-   - Bi-weekly deliveries
-   - Recipe cards included
-   - Stripe: `https://buy.stripe.com/eVqaEX6Z9b6QbfV8xe9Zm00`
+   - 6 seasonal produce items (~12-15 lbs)
+   - Checkout: `/checkout/starter` (embedded Stripe)
 
 2. **Family Box** - $65/delivery (Most Popular)
-   - 12-15 seasonal items
-   - Weekly deliveries available
-   - Recipe cards & meal plans
-   - Priority farmer selection
-   - Free delivery
-   - Stripe: `https://buy.stripe.com/9B66oHcjt8YI97NeVC9Zm01`
+   - 9+ produce items, 1 dozen eggs, 1 protein choice
+   - Checkout: `/checkout/family` (embedded Stripe)
 
 3. **Community Box** - $95/delivery
-   - 20-25 seasonal items
-   - Weekly deliveries
-   - Exclusive recipe content
-   - Meet your farmers events
-   - Free delivery
-   - Customization options
-   - Stripe: `https://buy.stripe.com/4gMdR9erB7UEgAf6p69Zm02`
+   - 10+ produce items, 2 dozen eggs, 2 protein choices
+   - Checkout: `/checkout/community` (embedded Stripe)
 
 ### Navigation Features
 - Sticky navigation bar
@@ -194,10 +183,11 @@ Located in `src/components/ui/`:
 ## 🔗 External Integrations
 
 ### Payment Processing
-- **Stripe Checkout:** 3 subscription plans integrated
-  - Starter Box checkout link
-  - Family Box checkout link
-  - Community Box checkout link
+- **Stripe Embedded Checkout:** 3 box tiers with on-site checkout
+  - `/checkout/starter` — Starter Box ($35)
+  - `/checkout/family` — Family Box ($65)
+  - `/checkout/community` — Community Box ($95)
+  - Server API route: `/api/checkout` creates Stripe Checkout Sessions
 
 ### External Links
 - **Investors Page:** Publuu flipbook (footer link)
@@ -287,7 +277,7 @@ npm run lint         # Run ESLint
 - All pages are client-side rendered (SPA)
 - Responsive design (mobile-first)
 - Earth-toned color palette
-- All subscription plans link to Stripe checkout
+- All box tiers use embedded Stripe checkout on-site (customers never leave unclemays.com)
 - Investors link opens external Publuu flipbook in new tab
 
 ---

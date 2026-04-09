@@ -7,7 +7,7 @@
 - **Model:** Seasonal produce boxes sourced from Black farmers, delivered across Chicago
 - **Pricing:** Starter $35 / Family $65 / Community $95
 - **No subscription required** — this is a deliberate brand differentiator; keep the tagline "No subscription. No commitment. Just good food."
-- **Revenue:** Stripe checkout (external links per box tier)
+- **Revenue:** Stripe embedded checkout on-site (customers never leave unclemays.com)
 - **Stage:** Live commerce site, active Meta ads campaign running
 
 ## Delivery Schedule
@@ -23,34 +23,36 @@ Orders are delivered **every Wednesday** across Chicago (temporary schedule; con
 - **Hosting:** Vercel (auto-deploys from GitHub main branch)
 
 ## Environment Variables
-All secrets and external service IDs live in `.env` (gitignored). Source files reference them via `process.env.NEXT_PUBLIC_*`. Since this is a static export, values are inlined at build time.
+All secrets and external service IDs live in `.env` (gitignored). Server-side vars (no `NEXT_PUBLIC_` prefix) are available only in API routes. Client-side vars are inlined at build time.
 
 | Variable | Purpose |
 |---|---|
-| `NEXT_PUBLIC_STRIPE_STARTER_URL` | Stripe checkout link for Starter Box ($35) |
-| `NEXT_PUBLIC_STRIPE_FAMILY_URL` | Stripe checkout link for Family Box ($65) |
-| `NEXT_PUBLIC_STRIPE_COMMUNITY_URL` | Stripe checkout link for Community Box ($95) |
+| `STRIPE_SECRET_KEY` | Stripe secret key (server-side only, used by API route) |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key (client-side, loads embedded checkout) |
+| `NEXT_PUBLIC_STRIPE_STARTER_URL` | Legacy Stripe payment link for Starter Box (fallback) |
+| `NEXT_PUBLIC_STRIPE_FAMILY_URL` | Legacy Stripe payment link for Family Box (fallback) |
+| `NEXT_PUBLIC_STRIPE_COMMUNITY_URL` | Legacy Stripe payment link for Community Box (fallback) |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics 4 measurement ID |
 | `NEXT_PUBLIC_FB_PIXEL_ID` | Facebook/Meta Pixel ID |
 | `NEXT_PUBLIC_EMAIL_FORM_URL` | Google Form URL for email capture |
 
-When updating Stripe links or analytics IDs, edit `.env` only. Do not hardcode these values in source files.
+When updating analytics IDs, edit `.env` only. Do not hardcode these values in source files. Stripe Price IDs are in `src/app/api/checkout/route.ts`.
 
 ## Tech Stack
-- **Framework:** Next.js 15 + React 18 + TypeScript (App Router, static export)
-- **Build output:** Static HTML via `output: 'export'` — all pages pre-rendered at build time
+- **Framework:** Next.js 15 + React 18 + TypeScript (App Router, server-side on Vercel)
+- **Build output:** Hybrid static + dynamic. Most pages pre-rendered; `/api/checkout` and `/checkout/[product]` are server-rendered on demand.
 - **UI:** shadcn/ui component library (components in `src/components/ui/`)
 - **Animation:** Framer Motion
 - **Routing:** Next.js App Router (file-based: src/app/)
 - **Fonts:** next/font/google (Playfair Display + Work Sans via CSS variables)
-- **Payments:** Stripe (external checkout links, not embedded)
+- **Payments:** Stripe Embedded Checkout (`@stripe/react-stripe-js`) — checkout form rendered on-site at `/checkout/[product]`, backed by server API route at `/api/checkout`
 - **Analytics:** GA4 + Facebook Pixel (loaded via next/script, afterInteractive)
 - **SEO:** All pages SSG with per-page metadata, 4 JSON-LD schemas on homepage
 
 ## Project File Map
 ```
 um_website/
-├── next.config.ts               ← output: 'export', images: unoptimized
+├── next.config.ts               ← images: unoptimized (no static export; server routes enabled)
 ├── tsconfig.json                 ← single config, @/* → ./src/*
 ├── tailwind.config.ts            ← custom earth-tone palette, next/font CSS vars
 ├── postcss.config.js
@@ -63,6 +65,9 @@ um_website/
 │   │   ├── page.tsx              ← homepage (JSON-LD schemas + <HomePageContent />)
 │   │   ├── globals.css           ← design system (CSS variables, Tailwind)
 │   │   ├── not-found.tsx         ← 404 page
+│   │   ├── api/checkout/route.ts ← server API: creates Stripe Checkout Sessions
+│   │   ├── checkout/[product]/page.tsx ← embedded Stripe checkout (starter/family/community)
+│   │   ├── order-success/        ← post-checkout confirmation page
 │   │   ├── investors/page.tsx    ← investor pitch page
 │   │   ├── privacy/page.tsx
 │   │   └── terms/page.tsx
@@ -74,7 +79,7 @@ um_website/
 │   │   └── NotFound.tsx
 │   ├── components/
 │   │   ├── Hero.tsx              ← headline, primary CTA, trust chips
-│   │   ├── Pricing.tsx           ← 3 box tiers with Stripe links and price anchoring
+│   │   ├── Pricing.tsx           ← 3 box tiers with checkout links and price anchoring
 │   │   ├── Navigation.tsx        ← sticky nav, "Order Now" → /#boxes
 │   │   ├── Footer.tsx            ← links, social, contact (uses next/link)
 │   │   ├── MobileCTA.tsx         ← sticky mobile bottom bar (appears after 300px scroll)
@@ -134,7 +139,7 @@ um_website/
 ## Development
 ```bash
 npm run dev          # local dev server (http://localhost:3000)
-npm run build        # static export to /out — must pass before deploying
+npm run build        # production build — must pass before deploying
 ```
 - Always run `npm run build` after changes to verify no TypeScript errors or broken exports
 - Vercel auto-deploys from the `main` branch — a passing build locally means a clean deploy
@@ -144,7 +149,7 @@ npm run build        # static export to /out — must pass before deploying
 ## Critical Paths — Don't Break
 These flows directly affect revenue and trust. Test after any related changes:
 
-1. **Stripe checkout flow** — "Order Now" buttons in Pricing.tsx must link to valid Stripe URLs from env vars. Broken links = lost sales.
+1. **Stripe checkout flow** — "Order Now" buttons in Pricing.tsx route to `/checkout/[product]` which loads embedded Stripe checkout via the `/api/checkout` server route. Broken API route or missing env vars = lost sales.
 2. **Mobile CTA** — `MobileCTA.tsx` sticky bar appears after 300px scroll on mobile. This is the primary conversion path for phone users.
 3. **Analytics firing** — GA4 and Facebook Pixel in `layout.tsx` must load on every page. The Meta ads campaign depends on Pixel events for optimization.
 4. **JSON-LD schemas** — 4 schemas in `page.tsx` (LocalBusiness, Organization, ItemList, FAQPage). Google uses these for rich results. Malformed JSON breaks all of them silently.

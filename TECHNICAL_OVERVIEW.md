@@ -209,10 +209,10 @@ npm run preview      # Preview production build locally
 ## 🔌 External Integrations
 
 ### Payment Processing
-- **Stripe Checkout Links**: Direct links to Stripe payment pages
-  - Starter Box: `https://buy.stripe.com/...`
-  - Family Box: `https://buy.stripe.com/...`
-  - Community Box: `https://buy.stripe.com/...`
+- **Stripe Embedded Checkout**: On-site checkout at `/checkout/[product]` (starter, family, community)
+  - Server API route at `/api/checkout` creates Checkout Sessions
+  - Client page renders `<EmbeddedCheckout>` from `@stripe/react-stripe-js`
+  - Customers never leave unclemays.com during payment
 
 ### Analytics
 - **Google Analytics**: Tracking ID `G-QWY5HRLX12`
@@ -263,7 +263,7 @@ Each page (`Index.tsx`, `About.tsx`, etc.) uses the `Layout` component which pro
 - **Mission**: Mission statement section
 - **HowItWorks**: Process explanation
 - **Awards**: Recognition display
-- **Pricing**: Subscription plans with Stripe links
+- **Pricing**: Box tiers with on-site checkout links
 
 ### UI Components (`src/components/ui/`)
 Pre-built, accessible components:
@@ -276,7 +276,7 @@ Pre-built, accessible components:
 ## 🔐 Security & Best Practices
 
 ### Security
-- **No sensitive data in code**: Stripe keys handled by Stripe
+- **No sensitive data in code**: Stripe secret key is server-side only (env var), publishable key is public by design
 - **HTTPS**: Enforced by Vercel
 - **Content Security**: External links use `rel="noopener noreferrer"`
 

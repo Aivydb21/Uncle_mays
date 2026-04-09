@@ -133,20 +133,13 @@ This creates an optimized production build in the `dist/` directory.
 
 ## 🔧 Configuration
 
-### Stripe Checkout Links
+### Stripe Embedded Checkout
 
-Update Stripe checkout URLs in `src/components/Pricing.tsx`:
+Checkout is handled on-site via embedded Stripe. To update pricing or add products:
 
-```typescript
-const plans = [
-  {
-    name: "Starter Box",
-    stripeUrl: "https://buy.stripe.com/YOUR_LINK_HERE",
-    // ...
-  },
-  // ...
-];
-```
+1. **Price IDs** are mapped in `src/app/api/checkout/route.ts` (server-side)
+2. **Product slugs** (starter, family, community) are defined in `src/app/checkout/[product]/page.tsx`
+3. **Environment variables** required: `STRIPE_SECRET_KEY` and `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` in `.env` and Vercel
 
 ### Contact Information
 
