@@ -7,36 +7,20 @@ import {
   EmbeddedCheckoutProvider,
   EmbeddedCheckout,
 } from "@stripe/react-stripe-js";
+import Link from "next/link";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
 
-const PRODUCTS: Record<string, { name: string; price: string; description: string }> = {
-  starter: {
-    name: "Starter Box",
-    price: "$35",
-    description: "6 seasonal produce items (~12-15 lbs). Perfect for individuals or couples.",
-  },
-  family: {
-    name: "Family Box",
-    price: "$65",
-    description: "9+ produce items, 1 dozen eggs, and 1 protein choice. Ideal for families of 3-5.",
-  },
-  community: {
-    name: "Community Box",
-    price: "$95",
-    description: "10+ produce items, 2 dozen eggs, and 2 protein choices. For large families or sharing.",
-  },
-};
+const VALID_PRODUCTS = new Set(["starter", "family", "community"]);
 
 export default function CheckoutPage() {
   const params = useParams<{ product: string }>();
   const product = params.product;
-  const info = PRODUCTS[product];
   const [error, setError] = useState<string | null>(null);
 
-  if (!info) {
+  if (!VALID_PRODUCTS.has(product)) {
     notFound();
   }
 
@@ -55,15 +39,15 @@ export default function CheckoutPage() {
   }, [product]);
 
   return (
-    <section className="py-16 bg-muted/30 min-h-screen">
-      <div className="container px-6 max-w-3xl mx-auto">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">{info.name}</h1>
-          <p className="text-muted-foreground text-lg">{info.description}</p>
-          <p className="text-2xl font-bold text-primary mt-3">{info.price}</p>
-          <p className="text-sm text-muted-foreground mt-1">
-            Delivered every Wednesday across Chicago
-          </p>
+    <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
+      <div className="container px-4 max-w-xl mx-auto">
+        <div className="mb-6">
+          <Link
+            href="/#boxes"
+            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            &larr; Back to boxes
+          </Link>
         </div>
 
         {error ? (
@@ -77,7 +61,7 @@ export default function CheckoutPage() {
             </a>
           </div>
         ) : (
-          <div id="checkout" className="rounded-2xl overflow-hidden shadow-soft bg-card">
+          <div id="checkout" className="rounded-2xl overflow-hidden shadow-soft">
             <EmbeddedCheckoutProvider
               stripe={stripePromise}
               options={{ fetchClientSecret }}
