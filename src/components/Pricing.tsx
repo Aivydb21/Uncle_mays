@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
-import { EmailCaptureModal } from "@/components/EmailCaptureModal";
 
 declare global {
   interface Window {
@@ -67,48 +65,12 @@ const plans = [
 ];
 
 export const Pricing = () => {
-  const [modalSlug, setModalSlug] = useState<string | null>(null);
-
-  const getStripeUrl = (slug: string) => {
-    const plan = plans.find((p) => p.checkoutSlug === slug);
-    return plan?.stripeUrl || "#";
-  };
-
-  const handleOrder = (slug: string) => {
-    setModalSlug(slug);
-  };
-
-  const handleModalCapture = (email: string) => {
-    const slug = modalSlug;
-    setModalSlug(null);
-
-    // Fire tracking events
+  const handleOrder = (stripeUrl: string) => {
     if (typeof window !== "undefined") {
       if (window.fbq) window.fbq("track", "InitiateCheckout");
       if (window.gtag) window.gtag("event", "begin_checkout");
     }
-
-    // Save lead — fire and forget
-    fetch("/api/capture-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, product: slug }),
-    }).catch(() => {});
-
-    window.location.href = getStripeUrl(slug!);
-  };
-
-  const handleModalDismiss = () => {
-    const slug = modalSlug;
-    setModalSlug(null);
-
-    // Fire tracking events
-    if (typeof window !== "undefined") {
-      if (window.fbq) window.fbq("track", "InitiateCheckout");
-      if (window.gtag) window.gtag("event", "begin_checkout");
-    }
-
-    window.location.href = getStripeUrl(slug!);
+    window.location.href = stripeUrl;
   };
 
   return (
@@ -178,7 +140,7 @@ export const Pricing = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleOrder(plan.checkoutSlug);
+                    handleOrder(plan.stripeUrl);
                   }}
                   className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
                     plan.popular
@@ -210,11 +172,6 @@ export const Pricing = () => {
         </motion.div>
       </div>
 
-      <EmailCaptureModal
-        productSlug={modalSlug}
-        onCapture={handleModalCapture}
-        onDismiss={handleModalDismiss}
-      />
     </section>
   );
 };
