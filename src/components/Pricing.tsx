@@ -1,7 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { EmailCaptureModal } from "@/components/EmailCaptureModal";
+
+declare global {
+  interface Window {
+    fbq: (...args: unknown[]) => void;
+    gtag: (...args: unknown[]) => void;
+  }
+}
 
 const produceBoxImage = "/images/produce-box.jpg";
 
@@ -20,6 +29,7 @@ const plans = [
       "Sourced from Black farmers",
     ],
     checkoutSlug: "starter",
+    stripeUrl: "https://buy.stripe.com/14AfZh2IT0sces75l29Zm03",
   },
   {
     name: "Family Box",
@@ -36,6 +46,7 @@ const plans = [
     ],
     popular: true,
     checkoutSlug: "family",
+    stripeUrl: "https://buy.stripe.com/4gM7sL2ITej2gAf3cU9Zm07",
   },
   {
     name: "Community Box",
@@ -51,12 +62,53 @@ const plans = [
       "Order anytime. Delivered every Wednesday.",
     ],
     checkoutSlug: "community",
+    stripeUrl: "https://buy.stripe.com/5kQ28r0AL6QA83J4gY9Zm06",
   },
 ];
 
 export const Pricing = () => {
+  const [modalSlug, setModalSlug] = useState<string | null>(null);
+
+  const getStripeUrl = (slug: string) => {
+    const plan = plans.find((p) => p.checkoutSlug === slug);
+    return plan?.stripeUrl || "#";
+  };
+
   const handleOrder = (slug: string) => {
-    window.location.href = `/checkout/${slug}`;
+    setModalSlug(slug);
+  };
+
+  const handleModalCapture = (email: string) => {
+    const slug = modalSlug;
+    setModalSlug(null);
+
+    // Fire tracking events
+    if (typeof window !== "undefined") {
+      if (window.fbq) window.fbq("track", "InitiateCheckout");
+      if (window.gtag) window.gtag("event", "begin_checkout");
+    }
+
+    // Save lead — fire and forget
+    fetch("/api/capture-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, product: slug }),
+    }).catch(() => {});
+
+    window.location.href = getStripeUrl(slug!);
+  };
+
+  const handleModalDismiss = () => {
+    const slug = modalSlug;
+    setModalSlug(null);
+
+    // Fire tracking events
+    if (typeof window !== "undefined") {
+      if (window.fbq) window.fbq("track", "InitiateCheckout");
+      if (window.gtag) window.gtag("event", "begin_checkout");
+    }
+
+    window.location.href = getStripeUrl(slug!);
   };
 
   return (
@@ -158,6 +210,11 @@ export const Pricing = () => {
         </motion.div>
       </div>
 
+      <EmailCaptureModal
+        productSlug={modalSlug}
+        onCapture={handleModalCapture}
+        onDismiss={handleModalDismiss}
+      />
     </section>
   );
 };

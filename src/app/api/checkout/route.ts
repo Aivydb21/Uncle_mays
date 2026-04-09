@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { product } = await req.json();
+    const { product, email } = await req.json();
     const priceId = PRICE_MAP[product];
 
     if (!priceId) {
@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
       mode: "payment",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
+      ...(email ? { customer_email: email } : {}),
+      customer_creation: "always",
       phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: ["US"] },
       custom_fields: [
