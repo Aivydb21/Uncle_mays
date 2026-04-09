@@ -19,7 +19,7 @@ const plans = [
       "Order anytime. Delivered every Wednesday.",
       "Sourced from Black farmers",
     ],
-    stripeUrl: process.env.NEXT_PUBLIC_STRIPE_STARTER_URL!,
+    checkoutSlug: "starter",
   },
   {
     name: "Family Box",
@@ -35,7 +35,7 @@ const plans = [
       "Order anytime. Delivered every Wednesday.",
     ],
     popular: true,
-    stripeUrl: process.env.NEXT_PUBLIC_STRIPE_FAMILY_URL!,
+    checkoutSlug: "family",
   },
   {
     name: "Community Box",
@@ -50,13 +50,13 @@ const plans = [
       "2 protein choices: whole chicken, beef short ribs, or lamb chops",
       "Order anytime. Delivered every Wednesday.",
     ],
-    stripeUrl: process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_URL!,
+    checkoutSlug: "community",
   },
 ];
 
 export const Pricing = () => {
-  const handleOrder = (stripeUrl: string) => {
-    window.location.href = stripeUrl;
+  const handleOrder = (slug: string) => {
+    window.location.href = `/checkout/${slug}`;
   };
 
   return (
@@ -126,7 +126,7 @@ export const Pricing = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleOrder(plan.stripeUrl);
+                    handleOrder(plan.checkoutSlug);
                   }}
                   className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
                     plan.popular
