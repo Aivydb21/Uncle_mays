@@ -141,7 +141,7 @@ function PaymentForm({
       }
 
       onSuccess();
-      router.push("/order-success");
+      router.push(`/order-success?pi=${encodeURIComponent(paymentIntent.id)}&amount=${checkout.price}`);
     } else {
       setPaymentError("Something went wrong. Please try again.");
       setSubmitting(false);
