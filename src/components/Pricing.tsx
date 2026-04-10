@@ -27,7 +27,7 @@ const plans = [
       "Sourced from Black farmers",
     ],
     checkoutSlug: "starter",
-    stripeUrl: "https://buy.stripe.com/14AfZh2IT0sces75l29Zm03",
+    stripeUrl: "https://buy.stripe.com/7sY4gzfvF2Akdo3aFm9Zm0f",
   },
   {
     name: "Family Box",

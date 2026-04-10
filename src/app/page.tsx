@@ -80,7 +80,7 @@ const productListSchema = {
           price: "35.00",
           priceCurrency: "USD",
           availability: "https://schema.org/InStock",
-          url: "https://buy.stripe.com/14AfZh2IT0sces75l29Zm03",
+          url: "https://buy.stripe.com/7sY4gzfvF2Akdo3aFm9Zm0f",
         },
       },
     },
