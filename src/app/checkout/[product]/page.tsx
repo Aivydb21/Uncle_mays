@@ -1,81 +1,67 @@
 "use client";
 
-import { useCallback, useState } from "react";
 import { useParams, notFound } from "next/navigation";
-import { loadStripe } from "@stripe/stripe-js";
-
-declare global {
-  interface Window {
-    fbq: (...args: unknown[]) => void;
-    gtag: (...args: unknown[]) => void;
-  }
-}
-import {
-  EmbeddedCheckoutProvider,
-  EmbeddedCheckout,
-} from "@stripe/react-stripe-js";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { PRODUCTS, type ProductSlug } from "@/lib/products";
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
+// Step indicator component
+function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
+  const steps = ["Order Summary", "Delivery", "Payment"];
+  return (
+    <div className="flex items-center gap-2 mb-8">
+      {steps.map((label, i) => {
+        const step = i + 1;
+        const filled = step <= current;
+        return (
+          <div key={step} className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
+              <div
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
+                  filled
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {step}
+              </div>
+              <span
+                className={`text-sm hidden sm:inline ${
+                  filled ? "text-foreground font-medium" : "text-muted-foreground"
+                }`}
+              >
+                {label}
+              </span>
+            </div>
+            {i < steps.length - 1 && (
+              <div
+                className={`h-px flex-1 min-w-[24px] ${
+                  step < current ? "bg-primary" : "bg-muted"
+                }`}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
-const VALID_PRODUCTS = new Set(["starter", "family", "community"]);
-
-export default function CheckoutPage() {
+export default function CheckoutSummaryPage() {
   const params = useParams<{ product: string }>();
-  const product = params.product;
-  const [email, setEmail] = useState("");
-  const [emailSubmitted, setEmailSubmitted] = useState(false);
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const slug = params.product as ProductSlug;
 
-  if (!VALID_PRODUCTS.has(product)) {
+  if (!PRODUCTS[slug]) {
     notFound();
   }
 
-  const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = email.trim();
-    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setEmailError("Please enter a valid email address.");
-      return;
-    }
-    setEmailError(null);
-
-    // Save lead to Mailchimp — fire and forget, never block checkout
-    fetch("/api/capture-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: trimmed, product }),
-    }).catch(() => {});
-
-    // Fire InitiateCheckout tracking events
-    if (typeof window !== "undefined") {
-      if (window.fbq) window.fbq("track", "InitiateCheckout");
-      if (window.gtag) window.gtag("event", "begin_checkout");
-    }
-
-    setEmailSubmitted(true);
-  };
-
-  const fetchClientSecret = useCallback(async () => {
-    const res = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ product, email: email.trim() }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error || "Something went wrong. Please try again.");
-      throw new Error(data.error);
-    }
-    return data.clientSecret;
-  }, [product, email]);
+  const product = PRODUCTS[slug];
 
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
-      <div className="container px-4 max-w-xl mx-auto">
+      <div className="container px-4 max-w-2xl mx-auto">
+        {/* Back link */}
         <div className="mb-6">
           <Link
             href="/#boxes"
@@ -85,52 +71,78 @@ export default function CheckoutPage() {
           </Link>
         </div>
 
-        {error ? (
-          <div className="text-center py-12">
-            <p className="text-destructive mb-4">{error}</p>
-            <a
-              href={`/checkout/${product}`}
-              className="text-primary underline underline-offset-4"
+        <StepIndicator current={1} />
+
+        <div className="rounded-2xl overflow-hidden shadow-soft bg-background">
+          {/* Product image */}
+          <div className="relative">
+            <img
+              src="/images/produce-box.jpg"
+              alt={`${product.name} — fresh seasonal produce`}
+              className="w-full h-56 object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            <div className="absolute bottom-4 left-5">
+              <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
+                ${product.price} per delivery
+              </span>
+            </div>
+          </div>
+
+          <div className="p-6 md:p-8">
+            {/* Product name & price */}
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
+                  {product.name}
+                </h1>
+                <p className="text-muted-foreground text-sm mt-1">
+                  Delivered fresh every Wednesday
+                </p>
+              </div>
+              <div className="text-right shrink-0">
+                <span className="text-3xl font-bold text-primary">${product.price}</span>
+              </div>
+            </div>
+
+            {/* What's in the box */}
+            <div className="mb-6">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+                What&apos;s in your box
+              </h2>
+              <ul className="space-y-2">
+                {product.items.map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm">
+                    <span className="text-primary mt-0.5">✓</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Trust signals */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
+              {[
+                { icon: "🌱", text: "Locally sourced" },
+                { icon: "🚚", text: "Delivered fresh Wednesdays" },
+                { icon: "📍", text: "Chicago area only" },
+              ].map(({ icon, text }) => (
+                <div key={text} className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>{icon}</span>
+                  <span>{text}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <button
+              onClick={() => router.push(`/checkout/${slug}/delivery`)}
+              className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft"
             >
-              Try again
-            </a>
+              Continue to Delivery &rarr;
+            </button>
           </div>
-        ) : !emailSubmitted ? (
-          <div className="rounded-2xl overflow-hidden shadow-soft bg-background p-8">
-            <h2 className="text-xl font-semibold mb-2">Enter your email</h2>
-            <p className="text-muted-foreground text-sm mb-6">
-              We&apos;ll send your order confirmation here.
-            </p>
-            <form onSubmit={handleEmailSubmit} noValidate>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                autoComplete="email"
-                className="w-full border border-border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary mb-2"
-              />
-              {emailError && (
-                <p className="text-destructive text-xs mb-3">{emailError}</p>
-              )}
-              <button
-                type="submit"
-                className="w-full bg-primary text-primary-foreground rounded-lg px-4 py-3 text-sm font-medium mt-2 hover:bg-primary/90 transition-colors"
-              >
-                Continue to payment
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div id="checkout" className="rounded-2xl overflow-hidden shadow-soft">
-            <EmbeddedCheckoutProvider
-              stripe={stripePromise}
-              options={{ fetchClientSecret }}
-            >
-              <EmbeddedCheckout />
-            </EmbeddedCheckoutProvider>
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );

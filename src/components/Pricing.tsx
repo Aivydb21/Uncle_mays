@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 declare global {
   interface Window {
@@ -65,12 +66,18 @@ const plans = [
 ];
 
 export const Pricing = () => {
-  const handleOrder = (stripeUrl: string) => {
-    if (typeof window !== "undefined") {
-      if (window.fbq) window.fbq("track", "InitiateCheckout");
-      if (window.gtag) window.gtag("event", "begin_checkout");
+  const router = useRouter();
+
+  const handleOrder = (checkoutSlug: string) => {
+    try {
+      if (typeof window !== "undefined") {
+        if (window.fbq) window.fbq("track", "InitiateCheckout");
+        if (window.gtag) window.gtag("event", "begin_checkout");
+      }
+    } catch {
+      // Never block checkout for tracking failures
     }
-    window.location.href = stripeUrl;
+    router.push(`/checkout/${checkoutSlug}`);
   };
 
   return (
@@ -140,7 +147,7 @@ export const Pricing = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleOrder(plan.stripeUrl);
+                    handleOrder(plan.checkoutSlug);
                   }}
                   className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
                     plan.popular
