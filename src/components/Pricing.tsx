@@ -71,9 +71,10 @@ const plans = [
 
 export const Pricing = () => {
   const [isSubscription, setIsSubscription] = useState(true);
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleOrder = (plan: typeof plans[0]) => {
+  const handleOrder = async (plan: typeof plans[0]) => {
     try {
       if (typeof window !== "undefined") {
         if (window.fbq) window.fbq("track", "InitiateCheckout");
@@ -83,8 +84,27 @@ export const Pricing = () => {
       // Never block checkout for tracking failures
     }
 
-    if (isSubscription && plan.subUrl) {
-      window.location.href = plan.subUrl;
+    if (isSubscription) {
+      setLoadingPlan(plan.checkoutSlug);
+      try {
+        const res = await fetch("/api/checkout/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ product: plan.checkoutSlug }),
+        });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+          return;
+        }
+      } catch {
+        // Fall through to payment link fallback
+      }
+      // Fallback to Stripe payment link if API unavailable or price IDs not configured
+      if (plan.subUrl) {
+        window.location.href = plan.subUrl;
+      }
+      setLoadingPlan(null);
     } else {
       router.push(`/checkout/${plan.checkoutSlug}`);
     }
@@ -199,15 +219,18 @@ export const Pricing = () => {
                     e.stopPropagation();
                     handleOrder(plan);
                   }}
+                  disabled={loadingPlan === plan.checkoutSlug}
                   className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
                     plan.popular
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium"
                       : "border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-soft"
-                  }`}
+                  } disabled:opacity-60 disabled:cursor-not-allowed`}
                   style={{ cursor: "pointer", zIndex: 9999, position: "relative" }}
                 >
                   <span className="text-center">
-                    {isSubscription
+                    {loadingPlan === plan.checkoutSlug
+                      ? "Redirecting…"
+                      : isSubscription
                       ? `Subscribe — ${plan.subPrice}/wk`
                       : `Order Now — ${plan.oneTimePrice}`}
                   </span>
