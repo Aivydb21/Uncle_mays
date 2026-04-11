@@ -34,10 +34,69 @@ export async function POST(req: NextRequest) {
 
     case "checkout.session.expired": {
       const session = event.data.object as Stripe.Checkout.Session;
+      const email =
+        session.customer_email ?? session.customer_details?.email ?? null;
+
       console.log(
-        `[WEBHOOK] checkout.session.expired | session=${session.id} email=${session.customer_email ?? "unknown"}`
+        `[WEBHOOK] checkout.session.expired | session=${session.id} email=${email ?? "unknown"} expires_at=${session.expires_at}`
       );
-      // TODO: abandoned cart follow-up
+
+      // Only attempt recovery if we have the customer's email (pre-checkout capture)
+      if (email) {
+        // Trigger a Trigger.dev task to send a recovery email 1 hour after abandonment.
+        // TRIGGER_SECRET_KEY is the prod secret key from:
+        //   https://cloud.trigger.dev → Project → Environments → Production → Secret key
+        // If unset, the cron-based abandonedCheckoutProcessor (runs every 15 min) will
+        // catch this session after the 1-hour window and send the recovery email instead.
+        const triggerSecretKey = process.env.TRIGGER_SECRET_KEY;
+        if (triggerSecretKey) {
+          try {
+            const res = await fetch(
+              "https://api.trigger.dev/api/v1/tasks/send-abandoned-checkout-email/trigger",
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${triggerSecretKey}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  payload: {
+                    sessionId: session.id,
+                    email,
+                    customerName: session.customer_details?.name ?? null,
+                    expiresAt: session.expires_at,
+                  },
+                  options: {
+                    // Idempotency key prevents duplicate tasks if webhook fires more than once
+                    idempotencyKey: `abandoned-checkout-${session.id}`,
+                  },
+                }),
+              }
+            );
+
+            if (res.ok) {
+              console.log(
+                `[WEBHOOK] Queued 1hr recovery email task for session ${session.id}`
+              );
+            } else {
+              const err = await res.json().catch(() => ({}));
+              console.warn(
+                `[WEBHOOK] Failed to queue recovery email task (will rely on cron fallback):`,
+                err
+              );
+            }
+          } catch (e) {
+            console.warn(
+              `[WEBHOOK] Network error queueing recovery email task (will rely on cron fallback):`,
+              e
+            );
+          }
+        } else {
+          console.log(
+            `[WEBHOOK] TRIGGER_SECRET_KEY not set — recovery email will be sent by cron fallback`
+          );
+        }
+      }
       break;
     }
 

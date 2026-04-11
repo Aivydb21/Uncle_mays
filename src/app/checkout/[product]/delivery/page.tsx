@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, notFound, useRouter } from "next/navigation";
 import Link from "next/link";
-import { PRODUCTS, type ProductSlug } from "@/lib/products";
+import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -153,6 +153,19 @@ export default function DeliveryPage() {
     setSubmitting(true);
     setSubmitError(null);
 
+    // Read protein choices for family/community boxes
+    let proteinChoices: ProteinId[] | undefined;
+    if (product.proteinCount > 0 && typeof window !== "undefined") {
+      try {
+        const saved = sessionStorage.getItem(`unc-proteins-${slug}`);
+        if (saved) {
+          proteinChoices = JSON.parse(saved) as ProteinId[];
+        }
+      } catch {
+        // ignore
+      }
+    }
+
     try {
       const res = await fetch("/api/checkout/session", {
         method: "POST",
@@ -173,6 +186,7 @@ export default function DeliveryPage() {
             zip: fields.zip.trim(),
           },
           deliveryNotes: fields.deliveryNotes.trim() || undefined,
+          proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
         }),
       });
 
@@ -203,8 +217,11 @@ export default function DeliveryPage() {
               zip: fields.zip.trim(),
             },
             deliveryNotes: fields.deliveryNotes.trim() || undefined,
+            proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
           })
         );
+        // Clear protein sessionStorage once saved
+        sessionStorage.removeItem(`unc-proteins-${slug}`);
       }
 
       router.push(`/checkout/${slug}/payment`);

@@ -39,6 +39,7 @@ interface StoredCheckout {
     zip: string;
   };
   deliveryNotes?: string;
+  proteinChoices?: string[];
 }
 
 // Step indicator component
@@ -216,6 +217,7 @@ export default function PaymentPage() {
             email: data.email,
             firstName: data.firstName,
             lastName: data.lastName,
+            proteins: data.proteinChoices,
           }),
         });
         const json = await res.json();
@@ -356,6 +358,19 @@ export default function PaymentPage() {
                 <span className="font-medium text-sm">{checkout.productName}</span>
                 <span className="font-bold text-primary">${checkout.price}</span>
               </div>
+
+              {checkout.proteinChoices && checkout.proteinChoices.length > 0 && (
+                <div className="mb-2">
+                  <p className="text-xs text-muted-foreground font-medium mb-1">
+                    Protein{checkout.proteinChoices.length > 1 ? "s" : ""}:
+                  </p>
+                  <ul className="space-y-0.5">
+                    {checkout.proteinChoices.map((p) => (
+                      <li key={p} className="text-xs text-foreground/80">• {p.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               <div className="border-t border-border pt-3 mb-3">
                 <div className="flex items-center justify-between text-sm font-semibold">

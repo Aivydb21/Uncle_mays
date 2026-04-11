@@ -5,7 +5,7 @@ import { upsertContact, tagOrderCompleted } from "@/lib/mailchimp";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { product, price, productName, email, firstName, lastName, phone, address, deliveryNotes } = body;
+    const { product, price, productName, email, firstName, lastName, phone, address, deliveryNotes, proteinChoices } = body;
 
     if (!product || !price || !email || !firstName || !lastName || !address) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
       phone,
       address,
       deliveryNotes,
+      proteins: Array.isArray(proteinChoices) && proteinChoices.length > 0 ? proteinChoices : undefined,
     });
 
     // Non-blocking: upsert contact with checkout_started tag in one call

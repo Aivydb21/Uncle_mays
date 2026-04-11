@@ -21,6 +21,7 @@ export interface CheckoutSession {
     zip: string;
   };
   deliveryNotes?: string;
+  proteins?: string[];
   paymentIntentId?: string;
   completedAt?: string;
   createdAt: string;
