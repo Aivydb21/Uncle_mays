@@ -86,23 +86,27 @@ export const Pricing = () => {
 
     if (isSubscription) {
       setLoadingPlan(plan.checkoutSlug);
+      // Try Stripe Checkout Session via API (requires STRIPE_*_SUB_PRICE_ID on server)
       try {
         const res = await fetch("/api/checkout/subscribe", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ product: plan.checkoutSlug }),
         });
-        const data = await res.json();
-        if (data.url) {
-          window.location.href = data.url;
-          return;
+        if (res.ok) {
+          const data = await res.json();
+          if (data.url) {
+            window.location.href = data.url;
+            return;
+          }
         }
       } catch {
-        // Fall through to payment link fallback
+        // Network error — fall through to payment link fallback
       }
-      // Fallback to Stripe payment link if API unavailable or price IDs not configured
+      // Fallback: redirect directly to Stripe subscription payment link
       if (plan.subUrl) {
         window.location.href = plan.subUrl;
+        return;
       }
       setLoadingPlan(null);
     } else {
