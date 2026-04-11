@@ -7,16 +7,46 @@ import { Button } from "@/components/ui/button";
 
 declare global {
   interface Window {
+    dataLayer: Record<string, unknown>[];
     fbq: (...args: unknown[]) => void;
     gtag: (...args: unknown[]) => void;
   }
 }
 
-function fireTracking(transactionId: string, value: number, currency: string) {
+interface TrackingItem {
+  item_id: string;
+  item_name: string;
+  price: number;
+  quantity: number;
+}
+
+function trackPurchase(transactionId: string, value: number, product?: string, items?: TrackingItem[]) {
   if (typeof window === "undefined") return;
 
-  if (window.gtag) {
-    window.gtag("event", "purchase", { transaction_id: transactionId, value, currency });
+  const resolvedItems: TrackingItem[] = items && items.length > 0
+    ? items
+    : [{ item_id: product || "produce_box", item_name: product || "Produce Box", price: value, quantity: 1 }];
+
+  // Push to dataLayer first — GTM routes to GA4/Ads even before gtag loads
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: "purchase",
+    ecommerce: {
+      transaction_id: transactionId,
+      value: value,
+      currency: "USD",
+      items: resolvedItems,
+    },
+  });
+
+  // Also direct gtag if already initialized
+  if (typeof window.gtag === "function") {
+    window.gtag("event", "purchase", {
+      transaction_id: transactionId,
+      value,
+      currency: "USD",
+      items: resolvedItems,
+    });
 
     const gAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
     const gAdsLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
@@ -24,14 +54,15 @@ function fireTracking(transactionId: string, value: number, currency: string) {
       window.gtag("event", "conversion", {
         send_to: `${gAdsId}/${gAdsLabel}`,
         value,
-        currency,
+        currency: "USD",
         transaction_id: transactionId,
       });
     }
   }
 
-  if (window.fbq) {
-    window.fbq("track", "Purchase", { value, currency });
+  // Meta pixel
+  if (typeof window.fbq === "function") {
+    window.fbq("track", "Purchase", { value, currency: "USD", content_type: "product" });
   }
 }
 
@@ -39,9 +70,10 @@ export default function OrderSuccessContent() {
   const searchParams = useSearchParams();
   // Stripe Checkout Sessions flow: ?session_id=cs_xxx
   const sessionId = searchParams.get("session_id");
-  // PaymentIntent flow (custom checkout): ?pi=pi_xxx&amount=35
+  // PaymentIntent flow (custom checkout): ?pi=pi_xxx&amount=35&product=starter
   const paymentIntentId = searchParams.get("pi");
   const amountParam = searchParams.get("amount");
+  const productParam = searchParams.get("product") ?? undefined;
   const fired = useRef(false);
   const [isSubscription, setIsSubscription] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
@@ -54,7 +86,7 @@ export default function OrderSuccessContent() {
       fired.current = true;
       const value = parseFloat(amountParam);
       if (!isNaN(value)) {
-        try { fireTracking(paymentIntentId, value, "USD"); } catch { /* ignore */ }
+        try { trackPurchase(paymentIntentId, value, productParam); } catch { /* ignore */ }
       }
       return;
     }
@@ -66,12 +98,12 @@ export default function OrderSuccessContent() {
         .then((r) => r.json())
         .then((data) => {
           if (data.error) return;
-          try { fireTracking(data.transactionId, data.value, data.currency ?? "USD"); } catch { /* ignore */ }
+          try { trackPurchase(data.transactionId, data.value, undefined, data.items); } catch { /* ignore */ }
           if (data.mode === "subscription") setIsSubscription(true);
         })
         .catch(() => {});
     }
-  }, [sessionId, paymentIntentId, amountParam]);
+  }, [sessionId, paymentIntentId, amountParam, productParam]);
 
   const handleManageSubscription = async () => {
     if (!sessionId) return;

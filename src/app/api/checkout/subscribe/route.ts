@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { product, email, firstName, lastName, phone, address, deliveryNotes, proteinChoices } = await req.json();
+    const { product, email, firstName, lastName, phone, address, deliveryNotes, proteinChoices, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await req.json();
     const priceId = SUB_PRICE_MAP[product];
 
     if (!priceId) {
@@ -50,6 +50,11 @@ export async function POST(req: NextRequest) {
     }
     if (deliveryNotes) deliveryMeta.deliveryNotes = deliveryNotes;
     if (proteinChoices?.length) deliveryMeta.proteinChoices = proteinChoices.join(", ");
+    if (utm_source) deliveryMeta.utm_source = utm_source;
+    if (utm_medium) deliveryMeta.utm_medium = utm_medium;
+    if (utm_campaign) deliveryMeta.utm_campaign = utm_campaign;
+    if (utm_content) deliveryMeta.utm_content = utm_content;
+    if (utm_term) deliveryMeta.utm_term = utm_term;
 
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",

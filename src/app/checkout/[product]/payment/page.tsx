@@ -12,13 +12,6 @@ import {
 } from "@stripe/react-stripe-js";
 import { PRODUCTS, type ProductSlug } from "@/lib/products";
 
-declare global {
-  interface Window {
-    fbq: (...args: unknown[]) => void;
-    gtag: (...args: unknown[]) => void;
-  }
-}
-
 // Load Stripe once outside component to avoid recreating on renders
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -142,7 +135,7 @@ function PaymentForm({
       }
 
       onSuccess();
-      router.push(`/order-success?pi=${encodeURIComponent(paymentIntent.id)}&amount=${checkout.price}`);
+      router.push(`/order-success?pi=${encodeURIComponent(paymentIntent.id)}&amount=${checkout.price}&product=${encodeURIComponent(checkout.product)}`);
     } else {
       setPaymentError("Something went wrong. Please try again.");
       setSubmitting(false);
@@ -209,6 +202,16 @@ export default function PaymentPage() {
   const createIntent = useCallback(
     async (data: StoredCheckout) => {
       try {
+        // Read any captured UTM params from localStorage
+        let utms: Record<string, string> = {};
+        try {
+          const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+          keys.forEach((k) => {
+            const val = localStorage.getItem(`unc-${k}`);
+            if (val) utms[k] = val;
+          });
+        } catch { /* ignore */ }
+
         const res = await fetch("/api/checkout/intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -218,6 +221,7 @@ export default function PaymentPage() {
             firstName: data.firstName,
             lastName: data.lastName,
             proteins: data.proteinChoices,
+            ...utms,
           }),
         });
         const json = await res.json();

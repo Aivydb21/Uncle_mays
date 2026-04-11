@@ -81,6 +81,16 @@ export default function SubscribePaymentPage() {
   const startSubscription = useCallback(async (data: StoredSubCheckout) => {
     setRedirecting(true);
     try {
+      // Read any captured UTM params from localStorage
+      let utms: Record<string, string> = {};
+      try {
+        const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+        keys.forEach((k) => {
+          const val = localStorage.getItem(`unc-${k}`);
+          if (val) utms[k] = val;
+        });
+      } catch { /* ignore */ }
+
       const res = await fetch("/api/checkout/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -93,6 +103,7 @@ export default function SubscribePaymentPage() {
           address: data.address,
           deliveryNotes: data.deliveryNotes,
           proteinChoices: data.proteinChoices,
+          ...utms,
         }),
       });
 

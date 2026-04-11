@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
     }
 
-    const { product, email, firstName, lastName, proteins } = await req.json();
+    const { product, email, firstName, lastName, proteins, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await req.json();
     const amount = AMOUNT_MAP[product];
 
     if (!amount) {
@@ -34,6 +34,11 @@ export async function POST(req: NextRequest) {
         ...(Array.isArray(proteins) && proteins.length > 0
           ? { protein_selections: proteins.join(", ") }
           : {}),
+        ...(utm_source ? { utm_source } : {}),
+        ...(utm_medium ? { utm_medium } : {}),
+        ...(utm_campaign ? { utm_campaign } : {}),
+        ...(utm_content ? { utm_content } : {}),
+        ...(utm_term ? { utm_term } : {}),
       },
       automatic_payment_methods: { enabled: true },
     });
