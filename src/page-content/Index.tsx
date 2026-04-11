@@ -59,6 +59,9 @@ const Index = () => {
     <>
       <Hero />
 
+      {/* 6. PRODUCT / BOXES — moved above fold to reduce scroll-to-order distance */}
+      <Pricing />
+
       {/* 2. HOW IT WORKS — Live ordering flow */}
       <section className="py-24 bg-background">
         <div className="container px-6">
@@ -216,9 +219,6 @@ const Index = () => {
         </div>
       </section>
 
-
-      {/* 6. PRODUCT / BOXES */}
-      <Pricing />
 
       {/* 7. SOCIAL PROOF — Community Voices */}
       <section className="py-24 bg-muted/20">

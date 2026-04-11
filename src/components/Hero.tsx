@@ -2,9 +2,16 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Truck, Star } from "lucide-react";
+import { Truck, Star, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 const heroImage = "/images/hero-produce.jpg";
+
+const HERO_BOXES = [
+  { name: "Starter Box", price: "$35", slug: "starter", note: "~12–15 lbs · 1–2 people" },
+  { name: "Family Box", price: "$65", slug: "family", note: "~22–26 lbs · feeds 4 · chicken included", popular: true },
+  { name: "Community Box", price: "$95", slug: "community", note: "~30–35 lbs · large families · protein included" },
+];
 
 export const Hero = () => {
   return (
@@ -59,10 +66,48 @@ export const Hero = () => {
             and brings restaurant-quality produce straight to your Chicago home.
           </motion.p>
 
+          {/* Inline box pricing CTAs — primary conversion path */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6"
+          >
+            {HERO_BOXES.map((box) => (
+              <Link
+                key={box.slug}
+                href={`/checkout/${box.slug}`}
+                className={`group flex flex-col gap-1 rounded-xl px-5 py-4 border transition-all duration-200 ${
+                  box.popular
+                    ? "bg-primary text-primary-foreground border-primary shadow-md hover:bg-primary/90"
+                    : "bg-background/80 text-foreground border-border hover:border-primary hover:bg-background"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-semibold text-sm">{box.name}</span>
+                  {box.popular && (
+                    <span className="text-xs font-semibold bg-white/20 rounded-full px-2 py-0.5">
+                      Popular
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`text-2xl font-bold ${box.popular ? "text-primary-foreground" : "text-primary"}`}>
+                    {box.price}
+                  </span>
+                  <ArrowRight className="h-4 w-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+                <p className={`text-xs leading-tight ${box.popular ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                  {box.note}
+                </p>
+              </Link>
+            ))}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
             className="flex flex-col sm:flex-row gap-4 justify-center sm:justify-start"
           >
             <Button
@@ -70,7 +115,9 @@ export const Hero = () => {
               asChild
               className="group text-lg font-semibold px-8 py-6 rounded-xl"
             >
-              <a href="#boxes">Shop Produce Boxes</a>
+              <Link href="/checkout/family">
+                Order Family Box — $65
+              </Link>
             </Button>
             <Button
               size="lg"
@@ -78,25 +125,25 @@ export const Hero = () => {
               variant="outline"
               className="group text-lg font-semibold px-8 py-6 rounded-xl border-primary/40 bg-background/70 hover:bg-background"
             >
-              <a href="/about">Read Our Story</a>
+              <a href="#boxes">See All Boxes</a>
             </Button>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.55 }}
-            className="mt-10 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground/70"
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground/70"
           >
             <span className="font-semibold text-foreground/90">Black-farmed produce</span>
             <span aria-hidden="true">•</span>
             <span className="font-semibold text-foreground/90">Chicago-wide delivery</span>
             <span aria-hidden="true">•</span>
-            <span className="font-semibold text-foreground/90">Boxes starting at $35</span>
+            <span className="font-semibold text-foreground/90">No subscription required</span>
             <span aria-hidden="true">•</span>
             <span className="inline-flex items-center gap-1 font-semibold text-foreground/90">
               <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-              Rooted in Chicago community
+              100% freshness guarantee
             </span>
           </motion.div>
         </div>
