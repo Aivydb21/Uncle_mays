@@ -25,8 +25,12 @@ export async function POST(req: NextRequest) {
   switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+      const customerId =
+        typeof session.customer === "string"
+          ? session.customer
+          : (session.customer as Stripe.Customer | null)?.id ?? null;
       console.log(
-        `[WEBHOOK] checkout.session.completed | session=${session.id} amount=${session.amount_total} email=${session.customer_email ?? session.customer_details?.email ?? "unknown"}`
+        `[WEBHOOK] checkout.session.completed | session=${session.id} amount=${session.amount_total} customer=${customerId ?? "none"} email=${session.customer_email ?? session.customer_details?.email ?? "unknown"}`
       );
       // TODO: fulfillment logic (send confirmation email, update order DB, notify ops)
       break;

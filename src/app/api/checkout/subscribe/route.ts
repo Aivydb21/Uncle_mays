@@ -45,9 +45,16 @@ export async function POST(req: NextRequest) {
       cancel_url: `${origin}/#boxes`,
     };
 
-    // Pass customer email if available to prevent duplicate customers (UNC-144 will add full dedup)
+    // Look up existing Stripe customer by email to prevent duplicate customer records.
+    // If found, pass `customer` (ID) so Stripe reuses the existing record.
+    // If not found, pass `customer_email` and Stripe will create one automatically.
     if (email) {
-      sessionParams.customer_email = email;
+      const existingCustomers = await stripe.customers.list({ email, limit: 1 });
+      if (existingCustomers.data.length > 0) {
+        sessionParams.customer = existingCustomers.data[0].id;
+      } else {
+        sessionParams.customer_email = email;
+      }
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
