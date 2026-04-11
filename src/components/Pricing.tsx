@@ -17,51 +17,65 @@ const produceBoxImage = "/images/produce-box.jpg";
 const plans = [
   {
     name: "Starter Box",
-    description: "Perfect for individuals or couples",
+    description: "A focused weekly haul for 1–2 people",
     oneTimePrice: "$35",
     subPrice: "$31.50",
     subFrequency: "/wk",
-    priceAnchor: "~$2.10/lb delivered",
+    priceAnchor: "Updated weekly · Spring/Summer mix",
     features: [
-      "3 lb sweet potatoes, honey-sweet and versatile",
-      "2 lb Carola potatoes, farm-select",
-      "2 lb Candy orange carrots, vibrant and crisp",
-      "1 bunch green curly kale",
-      "5 oz fresh salad mix, cut and ready to dress",
+      "Collard greens — 1 bunch",
+      "Asparagus — 1 lb",
+      "Spring onions — 1 bunch",
+      "Heirloom cherry tomatoes — 1 pint",
+      "Persian cucumbers — 4 ct",
+      "Snap peas — 1/2 lb",
     ],
+    proteinAddon: true,
     checkoutSlug: "starter",
   },
   {
     name: "Family Box",
-    description: "Ideal for families of 3–5",
+    description: "Feeds a family of 4. Enough variety to fill out the week",
     oneTimePrice: "$65",
     subPrice: "$58.50",
     subFrequency: "/wk",
-    priceAnchor: "~$1.95/lb with produce, eggs, and meat",
+    priceAnchor: "Updated weekly · Spring/Summer mix",
     features: [
-      "4 lb sweet potatoes, 2 lb Carola potatoes, 2 lb Candy orange carrots",
-      "Curly kale, Tuscan kale, rainbow chard, fresh salad mix",
-      "1 dozen farm eggs included",
-      "Your choice of protein: whole chicken, beef short ribs, or lamb chops",
-      "Delivered every Wednesday",
+      "Collard greens — 2 bunches",
+      "Asparagus — 1.5 lb",
+      "Spring onions — 2 bunches",
+      "Heirloom cherry tomatoes — 1 pint",
+      "Persian cucumbers — 6 ct",
+      "Snap peas — 1 lb",
+      "Rainbow chard — 1 bunch",
+      "Strawberries — 1 quart",
+      "Early beets with tops — 1 bunch",
+      "Zucchini — 2 ct",
     ],
     popular: true,
+    proteinAddon: true,
     checkoutSlug: "family",
   },
   {
     name: "Community Box",
-    description: "For large families or splitting across households",
+    description: "Specialty and heirloom varieties for the adventurous cook",
     oneTimePrice: "$95",
     subPrice: "$85.50",
     subFrequency: "/wk",
-    priceAnchor: "~$2.03/lb with produce, beans, and protein",
+    priceAnchor: "Updated weekly · Spring/Summer mix",
     features: [
-      "4 lb sweet potatoes, 3 lb Carola potatoes, 2 lb Candy orange carrots",
-      "4 greens: curly kale, Tuscan kale, rainbow chard, salad mix",
-      "1 lb organic pinto beans + 1 bag organic black turtle beans",
-      "Your choice of protein: whole chicken, beef short ribs, or lamb chops",
-      "Delivered every Wednesday",
+      "Watermelon radishes — 1 bunch",
+      "Fairy tale eggplant — 1/2 lb",
+      "Shishito peppers — 1/2 lb",
+      "Hakurei turnips with greens — 1 bunch",
+      "Sunburst cherry tomatoes — 1 pint",
+      "Pattypan squash — 1/2 lb",
+      "Dragon tongue beans — 1/2 lb",
+      "Rainbow chard — 1 bunch",
+      "Heirloom cucumber — 2 ct",
+      "Ramps — 1/2 lb",
     ],
+    proteinAddon: true,
     checkoutSlug: "community",
   },
 ];
@@ -188,6 +202,11 @@ export const Pricing = () => {
                     </li>
                   ))}
                 </ul>
+                {plan.proteinAddon && (
+                  <p className="text-xs text-muted-foreground text-center mb-2">
+                    🥩 Add a protein at checkout — chicken, pork, beef, or salmon (+$16–$22)
+                  </p>
+                )}
                 <p className="text-xs text-muted-foreground text-center mb-4">
                   🔒 Checkout is handled securely through Stripe. Takes under 60 seconds.
                 </p>

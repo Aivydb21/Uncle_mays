@@ -62,7 +62,6 @@ export default function SubscribeSummaryPage() {
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
 
   useEffect(() => {
-    if (proteinCount === 0) return;
     try {
       const saved = sessionStorage.getItem(`unc-sub-proteins-${slug}`);
       if (saved) {
@@ -93,7 +92,8 @@ export default function SubscribeSummaryPage() {
     });
   }
 
-  const proteinsReady = proteinCount === 0 || selectedProteins.length === proteinCount;
+  // Protein is always optional — never block checkout progression
+  const proteinsReady = true;
 
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
@@ -164,37 +164,26 @@ export default function SubscribeSummaryPage() {
               </ul>
             </div>
 
-            {/* Protein selection */}
+            {/* Protein add-on — optional for all boxes */}
             {proteinCount > 0 && (
               <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                  Choose your protein{proteinCount > 1 ? "s" : ""}
+                  Add a Protein — Optional
                 </h2>
                 <p className="text-xs text-muted-foreground mb-3">
-                  {proteinCount === 1
-                    ? "Select 1 protein for your box."
-                    : `Select ${proteinCount} proteins for your box.`}{" "}
-                  {selectedProteins.length > 0 && (
-                    <span className="text-primary font-medium">
-                      {selectedProteins.length}/{proteinCount} selected
-                    </span>
-                  )}
+                  Upgrade your box with a locally sourced protein (+$16–$22). Skip if you prefer.
                 </p>
                 <div className="space-y-2">
                   {PROTEIN_OPTIONS.map((opt) => {
                     const selected = selectedProteins.includes(opt.id);
-                    const maxReached = selectedProteins.length >= proteinCount && !selected;
                     return (
                       <button
                         key={opt.id}
                         type="button"
                         onClick={() => toggleProtein(opt.id)}
-                        disabled={maxReached}
                         className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium text-left transition-all ${
                           selected
                             ? "border-primary bg-primary/10 text-primary"
-                            : maxReached
-                            ? "border-border bg-muted/20 text-muted-foreground cursor-not-allowed opacity-50"
                             : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
                         }`}
                       >
@@ -209,7 +198,8 @@ export default function SubscribeSummaryPage() {
                             </svg>
                           )}
                         </span>
-                        {opt.label}
+                        <span className="flex-1">{opt.label}</span>
+                        <span className="text-muted-foreground font-normal">+${opt.price}</span>
                       </button>
                     );
                   })}
@@ -233,12 +223,9 @@ export default function SubscribeSummaryPage() {
 
             <button
               onClick={() => router.push(`/subscribe/${slug}/delivery`)}
-              disabled={!proteinsReady}
-              className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft"
             >
-              {proteinsReady
-                ? "Continue to Your Details \u2192"
-                : `Select ${proteinCount - selectedProteins.length} more protein${proteinCount - selectedProteins.length !== 1 ? "s" : ""} to continue`}
+              Continue to Your Details →
             </button>
           </div>
         </div>
