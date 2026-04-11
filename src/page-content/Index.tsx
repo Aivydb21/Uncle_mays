@@ -6,27 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
 
-const farmers = [
-  {
-    name: "Roots & Soil Farm",
-    location: "Pembroke Township, IL",
-    specialty: "Root vegetables, greens, sweet corn",
-    fact: "Family-operated for 3 generations, one of the oldest Black-owned farms in Illinois.",
-  },
-  {
-    name: "South Side Harvest Co.",
-    location: "Chicago, IL",
-    specialty: "Urban greens, herbs, microgreens",
-    fact: "Growing on reclaimed South Side land to bring hyperlocal produce to city neighborhoods.",
-  },
-  {
-    name: "Freedom Fields Farm",
-    location: "Kankakee, IL",
-    specialty: "Seasonal stone fruit, squash, heirloom tomatoes",
-    fact: "Every season, they donate 5% of their harvest to local food pantries.",
-  },
-];
-
 const faqs = [
   {
     q: "How does delivery work?",
@@ -34,11 +13,11 @@ const faqs = [
   },
   {
     q: "What's actually in the box?",
-    a: "Every box is seasonal. The Starter Box includes 6 produce items (~12–15 lbs) from this current rotation: asparagus, kale, lettuce, radishes, sweet potatoes, and microgreens. The Family Box adds more produce, a dozen eggs, and your choice of one protein: pastured whole chicken or beef short ribs. The Community Box includes the full produce spread, 2 dozen eggs, and your choice of two proteins from whole chicken, beef short ribs, and lamb chops.",
+    a: "Every box is sourced from a Black-owned farm and packed with what's freshest. The Starter Box includes sweet potatoes, Carola potatoes, Candy orange carrots, green curly kale, and fresh salad mix (~12-15 lbs). The Family Box adds Tuscan kale, rainbow chard, a dozen farm eggs, and your choice of protein: whole chicken, beef short ribs, or lamb chops. The Community Box includes the full produce spread plus organic pinto beans, organic black turtle beans, and your choice of protein.",
   },
   {
     q: "How much does a box cost?",
-    a: "The Starter Box is $35 (~12–15 lbs of produce). The Family Box is $65 and includes 22–26 lbs of produce, a dozen eggs, and one protein choice (pastured whole chicken or beef short ribs). The Community Box is $95 and includes 30–35 lbs of produce, two dozen eggs, and two protein choices (whole chicken, beef short ribs, or lamb chops). No subscription required. Order when you want.",
+    a: "The Starter Box is $35 (~12-15 lbs of produce). The Family Box is $65 and includes sweet potatoes, carrots, four greens, a dozen farm eggs, and one protein choice (whole chicken, beef short ribs, or lamb chops). The Community Box is $95 and includes the full harvest, pantry beans, and your choice of protein. No subscription required. Order when you want.",
   },
   {
     q: "Do I need a subscription?",
@@ -216,12 +195,11 @@ const Index = () => {
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {[
-                "Asparagus (1 bunch)",
-                "Rainbow chard or kale (1 bunch)",
-                "Green leaf or romaine lettuce (1 head)",
-                "Radishes (1 lb)",
-                "Sweet potatoes (2 lbs)",
-                "Microgreens (1 clam)",
+                "Sweet potatoes (3 lb)",
+                "Carola potatoes, farm-select (2 lb)",
+                "Candy orange carrots (2 lb)",
+                "Green curly kale (1 bunch)",
+                "Fresh salad mix (5 oz)",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2 text-sm text-foreground/80">
                   <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
@@ -238,44 +216,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 5. FARMER PROFILES */}
-      <section className="py-24 bg-background">
-        <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Farmers We Source From</h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {farmers.map((farmer, idx) => (
-              <motion.div
-                key={farmer.name}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.1 }}
-                className="bg-card rounded-2xl p-8 shadow-soft border border-border/50"
-              >
-                <div className="bg-primary/10 w-14 h-14 rounded-full flex items-center justify-center mb-4">
-                  <Leaf className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold mb-1">{farmer.name}</h3>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground mb-3">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {farmer.location}
-                </div>
-                <p className="text-sm font-medium text-primary mb-3">{farmer.specialty}</p>
-                <p className="text-sm text-foreground/70 leading-relaxed">{farmer.fact}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* 6. PRODUCT / BOXES */}
       <Pricing />
