@@ -115,7 +115,123 @@ export async function POST(req: NextRequest) {
       console.error(
         `[WEBHOOK] payment_intent.payment_failed | pi=${intent.id} error="${failMessage}"`
       );
-      // TODO: alert ops on payment failure
+      break;
+    }
+
+    case "customer.subscription.created": {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId =
+        typeof subscription.customer === "string"
+          ? subscription.customer
+          : subscription.customer.id;
+      console.log(
+        `[WEBHOOK] customer.subscription.created | sub=${subscription.id} customer=${customerId} status=${subscription.status} plan=${subscription.metadata?.product ?? "unknown"}`
+      );
+      break;
+    }
+
+    case "customer.subscription.deleted": {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId =
+        typeof subscription.customer === "string"
+          ? subscription.customer
+          : subscription.customer.id;
+      console.log(
+        `[WEBHOOK] customer.subscription.deleted | sub=${subscription.id} customer=${customerId} canceledAt=${subscription.canceled_at}`
+      );
+      break;
+    }
+
+    case "customer.subscription.updated": {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId =
+        typeof subscription.customer === "string"
+          ? subscription.customer
+          : subscription.customer.id;
+      const prevAttrs = event.data.previous_attributes as
+        | Partial<Stripe.Subscription>
+        | undefined;
+      const previousStatus = prevAttrs?.status;
+      console.log(
+        `[WEBHOOK] customer.subscription.updated | sub=${subscription.id} customer=${customerId} status=${subscription.status}${previousStatus ? ` (was ${previousStatus})` : ""} plan=${subscription.metadata?.product ?? "unknown"}`
+      );
+      break;
+    }
+
+    case "invoice.payment_succeeded": {
+      const invoice = event.data.object as Stripe.Invoice;
+      const subDetails = invoice.parent?.subscription_details?.subscription;
+      const subscriptionId =
+        typeof subDetails === "string" ? subDetails : subDetails?.id ?? null;
+      console.log(
+        `[WEBHOOK] invoice.payment_succeeded | invoice=${invoice.id} sub=${subscriptionId ?? "none"} amount=${invoice.amount_paid} email=${invoice.customer_email ?? "unknown"}`
+      );
+      break;
+    }
+
+    case "invoice.payment_failed": {
+      const invoice = event.data.object as Stripe.Invoice;
+      const subDetails = invoice.parent?.subscription_details?.subscription;
+      const subscriptionId =
+        typeof subDetails === "string" ? subDetails : subDetails?.id ?? null;
+      const customerId =
+        typeof invoice.customer === "string"
+          ? invoice.customer
+          : (invoice.customer as Stripe.Customer | null)?.id ?? null;
+      const email = invoice.customer_email ?? null;
+
+      console.error(
+        `[WEBHOOK] invoice.payment_failed | invoice=${invoice.id} sub=${subscriptionId ?? "none"} amount=${invoice.amount_due} email=${email ?? "unknown"} attempt=${invoice.attempt_count}`
+      );
+
+      const triggerSecretKey = process.env.TRIGGER_SECRET_KEY;
+      if (triggerSecretKey && email) {
+        try {
+          const res = await fetch(
+            "https://api.trigger.dev/api/v1/tasks/send-payment-failed-email/trigger",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${triggerSecretKey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                payload: {
+                  invoiceId: invoice.id,
+                  subscriptionId,
+                  customerId,
+                  email,
+                  amountDue: invoice.amount_due,
+                  attemptCount: invoice.attempt_count,
+                },
+                options: {
+                  idempotencyKey: `payment-failed-${invoice.id}`,
+                },
+              }),
+            }
+          );
+          if (res.ok) {
+            console.log(
+              `[WEBHOOK] Queued payment failure notification for invoice ${invoice.id}`
+            );
+          } else {
+            const err = await res.json().catch(() => ({}));
+            console.warn(
+              `[WEBHOOK] Failed to queue payment failure notification:`,
+              err
+            );
+          }
+        } catch (e) {
+          console.warn(
+            `[WEBHOOK] Network error queueing payment failure notification:`,
+            e
+          );
+        }
+      } else if (!triggerSecretKey) {
+        console.log(
+          `[WEBHOOK] TRIGGER_SECRET_KEY not set — payment failure notification skipped for invoice ${invoice.id}`
+        );
+      }
       break;
     }
 
