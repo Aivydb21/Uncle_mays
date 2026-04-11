@@ -11,6 +11,7 @@ export const PRODUCTS = {
   starter: {
     name: "Starter Box",
     price: 35,
+    subPrice: 31.50,
     proteinCount: 0,
     items: [
       "Asparagus",
@@ -24,6 +25,7 @@ export const PRODUCTS = {
   family: {
     name: "Family Box",
     price: 65,
+    subPrice: 58.50,
     proteinCount: 1,
     items: [
       "8\u201310 seasonal produce items",
@@ -35,6 +37,7 @@ export const PRODUCTS = {
   community: {
     name: "Community Box",
     price: 95,
+    subPrice: 85.50,
     proteinCount: 2,
     items: [
       "10+ seasonal produce items",

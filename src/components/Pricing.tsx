@@ -30,7 +30,6 @@ const plans = [
       "5 oz fresh salad mix, cut and ready to dress",
     ],
     checkoutSlug: "starter",
-    subUrl: process.env.NEXT_PUBLIC_STRIPE_STARTER_SUB_URL || "",
   },
   {
     name: "Family Box",
@@ -48,7 +47,6 @@ const plans = [
     ],
     popular: true,
     checkoutSlug: "family",
-    subUrl: process.env.NEXT_PUBLIC_STRIPE_FAMILY_SUB_URL || "",
   },
   {
     name: "Community Box",
@@ -65,16 +63,14 @@ const plans = [
       "Delivered every Wednesday",
     ],
     checkoutSlug: "community",
-    subUrl: process.env.NEXT_PUBLIC_STRIPE_COMMUNITY_SUB_URL || "",
   },
 ];
 
 export const Pricing = () => {
   const [isSubscription, setIsSubscription] = useState(true);
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleOrder = async (plan: typeof plans[0]) => {
+  const handleOrder = (plan: typeof plans[0]) => {
     try {
       if (typeof window !== "undefined") {
         if (window.fbq) window.fbq("track", "InitiateCheckout");
@@ -85,30 +81,7 @@ export const Pricing = () => {
     }
 
     if (isSubscription) {
-      setLoadingPlan(plan.checkoutSlug);
-      // Try Stripe Checkout Session via API (requires STRIPE_*_SUB_PRICE_ID on server)
-      try {
-        const res = await fetch("/api/checkout/subscribe", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ product: plan.checkoutSlug }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.url) {
-            window.location.href = data.url;
-            return;
-          }
-        }
-      } catch {
-        // Network error — fall through to payment link fallback
-      }
-      // Fallback: redirect directly to Stripe subscription payment link
-      if (plan.subUrl) {
-        window.location.href = plan.subUrl;
-        return;
-      }
-      setLoadingPlan(null);
+      router.push(`/subscribe/${plan.checkoutSlug}`);
     } else {
       router.push(`/checkout/${plan.checkoutSlug}`);
     }
@@ -223,18 +196,15 @@ export const Pricing = () => {
                     e.stopPropagation();
                     handleOrder(plan);
                   }}
-                  disabled={loadingPlan === plan.checkoutSlug}
                   className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
                     plan.popular
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium"
                       : "border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-soft"
-                  } disabled:opacity-60 disabled:cursor-not-allowed`}
+                  }`}
                   style={{ cursor: "pointer", zIndex: 9999, position: "relative" }}
                 >
                   <span className="text-center">
-                    {loadingPlan === plan.checkoutSlug
-                      ? "Redirecting…"
-                      : isSubscription
+                    {isSubscription
                       ? `Subscribe — ${plan.subPrice}/wk`
                       : `Order Now — ${plan.oneTimePrice}`}
                   </span>

@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { product, email } = await req.json();
+    const { product, email, firstName, lastName, phone, address, deliveryNotes, proteinChoices } = await req.json();
     const priceId = SUB_PRICE_MAP[product];
 
     if (!priceId) {
@@ -32,6 +32,25 @@ export async function POST(req: NextRequest) {
 
     const origin = req.headers.get("origin") || "https://unclemays.com";
 
+    // Build delivery metadata from pre-collected customer info
+    const deliveryMeta: Record<string, string> = { product };
+    if (firstName) deliveryMeta.firstName = firstName;
+    if (lastName) deliveryMeta.lastName = lastName;
+    if (phone) deliveryMeta.phone = phone;
+    if (address?.street) {
+      deliveryMeta.deliveryAddress = [
+        address.street,
+        address.apt,
+        address.city,
+        address.state,
+        address.zip,
+      ]
+        .filter(Boolean)
+        .join(", ");
+    }
+    if (deliveryNotes) deliveryMeta.deliveryNotes = deliveryNotes;
+    if (proteinChoices?.length) deliveryMeta.proteinChoices = proteinChoices.join(", ");
+
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
       payment_method_types: ["card"],
@@ -39,10 +58,10 @@ export async function POST(req: NextRequest) {
       phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: ["US"] },
       subscription_data: {
-        metadata: { product },
+        metadata: deliveryMeta,
       },
       success_url: `${origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/#boxes`,
+      cancel_url: `${origin}/subscribe/${product}`,
     };
 
     // Look up existing Stripe customer by email to prevent duplicate customer records.
