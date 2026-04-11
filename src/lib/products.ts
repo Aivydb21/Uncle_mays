@@ -19,8 +19,8 @@ export const PRODUCTS = {
     name: "Starter Box",
     price: 35,
     subPrice: 31.50,
-    // No protein included — optional paid add-on
-    proteinCount: 1,
+    // Produce only — no protein section
+    proteinCount: 0,
     proteinIncluded: false as const,
     items: [
       "Collard greens — 1 bunch",

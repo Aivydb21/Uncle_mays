@@ -161,8 +161,8 @@ export default function SubscribeSummaryPage() {
               </ul>
             </div>
 
-            {/* Protein section */}
-            <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+            {/* Protein section — only for boxes that include/offer protein */}
+            {product.proteinCount > 0 && <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
               {proteinIncluded ? (
                 <>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
@@ -212,7 +212,7 @@ export default function SubscribeSummaryPage() {
                   );
                 })}
               </div>
-            </div>
+            </div>}
 
             {/* Trust signals */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">

@@ -30,7 +30,6 @@ const plans = [
       "Persian cucumbers — 4 ct",
       "Snap peas — 1/2 lb",
     ],
-    proteinAddon: "optional" as const,
     checkoutSlug: "starter",
   },
   {
@@ -203,11 +202,6 @@ export const Pricing = () => {
                     </li>
                   ))}
                 </ul>
-                {plan.proteinAddon === "optional" && (
-                  <p className="text-xs text-muted-foreground text-center mb-2">
-                    🥩 Optional: add a protein at checkout (+$16–$22)
-                  </p>
-                )}
                 {plan.proteinAddon === "included-chicken" && (
                   <p className="text-xs text-primary/70 font-medium text-center mb-2">
                     🍗 Whole chicken included — no extra charge
