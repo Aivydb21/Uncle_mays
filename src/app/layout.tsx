@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Work_Sans } from "next/font/google";
 import Script from "next/script";
+import { Suspense } from "react";
 import "./globals.css";
 
 import { Providers } from "@/components/Providers";
@@ -117,7 +118,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <Footer />
             <MobileCTA />
           </div>
-          <FacebookPixelTracker />
+          <Suspense fallback={null}><FacebookPixelTracker /></Suspense>
         </Providers>
       </body>
     </html>
