@@ -49,6 +49,14 @@ export const Footer = () => {
                   Shop Produce Boxes
                 </a>
               </li>
+              <li>
+                <Link
+                  href="/manage-subscription"
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  Manage Subscription
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
       value: session.amount_total ? session.amount_total / 100 : 0,
       currency: session.currency?.toUpperCase() ?? "USD",
       items,
+      mode: session.mode,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";

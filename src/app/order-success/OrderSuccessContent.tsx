@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
@@ -43,6 +43,8 @@ export default function OrderSuccessContent() {
   const paymentIntentId = searchParams.get("pi");
   const amountParam = searchParams.get("amount");
   const fired = useRef(false);
+  const [isSubscription, setIsSubscription] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
     if (fired.current) return;
@@ -65,10 +67,30 @@ export default function OrderSuccessContent() {
         .then((data) => {
           if (data.error) return;
           try { fireTracking(data.transactionId, data.value, data.currency ?? "USD"); } catch { /* ignore */ }
+          if (data.mode === "subscription") setIsSubscription(true);
         })
         .catch(() => {});
     }
   }, [sessionId, paymentIntentId, amountParam]);
+
+  const handleManageSubscription = async () => {
+    if (!sessionId) return;
+    setPortalLoading(true);
+    try {
+      const res = await fetch("/api/portal/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ session_id: sessionId }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch {
+      // ignore
+    }
+    setPortalLoading(false);
+  };
 
   const ref = sessionId || paymentIntentId;
 
@@ -84,7 +106,22 @@ export default function OrderSuccessContent() {
         {ref ? (
           <p className="text-xs text-muted-foreground break-all">Reference: {ref}</p>
         ) : null}
-        <Button asChild size="lg" className="rounded-xl">
+        {isSubscription && (
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              You&apos;re now a subscriber. You can cancel, pause, or update billing at any time.
+            </p>
+            <Button
+              size="lg"
+              className="rounded-xl w-full"
+              onClick={handleManageSubscription}
+              disabled={portalLoading}
+            >
+              {portalLoading ? "Loading…" : "Manage Subscription"}
+            </Button>
+          </div>
+        )}
+        <Button asChild size="lg" variant={isSubscription ? "outline" : "default"} className="rounded-xl">
           <Link href="/">Back to home</Link>
         </Button>
       </div>
