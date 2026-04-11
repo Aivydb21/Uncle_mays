@@ -16,10 +16,10 @@ function authHeader(apiKey: string): string {
   return `Basic ${Buffer.from(`anystring:${apiKey}`).toString("base64")}`;
 }
 
+// Upsert contact and tag as checkout_started in a single PUT call.
 export async function upsertContact(
   email: string,
-  firstName: string,
-  lastName: string
+  firstName: string
 ): Promise<void> {
   const config = getConfig();
   if (!config) {
@@ -35,9 +35,11 @@ export async function upsertContact(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        email_address: email.trim().toLowerCase(),
+        email_address: email,
         status_if_new: "subscribed",
-        merge_fields: { FNAME: firstName, LNAME: lastName },
+        status: "subscribed",
+        tags: ["checkout_started"],
+        merge_fields: { FNAME: firstName },
       }),
     });
     if (!res.ok) {
@@ -48,7 +50,9 @@ export async function upsertContact(
   }
 }
 
-export async function addTag(email: string, tag: string): Promise<void> {
+// Called after Stripe payment success. Adds order_completed and deactivates
+// checkout_started in one call so the recovery sequence stops immediately.
+export async function tagOrderCompleted(email: string): Promise<void> {
   const config = getConfig();
   if (!config) return;
   const url = `https://${config.serverPrefix}.api.mailchimp.com/3.0/lists/${config.listId}/members/${hashEmail(email)}/tags`;
@@ -59,12 +63,17 @@ export async function addTag(email: string, tag: string): Promise<void> {
         Authorization: authHeader(config.apiKey),
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ tags: [{ name: tag, status: "active" }] }),
+      body: JSON.stringify({
+        tags: [
+          { name: "order_completed", status: "active" },
+          { name: "checkout_started", status: "inactive" },
+        ],
+      }),
     });
     if (!res.ok) {
-      console.error("Mailchimp tag error:", res.status, await res.text());
+      console.error("Mailchimp order_completed tag error:", res.status, await res.text());
     }
   } catch (err) {
-    console.error("Mailchimp tag error:", err);
+    console.error("Mailchimp order_completed tag error:", err);
   }
 }

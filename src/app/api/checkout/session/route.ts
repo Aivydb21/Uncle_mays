@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSession, updateSession, getAbandonedSessions } from "@/lib/checkout-store";
-import { upsertContact, addTag } from "@/lib/mailchimp";
+import { upsertContact, tagOrderCompleted } from "@/lib/mailchimp";
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,9 +23,8 @@ export async function POST(req: NextRequest) {
       deliveryNotes,
     });
 
-    // Non-blocking: upsert contact then tag as checkout_started for abandoned cart recovery
-    upsertContact(email, firstName, lastName)
-      .then(() => addTag(email, "checkout_started"))
+    // Non-blocking: upsert contact with checkout_started tag in one call
+    upsertContact(email, firstName)
       .catch((err) => console.error("Mailchimp checkout_started error:", err));
 
     return NextResponse.json({ sessionId: session.id });
@@ -47,9 +46,9 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
-    // Non-blocking: tag as order_completed to remove from abandoned cart sequence
+    // Non-blocking: add order_completed and deactivate checkout_started in one call
     if (patch.completedAt && updated.email) {
-      addTag(updated.email, "order_completed")
+      tagOrderCompleted(updated.email)
         .catch((err) => console.error("Mailchimp order_completed error:", err));
     }
 
