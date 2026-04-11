@@ -7,13 +7,21 @@ export const PROTEIN_OPTIONS = [
 
 export type ProteinId = (typeof PROTEIN_OPTIONS)[number]["id"];
 
-// proteinCount = max proteins selectable. Protein is always optional (add-on, not required).
+/**
+ * proteinIncluded: true  → protein is part of the box price (no extra charge)
+ * proteinIncluded: false → protein is an optional add-on at extra cost
+ * proteinOptions: string[] → restrict which proteins are available for this box
+ *   (undefined = all PROTEIN_OPTIONS shown)
+ * proteinCount: 1 → customer selects exactly 1 (radio behavior); enforced UI-side
+ */
 export const PRODUCTS = {
   starter: {
     name: "Starter Box",
     price: 35,
     subPrice: 31.50,
+    // No protein included — optional paid add-on
     proteinCount: 1,
+    proteinIncluded: false as const,
     items: [
       "Collard greens — 1 bunch",
       "Asparagus — 1 lb",
@@ -27,7 +35,10 @@ export const PRODUCTS = {
     name: "Family Box",
     price: 65,
     subPrice: 58.50,
+    // Chicken included in price — only chicken available, no upcharge
     proteinCount: 1,
+    proteinIncluded: true as const,
+    proteinOptions: ["chicken"] as ProteinId[],
     items: [
       "Collard greens — 2 bunches",
       "Asparagus — 1.5 lb",
@@ -39,13 +50,16 @@ export const PRODUCTS = {
       "Strawberries — 1 quart",
       "Early beets with tops — 1 bunch",
       "Zucchini — 2 ct",
+      "Pasture-raised whole chicken — included",
     ],
   },
   community: {
     name: "Community Box",
     price: 95,
     subPrice: 85.50,
+    // Protein included in price — customer picks 1 from full options, no upcharge
     proteinCount: 1,
+    proteinIncluded: true as const,
     items: [
       "Watermelon radishes — 1 bunch",
       "Fairy tale eggplant — 1/2 lb",

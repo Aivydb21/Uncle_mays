@@ -6,6 +6,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
 
+// Resolve which protein options are available for a given product
+function getAvailableProteins(product: typeof PRODUCTS[ProductSlug]) {
+  const allowed = "proteinOptions" in product ? (product.proteinOptions as ProteinId[]) : null;
+  return allowed ? PROTEIN_OPTIONS.filter((o) => allowed.includes(o.id)) : [...PROTEIN_OPTIONS];
+}
+
 // Step indicator component
 function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
   const steps = ["Order Summary", "Delivery", "Payment"];
@@ -58,7 +64,8 @@ export default function CheckoutSummaryPage() {
   }
 
   const product = PRODUCTS[slug];
-  const proteinCount = product.proteinCount;
+  const proteinIncluded = product.proteinIncluded;
+  const availableProteins = getAvailableProteins(product);
 
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
 
@@ -73,18 +80,12 @@ export default function CheckoutSummaryPage() {
     } catch {
       // ignore
     }
-  }, [slug, proteinCount]);
+  }, [slug]);
 
+  // Always single-select (radio): selecting a new protein replaces the previous one
   function toggleProtein(id: ProteinId) {
     setSelectedProteins((prev) => {
-      let next: ProteinId[];
-      if (prev.includes(id)) {
-        next = prev.filter((p) => p !== id);
-      } else if (proteinCount === 1) {
-        next = [id];
-      } else {
-        next = prev.length < proteinCount ? [...prev, id] : prev;
-      }
+      const next = prev.includes(id) ? [] : [id];
       try {
         sessionStorage.setItem(`unc-proteins-${slug}`, JSON.stringify(next));
       } catch {
@@ -93,9 +94,6 @@ export default function CheckoutSummaryPage() {
       return next;
     });
   }
-
-  // Protein is always optional — never block checkout progression
-  const proteinsReady = true;
 
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
@@ -159,48 +157,58 @@ export default function CheckoutSummaryPage() {
               </ul>
             </div>
 
-            {/* Protein add-on — optional for all boxes */}
-            {proteinCount > 0 && (
-              <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
-                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                  Add a Protein — Optional
-                </h2>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Upgrade your box with a locally sourced protein (+$16–$22). Skip if you prefer.
-                </p>
-                <div className="space-y-2">
-                  {PROTEIN_OPTIONS.map((opt) => {
-                    const selected = selectedProteins.includes(opt.id);
-                    return (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => toggleProtein(opt.id)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium text-left transition-all ${
-                          selected
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
+            {/* Protein section */}
+            <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+              {proteinIncluded ? (
+                <>
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                    Choose Your Protein — Included
+                  </h2>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Protein is included with your box at no extra charge. Select one.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                    Add a Protein — Optional
+                  </h2>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Add one locally sourced protein to your box (+$16–$22). Skip if you prefer.
+                  </p>
+                </>
+              )}
+              <div className="space-y-2">
+                {availableProteins.map((opt) => {
+                  const selected = selectedProteins.includes(opt.id);
+                  return (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => toggleProtein(opt.id)}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium text-left transition-all ${
+                        selected
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
+                      }`}
+                    >
+                      {/* Radio indicator */}
+                      <span
+                        className={`w-5 h-5 rounded-full flex-shrink-0 border-2 flex items-center justify-center ${
+                          selected ? "border-primary bg-primary" : "border-muted-foreground/40"
                         }`}
                       >
-                        <span
-                          className={`w-5 h-5 rounded flex-shrink-0 border-2 flex items-center justify-center ${
-                            selected ? "border-primary bg-primary" : "border-muted-foreground/40"
-                          }`}
-                        >
-                          {selected && (
-                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 12 12">
-                              <path d="M10 3L5 9 2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                            </svg>
-                          )}
-                        </span>
-                        <span className="flex-1">{opt.label}</span>
+                        {selected && <span className="w-2 h-2 rounded-full bg-white" />}
+                      </span>
+                      <span className="flex-1">{opt.label}</span>
+                      {!proteinIncluded && (
                         <span className="text-muted-foreground font-normal">+${opt.price}</span>
-                      </button>
-                    );
-                  })}
-                </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
-            )}
+            </div>
 
             {/* Trust signals */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
@@ -223,6 +231,11 @@ export default function CheckoutSummaryPage() {
             >
               Continue to Delivery →
             </button>
+            {proteinIncluded && selectedProteins.length === 0 && (
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                Don&apos;t forget to select your protein above before continuing.
+              </p>
+            )}
           </div>
         </div>
       </div>

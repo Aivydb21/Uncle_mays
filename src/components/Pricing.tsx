@@ -30,7 +30,7 @@ const plans = [
       "Persian cucumbers — 4 ct",
       "Snap peas — 1/2 lb",
     ],
-    proteinAddon: true,
+    proteinAddon: "optional" as const,
     checkoutSlug: "starter",
   },
   {
@@ -51,9 +51,10 @@ const plans = [
       "Strawberries — 1 quart",
       "Early beets with tops — 1 bunch",
       "Zucchini — 2 ct",
+      "Pasture-raised whole chicken — included",
     ],
     popular: true,
-    proteinAddon: true,
+    proteinAddon: "included-chicken" as const,
     checkoutSlug: "family",
   },
   {
@@ -75,7 +76,7 @@ const plans = [
       "Heirloom cucumber — 2 ct",
       "Ramps — 1/2 lb",
     ],
-    proteinAddon: true,
+    proteinAddon: "included-choice" as const,
     checkoutSlug: "community",
   },
 ];
@@ -202,9 +203,19 @@ export const Pricing = () => {
                     </li>
                   ))}
                 </ul>
-                {plan.proteinAddon && (
+                {plan.proteinAddon === "optional" && (
                   <p className="text-xs text-muted-foreground text-center mb-2">
-                    🥩 Add a protein at checkout — chicken, pork, beef, or salmon (+$16–$22)
+                    🥩 Optional: add a protein at checkout (+$16–$22)
+                  </p>
+                )}
+                {plan.proteinAddon === "included-chicken" && (
+                  <p className="text-xs text-primary/70 font-medium text-center mb-2">
+                    🍗 Whole chicken included — no extra charge
+                  </p>
+                )}
+                {plan.proteinAddon === "included-choice" && (
+                  <p className="text-xs text-primary/70 font-medium text-center mb-2">
+                    🥩 Your choice of protein included — chicken, pork, beef, or salmon
                   </p>
                 )}
                 <p className="text-xs text-muted-foreground text-center mb-4">
