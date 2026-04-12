@@ -139,20 +139,31 @@ export default function DeliveryPage() {
   }
 
   function handleEmailBlur() {
-    if (
-      !leadFired &&
-      fields.email.trim() &&
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())
-    ) {
-      setLeadFired(true);
-      try {
-        if (typeof window !== "undefined") {
-          if (window.fbq) window.fbq("track", "Lead");
-          if (window.gtag) window.gtag("event", "generate_lead");
+    const email = fields.email.trim();
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      // Fire pixel events (non-blocking, ignore errors)
+      if (!leadFired) {
+        setLeadFired(true);
+        try {
+          if (typeof window !== "undefined") {
+            if (window.fbq) window.fbq("track", "Lead");
+            if (window.gtag) window.gtag("event", "generate_lead");
+          }
+        } catch {
+          // Never block checkout for tracking failures
         }
-      } catch {
-        // Never block checkout for tracking failures
       }
+
+      // Capture email immediately to Mailchimp — fire-and-forget.
+      // This ensures abandoned cart recovery works even if the user never
+      // submits the delivery form. Non-blocking: never delays or breaks checkout.
+      fetch("/api/capture-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, product: slug }),
+      }).catch(() => {
+        // Intentionally swallowed — email capture must never interrupt checkout
+      });
     }
   }
 

@@ -24,6 +24,7 @@ export interface CheckoutSession {
   proteins?: string[];
   paymentIntentId?: string;
   completedAt?: string;
+  recoveryEmailSent?: boolean;
   createdAt: string;
   updatedAt: string;
 }
