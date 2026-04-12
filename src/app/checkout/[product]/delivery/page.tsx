@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
@@ -98,6 +98,20 @@ export default function DeliveryPage() {
 
   const product = PRODUCTS[slug];
 
+  // Effective price (may include first-order discount set by order summary page)
+  const [displayPrice, setDisplayPrice] = useState(product.price);
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(`unc-price-${slug}`);
+      if (stored) {
+        const parsed = parseInt(stored, 10);
+        if (!isNaN(parsed) && parsed > 0) setDisplayPrice(parsed);
+      }
+    } catch {
+      // ignore
+    }
+  }, [slug]);
+
   const [fields, setFields] = useState<FormFields>({
     firstName: "",
     lastName: "",
@@ -166,13 +180,25 @@ export default function DeliveryPage() {
       }
     }
 
+    // Read effective price (may include first-order discount set by order summary page)
+    let effectivePrice = product.price;
+    try {
+      const storedPrice = sessionStorage.getItem(`unc-price-${slug}`);
+      if (storedPrice) {
+        const parsed = parseInt(storedPrice, 10);
+        if (!isNaN(parsed) && parsed > 0) effectivePrice = parsed;
+      }
+    } catch {
+      // ignore
+    }
+
     try {
       const res = await fetch("/api/checkout/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           product: slug,
-          price: product.price,
+          price: effectivePrice,
           productName: product.name,
           email: fields.email.trim(),
           firstName: fields.firstName.trim(),
@@ -204,7 +230,7 @@ export default function DeliveryPage() {
             sessionId: data.sessionId,
             product: slug,
             productName: product.name,
-            price: product.price,
+            price: effectivePrice,
             email: fields.email.trim(),
             firstName: fields.firstName.trim(),
             lastName: fields.lastName.trim(),
@@ -456,12 +482,12 @@ export default function DeliveryPage() {
               </h2>
               <div className="flex items-center justify-between mb-4">
                 <span className="font-medium text-sm">{product.name}</span>
-                <span className="font-bold text-primary">${product.price}</span>
+                <span className="font-bold text-primary">${displayPrice}</span>
               </div>
               <div className="border-t border-border pt-3">
                 <div className="flex items-center justify-between text-sm font-semibold">
                   <span>Total</span>
-                  <span className="text-primary">${product.price}.00</span>
+                  <span className="text-primary">${displayPrice}.00</span>
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-3">

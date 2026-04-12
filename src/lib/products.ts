@@ -18,6 +18,7 @@ export const PRODUCTS = {
   starter: {
     name: "Starter Box",
     price: 35,
+    firstOrderPrice: 30,
     subPrice: 31.50,
     // Produce only — no protein section
     proteinCount: 0,

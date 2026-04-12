@@ -3,11 +3,16 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
-// Map product slugs to amounts in cents
+// Map product slugs to amounts in cents (regular price)
 const AMOUNT_MAP: Record<string, number> = {
   starter: 3500,
   family: 6500,
   community: 9500,
+};
+
+// First-order discounted prices in cents — applied automatically for eligible products
+const FIRST_ORDER_AMOUNT_MAP: Record<string, number> = {
+  starter: 3000, // $30 first-order price (regular $35)
 };
 
 export async function POST(req: NextRequest) {
@@ -17,7 +22,10 @@ export async function POST(req: NextRequest) {
     }
 
     const { product, email, firstName, lastName, proteins, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await req.json();
-    const amount = AMOUNT_MAP[product];
+
+    // Apply first-order discount for eligible products (e.g. starter box)
+    const isFirstOrder = product in FIRST_ORDER_AMOUNT_MAP;
+    const amount = isFirstOrder ? FIRST_ORDER_AMOUNT_MAP[product] : AMOUNT_MAP[product];
 
     if (!amount) {
       return NextResponse.json({ error: "Unknown product" }, { status: 400 });
@@ -31,6 +39,7 @@ export async function POST(req: NextRequest) {
         product,
         customer_name: `${firstName || ""} ${lastName || ""}`.trim(),
         customer_email: email || "",
+        ...(isFirstOrder ? { first_order_discount: "true" } : {}),
         ...(Array.isArray(proteins) && proteins.length > 0
           ? { protein_selections: proteins.join(", ") }
           : {}),

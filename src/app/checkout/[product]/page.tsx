@@ -67,6 +67,10 @@ export default function CheckoutSummaryPage() {
   const proteinIncluded = product.proteinIncluded;
   const availableProteins = getAvailableProteins(product);
 
+  // First-order pricing: starter box gets $30 instead of $35
+  const effectivePrice = "firstOrderPrice" in product ? product.firstOrderPrice : product.price;
+  const isFirstOrderDiscount = "firstOrderPrice" in product && product.firstOrderPrice < product.price;
+
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
 
   // Restore any prior selection from sessionStorage
@@ -121,7 +125,7 @@ export default function CheckoutSummaryPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute bottom-4 left-5">
               <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
-                ${product.price} per delivery
+                ${effectivePrice} per delivery
               </span>
             </div>
           </div>
@@ -138,9 +142,20 @@ export default function CheckoutSummaryPage() {
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="text-3xl font-bold text-primary">${product.price}</span>
+                <span className="text-3xl font-bold text-primary">${effectivePrice}</span>
+                {isFirstOrderDiscount && (
+                  <div className="text-xs text-muted-foreground line-through">${product.price}</div>
+                )}
               </div>
             </div>
+
+            {/* First-order discount callout */}
+            {isFirstOrderDiscount && (
+              <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2.5 text-sm text-primary font-medium">
+                <span>🎉</span>
+                <span>First-order discount applied — you save ${product.price - effectivePrice}!</span>
+              </div>
+            )}
 
             {/* What's in the box */}
             <div className="mb-6">
@@ -226,7 +241,15 @@ export default function CheckoutSummaryPage() {
 
             {/* CTA */}
             <button
-              onClick={() => router.push(`/checkout/${slug}/delivery`)}
+              onClick={() => {
+                // Persist effective price for downstream checkout steps
+                try {
+                  sessionStorage.setItem(`unc-price-${slug}`, String(effectivePrice));
+                } catch {
+                  // ignore
+                }
+                router.push(`/checkout/${slug}/delivery`);
+              }}
               className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft"
             >
               Continue to Delivery →
