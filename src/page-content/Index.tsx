@@ -1,21 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { HelpCircle, Users, Instagram, ShoppingBag, Bell, Package, Mail } from "lucide-react";
+import { Users, Instagram, ShoppingBag, Bell, Package, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
-
-const homepageFaqs = [
-  {
-    q: "Do I need a subscription?",
-    a: "No. Every box is a one-time purchase. Order when it works for you. If you'd like regular deliveries, reach out to info@unclemays.com and we can set up a recurring schedule.",
-  },
-  {
-    q: "What if I have an issue with my order?",
-    a: "We stand behind every box. If anything is wrong with your delivery (missing items, quality issues, anything), email us at info@unclemays.com and we'll make it right, no questions asked.",
-  },
-];
 
 const testimonials = [
   {
@@ -147,48 +136,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 8. FAQ (2 conversion-critical questions; full FAQ at /faq) */}
-      <section className="py-24 bg-background">
-        <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Quick Answers</h2>
-          </motion.div>
-
-          <div className="max-w-3xl mx-auto space-y-4">
-            {homepageFaqs.map((faq, idx) => (
-              <motion.div
-                key={faq.q}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.07 }}
-                className="bg-card rounded-2xl p-6 shadow-soft border border-border/50"
-              >
-                <div className="flex items-start gap-3">
-                  <HelpCircle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-semibold mb-2">{faq.q}</p>
-                    <p className="text-foreground/70 leading-relaxed text-sm">{faq.a}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-            <p className="text-center text-sm text-muted-foreground pt-2">
-              <a href="/faq" className="underline hover:text-foreground transition-colors">
-                View all frequently asked questions
-              </a>
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 10. EMAIL CAPTURE (moved below FAQ) */}
+      {/* EMAIL CAPTURE */}
       <section className="py-20 bg-background">
         <div className="container px-6">
           <motion.div

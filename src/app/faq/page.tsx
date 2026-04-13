@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import FaqContent from "@/page-content/Faq";
 
 export const metadata: Metadata = {
-  title: "FAQ | Uncle Mays Produce",
+  title: "How It Works | Uncle Mays Produce",
   description:
-    "Frequently asked questions about Uncle Mays Produce boxes, delivery, pricing, and more.",
+    "Learn how Uncle Mays Produce works: what's in the box, how delivery works, pricing, and frequently asked questions.",
   alternates: {
     canonical: "/faq",
   },
