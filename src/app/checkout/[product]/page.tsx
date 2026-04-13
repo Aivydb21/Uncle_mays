@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 // Resolve which protein options are available for a given product
 function getAvailableProteins(product: typeof PRODUCTS[ProductSlug]) {
@@ -72,6 +74,44 @@ export default function CheckoutSummaryPage() {
   const isFirstOrderDiscount = "firstOrderPrice" in product && product.firstOrderPrice < product.price;
 
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
+  const [email, setEmail] = useState("");
+  const [emailCaptured, setEmailCaptured] = useState(false);
+
+  // Restore any prior email from sessionStorage
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(`unc-email-${slug}`);
+      if (saved) {
+        setEmail(saved);
+        setEmailCaptured(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, [slug]);
+
+  function handleEmailBlur() {
+    const trimmed = email.trim();
+    if (trimmed && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      // Store for downstream checkout steps
+      try {
+        sessionStorage.setItem(`unc-email-${slug}`, trimmed);
+      } catch {
+        // ignore
+      }
+      // Fire-and-forget to Mailchimp for abandoned cart recovery
+      if (!emailCaptured) {
+        setEmailCaptured(true);
+        fetch("/api/capture-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: trimmed, product: slug }),
+        }).catch(() => {
+          // Never block checkout for email capture
+        });
+      }
+    }
+  }
 
   // Restore any prior selection from sessionStorage
   useEffect(() => {
@@ -239,6 +279,25 @@ export default function CheckoutSummaryPage() {
               ))}
             </div>
 
+            {/* Email capture — earliest possible point for abandoned cart recovery */}
+            <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+              <Label htmlFor="email" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                Your Email
+              </Label>
+              <p className="text-xs text-muted-foreground mb-3">
+                We&apos;ll send your order confirmation and delivery updates here.
+              </p>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={handleEmailBlur}
+                autoComplete="email"
+                placeholder="you@example.com"
+              />
+            </div>
+
             {/* CTA */}
             <button
               onClick={() => {
@@ -247,6 +306,15 @@ export default function CheckoutSummaryPage() {
                   sessionStorage.setItem(`unc-price-${slug}`, String(effectivePrice));
                 } catch {
                   // ignore
+                }
+                // Persist email if valid
+                const trimmed = email.trim();
+                if (trimmed && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+                  try {
+                    sessionStorage.setItem(`unc-email-${slug}`, trimmed);
+                  } catch {
+                    // ignore
+                  }
                 }
                 router.push(`/checkout/${slug}/delivery`);
               }}

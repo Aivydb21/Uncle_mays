@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 function getAvailableProteins(product: typeof PRODUCTS[ProductSlug]) {
   const allowed = "proteinOptions" in product ? (product.proteinOptions as ProteinId[]) : null;
@@ -66,6 +68,42 @@ export default function SubscribeSummaryPage() {
   const availableProteins = getAvailableProteins(product);
 
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
+  const [email, setEmail] = useState("");
+  const [emailCaptured, setEmailCaptured] = useState(false);
+
+  // Restore any prior email from sessionStorage
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(`unc-email-${slug}`);
+      if (saved) {
+        setEmail(saved);
+        setEmailCaptured(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, [slug]);
+
+  function handleEmailBlur() {
+    const trimmed = email.trim();
+    if (trimmed && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      try {
+        sessionStorage.setItem(`unc-email-${slug}`, trimmed);
+      } catch {
+        // ignore
+      }
+      if (!emailCaptured) {
+        setEmailCaptured(true);
+        fetch("/api/capture-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: trimmed, product: slug }),
+        }).catch(() => {
+          // Never block checkout for email capture
+        });
+      }
+    }
+  }
 
   useEffect(() => {
     try {
@@ -228,8 +266,38 @@ export default function SubscribeSummaryPage() {
               ))}
             </div>
 
+            {/* Email capture — earliest possible point for abandoned cart recovery */}
+            <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+              <Label htmlFor="email" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                Your Email
+              </Label>
+              <p className="text-xs text-muted-foreground mb-3">
+                We&apos;ll send your subscription confirmation and delivery updates here.
+              </p>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={handleEmailBlur}
+                autoComplete="email"
+                placeholder="you@example.com"
+              />
+            </div>
+
             <button
-              onClick={() => router.push(`/subscribe/${slug}/delivery`)}
+              onClick={() => {
+                // Persist email if valid
+                const trimmed = email.trim();
+                if (trimmed && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+                  try {
+                    sessionStorage.setItem(`unc-email-${slug}`, trimmed);
+                  } catch {
+                    // ignore
+                  }
+                }
+                router.push(`/subscribe/${slug}/delivery`);
+              }}
               className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft"
             >
               Continue to Your Details →

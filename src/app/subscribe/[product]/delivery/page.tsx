@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
@@ -112,6 +112,20 @@ export default function SubscribeDeliveryPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [leadFired, setLeadFired] = useState(false);
+
+  // Pre-fill email from Step 1 capture (sessionStorage)
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(`unc-email-${slug}`);
+      if (saved && !fields.email) {
+        setFields((prev) => ({ ...prev, email: saved }));
+        setLeadFired(true); // Already captured at Step 1
+      }
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;

@@ -129,6 +129,20 @@ export default function DeliveryPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [leadFired, setLeadFired] = useState(false);
 
+  // Pre-fill email from Step 1 capture (sessionStorage)
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(`unc-email-${slug}`);
+      if (saved && !fields.email) {
+        setFields((prev) => ({ ...prev, email: saved }));
+        setLeadFired(true); // Already captured at Step 1
+      }
+    } catch {
+      // ignore
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = e.target;
     setFields((prev) => ({ ...prev, [name]: value }));
