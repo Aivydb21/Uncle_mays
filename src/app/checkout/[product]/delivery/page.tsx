@@ -99,7 +99,7 @@ export default function DeliveryPage() {
   const product = PRODUCTS[slug];
 
   // Effective price (may include first-order discount set by order summary page)
-  const [displayPrice, setDisplayPrice] = useState(product.price);
+  const [displayPrice, setDisplayPrice] = useState<number>(product.price);
   useEffect(() => {
     try {
       const stored = sessionStorage.getItem(`unc-price-${slug}`);
@@ -206,7 +206,7 @@ export default function DeliveryPage() {
     }
 
     // Read effective price (may include first-order discount set by order summary page)
-    let effectivePrice = product.price;
+    let effectivePrice: number = product.price;
     try {
       const storedPrice = sessionStorage.getItem(`unc-price-${slug}`);
       if (storedPrice) {
