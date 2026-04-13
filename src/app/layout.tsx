@@ -5,9 +5,7 @@ import { Suspense } from "react";
 import "./globals.css";
 
 import { Providers } from "@/components/Providers";
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
-import { MobileCTA } from "@/components/MobileCTA";
+import { PageShell } from "@/components/PageShell";
 import { FacebookPixelTracker } from "@/components/FacebookPixelTracker";
 
 const playfair = Playfair_Display({
@@ -112,12 +110,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         <Providers>
-          <div className="flex min-h-screen flex-col">
-            <Navigation />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <MobileCTA />
-          </div>
+          <PageShell>{children}</PageShell>
           <Suspense fallback={null}><FacebookPixelTracker /></Suspense>
         </Providers>
       </body>

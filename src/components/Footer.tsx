@@ -16,18 +16,6 @@ export const Footer = () => {
             <p className="text-background/70 mb-6 max-w-md leading-relaxed">
               Fresh produce from Black farmers, delivered across Chicago. No subscription required. Just good food.
             </p>
-            {/* Footer shop CTA */}
-            <div className="flex flex-col gap-2 max-w-xs">
-              <Button
-                asChild
-                className="bg-background text-foreground hover:bg-background/90 font-semibold"
-              >
-                <a href="/#boxes">Shop Produce Boxes</a>
-              </Button>
-              <p className="text-xs text-background/50">
-                Boxes from $35. Delivered across Chicago.
-              </p>
-            </div>
           </div>
 
           <div>
@@ -39,6 +27,14 @@ export const Footer = () => {
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   About Uncle May
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/faq"
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  FAQ
                 </Link>
               </li>
               <li>

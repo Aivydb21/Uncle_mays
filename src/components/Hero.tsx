@@ -8,7 +8,7 @@ import Link from "next/link";
 const heroImage = "/images/hero-produce.jpg";
 
 const HERO_BOXES = [
-  { name: "Starter Box", price: "$35", slug: "starter", note: "~12–15 lbs · 1–2 people" },
+  { name: "Starter Box", price: "$30", priceNote: "first order", regularPrice: "$35", slug: "starter", note: "~12–15 lbs · 1–2 people" },
   { name: "Family Box", price: "$65", slug: "family", note: "~22–26 lbs · feeds 4 · chicken included", popular: true },
   { name: "Community Box", price: "$95", slug: "community", note: "~30–35 lbs · large families · protein included" },
 ];
@@ -38,7 +38,16 @@ export const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            {/* Live delivery badge */}
+            {/* First-order offer badge — message-match to Meta ads */}
+            <div className="inline-flex flex-col sm:flex-row sm:items-center sm:gap-3 gap-1 mb-4">
+              <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-bold shadow-md">
+                <span>$30 first order</span>
+                <span className="opacity-70">·</span>
+                <span className="line-through opacity-60 font-normal">$35</span>
+              </div>
+            </div>
+
+            {/* Delivery badge */}
             <div className="inline-flex flex-col sm:flex-row sm:items-center sm:gap-3 gap-1 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
               <span className="inline-flex items-center gap-2">
                 <Truck className="h-4 w-4 shrink-0" />
@@ -49,9 +58,9 @@ export const Hero = () => {
               </span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Fresh Produce from Black Farmers,{" "}
-              <span className="text-primary">Delivered to Your Door.</span>
+            <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">
+              Your first produce box:{" "}
+              <span className="text-primary">$30.</span>
             </h1>
           </motion.div>
 
@@ -61,9 +70,8 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-xl md:text-2xl mb-8 text-foreground/80 font-light"
           >
-            Curated seasonal boxes sourced directly from Black farmers. Every
-            purchase puts money in the hands of the people who grew your food
-            and brings restaurant-quality produce straight to your Chicago home.
+            Fresh, curated, Hyde Park delivery. Starter Box — normally $35.{" "}
+            First-order pricing ends this week.
           </motion.p>
 
           {/* Inline box pricing CTAs — primary conversion path */}
@@ -92,9 +100,21 @@ export const Hero = () => {
                   )}
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <span className={`text-2xl font-bold ${box.popular ? "text-primary-foreground" : "text-primary"}`}>
-                    {box.price}
-                  </span>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`text-2xl font-bold ${box.popular ? "text-primary-foreground" : "text-primary"}`}>
+                      {box.price}
+                    </span>
+                    {"priceNote" in box && box.priceNote && (
+                      <span className={`text-xs font-semibold ${box.popular ? "text-primary-foreground/70" : "text-primary/70"}`}>
+                        {box.priceNote}
+                      </span>
+                    )}
+                    {"regularPrice" in box && box.regularPrice && (
+                      <span className={`text-xs line-through ${box.popular ? "text-primary-foreground/50" : "text-muted-foreground"}`}>
+                        {box.regularPrice}
+                      </span>
+                    )}
+                  </div>
                   <ArrowRight className="h-4 w-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
                 </div>
                 <p className={`text-xs leading-tight ${box.popular ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
@@ -115,8 +135,8 @@ export const Hero = () => {
               asChild
               className="group text-lg font-semibold px-8 py-6 rounded-xl"
             >
-              <Link href="/checkout/family">
-                Order Family Box — $65
+              <Link href="/checkout/starter">
+                Claim Your $30 Box
               </Link>
             </Button>
             <Button

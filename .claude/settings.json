@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -lh /c/Users/Anthony/Desktop/um_website/src/components/*.tsx)",
+      "Read(//c/Users/Anthony/Desktop/um_website/**)",
+      "Bash(sort -k2)",
+      "Bash(wc -l /c/Users/Anthony/Desktop/um_website/src/app/**/*.tsx)",
+      "Bash(wc -l /c/Users/Anthony/Desktop/um_website/src/page-content/*.tsx)",
+      "Bash(grep -v \"^ui$\")",
+      "Bash(git -C /c/Users/Anthony/Desktop/um_website config --list)",
+      "Bash(git -C /c/Users/Anthony/Desktop/um_website remote -v)",
+      "Bash(git -C /c/Users/Anthony/Desktop/um_website log --oneline -10)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\Anthony\\Desktop\\um_business"
+    ]
+  }
+}

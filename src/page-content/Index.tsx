@@ -169,49 +169,6 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
-
-      {/* BOTTOM CTA */}
-      <section className="py-20 bg-foreground text-background">
-        <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="max-w-2xl mx-auto text-center"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Ready to eat better?
-            </h2>
-            <p className="text-xl text-background/80 mb-8">
-              Fresh produce from Black farmers, delivered straight to your Chicago door. Order today. No subscription, no commitment.
-            </p>
-            <div className="flex flex-col items-center gap-3">
-              <Button
-                size="lg"
-                className="text-lg font-semibold px-10 py-6 rounded-xl bg-background text-foreground hover:bg-background/90"
-                asChild
-              >
-                <a href="#boxes">Shop Produce Boxes</a>
-              </Button>
-              <p className="text-sm text-background/60">
-                Boxes from $35. Delivered across Chicago every Wednesday.
-              </p>
-            </div>
-            <div className="mt-10 flex justify-center gap-4">
-              <a
-                href="https://www.instagram.com/unclemaysproduce/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 text-background/70 hover:text-background transition-colors text-sm"
-              >
-                <Instagram className="h-4 w-4" />
-                Follow us on Instagram
-              </a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
     </>
   );
 };
