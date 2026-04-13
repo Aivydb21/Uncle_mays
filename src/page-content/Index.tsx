@@ -1,24 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Leaf, MapPin, RotateCcw, ShieldCheck, HelpCircle, Users, Instagram, ShoppingBag, Bell, Package, Mail } from "lucide-react";
+import { HelpCircle, Users, Instagram, ShoppingBag, Bell, Package, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
 
-const faqs = [
-  {
-    q: "How does delivery work?",
-    a: "We deliver directly to your Chicago address every Wednesday. Place your order any day of the week and it will be delivered the following Wednesday. You'll receive a confirmation email with your delivery window as soon as your order is placed.",
-  },
-  {
-    q: "What's actually in the box?",
-    a: "Every box is sourced from a Black-owned farm and packed with what's freshest. The Starter Box includes sweet potatoes, Carola potatoes, Candy orange carrots, green curly kale, and fresh salad mix (~12-15 lbs). The Family Box adds Tuscan kale, rainbow chard, a dozen farm eggs, and your choice of protein: whole chicken, beef short ribs, or lamb chops. The Community Box includes the full produce spread plus organic pinto beans, organic black turtle beans, and your choice of protein.",
-  },
-  {
-    q: "How much does a box cost?",
-    a: "The Starter Box is $35 (~12-15 lbs of produce). The Family Box is $65 and includes sweet potatoes, carrots, four greens, a dozen farm eggs, and one protein choice (whole chicken, beef short ribs, or lamb chops). The Community Box is $95 and includes the full harvest, pantry beans, and your choice of protein. No subscription required. Order when you want.",
-  },
+const homepageFaqs = [
   {
     q: "Do I need a subscription?",
     a: "No. Every box is a one-time purchase. Order when it works for you. If you'd like regular deliveries, reach out to info@unclemays.com and we can set up a recurring schedule.",
@@ -27,28 +15,24 @@ const faqs = [
     q: "What if I have an issue with my order?",
     a: "We stand behind every box. If anything is wrong with your delivery (missing items, quality issues, anything), email us at info@unclemays.com and we'll make it right, no questions asked.",
   },
-  {
-    q: "How do I cancel my order?",
-    a: "There's nothing to cancel. Every box is a one-time purchase with no recurring charges. If you need to modify or cancel an order you've already placed, email info@unclemays.com as soon as possible and we'll take care of it.",
-  },
 ];
 
 const testimonials = [
   {
     quote: "The Family Box lasted us almost two weeks. The collard greens were better than anything I've found at Jewel-Osco, and the tomatoes from the farm actually tasted like tomatoes. Already ordered again.",
-    name: "Keisha M.",
+    name: "Kiesha",
     location: "South Shore, Chicago",
     box: "Family Box",
   },
   {
     quote: "I ordered the Starter Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The asparagus and greens were gone in two days.",
-    name: "Darnell T.",
+    name: "Rob",
     location: "Bronzeville, Chicago",
     box: "Starter Box",
   },
   {
     quote: "We split a Community Box between three families on our block. Came out to about $32 each for produce that would've cost us double at the store. Already planning our next order.",
-    name: "Aisha R.",
+    name: "Shonda",
     location: "Hyde Park, Chicago",
     box: "Community Box",
   },
@@ -124,102 +108,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 3. WHAT YOU'RE GETTING — Features & Benefits */}
-      <section className="py-24 bg-muted/20">
-        <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">What You're Getting</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Every box is different. Always seasonal, always sourced from Black farmers, always fresh.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
-            {[
-              {
-                icon: Leaf,
-                title: "From Black Farmers",
-                description:
-                  "Every item is sourced from Black-owned farms. Your purchase goes directly to the farmers who grew it.",
-              },
-              {
-                icon: MapPin,
-                title: "Chicago-Wide Delivery",
-                description:
-                  "We deliver across Chicago. No pickup required. Fresh produce arrives at your door every Wednesday.",
-              },
-              {
-                icon: RotateCcw,
-                title: "Seasonal & Rotating",
-                description:
-                  "You'll never get the same box twice. Always what's freshest, always what's in season.",
-              },
-              {
-                icon: ShieldCheck,
-                title: "No Subscription",
-                description:
-                  "Order when you want. No lock-in, no commitment. Boxes start at $35. Pay only when you order.",
-              },
-            ].map((feature, idx) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.08 }}
-                className="bg-card rounded-2xl p-6 shadow-soft border border-border/50 text-center"
-              >
-                <div className="bg-primary/10 w-14 h-14 rounded-full flex items-center justify-center mb-4 mx-auto">
-                  <feature.icon className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-foreground/70 text-sm leading-relaxed">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Sample box contents */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="bg-card rounded-2xl p-8 shadow-soft border border-border/50 max-w-3xl mx-auto"
-          >
-            <h3 className="text-2xl font-bold mb-2 text-center">Sample Starter Box</h3>
-            <p className="text-muted-foreground text-center mb-6">
-              Contents rotate each delivery based on what's freshest. Here's a sample.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {[
-                "Sweet potatoes (3 lb)",
-                "Carola potatoes, farm-select (2 lb)",
-                "Candy orange carrots (2 lb)",
-                "Green curly kale (1 bunch)",
-                "Fresh salad mix (5 oz)",
-              ].map((item) => (
-                <div key={item} className="flex items-center gap-2 text-sm text-foreground/80">
-                  <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
-                  {item}
-                </div>
-              ))}
-            </div>
-            <div className="mt-6 text-center">
-              <Button asChild size="sm" className="px-6">
-                <a href="#boxes">Order a Box</a>
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-
       {/* 7. SOCIAL PROOF — Community Voices */}
       <section className="py-24 bg-muted/20">
         <div className="container px-6">
@@ -259,7 +147,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 8. FAQ */}
+      {/* 8. FAQ (2 conversion-critical questions; full FAQ at /faq) */}
       <section className="py-24 bg-background">
         <div className="container px-6">
           <motion.div
@@ -269,14 +157,11 @@ const Index = () => {
             transition={{ duration: 0.7 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Your Questions, Answered</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to know before you order.
-            </p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Quick Answers</h2>
           </motion.div>
 
           <div className="max-w-3xl mx-auto space-y-4">
-            {faqs.map((faq, idx) => (
+            {homepageFaqs.map((faq, idx) => (
               <motion.div
                 key={faq.q}
                 initial={{ opacity: 0, y: 16 }}
@@ -294,6 +179,11 @@ const Index = () => {
                 </div>
               </motion.div>
             ))}
+            <p className="text-center text-sm text-muted-foreground pt-2">
+              <a href="/faq" className="underline hover:text-foreground transition-colors">
+                View all frequently asked questions
+              </a>
+            </p>
           </div>
         </div>
       </section>
