@@ -2,12 +2,19 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useEffect } from "react";
 import { Truck, ShieldCheck, Star, Check, ArrowRight, Leaf } from "lucide-react";
 import { PRODUCTS } from "@/lib/products";
 
 const starterBox = PRODUCTS.starter;
 const FIRST_ORDER_PRICE = starterBox.firstOrderPrice; // $30
 const REGULAR_PRICE = starterBox.price; // $35
+
+declare global {
+  interface Window {
+    fbq: (...args: unknown[]) => void;
+  }
+}
 
 const testimonial = {
   quote:
@@ -41,6 +48,19 @@ function CTAButton({ className = "" }: { className?: string }) {
 }
 
 export default function StarterBoxLandingPage() {
+  // Fire Meta Pixel ViewContent event when page loads
+  useEffect(() => {
+    if (typeof window !== "undefined" && typeof window.fbq === "function") {
+      window.fbq("track", "ViewContent", {
+        content_name: "Starter Box",
+        content_ids: ["starter"],
+        content_type: "product",
+        value: FIRST_ORDER_PRICE,
+        currency: "USD",
+      });
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Minimal header — logo only, no nav links */}
