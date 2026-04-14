@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { getUTMParams } from "@/lib/utm";
 
 declare global {
   interface Window {
@@ -86,10 +87,30 @@ export const Pricing = () => {
   const router = useRouter();
 
   const handleOrder = async (plan: typeof plans[0]) => {
+    // Extract price value from string (e.g., "$35" -> 35)
+    const price = parseFloat(isSubscription ? plan.subPrice.replace('$', '') : plan.oneTimePrice.replace('$', ''));
+
+    // Fire tracking events
     try {
       if (typeof window !== "undefined") {
+        // Meta Pixel
         if (window.fbq) window.fbq("track", "InitiateCheckout");
-        if (window.gtag) window.gtag("event", "begin_checkout");
+
+        // GA4 begin_checkout event with enhanced e-commerce parameters
+        if (window.gtag) {
+          window.gtag("event", "begin_checkout", {
+            currency: "USD",
+            value: price,
+            items: [{
+              item_id: plan.checkoutSlug,
+              item_name: plan.name,
+              affiliation: "Uncle May's Produce",
+              price: price,
+              quantity: 1,
+              item_category: "Produce Box",
+            }]
+          });
+        }
       }
     } catch {
       // Never block checkout for tracking failures
@@ -102,10 +123,16 @@ export const Pricing = () => {
       setCheckoutLoading(plan.checkoutSlug);
 
       try {
+        // Get UTM parameters for campaign attribution
+        const utmParams = getUTMParams();
+
         const response = await fetch("/api/checkout/hosted", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ product: plan.checkoutSlug }),
+          body: JSON.stringify({
+            product: plan.checkoutSlug,
+            ...utmParams
+          }),
         });
 
         if (!response.ok) {

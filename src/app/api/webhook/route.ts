@@ -4,6 +4,95 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
+/**
+ * Send purchase event to GA4 via Measurement Protocol (server-side tracking).
+ * This ensures 100% accurate conversion tracking, unaffected by ad blockers.
+ *
+ * Docs: https://developers.google.com/analytics/devguides/collection/protocol/ga4
+ */
+async function sendGA4PurchaseEvent(session: Stripe.Checkout.Session) {
+  const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
+  const GA4_API_SECRET = process.env.GA4_API_SECRET;
+
+  if (!GA4_MEASUREMENT_ID || !GA4_API_SECRET) {
+    console.log(
+      "[WEBHOOK] GA4 tracking skipped: NEXT_PUBLIC_GA_ID or GA4_API_SECRET not set"
+    );
+    return;
+  }
+
+  // Use customer ID as client_id for GA4 (or fallback to session ID)
+  const clientId =
+    (typeof session.customer === "string" ? session.customer : session.customer?.id) ||
+    session.id;
+
+  // Get product info from metadata
+  const product = session.metadata?.product || "unknown";
+  const value = session.amount_total ? session.amount_total / 100 : 0;
+
+  // Build items array for enhanced e-commerce
+  const items = [
+    {
+      item_id: product,
+      item_name: product.charAt(0).toUpperCase() + product.slice(1) + " Box",
+      affiliation: "Uncle May's Produce",
+      price: value,
+      quantity: 1,
+      item_category: "Produce Box",
+    },
+  ];
+
+  // Build event params with UTM attribution from metadata
+  const eventParams: Record<string, unknown> = {
+    transaction_id: session.id,
+    value,
+    currency: "USD",
+    tax: 0,
+    shipping: 0,
+    items,
+  };
+
+  // Add UTM parameters for campaign attribution
+  if (session.metadata?.utm_source) eventParams.campaign_source = session.metadata.utm_source;
+  if (session.metadata?.utm_medium) eventParams.campaign_medium = session.metadata.utm_medium;
+  if (session.metadata?.utm_campaign) eventParams.campaign_name = session.metadata.utm_campaign;
+  if (session.metadata?.utm_content) eventParams.campaign_content = session.metadata.utm_content;
+  if (session.metadata?.utm_term) eventParams.campaign_term = session.metadata.utm_term;
+
+  const payload = {
+    client_id: clientId,
+    events: [
+      {
+        name: "purchase",
+        params: eventParams,
+      },
+    ],
+  };
+
+  try {
+    const response = await fetch(
+      `https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      console.log(
+        `[WEBHOOK] GA4 purchase event sent for session ${session.id} ($${value})`
+      );
+    } else {
+      console.error(
+        `[WEBHOOK] GA4 purchase event failed: ${response.status} ${response.statusText}`
+      );
+    }
+  } catch (error) {
+    console.error(`[WEBHOOK] GA4 purchase event error:`, error);
+  }
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -32,6 +121,10 @@ export async function POST(req: NextRequest) {
       console.log(
         `[WEBHOOK] checkout.session.completed | session=${session.id} amount=${session.amount_total} customer=${customerId ?? "none"} email=${session.customer_email ?? session.customer_details?.email ?? "unknown"}`
       );
+
+      // Send server-side purchase event to GA4 (unaffected by ad blockers)
+      await sendGA4PurchaseEvent(session);
+
       // TODO: fulfillment logic (send confirmation email, update order DB, notify ops)
       break;
     }

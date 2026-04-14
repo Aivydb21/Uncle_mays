@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Truck, ShieldCheck, Star, Check, ArrowRight, Leaf } from "lucide-react";
 import { PRODUCTS } from "@/lib/products";
+import { getUTMParams } from "@/lib/utm";
 
 const starterBox = PRODUCTS.starter;
 const FIRST_ORDER_PRICE = starterBox.firstOrderPrice; // $30
@@ -29,23 +30,48 @@ function CTAButton({ className = "" }: { className?: string }) {
   const handleClick = async () => {
     setLoading(true);
 
-    // Fire Meta pixel InitiateCheckout for conversion tracking
-    if (typeof window !== "undefined" && typeof (window as Window & { fbq?: (...a: unknown[]) => void }).fbq === "function") {
-      (window as Window & { fbq: (...a: unknown[]) => void }).fbq("track", "InitiateCheckout", {
-        content_name: "Starter Box",
-        content_ids: ["starter"],
-        content_type: "product",
-        value: FIRST_ORDER_PRICE,
-        currency: "USD",
-      });
+    // Fire tracking events
+    if (typeof window !== "undefined") {
+      // Meta Pixel
+      if (typeof (window as Window & { fbq?: (...a: unknown[]) => void }).fbq === "function") {
+        (window as Window & { fbq: (...a: unknown[]) => void }).fbq("track", "InitiateCheckout", {
+          content_name: "Starter Box",
+          content_ids: ["starter"],
+          content_type: "product",
+          value: FIRST_ORDER_PRICE,
+          currency: "USD",
+        });
+      }
+
+      // GA4 begin_checkout event with enhanced e-commerce parameters
+      if (typeof (window as Window & { gtag?: (...a: unknown[]) => void }).gtag === "function") {
+        (window as Window & { gtag: (...a: unknown[]) => void }).gtag("event", "begin_checkout", {
+          currency: "USD",
+          value: FIRST_ORDER_PRICE,
+          items: [{
+            item_id: "starter",
+            item_name: "Starter Box",
+            affiliation: "Uncle May's Produce",
+            price: FIRST_ORDER_PRICE,
+            quantity: 1,
+            item_category: "Produce Box",
+          }]
+        });
+      }
     }
 
     try {
+      // Get UTM parameters for campaign attribution
+      const utmParams = getUTMParams();
+
       // Create Stripe Checkout Session
       const response = await fetch("/api/checkout/hosted", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ product: "starter" }),
+        body: JSON.stringify({
+          product: "starter",
+          ...utmParams
+        }),
       });
 
       if (!response.ok) {

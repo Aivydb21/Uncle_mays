@@ -7,6 +7,7 @@ import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { PageShell } from "@/components/PageShell";
 import { FacebookPixelTracker } from "@/components/FacebookPixelTracker";
+import { UTMCapture } from "@/components/UTMCapture";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -112,6 +113,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <Providers>
           <PageShell>{children}</PageShell>
           <Suspense fallback={null}><FacebookPixelTracker /></Suspense>
+          <UTMCapture />
         </Providers>
       </body>
     </html>

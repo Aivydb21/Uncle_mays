@@ -23,7 +23,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { product, email } = await req.json();
+    const body = await req.json();
+    const {
+      product,
+      email,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+    } = body;
+
     const priceId = PRICE_MAP[product];
 
     if (!priceId) {
@@ -31,6 +41,19 @@ export async function POST(req: NextRequest) {
     }
 
     const origin = req.headers.get("origin") || "https://unclemays.com";
+
+    // Build metadata object with product info + UTM parameters for campaign attribution
+    const metadata: Record<string, string> = {
+      product,
+      source: "website",
+    };
+
+    // Add UTM parameters to metadata for GA4 server-side tracking
+    if (utm_source) metadata.utm_source = utm_source;
+    if (utm_medium) metadata.utm_medium = utm_medium;
+    if (utm_campaign) metadata.utm_campaign = utm_campaign;
+    if (utm_content) metadata.utm_content = utm_content;
+    if (utm_term) metadata.utm_term = utm_term;
 
     // Create HOSTED Checkout Session (redirects to checkout.stripe.com)
     const session = await stripe.checkout.sessions.create({
@@ -57,11 +80,8 @@ export async function POST(req: NextRequest) {
       },
       success_url: `${origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/#boxes`,
-      // Metadata for analytics and abandoned cart tracking
-      metadata: {
-        product,
-        source: "website",
-      },
+      // Metadata for analytics, abandoned cart tracking, and campaign attribution
+      metadata,
     });
 
     // Return the session URL for redirect (NOT client_secret)
