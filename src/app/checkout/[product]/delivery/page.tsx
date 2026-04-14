@@ -6,6 +6,7 @@ import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
 
 declare global {
   interface Window {
@@ -67,6 +68,7 @@ interface FormFields {
   state: string;
   zip: string;
   deliveryNotes: string;
+  deliveryDate: Date | undefined;
 }
 
 type FormErrors = Partial<Record<keyof FormFields, string>>;
@@ -78,6 +80,7 @@ function validate(fields: FormFields): FormErrors {
   if (!fields.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) {
     errors.email = "A valid email address is required.";
   }
+  if (!fields.deliveryDate) errors.deliveryDate = "Please select a delivery date.";
   if (!fields.street.trim()) errors.street = "Street address is required.";
   if (!fields.city.trim()) errors.city = "City is required.";
   if (!fields.state.trim()) errors.state = "State is required.";
@@ -123,6 +126,7 @@ export default function DeliveryPage() {
     state: "IL",
     zip: "",
     deliveryNotes: "",
+    deliveryDate: undefined,
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -181,6 +185,27 @@ export default function DeliveryPage() {
     }
   }
 
+  function handleDateSelect(date: Date | undefined) {
+    setFields((prev) => ({ ...prev, deliveryDate: date }));
+    if (errors.deliveryDate) {
+      setErrors((prev) => ({ ...prev, deliveryDate: undefined }));
+    }
+  }
+
+  // Only allow Thursdays that are in the future
+  function isDeliveryDateDisabled(date: Date): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Disable if date is in the past
+    if (date < today) return true;
+
+    // Disable if not Thursday (day 4)
+    if (date.getDay() !== 4) return true;
+
+    return false;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const validationErrors = validate(fields);
@@ -237,6 +262,7 @@ export default function DeliveryPage() {
             zip: fields.zip.trim(),
           },
           deliveryNotes: fields.deliveryNotes.trim() || undefined,
+          deliveryDate: fields.deliveryDate?.toISOString(),
           proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
         }),
       });
@@ -268,6 +294,7 @@ export default function DeliveryPage() {
               zip: fields.zip.trim(),
             },
             deliveryNotes: fields.deliveryNotes.trim() || undefined,
+            deliveryDate: fields.deliveryDate?.toISOString(),
             proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
           })
         );
@@ -391,6 +418,28 @@ export default function DeliveryPage() {
                     autoComplete="tel"
                     placeholder="(312) 555-0100"
                   />
+                </div>
+
+                {/* Delivery Date */}
+                <div className="space-y-1.5 mb-4">
+                  <Label>
+                    Delivery Date <span className="text-destructive">*</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Select a Thursday for delivery (deliveries every Thursday)
+                  </p>
+                  <div className="flex justify-center border rounded-lg p-3 bg-muted/20">
+                    <Calendar
+                      mode="single"
+                      selected={fields.deliveryDate}
+                      onSelect={handleDateSelect}
+                      disabled={isDeliveryDateDisabled}
+                      initialFocus
+                    />
+                  </div>
+                  {errors.deliveryDate && (
+                    <p className="text-destructive text-xs">{errors.deliveryDate}</p>
+                  )}
                 </div>
 
                 {/* Street + Apt */}

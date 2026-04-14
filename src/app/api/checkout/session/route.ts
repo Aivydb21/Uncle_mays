@@ -5,7 +5,7 @@ import { upsertContact, createCart, deleteCart, tagOrderCompleted } from "@/lib/
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { product, price, productName, email, firstName, lastName, phone, address, deliveryNotes, proteinChoices } = body;
+    const { product, price, productName, email, firstName, lastName, phone, address, deliveryNotes, deliveryDate, proteinChoices } = body;
 
     if (!product || !price || !email || !firstName || !lastName || !address) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
       phone,
       address,
       deliveryNotes,
+      deliveryDate,
       proteins: Array.isArray(proteinChoices) && proteinChoices.length > 0 ? proteinChoices : undefined,
     });
 
