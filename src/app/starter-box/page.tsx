@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Truck, ShieldCheck, Star, Check, ArrowRight, Leaf } from "lucide-react";
 import { PRODUCTS } from "@/lib/products";
 
@@ -24,26 +24,58 @@ const testimonial = {
 };
 
 function CTAButton({ className = "" }: { className?: string }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = async () => {
+    setLoading(true);
+
+    // Fire Meta pixel InitiateCheckout for conversion tracking
+    if (typeof window !== "undefined" && typeof (window as Window & { fbq?: (...a: unknown[]) => void }).fbq === "function") {
+      (window as Window & { fbq: (...a: unknown[]) => void }).fbq("track", "InitiateCheckout", {
+        content_name: "Starter Box",
+        content_ids: ["starter"],
+        content_type: "product",
+        value: FIRST_ORDER_PRICE,
+        currency: "USD",
+      });
+    }
+
+    try {
+      // Create Stripe Checkout Session
+      const response = await fetch("/api/checkout/hosted", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ product: "starter" }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create checkout session");
+      }
+
+      const { url } = await response.json();
+
+      // Redirect to Stripe Checkout
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error("No checkout URL returned");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+      alert("Failed to start checkout. Please try again.");
+      setLoading(false);
+    }
+  };
+
   return (
-    <Link
-      href="/checkout/starter"
-      className={`inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold text-lg rounded-xl px-8 py-4 shadow-lg hover:bg-primary/90 transition-all duration-200 active:scale-95 ${className}`}
-      onClick={() => {
-        // Fire Meta pixel ViewContent + InitiateCheckout for conversion tracking
-        if (typeof window !== "undefined" && typeof (window as Window & { fbq?: (...a: unknown[]) => void }).fbq === "function") {
-          (window as Window & { fbq: (...a: unknown[]) => void }).fbq("track", "InitiateCheckout", {
-            content_name: "Starter Box",
-            content_ids: ["starter"],
-            content_type: "product",
-            value: FIRST_ORDER_PRICE,
-            currency: "USD",
-          });
-        }
-      }}
+    <button
+      onClick={handleClick}
+      disabled={loading}
+      className={`inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold text-lg rounded-xl px-8 py-4 shadow-lg hover:bg-primary/90 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
     >
-      Claim Your $30 Box
-      <ArrowRight className="h-5 w-5" />
-    </Link>
+      {loading ? "Loading..." : "Claim Your $30 Box"}
+      {!loading && <ArrowRight className="h-5 w-5" />}
+    </button>
   );
 }
 

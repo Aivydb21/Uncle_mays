@@ -144,7 +144,19 @@ function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <PaymentElement className="mb-6" />
+      <PaymentElement className="mb-4" />
+
+      {/* Value reinforcement */}
+      <div className="mb-6 p-3 rounded-lg bg-muted/30 border border-border">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
+          <span>💡</span>
+          <span className="font-medium text-foreground">Smart Value</span>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Your ${checkout.price} box provides 8-10 servings of fresh produce — just $3-5 per meal.
+          No subscription required, order when you want.
+        </p>
+      </div>
 
       {paymentError && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
@@ -162,23 +174,28 @@ function PaymentForm({
           : `Place Order — $${checkout.price}.00`}
       </button>
 
-      {/* Security badge */}
-      <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
-        <svg
-          className="w-4 h-4 text-muted-foreground"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-          />
-        </svg>
-        <span>Secured by Stripe · SSL encrypted</span>
+      {/* Enhanced security badges */}
+      <div className="mt-4 space-y-2">
+        <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+          <svg
+            className="w-4 h-4 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
+          </svg>
+          <span>Secure checkout powered by Stripe</span>
+        </div>
+        <p className="text-center text-xs text-muted-foreground">
+          Your payment info is encrypted and secure. We never store your card details.
+        </p>
       </div>
     </form>
   );
@@ -317,9 +334,24 @@ export default function PaymentPage() {
               >
                 Payment
               </h1>
-              <p className="text-sm text-muted-foreground mb-6">
+              <p className="text-sm text-muted-foreground mb-4">
                 Complete your order to get fresh produce delivered this Wednesday.
               </p>
+
+              {/* Urgency + Trust callout */}
+              <div className="mb-6 p-4 rounded-xl border border-primary/20 bg-primary/5">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl mt-0.5">⏰</span>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-primary mb-1">
+                      Order by Thursday 11:59pm for delivery this Sunday
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Limited boxes available this week. 89% of customers refer friends to Uncle May's.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {clientSecret && !paymentComplete ? (
                 <Elements
@@ -383,7 +415,7 @@ export default function PaymentPage() {
                 </div>
               </div>
 
-              <div className="text-xs text-muted-foreground space-y-1">
+              <div className="text-xs text-muted-foreground space-y-1 mb-4">
                 <p className="font-medium text-foreground/80">{checkout.firstName} {checkout.lastName}</p>
                 <p>{checkout.email}</p>
                 {checkout.address && (
@@ -393,6 +425,20 @@ export default function PaymentPage() {
                     {checkout.address.city}, {checkout.address.state} {checkout.address.zip}
                   </p>
                 )}
+              </div>
+
+              {/* Trust signals in sidebar */}
+              <div className="pt-4 border-t border-border space-y-2">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>Delivered this Sunday</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>💡</span>
+                  <span>Just $3-5 per meal</span>
+                </div>
               </div>
             </div>
           </div>

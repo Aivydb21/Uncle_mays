@@ -265,18 +265,52 @@ export default function CheckoutSummaryPage() {
               </div>
             </div>}
 
+            {/* Trust signals + Urgency */}
+            <div className="mb-6 p-4 rounded-xl border border-primary/20 bg-primary/5">
+              <div className="flex items-start gap-3 mb-3">
+                <span className="text-2xl">⏰</span>
+                <div>
+                  <p className="text-sm font-semibold text-primary mb-1">
+                    Order by Thursday 11:59pm for delivery this Sunday
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Limited boxes available this week.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Value proposition */}
+            <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+              <div className="flex items-center gap-2 mb-2">
+                <span>💡</span>
+                <span className="text-sm font-semibold">Smart Value</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Your ${effectivePrice} box provides 8-10 servings of fresh, locally sourced produce — just $3-5 per meal.
+              </p>
+            </div>
+
             {/* Trust signals */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
               {[
                 { icon: "🌱", text: "Locally sourced" },
-                { icon: "🚚", text: "Delivered fresh Wednesdays" },
-                { icon: "📍", text: "Chicago area only" },
+                { icon: "🚚", text: "Delivered fresh Sundays" },
+                { icon: "🔒", text: "Secure checkout" },
               ].map(({ icon, text }) => (
                 <div key={text} className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span>{icon}</span>
                   <span>{text}</span>
                 </div>
               ))}
+            </div>
+
+            {/* Social proof */}
+            <div className="mb-8 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <svg className="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span className="font-medium">89% of customers refer friends to Uncle May's</span>
             </div>
 
             {/* Email capture — earliest possible point for abandoned cart recovery */}
