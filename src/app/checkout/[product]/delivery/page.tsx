@@ -73,8 +73,8 @@ interface FormFields {
 
 type FormErrors = Partial<Record<keyof FormFields, string>>;
 
-// Generate next 4 Wednesdays
-function getNextWednesdays(count: number = 4): Date[] {
+// Generate next 2 Wednesdays
+function getNextWednesdays(count: number = 2): Date[] {
   const wednesdays: Date[] = [];
   const today = new Date();
   today.setHours(0, 0, 0, 0);
