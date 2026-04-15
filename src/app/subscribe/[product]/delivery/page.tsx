@@ -6,6 +6,7 @@ import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
 
 declare global {
   interface Window {
@@ -66,9 +67,55 @@ interface FormFields {
   state: string;
   zip: string;
   deliveryNotes: string;
+  deliveryDate: string;
+  deliveryWindow: string;
 }
 
 type FormErrors = Partial<Record<keyof FormFields, string>>;
+
+// Check if a date is a Wednesday
+function isWednesday(date: Date): boolean {
+  return date.getDay() === 3; // 0 = Sunday, 3 = Wednesday
+}
+
+// Get the earliest selectable delivery date (next Wednesday)
+function getEarliestDeliveryDate(): Date {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let current = new Date(today);
+  const daysUntilWednesday = (3 - current.getDay() + 7) % 7;
+
+  if (daysUntilWednesday === 0) {
+    // If today is Wednesday, start from next Wednesday to give processing time
+    current.setDate(current.getDate() + 7);
+  } else {
+    current.setDate(current.getDate() + daysUntilWednesday);
+  }
+
+  return current;
+}
+
+// Check if a date is a valid delivery date
+function isValidDeliveryDate(date: Date): boolean {
+  const earliest = getEarliestDeliveryDate();
+  const maxDate = new Date(earliest);
+  maxDate.setDate(maxDate.getDate() + (8 * 7)); // 8 weeks out
+
+  const dateTime = date.getTime();
+  return (
+    isWednesday(date) &&
+    dateTime >= earliest.getTime() &&
+    dateTime <= maxDate.getTime()
+  );
+}
+
+const TIME_WINDOWS = [
+  { id: '9am-12pm', label: '9:00 AM - 12:00 PM' },
+  { id: '12pm-3pm', label: '12:00 PM - 3:00 PM' },
+  { id: '3pm-6pm', label: '3:00 PM - 6:00 PM' },
+  { id: '6pm-9pm', label: '6:00 PM - 9:00 PM' },
+];
 
 function validate(fields: FormFields): FormErrors {
   const errors: FormErrors = {};
@@ -83,6 +130,8 @@ function validate(fields: FormFields): FormErrors {
   if (!fields.zip.trim() || !/^\d{5}(-\d{4})?$/.test(fields.zip.trim())) {
     errors.zip = "A valid ZIP code is required.";
   }
+  if (!fields.deliveryDate) errors.deliveryDate = "Please select a delivery date.";
+  if (!fields.deliveryWindow) errors.deliveryWindow = "Please select a delivery time window.";
   return errors;
 }
 
@@ -108,6 +157,8 @@ export default function SubscribeDeliveryPage() {
     state: "IL",
     zip: "",
     deliveryNotes: "",
+    deliveryDate: "",
+    deliveryWindow: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -196,6 +247,8 @@ export default function SubscribeDeliveryPage() {
             zip: fields.zip.trim(),
           },
           deliveryNotes: fields.deliveryNotes.trim() || undefined,
+          deliveryDate: fields.deliveryDate,
+          deliveryWindow: fields.deliveryWindow,
           proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
         })
       );
@@ -383,6 +436,84 @@ export default function SubscribeDeliveryPage() {
                       <p className="text-destructive text-xs">{errors.zip}</p>
                     )}
                   </div>
+                </div>
+
+                {/* Delivery Date Selection */}
+                <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+                  <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                    Choose Your First Delivery Date <span className="text-destructive">*</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Select any Wednesday within the next 8 weeks for your first weekly delivery
+                  </p>
+                  <div className="flex justify-center">
+                    <Calendar
+                      mode="single"
+                      selected={fields.deliveryDate ? new Date(fields.deliveryDate) : undefined}
+                      onSelect={(date) => {
+                        if (date && isValidDeliveryDate(date)) {
+                          const dateStr = date.toISOString().split('T')[0];
+                          setFields((prev) => ({ ...prev, deliveryDate: dateStr }));
+                          if (errors.deliveryDate) {
+                            setErrors((prev) => ({ ...prev, deliveryDate: undefined }));
+                          }
+                        }
+                      }}
+                      disabled={(date) => !isValidDeliveryDate(date)}
+                      fromDate={getEarliestDeliveryDate()}
+                      toDate={new Date(Date.now() + (8 * 7 * 24 * 60 * 60 * 1000))}
+                      className="rounded-lg border"
+                    />
+                  </div>
+                  {fields.deliveryDate && (
+                    <p className="text-sm text-center mt-3 font-medium text-primary">
+                      First delivery on {new Date(fields.deliveryDate).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  )}
+                  {errors.deliveryDate && (
+                    <p className="text-destructive text-xs mt-2">{errors.deliveryDate}</p>
+                  )}
+                </div>
+
+                {/* Delivery Time Window Selection */}
+                <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+                  <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                    Choose Your Weekly Delivery Window <span className="text-destructive">*</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Select a 3-hour delivery window for all weekly deliveries
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {TIME_WINDOWS.map((window) => {
+                      const selected = fields.deliveryWindow === window.id;
+                      return (
+                        <button
+                          key={window.id}
+                          type="button"
+                          onClick={() => {
+                            setFields((prev) => ({ ...prev, deliveryWindow: window.id }));
+                            if (errors.deliveryWindow) {
+                              setErrors((prev) => ({ ...prev, deliveryWindow: undefined }));
+                            }
+                          }}
+                          className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all ${
+                            selected
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
+                          }`}
+                        >
+                          {window.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.deliveryWindow && (
+                    <p className="text-destructive text-xs mt-2">{errors.deliveryWindow}</p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5 mb-6">
