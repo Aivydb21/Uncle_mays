@@ -400,7 +400,10 @@ export const setupGoogleAdsAudiences = task({
       },
     ];
 
-    const results = [];
+    const results: Array<
+      | { name: string; exists: boolean; audienceId: string }
+      | { name: string; created: boolean; audienceId?: string; resourceName?: string; error?: string }
+    > = [];
 
     for (const audience of audiences) {
       try {

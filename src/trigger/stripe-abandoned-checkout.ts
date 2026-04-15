@@ -280,7 +280,7 @@ unclemays.com | info@unclemays.com`;
     `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns`,
     {
       method: "POST",
-      headers: { Authorization: authHeader, "Content-Type: application/json" },
+      headers: { Authorization: authHeader, "Content-Type": "application/json" },
       body: JSON.stringify({
         type: "regular",
         settings: {
