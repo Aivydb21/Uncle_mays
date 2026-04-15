@@ -3,7 +3,17 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, notFound, useRouter } from "next/navigation";
 import Link from "next/link";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import { PRODUCTS, type ProductSlug } from "@/lib/products";
+
+// Load Stripe once outside component to avoid recreating on renders
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
   const steps = ["Subscription Summary", "Your Details", "Payment"];
@@ -65,6 +75,100 @@ interface StoredSubCheckout {
   proteinChoices?: string[];
 }
 
+// Inner form — must live inside <Elements>
+function SubscriptionPaymentForm({
+  checkout,
+  subscriptionId,
+  onSuccess,
+}: {
+  checkout: StoredSubCheckout;
+  subscriptionId: string;
+  onSuccess: () => void;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [submitting, setSubmitting] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const router = useRouter();
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setSubmitting(true);
+    setPaymentError(null);
+
+    const { error, paymentIntent } = await stripe.confirmPayment({
+      elements,
+      redirect: "if_required",
+    });
+
+    if (error) {
+      setPaymentError(error.message ?? "Payment failed. Please try again.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (paymentIntent && paymentIntent.status === "succeeded") {
+      // Clean up localStorage
+      try {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("unc-sub-checkout");
+        }
+      } catch {
+        // Ignore storage errors
+      }
+
+      onSuccess();
+      router.push(`/order-success?subscription_id=${encodeURIComponent(subscriptionId)}&amount=${checkout.subPrice}&product=${encodeURIComponent(checkout.product)}&type=subscription`);
+    } else {
+      setPaymentError("Something went wrong. Please try again.");
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <PaymentElement className="mb-6" />
+
+      {paymentError && (
+        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+          {paymentError}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={!stripe || !elements || submitting}
+        className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {submitting
+          ? "Processing…"
+          : `Subscribe — $${checkout.subPrice}/wk`}
+      </button>
+
+      {/* Security badge */}
+      <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
+        <svg
+          className="w-4 h-4 text-muted-foreground"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+          />
+        </svg>
+        <span>Secured by Stripe · SSL encrypted</span>
+      </div>
+    </form>
+  );
+}
+
 export default function SubscribePaymentPage() {
   const params = useParams<{ product: string }>();
   const slug = params.product as ProductSlug;
@@ -75,61 +179,58 @@ export default function SubscribePaymentPage() {
   }
 
   const [checkout, setCheckout] = useState<StoredSubCheckout | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [redirecting, setRedirecting] = useState(false);
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
+  const [intentError, setIntentError] = useState<string | null>(null);
+  const [loadingIntent, setLoadingIntent] = useState(true);
+  const [paymentComplete, setPaymentComplete] = useState(false);
 
-  const startSubscription = useCallback(async (data: StoredSubCheckout) => {
-    setRedirecting(true);
-    try {
-      // Read any captured UTM params from localStorage
-      let utms: Record<string, string> = {};
+  const createIntent = useCallback(
+    async (data: StoredSubCheckout) => {
       try {
-        const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
-        keys.forEach((k) => {
-          const val = localStorage.getItem(`unc-${k}`);
-          if (val) utms[k] = val;
+        // Read any captured UTM params from localStorage
+        let utms: Record<string, string> = {};
+        try {
+          const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+          keys.forEach((k) => {
+            const val = localStorage.getItem(`unc-${k}`);
+            if (val) utms[k] = val;
+          });
+        } catch { /* ignore */ }
+
+        const res = await fetch("/api/checkout/subscribe-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product: data.product,
+            email: data.email,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            phone: data.phone,
+            address: data.address,
+            deliveryNotes: data.deliveryNotes,
+            proteinChoices: data.proteinChoices,
+            ...utms,
+          }),
         });
-      } catch { /* ignore */ }
-
-      const res = await fetch("/api/checkout/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          product: data.product,
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phone: data.phone,
-          address: data.address,
-          deliveryNotes: data.deliveryNotes,
-          proteinChoices: data.proteinChoices,
-          ...utms,
-        }),
-      });
-
-      const json = await res.json();
-
-      if (!res.ok || !json.url) {
-        setError(json.error || "Could not start your subscription. Please try again.");
-        setRedirecting(false);
-        return;
-      }
-
-      // Clear stored checkout data before redirecting
-      try {
-        localStorage.removeItem("unc-sub-checkout");
+        const json = await res.json();
+        if (!res.ok) {
+          setIntentError(json.error || "Could not initialize subscription. Please try again.");
+          return;
+        }
+        setClientSecret(json.clientSecret);
+        setSubscriptionId(json.subscriptionId);
       } catch {
-        // ignore
+        setIntentError("Network error. Please check your connection and try again.");
+      } finally {
+        setLoadingIntent(false);
       }
-
-      window.location.href = json.url;
-    } catch {
-      setError("Network error. Please check your connection and try again.");
-      setRedirecting(false);
-    }
-  }, []);
+    },
+    []
+  );
 
   useEffect(() => {
+    // Load checkout state from localStorage
     let stored: StoredSubCheckout | null = null;
     try {
       if (typeof window !== "undefined") {
@@ -137,39 +238,38 @@ export default function SubscribePaymentPage() {
         if (raw) stored = JSON.parse(raw) as StoredSubCheckout;
       }
     } catch {
-      // ignore
+      // Ignore parse errors
     }
 
     if (!stored || stored.product !== slug) {
+      // Redirect back to delivery if no session found
       router.replace(`/subscribe/${slug}/delivery`);
       return;
     }
 
     setCheckout(stored);
-    startSubscription(stored);
-  }, [slug, router, startSubscription]);
+    createIntent(stored);
+  }, [slug, router, createIntent]);
 
-  if (!checkout || (redirecting && !error)) {
+  // While loading or redirecting
+  if (!checkout || loadingIntent) {
     return (
       <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
         <div className="container px-4 max-w-2xl mx-auto">
-          <StepIndicator current={3} />
-          <div className="rounded-2xl bg-background shadow-soft p-8 flex flex-col items-center justify-center min-h-[300px] gap-4">
-            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-            <p className="text-muted-foreground text-sm">Setting up your subscription…</p>
+          <div className="flex items-center justify-center min-h-[300px]">
+            <p className="text-muted-foreground text-sm">Loading payment…</p>
           </div>
         </div>
       </section>
     );
   }
 
-  if (error) {
+  if (intentError) {
     return (
       <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
         <div className="container px-4 max-w-2xl mx-auto">
-          <StepIndicator current={3} />
           <div className="rounded-2xl bg-background shadow-soft p-8 text-center">
-            <p className="text-destructive mb-4">{error}</p>
+            <p className="text-destructive mb-4">{intentError}</p>
             <Link
               href={`/subscribe/${slug}/delivery`}
               className="text-primary underline underline-offset-4 text-sm"
@@ -182,5 +282,114 @@ export default function SubscribePaymentPage() {
     );
   }
 
-  return null;
+  return (
+    <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
+      <div className="container px-4 max-w-3xl mx-auto">
+        {/* Back link */}
+        <div className="mb-6">
+          <Link
+            href={`/subscribe/${slug}/delivery`}
+            className="text-sm text-muted-foreground hover:text-primary transition-colors"
+          >
+            &larr; Back to delivery details
+          </Link>
+        </div>
+
+        <StepIndicator current={3} />
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {/* Payment form */}
+          <div className="md:col-span-2">
+            <div className="rounded-2xl bg-background shadow-soft p-6 md:p-8">
+              <h1
+                className="text-xl font-bold mb-1"
+                style={{ fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}
+              >
+                Payment
+              </h1>
+              <p className="text-sm text-muted-foreground mb-6">
+                Complete your subscription to get fresh produce delivered every Wednesday.
+              </p>
+
+              {clientSecret && subscriptionId && !paymentComplete ? (
+                <Elements
+                  stripe={stripePromise}
+                  options={{
+                    clientSecret,
+                    appearance: {
+                      theme: "stripe",
+                      variables: {
+                        colorPrimary: "#2d5016",
+                        borderRadius: "8px",
+                        fontFamily: "Work Sans, system-ui, sans-serif",
+                      },
+                    },
+                  }}
+                >
+                  <SubscriptionPaymentForm
+                    checkout={checkout}
+                    subscriptionId={subscriptionId}
+                    onSuccess={() => setPaymentComplete(true)}
+                  />
+                </Elements>
+              ) : paymentComplete ? (
+                <div className="text-center py-8">
+                  <p className="text-primary font-semibold">
+                    Payment successful! Redirecting…
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          </div>
+
+          {/* Order summary sidebar */}
+          <div className="md:col-span-1">
+            <div className="rounded-2xl bg-background shadow-soft p-5 sticky top-6">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+                Subscription Summary
+              </h2>
+
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-medium text-sm">{checkout.productName}</span>
+                <span className="font-bold text-primary">${checkout.subPrice}/wk</span>
+              </div>
+
+              {checkout.proteinChoices && checkout.proteinChoices.length > 0 && (
+                <div className="mb-2">
+                  <p className="text-xs text-muted-foreground font-medium mb-1">
+                    Protein{checkout.proteinChoices.length > 1 ? "s" : ""}:
+                  </p>
+                  <ul className="space-y-0.5">
+                    {checkout.proteinChoices.map((p) => (
+                      <li key={p} className="text-xs text-foreground/80">• {p.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="border-t border-border pt-3 mb-3">
+                <div className="flex items-center justify-between text-sm font-semibold">
+                  <span>Weekly Total</span>
+                  <span className="text-primary">${checkout.subPrice}/wk</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Cancel anytime. No commitment.</p>
+              </div>
+
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p className="font-medium text-foreground/80">{checkout.firstName} {checkout.lastName}</p>
+                <p>{checkout.email}</p>
+                {checkout.address && (
+                  <p>
+                    {checkout.address.street}
+                    {checkout.address.apt ? ` ${checkout.address.apt}` : ""},{" "}
+                    {checkout.address.city}, {checkout.address.state} {checkout.address.zip}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
