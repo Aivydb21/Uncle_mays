@@ -6,6 +6,7 @@ import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
 
 declare global {
   interface Window {
@@ -73,36 +74,41 @@ interface FormFields {
 
 type FormErrors = Partial<Record<keyof FormFields, string>>;
 
-// Generate next 2 Wednesdays
-function getNextWednesdays(count: number = 2): Date[] {
-  const wednesdays: Date[] = [];
+// Check if a date is a Wednesday
+function isWednesday(date: Date): boolean {
+  return date.getDay() === 3; // 0 = Sunday, 3 = Wednesday
+}
+
+// Get the earliest selectable delivery date (next Wednesday)
+function getEarliestDeliveryDate(): Date {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   let current = new Date(today);
-  // Move to next Wednesday (or today if it's Wednesday)
   const daysUntilWednesday = (3 - current.getDay() + 7) % 7;
-  if (daysUntilWednesday === 0 && current.getTime() === today.getTime()) {
+
+  if (daysUntilWednesday === 0) {
     // If today is Wednesday, start from next Wednesday to give processing time
     current.setDate(current.getDate() + 7);
   } else {
     current.setDate(current.getDate() + daysUntilWednesday);
   }
 
-  for (let i = 0; i < count; i++) {
-    wednesdays.push(new Date(current));
-    current.setDate(current.getDate() + 7);
-  }
-
-  return wednesdays;
+  return current;
 }
 
-function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric'
-  });
+// Check if a date is a valid delivery date
+function isValidDeliveryDate(date: Date): boolean {
+  const earliest = getEarliestDeliveryDate();
+  const maxDate = new Date(earliest);
+  maxDate.setDate(maxDate.getDate() + (8 * 7)); // 8 weeks out
+
+  const dateTime = date.getTime();
+  return (
+    isWednesday(date) &&
+    dateTime >= earliest.getTime() &&
+    dateTime <= maxDate.getTime()
+  );
 }
 
 const TIME_WINDOWS = [
@@ -368,33 +374,36 @@ export default function DeliveryPage() {
                     Choose Your Delivery Date <span className="text-destructive">*</span>
                   </Label>
                   <p className="text-xs text-muted-foreground mb-3">
-                    Select a Wednesday for delivery
+                    Select any Wednesday within the next 8 weeks
                   </p>
-                  <div className="grid grid-cols-2 gap-2">
-                    {getNextWednesdays().map((date) => {
-                      const dateStr = date.toISOString().split('T')[0];
-                      const selected = fields.deliveryDate === dateStr;
-                      return (
-                        <button
-                          key={dateStr}
-                          type="button"
-                          onClick={() => {
-                            setFields((prev) => ({ ...prev, deliveryDate: dateStr }));
-                            if (errors.deliveryDate) {
-                              setErrors((prev) => ({ ...prev, deliveryDate: undefined }));
-                            }
-                          }}
-                          className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all ${
-                            selected
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
-                          }`}
-                        >
-                          {formatDate(date)}
-                        </button>
-                      );
-                    })}
+                  <div className="flex justify-center">
+                    <Calendar
+                      mode="single"
+                      selected={fields.deliveryDate ? new Date(fields.deliveryDate) : undefined}
+                      onSelect={(date) => {
+                        if (date && isValidDeliveryDate(date)) {
+                          const dateStr = date.toISOString().split('T')[0];
+                          setFields((prev) => ({ ...prev, deliveryDate: dateStr }));
+                          if (errors.deliveryDate) {
+                            setErrors((prev) => ({ ...prev, deliveryDate: undefined }));
+                          }
+                        }
+                      }}
+                      disabled={(date) => !isValidDeliveryDate(date)}
+                      fromDate={getEarliestDeliveryDate()}
+                      toDate={new Date(Date.now() + (8 * 7 * 24 * 60 * 60 * 1000))}
+                      className="rounded-lg border"
+                    />
                   </div>
+                  {fields.deliveryDate && (
+                    <p className="text-sm text-center mt-3 font-medium text-primary">
+                      Delivering on {new Date(fields.deliveryDate).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  )}
                   {errors.deliveryDate && (
                     <p className="text-destructive text-xs mt-2">{errors.deliveryDate}</p>
                   )}
