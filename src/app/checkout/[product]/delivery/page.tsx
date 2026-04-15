@@ -368,84 +368,6 @@ export default function DeliveryPage() {
               </p>
 
               <form onSubmit={handleSubmit} noValidate>
-                {/* Delivery Date Selection */}
-                <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
-                  <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
-                    Choose Your Delivery Date <span className="text-destructive">*</span>
-                  </Label>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Select any Wednesday within the next 8 weeks
-                  </p>
-                  <div className="flex justify-center">
-                    <Calendar
-                      mode="single"
-                      selected={fields.deliveryDate ? new Date(fields.deliveryDate) : undefined}
-                      onSelect={(date) => {
-                        if (date && isValidDeliveryDate(date)) {
-                          const dateStr = date.toISOString().split('T')[0];
-                          setFields((prev) => ({ ...prev, deliveryDate: dateStr }));
-                          if (errors.deliveryDate) {
-                            setErrors((prev) => ({ ...prev, deliveryDate: undefined }));
-                          }
-                        }
-                      }}
-                      disabled={(date) => !isValidDeliveryDate(date)}
-                      fromDate={getEarliestDeliveryDate()}
-                      toDate={new Date(Date.now() + (8 * 7 * 24 * 60 * 60 * 1000))}
-                      className="rounded-lg border"
-                    />
-                  </div>
-                  {fields.deliveryDate && (
-                    <p className="text-sm text-center mt-3 font-medium text-primary">
-                      Delivering on {new Date(fields.deliveryDate).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
-                  )}
-                  {errors.deliveryDate && (
-                    <p className="text-destructive text-xs mt-2">{errors.deliveryDate}</p>
-                  )}
-                </div>
-
-                {/* Delivery Time Window Selection */}
-                <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
-                  <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
-                    Choose Your Delivery Window <span className="text-destructive">*</span>
-                  </Label>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Select a 3-hour delivery window
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {TIME_WINDOWS.map((window) => {
-                      const selected = fields.deliveryWindow === window.id;
-                      return (
-                        <button
-                          key={window.id}
-                          type="button"
-                          onClick={() => {
-                            setFields((prev) => ({ ...prev, deliveryWindow: window.id }));
-                            if (errors.deliveryWindow) {
-                              setErrors((prev) => ({ ...prev, deliveryWindow: undefined }));
-                            }
-                          }}
-                          className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all ${
-                            selected
-                              ? "border-primary bg-primary/10 text-primary"
-                              : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
-                          }`}
-                        >
-                          {window.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  {errors.deliveryWindow && (
-                    <p className="text-destructive text-xs mt-2">{errors.deliveryWindow}</p>
-                  )}
-                </div>
-
                 {/* Name row */}
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="space-y-1.5">
@@ -599,6 +521,84 @@ export default function DeliveryPage() {
                       <p className="text-destructive text-xs">{errors.zip}</p>
                     )}
                   </div>
+                </div>
+
+                {/* Delivery Date Selection */}
+                <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+                  <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                    Choose Your Delivery Date <span className="text-destructive">*</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Select any Wednesday within the next 8 weeks
+                  </p>
+                  <div className="flex justify-center">
+                    <Calendar
+                      mode="single"
+                      selected={fields.deliveryDate ? new Date(fields.deliveryDate) : undefined}
+                      onSelect={(date) => {
+                        if (date && isValidDeliveryDate(date)) {
+                          const dateStr = date.toISOString().split('T')[0];
+                          setFields((prev) => ({ ...prev, deliveryDate: dateStr }));
+                          if (errors.deliveryDate) {
+                            setErrors((prev) => ({ ...prev, deliveryDate: undefined }));
+                          }
+                        }
+                      }}
+                      disabled={(date) => !isValidDeliveryDate(date)}
+                      fromDate={getEarliestDeliveryDate()}
+                      toDate={new Date(Date.now() + (8 * 7 * 24 * 60 * 60 * 1000))}
+                      className="rounded-lg border"
+                    />
+                  </div>
+                  {fields.deliveryDate && (
+                    <p className="text-sm text-center mt-3 font-medium text-primary">
+                      Delivering on {new Date(fields.deliveryDate).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </p>
+                  )}
+                  {errors.deliveryDate && (
+                    <p className="text-destructive text-xs mt-2">{errors.deliveryDate}</p>
+                  )}
+                </div>
+
+                {/* Delivery Time Window Selection */}
+                <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+                  <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                    Choose Your Delivery Window <span className="text-destructive">*</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Select a 3-hour delivery window
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {TIME_WINDOWS.map((window) => {
+                      const selected = fields.deliveryWindow === window.id;
+                      return (
+                        <button
+                          key={window.id}
+                          type="button"
+                          onClick={() => {
+                            setFields((prev) => ({ ...prev, deliveryWindow: window.id }));
+                            if (errors.deliveryWindow) {
+                              setErrors((prev) => ({ ...prev, deliveryWindow: undefined }));
+                            }
+                          }}
+                          className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all ${
+                            selected
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
+                          }`}
+                        >
+                          {window.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.deliveryWindow && (
+                    <p className="text-destructive text-xs mt-2">{errors.deliveryWindow}</p>
+                  )}
                 </div>
 
                 {/* Delivery notes */}
