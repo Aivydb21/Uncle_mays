@@ -220,6 +220,8 @@ export default function PaymentPage() {
             email: data.email,
             firstName: data.firstName,
             lastName: data.lastName,
+            phone: data.phone,
+            address: data.address,
             proteins: data.proteinChoices,
             ...utms,
           }),
