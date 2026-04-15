@@ -106,13 +106,19 @@ export async function POST(req: NextRequest) {
       metadata,
     });
 
-    // Type guard for expanded invoice with payment intent
-    type ExpandedInvoice = Stripe.Invoice & {
-      payment_intent: Stripe.PaymentIntent;
-    };
+    // Handle latest_invoice - it can be a string ID or expanded Invoice object
+    let paymentIntent: Stripe.PaymentIntent | null = null;
 
-    const invoice = subscription.latest_invoice as ExpandedInvoice;
-    const paymentIntent = invoice.payment_intent;
+    if (typeof subscription.latest_invoice === "string") {
+      // Invoice not expanded - fetch it manually
+      const invoice = await stripe.invoices.retrieve(subscription.latest_invoice, {
+        expand: ["payment_intent"],
+      });
+      paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+    } else if (subscription.latest_invoice) {
+      // Invoice is expanded
+      paymentIntent = subscription.latest_invoice.payment_intent as Stripe.PaymentIntent;
+    }
 
     if (!paymentIntent?.client_secret) {
       return NextResponse.json(
