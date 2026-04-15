@@ -100,16 +100,13 @@ export async function POST(req: NextRequest) {
     if (utm_content) metadata.utm_content = utm_content;
     if (utm_term) metadata.utm_term = utm_term;
 
-    // Create subscription in paused state - will be activated after first payment
+    // Create subscription - will be incomplete until first payment succeeds
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: priceId }],
       payment_behavior: "default_incomplete",
       payment_settings: { save_default_payment_method: "on_subscription" },
       metadata,
-      // Start in the future so first payment is manual
-      billing_cycle_anchor_config: { day_of_month: 1 },
-      proration_behavior: "none",
     });
 
     // Create a manual PaymentIntent for the first payment
