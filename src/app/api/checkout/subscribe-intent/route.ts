@@ -44,6 +44,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Get price details to know the amount
+    const price = await stripe.prices.retrieve(priceId);
+    const amount = price.unit_amount || 0;
+
     // Look up or create customer
     let customerId: string;
     if (email) {
@@ -73,7 +77,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Build metadata
-    const metadata: Record<string, string> = { product };
+    const metadata: Record<string, string> = { product, priceId };
     if (firstName) metadata.firstName = firstName;
     if (lastName) metadata.lastName = lastName;
     if (phone) metadata.phone = phone;
@@ -96,31 +100,35 @@ export async function POST(req: NextRequest) {
     if (utm_content) metadata.utm_content = utm_content;
     if (utm_term) metadata.utm_term = utm_term;
 
-    // Create subscription in incomplete state
+    // Create subscription in paused state - will be activated after first payment
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: priceId }],
       payment_behavior: "default_incomplete",
       payment_settings: { save_default_payment_method: "on_subscription" },
-      expand: ["latest_invoice.payment_intent"],
       metadata,
+      // Start in the future so first payment is manual
+      billing_cycle_anchor_config: { day_of_month: 1 },
+      proration_behavior: "none",
     });
 
-    // Handle latest_invoice - it can be a string ID or expanded Invoice object
-    let paymentIntent: Stripe.PaymentIntent | null = null;
+    // Create a manual PaymentIntent for the first payment
+    const paymentIntent = await stripe.paymentIntents.create({
+      customer: customerId,
+      amount,
+      currency: "usd",
+      automatic_payment_methods: { enabled: true },
+      setup_future_usage: "off_session",
+      metadata: {
+        ...metadata,
+        subscriptionId: subscription.id,
+        firstPayment: "true",
+      },
+    });
 
-    if (typeof subscription.latest_invoice === "string") {
-      // Invoice not expanded - fetch it manually
-      const invoice = await stripe.invoices.retrieve(subscription.latest_invoice, {
-        expand: ["payment_intent"],
-      });
-      paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
-    } else if (subscription.latest_invoice) {
-      // Invoice is expanded
-      paymentIntent = subscription.latest_invoice.payment_intent as Stripe.PaymentIntent;
-    }
-
-    if (!paymentIntent?.client_secret) {
+    if (!paymentIntent.client_secret) {
+      // Clean up subscription if payment intent creation failed
+      await stripe.subscriptions.cancel(subscription.id);
       return NextResponse.json(
         { error: "Could not initialize subscription payment" },
         { status: 500 }
