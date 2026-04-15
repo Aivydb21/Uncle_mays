@@ -19,7 +19,7 @@ export const PRODUCTS = {
     name: "Starter Box",
     price: 35,
     firstOrderPrice: 30,
-    subPrice: 31.50,
+    subPrice: 30,
     // Produce only — no protein section
     proteinCount: 0,
     proteinIncluded: false as const,
@@ -35,7 +35,7 @@ export const PRODUCTS = {
   family: {
     name: "Family Box",
     price: 65,
-    subPrice: 58.50,
+    subPrice: 55,
     // Chicken included in price — only chicken available, no upcharge
     proteinCount: 1,
     proteinIncluded: true as const,
@@ -57,7 +57,7 @@ export const PRODUCTS = {
   community: {
     name: "Community Box",
     price: 95,
-    subPrice: 85.50,
+    subPrice: 75,
     // Protein included in price — customer picks 1 from full options, no upcharge
     proteinCount: 1,
     proteinIncluded: true as const,
