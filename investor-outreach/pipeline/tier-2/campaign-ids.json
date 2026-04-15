@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Tier 2A - Warm Investors (Denise)",
+    "sender": "denise@unclemays.com",
+    "contacts": 151,
+    "contacts_added": 151,
+    "campaign_id": "69d7dc2bf18bda002233eb04",
+    "steps_created": 0,
+    "status": "created_inactive"
+  },
+  {
+    "name": "Tier 2B - Warm Investors (Rosalind)",
+    "sender": "rosalind@unclemays.com",
+    "contacts": 151,
+    "contacts_added": 151,
+    "campaign_id": "69d7dc492a222a0019913520",
+    "steps_created": 0,
+    "status": "created_inactive"
+  },
+  {
+    "name": "Tier 2C - Warm Investors (Invest)",
+    "sender": "invest@unclemays.com",
+    "contacts": 151,
+    "contacts_added": 151,
+    "campaign_id": "69d7dc68457595000d6b285d",
+    "steps_created": 0,
+    "status": "created_inactive"
+  },
+  {
+    "name": "Tier 2D - Warm Investors (TimJ)",
+    "sender": "timj@unclemays.com",
+    "contacts": 151,
+    "contacts_added": 151,
+    "campaign_id": "69d7dc86cfcc9800152117b7",
+    "steps_created": 0,
+    "status": "created_inactive"
+  }
+]

@@ -1,0 +1,70 @@
+{
+  "tier1_duplicates_removed": [
+    {
+      "name": "Julio Babecki",
+      "email": "julio.babecki@lcatterton.com",
+      "organization": "L Catterton",
+      "reason": "Duplicate: already in Tier 1 Apollo campaign"
+    },
+    {
+      "name": "Stephen Parks",
+      "email": "sparks@topspincp.com",
+      "organization": "Topspin Consumer Partners",
+      "reason": "Duplicate: already in Tier 1 Apollo campaign"
+    },
+    {
+      "name": "Brian Crandall",
+      "email": "bcrandall@tsgconsumer.com",
+      "organization": "TSG Consumer Partners",
+      "reason": "Duplicate: already in Tier 1 Apollo campaign"
+    },
+    {
+      "name": "Jody Rasch",
+      "email": "jody@beyondimpact.vc",
+      "organization": "Beyond Impact VC",
+      "reason": "Duplicate: already in Tier 1 Apollo campaign"
+    },
+    {
+      "name": "Jay Garcia",
+      "email": "jgarcia@sbccfund.com",
+      "organization": "Small Business Community Capital (SBCC)",
+      "reason": "Duplicate: already in Tier 1 Apollo campaign"
+    },
+    {
+      "name": "Hongtao Hou",
+      "email": "ted@berkeleycatalystfund.com",
+      "organization": "Berkeley Catalyst Fund",
+      "reason": "Duplicate: already in Tier 1 Apollo campaign"
+    },
+    {
+      "name": "Josh Wand",
+      "email": "josh@familyfund.vc",
+      "organization": "The Family Fund & Founder Community",
+      "reason": "Duplicate: already in Tier 1 Apollo campaign"
+    }
+  ],
+  "id_unresolved": [
+    {
+      "name": "Felipe Rojas",
+      "email": "frojas@advanzcp.com",
+      "organization": "Advanz Capital Partners",
+      "reason": "No matching Apollo contact ID found"
+    }
+  ],
+  "total_parsed": 612,
+  "total_after_dedup": 605,
+  "total_resolved": 604,
+  "total_unresolved": 1,
+  "split_stats": {
+    "total": 604,
+    "sizes": [
+      151,
+      151,
+      151,
+      151
+    ],
+    "max_imbalance": 0,
+    "firm_collisions": 1,
+    "org_count": 478
+  }
+}

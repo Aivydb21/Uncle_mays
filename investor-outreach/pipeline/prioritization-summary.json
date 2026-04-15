@@ -1,0 +1,137 @@
+{
+  "generated": "2026-04-05",
+  "scope": "full database scored, Tier 1 metro-constrained",
+  "total_contacts_in_apollo": 3240,
+  "total_unique_fetched": 3108,
+  "metro_counts": {
+    "Los Angeles": 149,
+    "SF/Bay Area": 298,
+    "New York": 583,
+    "Chicago": 141
+  },
+  "tier_counts": {
+    "tier1": 66,
+    "tier2": 612,
+    "tier3": 677,
+    "national_25_plus_outside_metros": 8,
+    "excluded": 1753
+  },
+  "tier1_top10": [
+    {
+      "name": "Aaron Rudberg",
+      "org": "S2G Investments",
+      "score": 50,
+      "location": "Chicago, Illinois",
+      "metro": "Chicago",
+      "reasons": [
+        "Known food/consumer VC: s2g",
+        "Chicago-based",
+        "Senior: GP/MP/Founder"
+      ]
+    },
+    {
+      "name": "Manny Martinez",
+      "org": "Brynwood Partners",
+      "score": 45,
+      "location": "Chicago, Illinois",
+      "metro": "Chicago",
+      "reasons": [
+        "Known food/consumer VC: brynwood",
+        "Chicago-based",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Bala Nagarajan",
+      "org": "S2G Investments",
+      "score": 45,
+      "location": "Chicago, Illinois",
+      "metro": "Chicago",
+      "reasons": [
+        "Known food/consumer VC: s2g",
+        "Chicago-based",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Ami Naik",
+      "org": "Radicle Impact Partners",
+      "score": 45,
+      "location": "San Francisco, California",
+      "metro": "SF/Bay Area",
+      "reasons": [
+        "Known food/consumer VC: radicle impact",
+        "Impact fund (equity)",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Stephen Bowater",
+      "org": "Brynwood Partners",
+      "score": 45,
+      "location": "Chicago, Illinois",
+      "metro": "Chicago",
+      "reasons": [
+        "Known food/consumer VC: brynwood",
+        "Chicago-based",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Ronald Meeusen",
+      "org": "Cultivian Sandbox Ventures",
+      "score": 45,
+      "location": "Chicago, Illinois",
+      "metro": "Chicago",
+      "reasons": [
+        "Known food/consumer VC: cultivian sandbox",
+        "Chicago-based",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Anthony Marino",
+      "org": "L Catterton",
+      "score": 40,
+      "location": "San Francisco, California",
+      "metro": "SF/Bay Area",
+      "reasons": [
+        "Known food/consumer VC: l catterton",
+        "Senior: GP/MP/Founder"
+      ]
+    },
+    {
+      "name": "Carle Stenmark",
+      "org": "VMG Partners",
+      "score": 40,
+      "location": "San Francisco, California",
+      "metro": "SF/Bay Area",
+      "reasons": [
+        "Known food/consumer VC: vmg partners",
+        "Senior: GP/MP/Founder"
+      ]
+    },
+    {
+      "name": "Vishal Vasishth",
+      "org": "Obvious Ventures",
+      "score": 40,
+      "location": "San Francisco, California",
+      "metro": "SF/Bay Area",
+      "reasons": [
+        "Known food/consumer VC: obvious ventures",
+        "Senior: GP/MP/Founder"
+      ]
+    },
+    {
+      "name": "Kirby Harris",
+      "org": "Base Ventures",
+      "score": 40,
+      "location": "Oakland, California",
+      "metro": "SF/Bay Area",
+      "reasons": [
+        "Known food/consumer VC: base ventures",
+        "Senior: GP/MP/Founder"
+      ]
+    }
+  ]
+}

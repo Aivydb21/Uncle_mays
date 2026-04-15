@@ -1,0 +1,108 @@
+{
+  "generated": "2026-04-05",
+  "total_contacts": 30,
+  "by_type": {
+    "CDFI": 1,
+    "Black-Led VC": 3,
+    "Diversity VC": 1,
+    "Climate/Impact": 2,
+    "Impact Fund": 2,
+    "Community Fund": 2,
+    "CDFI/Impact": 1,
+    "Food Foundation": 1,
+    "Impact VC": 4,
+    "Impact Platform": 1,
+    "Community VC": 1,
+    "Regenerative VC": 2,
+    "Public Capital": 1,
+    "Catalytic Capital": 1,
+    "Urban Development": 1,
+    "Impact Advisory": 4,
+    "Family Office": 1,
+    "Impact Role": 1
+  },
+  "new_contacts": 25,
+  "already_contacted": 5,
+  "top_10": [
+    {
+      "name": "Bob Tucker",
+      "org": "Chicago Community Loan Fund (CCLF)",
+      "type": "CDFI",
+      "score": 50,
+      "why": "Chicago CDFI, finances community development projects",
+      "status": "New"
+    },
+    {
+      "name": "James Norman",
+      "org": "Black Operator Ventures",
+      "type": "Black-Led VC",
+      "score": 40,
+      "why": "Black-led operator fund, invests in Black founders",
+      "status": "Already contacted"
+    },
+    {
+      "name": "Kirby Harris",
+      "org": "Base Ventures",
+      "type": "Black-Led VC",
+      "score": 40,
+      "why": "Black-led seed fund, Oakland-based",
+      "status": "New"
+    },
+    {
+      "name": "Henri Pierre-Jacques",
+      "org": "Harlem Capital",
+      "type": "Diversity VC",
+      "score": 40,
+      "why": "Diversity-focused fund, invests in minority and women founders",
+      "status": "New"
+    },
+    {
+      "name": "Paul Seidler",
+      "org": "Evergreen Climate Innovations",
+      "type": "Climate/Impact",
+      "score": 35,
+      "why": "Chicago-based climate innovation fund, food systems in scope",
+      "status": "New"
+    },
+    {
+      "name": "Ian Adams",
+      "org": "Evergreen Climate Innovations",
+      "type": "Climate/Impact",
+      "score": 35,
+      "why": "Chicago-based climate innovation fund, food systems in scope",
+      "status": "New"
+    },
+    {
+      "name": "Michael Rauenhorst",
+      "org": "Social Investment Managers & Advisors (SIMA Funds)",
+      "type": "Impact Fund",
+      "score": 35,
+      "why": "Social investment fund (SIMA), emerging markets and impact",
+      "status": "Already contacted"
+    },
+    {
+      "name": "Erik Moore",
+      "org": "Base Ventures",
+      "type": "Black-Led VC",
+      "score": 35,
+      "why": "Black-led seed fund, Oakland-based",
+      "status": "New"
+    },
+    {
+      "name": "Jay Garcia",
+      "org": "Small Business Community Capital (SBCC)",
+      "type": "Community Fund",
+      "score": 30,
+      "why": "Community capital for small businesses",
+      "status": "New"
+    },
+    {
+      "name": "Alison Powers",
+      "org": "Capital Impact Partners",
+      "type": "CDFI/Impact",
+      "score": 30,
+      "why": "Community development FI, finances community facilities including grocery",
+      "status": "New"
+    }
+  ]
+}

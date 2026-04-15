@@ -1,0 +1,120 @@
+{
+  "generated": "2026-04-05",
+  "linkedin_tier1_count": 99,
+  "linkedin_tier2_count": 136,
+  "excluded_count": 1659,
+  "new_contacts_outside_original_metros": 14,
+  "sub_tier_a_count": 33,
+  "sub_tier_b_count": 66,
+  "top_10": [
+    {
+      "name": "Sonia Nagar",
+      "org": "SNAK Venture Partners",
+      "score": 50,
+      "location": "Chicago, Illinois",
+      "reasons": [
+        "Known food/consumer VC: snak venture",
+        "Chicago-based",
+        "Senior: GP/MP/Founder"
+      ]
+    },
+    {
+      "name": "Aaron Rudberg",
+      "org": "S2G Investments",
+      "score": 50,
+      "location": "Chicago, Illinois",
+      "reasons": [
+        "Known food/consumer VC: s2g",
+        "Chicago-based",
+        "Senior: GP/MP/Founder"
+      ]
+    },
+    {
+      "name": "Manny Martinez",
+      "org": "Brynwood Partners",
+      "score": 45,
+      "location": "Chicago, Illinois",
+      "reasons": [
+        "Known food/consumer VC: brynwood",
+        "Chicago-based",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Corey Vernon",
+      "org": "Radicle Impact Partners",
+      "score": 45,
+      "location": "Park City, Utah",
+      "reasons": [
+        "Known food/consumer VC: radicle impact",
+        "Impact fund (equity)",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Bala Nagarajan",
+      "org": "S2G Investments",
+      "score": 45,
+      "location": "Chicago, Illinois",
+      "reasons": [
+        "Known food/consumer VC: s2g",
+        "Chicago-based",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Tyler Mayoras",
+      "org": "Manna Tree",
+      "score": 45,
+      "location": "Chicago, Illinois",
+      "reasons": [
+        "Known food/consumer VC: manna tree",
+        "Chicago-based",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Ami Naik",
+      "org": "Radicle Impact Partners",
+      "score": 45,
+      "location": "San Francisco, California",
+      "reasons": [
+        "Known food/consumer VC: radicle impact",
+        "Impact fund (equity)",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Stephen Bowater",
+      "org": "Brynwood Partners",
+      "score": 45,
+      "location": "Chicago, Illinois",
+      "reasons": [
+        "Known food/consumer VC: brynwood",
+        "Chicago-based",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Ronald Meeusen",
+      "org": "Cultivian Sandbox Ventures",
+      "score": 45,
+      "location": "Chicago, Illinois",
+      "reasons": [
+        "Known food/consumer VC: cultivian sandbox",
+        "Chicago-based",
+        "Title: Partner/MD/Principal"
+      ]
+    },
+    {
+      "name": "Jordan Gaspar",
+      "org": "AF Ventures",
+      "score": 40,
+      "location": "New York, New York",
+      "reasons": [
+        "Known food/consumer VC: af ventures",
+        "Senior: GP/MP/Founder"
+      ]
+    }
+  ]
+}
