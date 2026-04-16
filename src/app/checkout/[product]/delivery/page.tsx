@@ -6,7 +6,6 @@ import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
 
 declare global {
   interface Window {
@@ -109,6 +108,28 @@ function isValidDeliveryDate(date: Date): boolean {
     dateTime >= earliest.getTime() &&
     dateTime <= maxDate.getTime()
   );
+}
+
+// Generate next 4 available Wednesday delivery dates
+function getAvailableDeliveryDates(): Array<{ value: string; label: string }> {
+  const dates: Array<{ value: string; label: string }> = [];
+  const firstWednesday = getEarliestDeliveryDate();
+
+  for (let i = 0; i < 4; i++) {
+    const date = new Date(firstWednesday);
+    date.setDate(date.getDate() + (i * 7)); // Add weeks
+
+    const dateStr = date.toISOString().split('T')[0];
+    const label = date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    dates.push({ value: dateStr, label });
+  }
+
+  return dates;
 }
 
 const TIME_WINDOWS = [
@@ -525,40 +546,31 @@ export default function DeliveryPage() {
 
                 {/* Delivery Date Selection */}
                 <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
-                  <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                  <Label htmlFor="deliveryDate" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
                     Choose Your Delivery Date <span className="text-destructive">*</span>
                   </Label>
                   <p className="text-xs text-muted-foreground mb-3">
-                    Select any Wednesday within the next 8 weeks
+                    We deliver every Wednesday. Select your preferred date:
                   </p>
-                  <div className="flex justify-center">
-                    <Calendar
-                      mode="single"
-                      selected={fields.deliveryDate ? new Date(fields.deliveryDate) : undefined}
-                      onSelect={(date) => {
-                        if (date && isValidDeliveryDate(date)) {
-                          const dateStr = date.toISOString().split('T')[0];
-                          setFields((prev) => ({ ...prev, deliveryDate: dateStr }));
-                          if (errors.deliveryDate) {
-                            setErrors((prev) => ({ ...prev, deliveryDate: undefined }));
-                          }
-                        }
-                      }}
-                      disabled={(date) => !isValidDeliveryDate(date)}
-                      fromDate={getEarliestDeliveryDate()}
-                      toDate={new Date(Date.now() + (8 * 7 * 24 * 60 * 60 * 1000))}
-                      className="rounded-lg border"
-                    />
-                  </div>
-                  {fields.deliveryDate && (
-                    <p className="text-sm text-center mt-3 font-medium text-primary">
-                      Delivering on {new Date(fields.deliveryDate).toLocaleDateString('en-US', {
-                        weekday: 'long',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
-                  )}
+                  <select
+                    id="deliveryDate"
+                    name="deliveryDate"
+                    value={fields.deliveryDate}
+                    onChange={(e) => {
+                      setFields((prev) => ({ ...prev, deliveryDate: e.target.value }));
+                      if (errors.deliveryDate) {
+                        setErrors((prev) => ({ ...prev, deliveryDate: undefined }));
+                      }
+                    }}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Select a delivery date...</option>
+                    {getAvailableDeliveryDates().map((date) => (
+                      <option key={date.value} value={date.value}>
+                        {date.label}
+                      </option>
+                    ))}
+                  </select>
                   {errors.deliveryDate && (
                     <p className="text-destructive text-xs mt-2">{errors.deliveryDate}</p>
                   )}
