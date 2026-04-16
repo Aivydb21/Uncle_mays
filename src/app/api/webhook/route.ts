@@ -4,6 +4,57 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
+// GA4 Measurement Protocol for server-side conversion tracking
+async function trackGA4Purchase(params: {
+  transactionId: string;
+  value: number;
+  currency: string;
+  items: Array<{ item_id: string; item_name: string; price: number; quantity: number }>;
+  clientId?: string;
+}) {
+  const measurementId = process.env.GA4_MEASUREMENT_ID;
+  const apiSecret = process.env.GA4_API_SECRET;
+
+  if (!measurementId || !apiSecret) {
+    console.warn("[GA4] Measurement ID or API Secret not configured, skipping server-side tracking");
+    return;
+  }
+
+  try {
+    const payload = {
+      client_id: params.clientId || `stripe.${params.transactionId}`,
+      events: [
+        {
+          name: "purchase",
+          params: {
+            transaction_id: params.transactionId,
+            value: params.value,
+            currency: params.currency,
+            items: params.items,
+          },
+        },
+      ],
+    };
+
+    const response = await fetch(
+      `https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      console.log(`[GA4] Purchase tracked: ${params.transactionId} = $${params.value}`);
+    } else {
+      console.error(`[GA4] Tracking failed: ${response.status} ${await response.text()}`);
+    }
+  } catch (error) {
+    console.error("[GA4] Error tracking purchase:", error);
+  }
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -29,10 +80,100 @@ export async function POST(req: NextRequest) {
         typeof session.customer === "string"
           ? session.customer
           : (session.customer as Stripe.Customer | null)?.id ?? null;
+      const email = session.customer_email ?? session.customer_details?.email ?? "unknown";
+      const phone = session.customer_details?.phone ?? null;
+
       console.log(
-        `[WEBHOOK] checkout.session.completed | session=${session.id} amount=${session.amount_total} customer=${customerId ?? "none"} email=${session.customer_email ?? session.customer_details?.email ?? "unknown"}`
+        `[WEBHOOK] checkout.session.completed | session=${session.id} amount=${session.amount_total} customer=${customerId ?? "none"} email=${email} phone=${phone ?? "none"}`
       );
-      // TODO: fulfillment logic (send confirmation email, update order DB, notify ops)
+
+      // Track purchase in GA4 (server-side for reliability)
+      const amountInDollars = (session.amount_total ?? 0) / 100;
+      const productName = session.metadata?.productName || "Produce Box";
+      const productId = session.metadata?.productId || "produce_box";
+
+      await trackGA4Purchase({
+        transactionId: session.id,
+        value: amountInDollars,
+        currency: "USD",
+        items: [
+          {
+            item_id: productId,
+            item_name: productName,
+            price: amountInDollars,
+            quantity: 1,
+          },
+        ],
+        clientId: customerId || undefined,
+      });
+
+      // Trigger SMS confirmation if phone number and delivery date are available
+      // The session metadata should contain the checkout session ID from our local store
+      const checkoutSessionId = session.metadata?.checkoutSessionId;
+      if (checkoutSessionId && phone) {
+        const triggerSecretKey = process.env.TRIGGER_SECRET_KEY;
+        if (triggerSecretKey) {
+          try {
+            // Fetch the local checkout session to get delivery details
+            const checkoutRes = await fetch(
+              `${process.env.SITE_BASE_URL || "https://unclemays.com"}/api/checkout/session/${checkoutSessionId}`
+            );
+
+            if (checkoutRes.ok) {
+              const checkoutSession = await checkoutRes.json();
+
+              if (checkoutSession.deliveryDate) {
+                const res = await fetch(
+                  "https://api.trigger.dev/api/v1/tasks/send-delivery-confirmation-sms/trigger",
+                  {
+                    method: "POST",
+                    headers: {
+                      Authorization: `Bearer ${triggerSecretKey}`,
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      payload: {
+                        sessionId: checkoutSessionId,
+                        phone: phone,
+                        firstName: checkoutSession.firstName || session.customer_details?.name?.split(" ")[0] || "there",
+                        deliveryDate: checkoutSession.deliveryDate,
+                        deliveryWindow: checkoutSession.deliveryWindow,
+                        productName: checkoutSession.productName || "produce box",
+                      },
+                      options: {
+                        idempotencyKey: `sms-confirmation-${checkoutSessionId}`,
+                      },
+                    }),
+                  }
+                );
+
+                if (res.ok) {
+                  console.log(
+                    `[WEBHOOK] Queued SMS confirmation task for session ${checkoutSessionId}`
+                  );
+                } else {
+                  const err = await res.json().catch(() => ({}));
+                  console.warn(
+                    `[WEBHOOK] Failed to queue SMS confirmation task:`,
+                    err
+                  );
+                }
+              } else {
+                console.log(
+                  `[WEBHOOK] No delivery date for session ${checkoutSessionId}, skipping SMS confirmation`
+                );
+              }
+            }
+          } catch (e) {
+            console.warn(
+              `[WEBHOOK] Error queueing SMS confirmation task:`,
+              e
+            );
+          }
+        }
+      }
+
+      // TODO: Additional fulfillment logic (send confirmation email, update order DB, notify ops)
       break;
     }
 
