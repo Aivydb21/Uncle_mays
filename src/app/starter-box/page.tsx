@@ -19,7 +19,7 @@ const testimonial = {
 function CTAButton({ className = "" }: { className?: string }) {
   return (
     <Link
-      href="/checkout/starter"
+      href="/subscribe/starter"
       className={`inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold text-lg rounded-xl px-8 py-4 shadow-lg hover:bg-primary/90 transition-all duration-200 active:scale-95 ${className}`}
       onClick={() => {
         // Fire Meta pixel ViewContent + InitiateCheckout for conversion tracking

@@ -32,6 +32,7 @@ If you add or remove agents, update AGENTS_SHARED below.
 """
 
 import os
+import re
 import shutil
 import sys
 from datetime import datetime
@@ -50,6 +51,58 @@ AGENTS_SHARED = [
     ("bfcf59d8-ca78-4306-872f-4e5a53f5c650", "CFO"),
     ("ed268a60-d566-4750-8ad0-8dfe79b27212", "COO"),
 ]
+
+# --- Role-specific stripping ---
+# Sections marked with HTML comment blocks in CLAUDE.md can be stripped per-role.
+# This keeps each agent's COMPANY-CONTEXT.md to only what they need.
+
+TRIGGER_DEV_PATTERN = re.compile(
+    r"<!-- TRIGGER\.DEV basic START -->.*?<!-- TRIGGER\.DEV basic END -->",
+    re.DOTALL,
+)
+
+# Python code block patterns for APIs that only certain agents need.
+# These are stripped from agents that don't use them.
+FIRECRAWL_PYTHON_PATTERN = re.compile(
+    r"### Python Usage \(for scripts\)\n\n```python\nimport json, os, urllib\.request\n\nconfig = json\.load\(open\(os\.path\.expanduser\(\"~/.claude/firecrawl.*?```\n",
+    re.DOTALL,
+)
+META_PYTHON_PATTERN = re.compile(
+    r"### Python Usage\n\n```python\nimport json, os, urllib\.request\n\nconfig = json\.load\(open\(os\.path\.expanduser\(\"~/.claude/meta.*?```\n",
+    re.DOTALL,
+)
+GOOGLE_ADS_PYTHON_PATTERN = re.compile(
+    r"### Python Usage\n\n```python\nimport json, os, urllib\.request, urllib\.parse\n\nconfig = json\.load\(open\(os\.path\.expanduser\(\"~/.claude/google-ads.*?```\n",
+    re.DOTALL,
+)
+CANVA_PYTHON_PATTERN = re.compile(
+    r"### Python Usage\n\n```python\nimport json, os, urllib\.request, base64\n\nconfig = json\.load\(open\(os\.path\.expanduser\(\"~/.claude/canva.*?```\n",
+    re.DOTALL,
+)
+
+def strip_triggerdev(content):
+    return TRIGGER_DEV_PATTERN.sub("", content)
+
+def strip_api_python_blocks(content):
+    """Remove Python code blocks for Firecrawl, Meta, Google Ads, Canva."""
+    content = FIRECRAWL_PYTHON_PATTERN.sub("", content)
+    content = META_PYTHON_PATTERN.sub("", content)
+    content = GOOGLE_ADS_PYTHON_PATTERN.sub("", content)
+    content = CANVA_PYTHON_PATTERN.sub("", content)
+    return content
+
+# Strip functions per agent role (applied AFTER building new_base)
+# CEO: full context (needs everything for strategic decisions)
+# IR:  full context (owns all outreach + Apollo + LinkedIn)
+# CFO: remove Trigger.dev + API Python code blocks (finance, not engineering)
+# COO: remove Trigger.dev + API Python code blocks (operations, not engineering/outreach)
+AGENT_STRIP_FNS = {
+    "CEO": [],                                          # keep all
+    "Investor Relations": [],                           # keep all
+    "CFO": [strip_triggerdev, strip_api_python_blocks], # no code examples needed
+    "COO": [strip_triggerdev, strip_api_python_blocks], # no code examples needed
+    # CTO handled separately (gets extra section appended)
+}
 
 # CTO gets a custom version with the Website Technical Stack section appended
 CTO_ID = "3f827c01-38a9-435b-826c-64192188a8cb"
@@ -151,22 +204,28 @@ def main():
             continue
         with open(path, "r", encoding="utf-8") as f:
             current = f.read()
-        if current == new_base:
+        # Apply role-specific strips
+        role_content = new_base
+        for strip_fn in AGENT_STRIP_FNS.get(name, []):
+            role_content = strip_fn(role_content)
+        if current == role_content:
             print(f"  [unchanged] {name:25} ({len(current)} bytes)")
             continue
         if dry_run:
-            print(f"  [would-write] {name:25} {len(current)} -> {len(new_base)} bytes")
+            print(f"  [would-write] {name:25} {len(current)} -> {len(role_content)} bytes  (stripped {len(new_base)-len(role_content)} bytes)")
             continue
         shutil.copy(path, path + backup_suffix)
         with open(path, "w", encoding="utf-8", newline="") as f:
-            f.write(new_base)
-        print(f"  [written] {name:25} {len(current)} -> {len(new_base)} bytes (backup: {backup_suffix})")
+            f.write(role_content)
+        print(f"  [written] {name:25} {len(current)} -> {len(role_content)} bytes  (stripped {len(new_base)-len(role_content)} bytes, backup: {backup_suffix})")
 
-    # CTO version with extra section
+    # CTO version with extra section (Trigger.dev stays — CTO needs it)
     if CTO_INSERT_MARKER in new_base:
         cto_content = new_base.replace(CTO_INSERT_MARKER, CTO_INSERT_MARKER + CTO_EXTRA)
     else:
         cto_content = new_base + CTO_EXTRA
+    # Strip API Python code blocks irrelevant to CTO (Firecrawl, Meta, Google Ads, Canva)
+    cto_content = strip_api_python_blocks(cto_content)
     if os.path.exists(cto_path):
         with open(cto_path, "r", encoding="utf-8") as f:
             cto_current = f.read()

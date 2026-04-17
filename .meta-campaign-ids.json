@@ -1,0 +1,112 @@
+{
+  "account": {
+    "ad_account_id": "act_814877604473301",
+    "page_id": "755316477673748",
+    "pixel_id": "2276705169443313",
+    "business_id": "751387917801678"
+  },
+  "subscription_launch_apr2026": {
+    "campaign_id": "120243219649250762",
+    "campaign_name": "Subscription Launch - Produce Box",
+    "daily_budget": 67,
+    "status": "PAUSED",
+    "ad_sets": {
+      "instagram_feed": {
+        "id": "120243219914430762",
+        "placement": "Instagram Feed",
+        "targeting": "Women 25-50, Hyde Park 5mi",
+        "targeting_updated": "2026-04-17",
+        "targeting_reason": "Focus on Hyde Park beachhead market with high Black women concentration",
+        "geo_location": {
+          "latitude": 41.7954,
+          "longitude": -87.5914,
+          "radius_miles": 5
+        }
+      },
+      "instagram_stories": {
+        "id": "120243219918030762",
+        "placement": "Instagram Stories",
+        "targeting": "Women 25-50, Hyde Park 5mi",
+        "targeting_updated": "2026-04-17",
+        "targeting_reason": "Focus on Hyde Park beachhead market with high Black women concentration",
+        "geo_location": {
+          "latitude": 41.7954,
+          "longitude": -87.5914,
+          "radius_miles": 5
+        }
+      },
+      "facebook_feed": {
+        "id": "120243219919870762",
+        "placement": "Facebook Feed",
+        "targeting": "Women 25-50, Hyde Park 5mi",
+        "targeting_updated": "2026-04-17",
+        "targeting_reason": "Focus on Hyde Park beachhead market with high Black women concentration",
+        "geo_location": {
+          "latitude": 41.7954,
+          "longitude": -87.5914,
+          "radius_miles": 5
+        }
+      }
+    },
+    "videos": [
+      {
+        "id": "1437672617665607",
+        "filename": "smaller a.mp4",
+        "size_mb": 9.4
+      },
+      {
+        "id": "2355242318591638",
+        "filename": "smaller b video.mp4",
+        "size_mb": 9.2
+      }
+    ],
+    "thumbnail": {
+      "hash": "7aef798892a38251a52c4e3f72716993",
+      "filename": "meta_feed_chicago_families_1080x1080.png"
+    },
+    "ads": [
+      {
+        "id": "120243221203760762",
+        "ad_set": "instagram_feed",
+        "video": "1437672617665607",
+        "creative_id": "1280764066819531"
+      },
+      {
+        "id": "120243221205970762",
+        "ad_set": "instagram_feed",
+        "video": "2355242318591638",
+        "creative_id": "3966684956796146"
+      },
+      {
+        "id": "120243221207200762",
+        "ad_set": "instagram_stories",
+        "video": "1437672617665607",
+        "creative_id": "1280764066819531"
+      },
+      {
+        "id": "120243221208210762",
+        "ad_set": "instagram_stories",
+        "video": "2355242318591638",
+        "creative_id": "3966684956796146"
+      },
+      {
+        "id": "120243221208940762",
+        "ad_set": "facebook_feed",
+        "video": "1437672617665607",
+        "creative_id": "1577563503305032"
+      },
+      {
+        "id": "120243221209870762",
+        "ad_set": "facebook_feed",
+        "video": "2355242318591638",
+        "creative_id": "1306430608106512"
+      }
+    ],
+    "creative": {
+      "primary_text": "Get farm-fresh produce boxes delivered to your door every week. Support local farmers and eat healthier. Join our community today!",
+      "headline": "Fresh Produce Delivered Weekly",
+      "cta": "SHOP_NOW",
+      "link": "https://unclemays.com/products/weekly-produce-box?utm_source=facebook&utm_medium=video&utm_campaign=subscription_launch_apr2026"
+    }
+  }
+}

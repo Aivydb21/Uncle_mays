@@ -1,0 +1,12 @@
+{
+  "timestamp": "2026-04-16T14:02:22.688566",
+  "period_hours": 48,
+  "total_sessions": 4,
+  "completed": 0,
+  "expired": 4,
+  "open": 0,
+  "conversion_rate": 0.0,
+  "abandon_rate": 100.0,
+  "baseline": 97.0,
+  "change": 3.0
+}

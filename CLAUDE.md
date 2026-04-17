@@ -320,49 +320,6 @@ curl -X POST 'https://api.firecrawl.dev/v2/map' \
 - **For scoring scripts:** When `prioritize-contacts.py` or `prioritize-linkedin.py` identifies a high-score contact, use Firecrawl to enrich with fund thesis data before outreach
 - **Load config from:** `~/.claude/firecrawl-config.json` (same pattern as Apollo, Stripe, etc.)
 
-### Python Usage (for scripts)
-
-```python
-import json, os, urllib.request
-
-config = json.load(open(os.path.expanduser("~/.claude/firecrawl-config.json")))
-FIRECRAWL_KEY = config["api_key"]
-FIRECRAWL_URL = config["base_url"]
-
-def firecrawl_scrape(url):
-    """Scrape a URL and return markdown content."""
-    payload = json.dumps({"url": url}).encode("utf-8")
-    req = urllib.request.Request(
-        f"{FIRECRAWL_URL}/scrape",
-        data=payload,
-        headers={
-            "Authorization": f"Bearer {FIRECRAWL_KEY}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
-    resp = urllib.request.urlopen(req, timeout=30)
-    data = json.loads(resp.read())
-    if data.get("success"):
-        return data["data"]["markdown"]
-    return None
-
-def firecrawl_search(query):
-    """Search the web and return results."""
-    payload = json.dumps({"query": query}).encode("utf-8")
-    req = urllib.request.Request(
-        f"{FIRECRAWL_URL}/search",
-        data=payload,
-        headers={
-            "Authorization": f"Bearer {FIRECRAWL_KEY}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
-    resp = urllib.request.urlopen(req, timeout=30)
-    return json.loads(resp.read())
-```
-
 ## Domain Authentication (verified 2026-04-04)
 - **SPF:** `v=spf1 include:_spf.google.com -all` (hardfail) — PASSING
 - **DKIM:** `google._domainkey` configured with RSA key — PASSING
@@ -373,11 +330,16 @@ def firecrawl_search(query):
 
 ## Meta (Facebook/Instagram) API
 
-- **Config:** `~/.claude/meta-config.json` (access token + base URL)
+- **Config:** `~/.claude/meta-config.json` (access token, ad account ID, page ID)
 - **Base URL:** `https://graph.facebook.com/v21.0`
 - **Auth:** Access token appended as `?access_token=<token>` or via `Authorization: Bearer <token>` header
-- **Use cases:** Page insights, ad performance, Instagram analytics, audience data, post scheduling
-- **Docs:** https://developers.facebook.com/docs/graph-api
+- **Ad Account:** `act_814877604473301` (Second Try)
+- **Page ID:** `755316477673748` (Uncle May's Facebook Page)
+- **Pixel ID:** `2276705169443313` (Meta Pixel for conversion tracking)
+- **Business ID:** `751387917801678`
+- **Use cases:** Campaign management, ad performance, video/image upload, audience targeting, conversion tracking
+- **Docs:** https://developers.facebook.com/docs/marketing-apis
+- **Reference:** `docs/meta-api-reference.md` (complete API guide with all IDs and working scripts)
 
 ### Meta API Usage
 
@@ -390,23 +352,6 @@ curl "https://graph.facebook.com/v21.0/{page-id}/posts?access_token=$META_TOKEN"
 
 # Get ad account insights
 curl "https://graph.facebook.com/v21.0/act_{ad-account-id}/insights?access_token=$META_TOKEN"
-```
-
-### Python Usage
-
-```python
-import json, os, urllib.request
-
-config = json.load(open(os.path.expanduser("~/.claude/meta-config.json")))
-META_TOKEN = config["access_token"]
-META_URL = config["base_url"]
-
-def meta_get(endpoint, params=""):
-    """GET request to Meta Graph API."""
-    url = f"{META_URL}/{endpoint}?access_token={META_TOKEN}{params}"
-    req = urllib.request.Request(url)
-    resp = urllib.request.urlopen(req, timeout=30)
-    return json.loads(resp.read())
 ```
 
 ## Google Ads API
@@ -447,56 +392,6 @@ curl -sS -X POST "https://googleads.googleapis.com/v18/customers/$GADS_CUSTOMER_
   -H "developer-token: $GADS_DEVELOPER_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"query":"SELECT campaign.id, campaign.name, metrics.clicks, metrics.impressions, metrics.cost_micros FROM campaign WHERE segments.date DURING LAST_7_DAYS"}'
-```
-
-### Python Usage
-
-```python
-import json, os, urllib.request, urllib.parse
-
-config = json.load(open(os.path.expanduser("~/.claude/google-ads-config.json")))
-
-def google_ads_access_token():
-    """Exchange the stored refresh token for a short-lived access token."""
-    if not config.get("refresh_token"):
-        raise RuntimeError("google-ads-config.json refresh_token is missing; run the OAuth consent flow first")
-    payload = urllib.parse.urlencode({
-        "client_id": config["client_id"],
-        "client_secret": config["client_secret"],
-        "refresh_token": config["refresh_token"],
-        "grant_type": "refresh_token",
-    }).encode("utf-8")
-    req = urllib.request.Request(
-        config["oauth_token_url"],
-        data=payload,
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-        method="POST",
-    )
-    resp = urllib.request.urlopen(req, timeout=30)
-    return json.loads(resp.read())["access_token"]
-
-def google_ads_search(query, customer_id=None):
-    """Run a GAQL search query against the configured Google Ads customer."""
-    cid = customer_id or config.get("customer_id")
-    if not cid:
-        raise RuntimeError("google-ads-config.json customer_id is missing")
-    token = google_ads_access_token()
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "developer-token": config["developer_token"],
-        "Content-Type": "application/json",
-    }
-    if config.get("login_customer_id"):
-        headers["login-customer-id"] = str(config["login_customer_id"])
-    payload = json.dumps({"query": query}).encode("utf-8")
-    req = urllib.request.Request(
-        f"{config['base_url']}/customers/{cid}/googleAds:search",
-        data=payload,
-        headers=headers,
-        method="POST",
-    )
-    resp = urllib.request.urlopen(req, timeout=30)
-    return json.loads(resp.read())
 ```
 
 ### Google Ads Integration Rules
@@ -571,86 +466,6 @@ curl -sS -X POST 'https://api.canva.com/rest/v1/exports' \
   -H "Authorization: Bearer $CANVA_TOKEN" \
   -H 'Content-Type: application/json' \
   -d '{"design_id": "DAHFhtqRSLs", "format": {"type": "pdf"}}'
-```
-
-### Python Usage
-
-```python
-import json, os, urllib.request, base64
-
-config = json.load(open(os.path.expanduser("~/.claude/canva-config.json")))
-
-def canva_refresh_token():
-    """Refresh the access token using the refresh token."""
-    credentials = base64.b64encode(
-        f'{config["client_id"]}:{config["client_secret"]}'.encode()
-    ).decode()
-    payload = urllib.parse.urlencode({
-        "grant_type": "refresh_token",
-        "refresh_token": config["refresh_token"],
-    }).encode("utf-8")
-    req = urllib.request.Request(
-        config["oauth_token_url"],
-        data=payload,
-        headers={
-            "Authorization": f"Basic {credentials}",
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-        method="POST",
-    )
-    resp = urllib.request.urlopen(req, timeout=30)
-    tokens = json.loads(resp.read())
-    config["access_token"] = tokens["access_token"]
-    config["refresh_token"] = tokens["refresh_token"]
-    # Save updated tokens
-    with open(os.path.expanduser("~/.claude/canva-config.json"), "w") as f:
-        json.dump(config, f, indent=2)
-    return tokens["access_token"]
-
-def canva_get(endpoint):
-    """GET request to Canva API. Auto-refreshes on 401."""
-    url = f'{config["base_url"]}/{endpoint}'
-    req = urllib.request.Request(url, headers={"Authorization": f'Bearer {config["access_token"]}'})
-    try:
-        resp = urllib.request.urlopen(req, timeout=30)
-        return json.loads(resp.read())
-    except urllib.error.HTTPError as e:
-        if e.code == 401:
-            new_token = canva_refresh_token()
-            req = urllib.request.Request(url, headers={"Authorization": f"Bearer {new_token}"})
-            resp = urllib.request.urlopen(req, timeout=30)
-            return json.loads(resp.read())
-        raise
-
-def canva_post(endpoint, data):
-    """POST request to Canva API. Auto-refreshes on 401."""
-    url = f'{config["base_url"]}/{endpoint}'
-    payload = json.dumps(data).encode("utf-8")
-    req = urllib.request.Request(
-        url, data=payload,
-        headers={
-            "Authorization": f'Bearer {config["access_token"]}',
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
-    try:
-        resp = urllib.request.urlopen(req, timeout=30)
-        return json.loads(resp.read())
-    except urllib.error.HTTPError as e:
-        if e.code == 401:
-            new_token = canva_refresh_token()
-            req = urllib.request.Request(
-                url, data=payload,
-                headers={
-                    "Authorization": f"Bearer {new_token}",
-                    "Content-Type": "application/json",
-                },
-                method="POST",
-            )
-            resp = urllib.request.urlopen(req, timeout=30)
-            return json.loads(resp.read())
-        raise
 ```
 
 ### Canva Integration Rules

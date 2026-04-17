@@ -144,7 +144,7 @@ def create_campaign(budget_resource_name):
                 "geo_target_type_setting": {
                     "positive_geo_target_type": "PRESENCE_OR_INTEREST"
                 },
-                "contains_eu_political_advertising": "UNSPECIFIED"
+                "contains_eu_political_advertising": "DOES_NOT_CONTAIN_EU_POLITICAL_ADVERTISING"
             }
         }]
     }
@@ -181,7 +181,9 @@ def add_geo_targeting(campaign_resource_name):
         "operations": [{
             "create": {
                 "campaign": campaign_resource_name,
-                "geo_target_constant": "geoTargetConstants/1014044",  # Chicago metro
+                "location": {
+                    "geo_target_constant": "geoTargetConstants/1014044"  # Chicago metro
+                },
             }
         }]
     }

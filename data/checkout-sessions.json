@@ -1,0 +1,46 @@
+{
+  "sessions": [
+    {
+      "product": "starter",
+      "price": 30,
+      "productName": "Starter Box",
+      "email": "test@example.com",
+      "firstName": "Test",
+      "lastName": "User",
+      "phone": "312-555-0100",
+      "address": {
+        "street": "123 Test St",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601"
+      },
+      "deliveryDate": "2026-04-23",
+      "deliveryWindow": "12pm-3pm",
+      "deliveryNotes": "Leave at front door",
+      "id": "68492fe6-e034-4a3b-8073-ea607cacbaca",
+      "createdAt": "2026-04-15T15:56:18.554Z",
+      "updatedAt": "2026-04-15T15:56:18.554Z"
+    },
+    {
+      "product": "starter",
+      "price": 30,
+      "productName": "Starter Box",
+      "email": "test@example.com",
+      "firstName": "Test",
+      "lastName": "User",
+      "phone": "312-555-0100",
+      "address": {
+        "street": "123 Test St",
+        "city": "Chicago",
+        "state": "IL",
+        "zip": "60601"
+      },
+      "deliveryDate": "2026-04-23",
+      "deliveryWindow": "12pm-3pm",
+      "deliveryNotes": "Leave at front door",
+      "id": "d5eade7d-9c87-48c0-815b-16d2182bdc0c",
+      "createdAt": "2026-04-15T16:13:17.133Z",
+      "updatedAt": "2026-04-15T16:13:17.133Z"
+    }
+  ]
+}

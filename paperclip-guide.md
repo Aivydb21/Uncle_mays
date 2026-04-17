@@ -10,10 +10,13 @@
 
 ### Starting Paperclip
 ```bash
-cd C:\Users\Anthony\Desktop\paperclip\server
-npx tsx src/index.ts
+node C:\Users\Anthony\Desktop\business\start-paperclip.cjs
 ```
 Then open http://localhost:3100
+
+> The startup script handles migration fixes automatically before launching.
+> Do NOT use `npx paperclipai run` directly — it will crash if the DB has
+> migrations that conflict with existing schema objects.
 
 ### Your Agents
 

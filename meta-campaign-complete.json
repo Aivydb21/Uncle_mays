@@ -1,0 +1,18 @@
+{
+  "campaign_id": "120243219649250762",
+  "campaign_name": "Subscription Launch Apr 2026",
+  "ad_sets": {
+    "ig_feed": "120243219914430762",
+    "ig_stories": "120243219918030762",
+    "fb_feed": "120243219919870762"
+  },
+  "status": "PAUSED",
+  "created_at": "2026-04-17T13:05:36.657346",
+  "next_steps": [
+    "Upload 10 static images via UI or API",
+    "Create ads",
+    "Compress videos to <4MB",
+    "Get board approval",
+    "Activate campaign"
+  ]
+}

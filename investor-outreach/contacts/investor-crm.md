@@ -1,17 +1,18 @@
 # Investor Pipeline Tracker
 
-> Last updated: 2026-04-06
+> Last updated: 2026-04-17
 
 ## Pipeline Summary
 
 | Stage | Count | Capital |
 |-------|-------|---------|
 | Prospect | 87 | - |
-| Contacted | 10 | - |
+| Contacted | 9 | - |
 | Meeting Scheduled | 0 | - |
-| Due Diligence | 0 | - |
+| Due Diligence | 1 | - |
 | Committed | 0 | - |
-| **Total** | **97** | **$0 / $500K** |
+| Pass | 2 | - |
+| **Total** | **99** | **$0 / $500K** |
 
 ### Prioritized Pipeline (generated 2026-04-05, full database scored)
 
@@ -31,10 +32,11 @@
 
 | Investor | Organization | Type | Status | Amount | Last Touch | LI Status | Next Action | Notes |
 |----------|-------------|------|--------|--------|------------|-----------|-------------|-------|
+| Tony Bash + Peter Braxton | MacArthur Strategic Capital | Impact | DD | - | 2026-04-17 | -- | Send follow-up (draft ready) | Met Mar 24, expressed interest. Anthony re-engaged Apr 11 (email + call). MacArthur checking internal capacity to co-invest/help fund raise. Follow-up draft created Apr 17: `drafts/macarthur-followup-2026-04-17.md`. Peter Braxton also intro to AHA Social Impact Fund & William Burns. [UNC-134](/UNC/issues/UNC-134) |
 | Marianne Wu | Congruent Ventures | VC | Pass | - | 2026-04-08 | -- | None — pass | Board Member & Investor. Apollo Step 1 sent 4/6. Replied 4/6: climate thesis, not a fit. Grace reply drafted 4/8 (draft ID: r6170193910360179612). |
-| Tyler Mayoras | Manna Tree | VC | Contacted | - | 2026-04-08 | Connected | DM1 ~Apr 15 | MD, Food & Beverage focus. Gmail sent 4/4, LI requested 4/6, connected 4/8. |
-| James Norman | Black Operator Ventures | VC | Contacted | - | 2026-04-06 | Requested | Await reply | MP, Black-led operator-focused fund. Gmail sent 4/4, LI requested 4/6. |
-| Jordan Gaspar | AF Ventures | VC | Contacted | - | 2026-04-06 | Requested | Await reply | GP, food/ag VC. Gmail sent 4/4, LI requested 4/6. |
+| Tyler Mayoras | Manna Tree | VC | Contacted | - | 2026-04-17 | Connected | Send DM1 (draft ready) | MD, Food & Beverage focus. Gmail sent 4/4, LI requested 4/6, connected 4/8. LinkedIn DM1 draft created Apr 17: `drafts/mayoras-linkedin-dm1-2026-04-17.md`. |
+| James Norman | Black Operator Ventures | VC | Contacted | - | 2026-04-17 | Requested | Send follow-up (draft ready) | MP, Black-led operator-focused fund. Gmail sent 4/4, LI requested 4/6. Follow-up draft created Apr 17: `drafts/norman-followup-2026-04-17.md`. |
+| Jordan Gaspar | AF Ventures | VC | Contacted | - | 2026-04-17 | Requested | Send follow-up (draft ready) | GP, food/ag VC. Gmail sent 4/4, LI requested 4/6. Follow-up draft created Apr 17: `drafts/gaspar-followup-2026-04-17.md`. |
 | Sonia Nagar | SNAK Venture Partners | VC | Contacted | - | 2026-04-06 | Requested | Await reply | Founder & MP, food-focused VC. Gmail sent 4/4, LI requested 4/6. |
 | Corey Vernon | Radicle Impact Partners | Impact | Contacted | - | 2026-04-06 | Requested | Await reply | Partner, impact investor. Gmail sent 4/4, LI requested 4/6. |
 | Rodney Clark | Aspect Consumer Partners | VC | Contacted | - | 2026-04-06 | Requested | Await reply | MP & Co-Founder, consumer-focused. Gmail sent 4/4, LI requested 4/6. |
