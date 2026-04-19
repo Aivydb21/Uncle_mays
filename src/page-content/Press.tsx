@@ -39,7 +39,7 @@ const storyAngles = [
     category: "Business & Entrepreneurship",
     angles: [
       "Chicago entrepreneur secures $2M SBA loan to bring a data-driven grocery model to Hyde Park",
-      "Chicago Booth MBA applies private equity rigor to neighborhood retail",
+      "Chicago Booth MBA applies M&A rigor to neighborhood retail",
       "Award-winning founder rewires how produce moves from farm to household",
     ],
   },
@@ -146,7 +146,7 @@ const Press = () => {
                 Uncle May&apos;s Produce is building the data and distribution infrastructure for culturally
                 connected urban food consumption. The produce box delivery business validates demand and builds
                 the customer data flywheel ahead of the Hyde Park flagship store opening. Founded by Anthony Ivy
-                (Chicago Booth MBA, PE and M&amp;A background), the company has assembled a leadership team with
+                (Chicago Booth MBA, M&amp;A background), the company has assembled a leadership team with
                 decades of experience across Amazon, BofA, Unilever, and P&amp;G, and secured SBA financing
                 for the flagship build-out.
               </p>
@@ -246,7 +246,7 @@ const Press = () => {
                     <li>2025 World Business Chicago Food Innovation Award Winner</li>
                     <li>SXSW 2026 Speaker</li>
                     <li>Chicago Booth MBA</li>
-                    <li>PE/M&amp;A Background</li>
+                    <li>M&amp;A Background</li>
                   </ul>
                 </div>
               </div>
