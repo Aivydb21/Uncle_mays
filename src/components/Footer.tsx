@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, MapPin, Instagram } from "lucide-react";
+import { Mail, MapPin, Instagram, Facebook } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Footer = () => {
@@ -53,6 +53,14 @@ export const Footer = () => {
                   Manage Subscription
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/press"
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  Press
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -81,6 +89,17 @@ export const Footer = () => {
                   className="text-background/70 hover:text-background transition-colors"
                 >
                   @unclemaysproduce
+                </a>
+              </li>
+              <li className="flex items-start gap-2">
+                <Facebook className="h-5 w-5 text-background/70 flex-shrink-0 mt-0.5" />
+                <a
+                  href="https://www.facebook.com/755316477673748"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-background/70 hover:text-background transition-colors"
+                >
+                  Uncle May's Produce
                 </a>
               </li>
             </ul>
