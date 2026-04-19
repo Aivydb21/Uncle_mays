@@ -27,41 +27,36 @@ const awards = [
 
 const keyFacts = [
   { label: "Founded", value: "2024" },
-  { label: "Flagship Location", value: "Hyde Park, Chicago (10,000 sq ft)" },
-  { label: "Year 1 Revenue Projection", value: "$6.3M ($629/sq ft)" },
-  { label: "Gross Margin (stabilized)", value: "35%" },
-  { label: "EBITDA Margin", value: "15.3%" },
-  { label: "10-Year Vision", value: "82 stores, $625M revenue" },
-  { label: "TAM", value: "$100B+ annual Black grocery spend" },
-  { label: "SBA Financing", value: "$2M (Busey Bank, conditionally approved)" },
+  { label: "Flagship Location", value: "Hyde Park, Chicago" },
+  { label: "Current Product", value: "Direct-to-consumer produce boxes" },
+  { label: "Long-Term Vision", value: "82-store national rollout" },
+  { label: "Market Focus", value: "Urban communities with strong cultural food identity" },
+  { label: "SBA Financing", value: "$2M SBA 7(a) loan secured" },
 ];
 
 const storyAngles = [
   {
-    audience: "Business Press",
-    outlets: "Crain's Chicago Business, Chicago Tribune",
+    category: "Business & Entrepreneurship",
     angles: [
-      "Chicago entrepreneur secures $2M SBA loan for Hyde Park flagship grocery",
-      "Booth MBA brings PE/M&A rigor to neighborhood retail",
-      "Award-winning model rewires the supply and demand story for Black food",
+      "Chicago entrepreneur secures $2M SBA loan to bring a data-driven grocery model to Hyde Park",
+      "Chicago Booth MBA applies private equity rigor to neighborhood retail",
+      "Award-winning founder rewires how produce moves from farm to household",
     ],
   },
   {
-    audience: "Black Business Press",
-    outlets: "Black Enterprise, Essence, The Root, Capital B",
+    category: "Food Systems & Community",
     angles: [
-      "First data and distribution platform built specifically for Black food consumption",
-      "SXSW speaker launches 10,000 sq ft flagship after proving demand with produce boxes",
-      "From PE to produce: how a Booth MBA is building a $625M grocery vision",
+      "First data and distribution platform connecting culturally aligned farmers to urban households",
+      "SXSW speaker launches Hyde Park flagship after validating demand with direct-to-consumer produce",
+      "Why the food desert framing misses the real opportunity: demand intelligence and distribution infrastructure",
     ],
   },
   {
-    audience: "Food and Retail Trade",
-    outlets: "Grocery Dive, Progressive Grocer, Civil Eats",
+    category: "Innovation & Technology",
     angles: [
-      "Distribution-first approach: connecting Black farmers to Black households before the doors open",
-      "35% gross margins in neighborhood format: a replicable unit economics model",
-      "TechRise Award winner reimagines grocery for underserved yet affluent communities",
+      "Distribution-first approach: building the customer data flywheel before the store doors open",
+      "TechRise Award winner applies technology and analytics to a category long overlooked by institutional capital",
+      "From SBA to produce boxes: a replicable financing model for independent community grocery",
     ],
   },
 ];
@@ -83,9 +78,9 @@ const Press = () => {
               Uncle May&apos;s Produce in the Media
             </h1>
             <p className="text-lg text-foreground/80 leading-relaxed max-w-2xl">
-              We&apos;re building the first data and distribution platform for Black food consumption, starting with
-              produce boxes and a 10,000 sq ft flagship in Chicago&apos;s Hyde Park. Resources for journalists and media
-              professionals are below.
+              We&apos;re building the first data and distribution platform for urban food consumption, starting with
+              produce boxes and a neighborhood grocery flagship in Chicago&apos;s Hyde Park. Resources for journalists
+              and media professionals are below.
             </p>
           </motion.div>
         </div>
@@ -133,7 +128,7 @@ const Press = () => {
         </div>
       </section>
 
-      {/* Company Boilerplate / Key Facts */}
+      {/* Company Overview */}
       <section className="py-16 md:py-20 bg-muted/30">
         <div className="container px-6">
           <div className="max-w-4xl mx-auto">
@@ -148,13 +143,12 @@ const Press = () => {
                 <h2 className="text-2xl md:text-3xl font-bold">Company Overview</h2>
               </div>
               <p className="text-foreground/70 mb-8 leading-relaxed">
-                Uncle May&apos;s Produce is the first data and distribution platform for Black food consumption.
-                The company operates neighborhood-format grocery stores (7,500 to 12,000 sq ft) targeting
-                historically Black American and culturally thriving urban communities. The produce box delivery
-                business validates demand and builds the customer data flywheel before the flagship store opens.
-                Founded by Anthony Ivy (Chicago Booth MBA, PE and M&amp;A background), the company has secured
-                a $2M SBA 7(a) loan, signed a letter of intent on the Hyde Park location, and assembled a
-                leadership team with decades of experience across Amazon, BofA, Unilever, and P&amp;G.
+                Uncle May&apos;s Produce is building the data and distribution infrastructure for culturally
+                connected urban food consumption. The produce box delivery business validates demand and builds
+                the customer data flywheel ahead of the Hyde Park flagship store opening. Founded by Anthony Ivy
+                (Chicago Booth MBA, PE and M&amp;A background), the company has assembled a leadership team with
+                decades of experience across Amazon, BofA, Unilever, and P&amp;G, and secured SBA financing
+                for the flagship build-out.
               </p>
 
               <div className="grid sm:grid-cols-2 gap-4">
@@ -194,8 +188,7 @@ const Press = () => {
                     transition={{ duration: 0.5, delay: i * 0.1 }}
                     className="bg-card rounded-xl p-6 border border-border/50 shadow-soft"
                   >
-                    <h3 className="font-bold text-lg mb-1">{section.audience}</h3>
-                    <p className="text-sm text-primary font-semibold mb-3">{section.outlets}</p>
+                    <h3 className="font-bold text-lg mb-3">{section.category}</h3>
                     <ul className="space-y-2">
                       {section.angles.map((angle, j) => (
                         <li key={j} className="flex items-start gap-2 text-sm text-foreground/75">
@@ -226,9 +219,9 @@ const Press = () => {
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold mb-4">Press Contact</h2>
                 <p className="text-foreground/70 mb-6 leading-relaxed">
-                  We&apos;re available for interviews, speaking engagements, expert commentary on Black food
-                  systems, SBA financing for grocery, and neighborhood retail innovation. High-res photos and
-                  additional materials are available on request.
+                  We&apos;re available for interviews, speaking engagements, and expert commentary on food systems,
+                  community retail, and SBA financing. High-res photos and additional materials are available on
+                  request.
                 </p>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
@@ -318,8 +311,8 @@ const Press = () => {
                   "Produce box demos",
                   "Store tours (upon flagship opening)",
                   "Thought leadership articles",
-                  "Expert commentary on Black food systems",
-                  "SBA financing for grocery (replicable model)",
+                  "Expert commentary on food systems",
+                  "SBA financing for independent grocery",
                   "Neighborhood retail innovation",
                 ].map((item, i) => (
                   <div key={i} className="bg-card rounded-lg p-4 border border-border/50 text-sm text-foreground/80">
