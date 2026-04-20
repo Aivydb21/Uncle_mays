@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { upsertContact, createCart } from "@/lib/mailchimp";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
@@ -82,6 +83,16 @@ export async function POST(req: NextRequest) {
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
+
+    // Non-blocking: upsert subscriber + create abandoned cart so Mailchimp
+    // Journey fires if the customer abandons the Stripe Checkout page.
+    if (email && firstName && lastName) {
+      upsertContact(email, firstName, lastName)
+        .catch((err) => console.error("Mailchimp upsertContact error (subscribe):", err));
+      const priceInDollars = (session.amount_total ?? 0) / 100;
+      createCart(session.id, email, firstName, lastName, product, priceInDollars)
+        .catch((err) => console.error("Mailchimp createCart error (subscribe):", err));
+    }
 
     return NextResponse.json({ url: session.url });
   } catch (err: unknown) {

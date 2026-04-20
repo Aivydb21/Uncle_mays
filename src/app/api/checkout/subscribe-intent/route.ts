@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { upsertContact, createCart } from "@/lib/mailchimp";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
@@ -77,7 +78,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Build metadata
-    const metadata: Record<string, string> = { product, priceId };
+    const metadata: Record<string, string> = { product, priceId, customer_email: email };
     if (firstName) metadata.firstName = firstName;
     if (lastName) metadata.lastName = lastName;
     if (phone) metadata.phone = phone;
@@ -131,6 +132,14 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Non-blocking: upsert subscriber + create abandoned cart so Mailchimp
+    // Journey fires if the customer abandons before completing payment.
+    upsertContact(email, firstName, lastName)
+      .catch((err) => console.error("Mailchimp upsertContact error (subscribe-intent):", err));
+    const priceInDollars = amount / 100;
+    createCart(paymentIntent.id, email, firstName, lastName, product, priceInDollars)
+      .catch((err) => console.error("Mailchimp createCart error (subscribe-intent):", err));
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,

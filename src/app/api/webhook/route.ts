@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { tagOrderCompleted, deleteCart } from "@/lib/mailchimp";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
@@ -173,7 +174,15 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // TODO: Additional fulfillment logic (send confirmation email, update order DB, notify ops)
+      // Non-blocking: mark order complete and remove the Mailchimp cart so the
+      // abandoned cart Journey does not fire for customers who already paid.
+      if (email && email !== "unknown") {
+        tagOrderCompleted(email)
+          .catch((err) => console.error("[WEBHOOK] Mailchimp tagOrderCompleted error:", err));
+        deleteCart(session.id)
+          .catch((err) => console.error("[WEBHOOK] Mailchimp deleteCart error:", err));
+      }
+
       break;
     }
 
@@ -250,6 +259,16 @@ export async function POST(req: NextRequest) {
       console.log(
         `[WEBHOOK] payment_intent.succeeded | pi=${intent.id} amount=${intent.amount} status=${intent.status}`
       );
+
+      // Non-blocking: clean up Mailchimp abandoned cart for subscribe-intent flow.
+      // customer_email is stored in metadata by /api/checkout/subscribe-intent.
+      const intentEmail = intent.metadata?.customer_email || intent.receipt_email;
+      if (intentEmail && intent.metadata?.firstPayment === "true") {
+        tagOrderCompleted(intentEmail)
+          .catch((err) => console.error("[WEBHOOK] Mailchimp tagOrderCompleted error (pi):", err));
+        deleteCart(intent.id)
+          .catch((err) => console.error("[WEBHOOK] Mailchimp deleteCart error (pi):", err));
+      }
       break;
     }
 
