@@ -271,11 +271,16 @@ export default function DeliveryPage() {
 
     // Read protein choices for family/community boxes
     let proteinChoices: ProteinId[] | undefined;
+    let additionalProteinChoices: ProteinId[] | undefined;
     if (product.proteinCount > 0 && typeof window !== "undefined") {
       try {
         const saved = sessionStorage.getItem(`unc-proteins-${slug}`);
         if (saved) {
           proteinChoices = JSON.parse(saved) as ProteinId[];
+        }
+        const savedAdditional = sessionStorage.getItem(`unc-additional-proteins-${slug}`);
+        if (savedAdditional) {
+          additionalProteinChoices = JSON.parse(savedAdditional) as ProteinId[];
         }
       } catch {
         // ignore
@@ -317,6 +322,7 @@ export default function DeliveryPage() {
           deliveryDate: fields.deliveryDate,
           deliveryWindow: fields.deliveryWindow,
           proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
+          additionalProteinChoices: additionalProteinChoices?.length ? additionalProteinChoices : undefined,
         }),
       });
 
@@ -350,10 +356,12 @@ export default function DeliveryPage() {
             deliveryDate: fields.deliveryDate,
             deliveryWindow: fields.deliveryWindow,
             proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
+            additionalProteinChoices: additionalProteinChoices?.length ? additionalProteinChoices : undefined,
           })
         );
         // Clear protein sessionStorage once saved
         sessionStorage.removeItem(`unc-proteins-${slug}`);
+        sessionStorage.removeItem(`unc-additional-proteins-${slug}`);
       }
 
       router.push(`/checkout/${slug}/payment`);
