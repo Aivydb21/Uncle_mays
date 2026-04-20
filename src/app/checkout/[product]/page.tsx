@@ -74,18 +74,31 @@ export default function CheckoutSummaryPage() {
   const isFirstOrderDiscount = "firstOrderPrice" in product && product.firstOrderPrice < product.price;
 
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
+  const [additionalProteins, setAdditionalProteins] = useState<ProteinId[]>([]);
   const [email, setEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
 
-  // Fire Meta Pixel ViewContent event on page load
+  // Fire Meta Pixel ViewContent + InitiateCheckout on page load
+  // Users arriving here came from a Meta ad routed directly to checkout, so both events apply.
   useEffect(() => {
-    if (typeof window !== "undefined" && (window as Window & { fbq?: (...args: unknown[]) => void }).fbq) {
-      (window as Window & { fbq: (...args: unknown[]) => void }).fbq("track", "ViewContent", {
+    const fbq = typeof window !== "undefined"
+      ? (window as Window & { fbq?: (...args: unknown[]) => void }).fbq
+      : undefined;
+    if (fbq) {
+      fbq("track", "ViewContent", {
         content_name: product.name,
         content_ids: [slug],
         content_type: "product",
         value: effectivePrice,
         currency: "USD",
+      });
+      fbq("track", "InitiateCheckout", {
+        content_name: product.name,
+        content_ids: [slug],
+        content_type: "product",
+        value: effectivePrice,
+        currency: "USD",
+        num_items: 1,
       });
     }
   }, [slug, product.name, effectivePrice]);
@@ -134,6 +147,11 @@ export default function CheckoutSummaryPage() {
         const parsed = JSON.parse(saved) as ProteinId[];
         setSelectedProteins(parsed);
       }
+      const savedAdditional = sessionStorage.getItem(`unc-additional-proteins-${slug}`);
+      if (savedAdditional) {
+        const parsed = JSON.parse(savedAdditional) as ProteinId[];
+        setAdditionalProteins(parsed);
+      }
     } catch {
       // ignore
     }
@@ -151,6 +169,31 @@ export default function CheckoutSummaryPage() {
       return next;
     });
   }
+
+  // Multi-select (checkboxes): toggle additional proteins on/off
+  function toggleAdditionalProtein(id: ProteinId) {
+    setAdditionalProteins((prev) => {
+      const next = prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id];
+      try {
+        sessionStorage.setItem(`unc-additional-proteins-${slug}`, JSON.stringify(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }
+
+  // Calculate additional protein cost
+  const additionalProteinCost =
+    "additionalProteinPricing" in product
+      ? additionalProteins.reduce((sum, id) => {
+          const pricing = product.additionalProteinPricing as Record<ProteinId, number>;
+          return sum + (pricing[id] || 0);
+        }, 0)
+      : 0;
+
+  // Total price including additional proteins
+  const totalPrice = effectivePrice + additionalProteinCost;
 
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
@@ -195,9 +238,14 @@ export default function CheckoutSummaryPage() {
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="text-3xl font-bold text-primary">${effectivePrice}</span>
+                <span className="text-3xl font-bold text-primary">${totalPrice}</span>
                 {isFirstOrderDiscount && (
-                  <div className="text-xs text-muted-foreground line-through">${product.price}</div>
+                  <div className="text-xs text-muted-foreground line-through">${product.price + additionalProteinCost}</div>
+                )}
+                {additionalProteinCost > 0 && (
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Box: ${effectivePrice} + Proteins: ${additionalProteinCost}
+                  </div>
                 )}
               </div>
             </div>
@@ -278,6 +326,55 @@ export default function CheckoutSummaryPage() {
               </div>
             </div>}
 
+            {/* Additional proteins section — only for boxes that allow it */}
+            {"additionalProteinAllowed" in product && product.additionalProteinAllowed && (
+              <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
+                  Add More Proteins — Optional
+                </h2>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Add 2nd or 3rd protein options to your box (+${18}–${24}). You can select up to 3 additional proteins.
+                </p>
+                <div className="space-y-2">
+                  {availableProteins
+                    .filter((opt) => !selectedProteins.includes(opt.id)) // Exclude already-selected included protein
+                    .map((opt) => {
+                      const selected = additionalProteins.includes(opt.id);
+                      const pricing = "additionalProteinPricing" in product
+                        ? (product.additionalProteinPricing as Record<ProteinId, number>)[opt.id]
+                        : 0;
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => toggleAdditionalProtein(opt.id)}
+                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium text-left transition-all ${
+                            selected
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
+                          }`}
+                        >
+                          {/* Checkbox indicator */}
+                          <span
+                            className={`w-5 h-5 rounded flex-shrink-0 border-2 flex items-center justify-center ${
+                              selected ? "border-primary bg-primary" : "border-muted-foreground/40"
+                            }`}
+                          >
+                            {selected && (
+                              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </span>
+                          <span className="flex-1">{opt.label}</span>
+                          <span className="text-muted-foreground font-normal">+${pricing}</span>
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+
             {/* Trust signals */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
               {[
@@ -314,9 +411,9 @@ export default function CheckoutSummaryPage() {
             {/* CTA */}
             <button
               onClick={() => {
-                // Persist effective price for downstream checkout steps
+                // Persist total price (base + additional proteins) for downstream checkout steps
                 try {
-                  sessionStorage.setItem(`unc-price-${slug}`, String(effectivePrice));
+                  sessionStorage.setItem(`unc-price-${slug}`, String(totalPrice));
                 } catch {
                   // ignore
                 }
