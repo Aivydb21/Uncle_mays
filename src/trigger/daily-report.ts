@@ -94,6 +94,109 @@ async function fetchMailchimpList(apiKey: string, listId: string) {
   return res.json();
 }
 
+async function fetchMetaCampaignStats(
+  accessToken: string,
+  campaignId: string
+): Promise<any> {
+  const baseUrl = "https://graph.facebook.com/v21.0";
+
+  // Fetch campaign details
+  const campaignFields = "id,name,status,daily_budget,effective_status,configured_status";
+  const campaignRes = await fetch(
+    `${baseUrl}/${campaignId}?fields=${campaignFields}&access_token=${accessToken}`
+  );
+  const campaign = await campaignRes.json();
+
+  // Fetch 24h insights
+  const insightsFields = [
+    "campaign_id",
+    "campaign_name",
+    "spend",
+    "impressions",
+    "reach",
+    "frequency",
+    "clicks",
+    "actions",
+    "cost_per_action_type",
+    "action_values",
+  ].join(",");
+
+  const insights24hRes = await fetch(
+    `${baseUrl}/${campaignId}/insights?fields=${insightsFields}&date_preset=yesterday&level=campaign&access_token=${accessToken}`
+  );
+  const insights24h = await insights24hRes.json();
+
+  // Fetch 7d insights
+  const insights7dRes = await fetch(
+    `${baseUrl}/${campaignId}/insights?fields=${insightsFields}&date_preset=last_7d&level=campaign&access_token=${accessToken}`
+  );
+  const insights7d = await insights7dRes.json();
+
+  return { campaign, insights24h, insights7d };
+}
+
+function extractActionValue(actions: any[] | undefined, actionType: string): number {
+  if (!actions) return 0;
+  const action = actions.find((a) => a.action_type === actionType);
+  return action ? parseInt(action.value, 10) : 0;
+}
+
+function formatMetaStats(data: any) {
+  const { campaign, insights24h, insights7d } = data;
+
+  const data24h = insights24h?.data?.[0] || {};
+  const data7d = insights7d?.data?.[0] || {};
+
+  const spend24h = parseFloat(data24h.spend || "0");
+  const impressions24h = parseInt(data24h.impressions || "0", 10);
+  const reach24h = parseInt(data24h.reach || "0", 10);
+  const clicks24h = parseInt(data24h.clicks || "0", 10);
+  const checkouts24h = extractActionValue(data24h.actions, "omni_initiated_checkout");
+  const purchases24h = extractActionValue(data24h.actions, "purchase");
+  const landingPageViews24h = extractActionValue(data24h.actions, "landing_page_view");
+
+  const spend7d = parseFloat(data7d.spend || "0");
+  const checkouts7d = extractActionValue(data7d.actions, "omni_initiated_checkout");
+
+  const cpa24h = checkouts24h > 0 ? spend24h / checkouts24h : 0;
+  const cpa7dAvg = checkouts7d > 0 ? spend7d / 7 / (checkouts7d / 7) : 0;
+
+  const campaignStatus = campaign.effective_status || "UNKNOWN";
+  const dailyBudget = parseFloat(campaign.daily_budget || "0") / 100;
+
+  const alerts: string[] = [];
+  if (campaignStatus !== "ACTIVE") {
+    alerts.push(`Campaign is ${campaignStatus}, not ACTIVE`);
+  }
+  if (spend24h === 0) {
+    alerts.push("No spend in last 24 hours");
+  }
+  if (cpa24h > 20 && checkouts24h > 0) {
+    alerts.push(`CPA $${cpa24h.toFixed(2)} exceeds target $20`);
+  }
+  if (spend24h > 0 && spend24h < dailyBudget * 0.5) {
+    alerts.push(`Underspending - only $${spend24h.toFixed(2)} of $${dailyBudget.toFixed(2)} daily budget`);
+  }
+
+  return {
+    campaignName: campaign.name || "Unknown",
+    campaignStatus,
+    dailyBudget,
+    spend24h,
+    impressions24h,
+    reach24h,
+    clicks24h,
+    checkouts24h,
+    purchases24h,
+    landingPageViews24h,
+    cpa24h,
+    spend7dAvg: spend7d / 7,
+    checkouts7dAvg: checkouts7d / 7,
+    cpa7dAvg,
+    alerts,
+  };
+}
+
 async function sendGmail(
   accessToken: string,
   to: string,
@@ -173,9 +276,10 @@ function buildReport(data: {
   mailchimpCampaigns: any;
   mailchimpReports: any[];
   mailchimpList: any;
+  metaStats?: any;
   date: string;
 }) {
-  const { apolloAccounts, apolloCampaigns, stripeBalance, stripeCharges, stripePayouts, mailchimpCampaigns, mailchimpReports, mailchimpList, date } = data;
+  const { apolloAccounts, apolloCampaigns, stripeBalance, stripeCharges, stripePayouts, mailchimpCampaigns, mailchimpReports, mailchimpList, metaStats, date } = data;
 
   // Apollo accounts table
   const accounts = apolloAccounts?.email_accounts || [];
@@ -318,12 +422,50 @@ ${payoutRows ? `
 </table>
 </div>
 
+${metaStats ? `
+<div class="section">
+<h2>Meta Ads - Subscription Launch</h2>
+<div style="background: ${metaStats.alerts.length > 0 ? '#fff3cd' : '#f0f7e6'}; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+  <div style="font-weight: 600; margin-bottom: 8px;">${metaStats.campaignName}</div>
+  <div style="font-size: 13px; color: #666;">
+    Status: <strong>${metaStats.campaignStatus}</strong> |
+    Daily Budget: <strong>$${metaStats.dailyBudget.toFixed(2)}</strong>
+  </div>
+  ${metaStats.alerts.length > 0 ? `
+  <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #ddd;">
+    <div style="font-weight: 600; color: #856404; margin-bottom: 4px;">⚠️ Alerts:</div>
+    ${metaStats.alerts.map((alert: string) => `<div style="font-size: 12px; color: #856404;">• ${alert}</div>`).join('')}
+  </div>
+  ` : ''}
+</div>
+
+<div>
+  <div class="metric"><div class="label">24h Spend</div><div class="value">$${metaStats.spend24h.toFixed(2)}</div></div>
+  <div class="metric"><div class="label">24h Impressions</div><div class="value">${metaStats.impressions24h.toLocaleString()}</div></div>
+  <div class="metric"><div class="label">24h Clicks</div><div class="value">${metaStats.clicks24h}</div></div>
+  <div class="metric"><div class="label">24h Checkouts</div><div class="value">${metaStats.checkouts24h}</div></div>
+</div>
+
+<div style="margin-top: 12px;">
+  <div class="metric"><div class="label">CPA (24h)</div><div class="value">$${metaStats.cpa24h.toFixed(2)}</div></div>
+  <div class="metric"><div class="label">CPA (7d avg)</div><div class="value">$${metaStats.cpa7dAvg.toFixed(2)}</div></div>
+  <div class="metric"><div class="label">7d Avg Spend/Day</div><div class="value">$${metaStats.spend7dAvg.toFixed(2)}</div></div>
+  <div class="metric"><div class="label">7d Avg Checkouts/Day</div><div class="value">${metaStats.checkouts7dAvg.toFixed(1)}</div></div>
+</div>
+
+<p style="font-size:13px;margin-top:16px;">
+  <a href="https://business.facebook.com/adsmanager/manage/campaigns?act=814877604473301&selected_campaign_ids=120243219649250762" target="_blank">View in Ads Manager →</a>
+</p>
+</div>
+` : ''}
+
 <div class="section">
 <h2>Action Items</h2>
 <ul>
   <li>Check Gmail for investor replies</li>
   <li>Draft 5-10 new personalized outreach emails</li>
   <li>Monitor warmup progress (Warmbox)</li>
+  ${metaStats && metaStats.alerts.length > 0 ? '<li><strong>Review Meta Ads Manager</strong> — campaign needs attention</li>' : ''}
 </ul>
 </div>
 
@@ -348,8 +490,10 @@ export const dailyReport = schedules.task({
     const gmailClientId = process.env.GMAIL_CLIENT_ID!;
     const gmailClientSecret = process.env.GMAIL_CLIENT_SECRET!;
     const gmailRefreshToken = process.env.GMAIL_REFRESH_TOKEN!;
+    const metaAccessToken = process.env.META_ACCESS_TOKEN;
     const reportEmail = process.env.REPORT_EMAIL || DAILY_REPORT_RECIPIENTS;
     const mailchimpListId = "2645503d11";
+    const metaCampaignId = "120243219649250762";
 
     const since48h = Math.floor(Date.now() / 1000) - 172800;
     const today = new Date().toLocaleDateString("en-US", {
@@ -380,6 +524,18 @@ export const dailyReport = schedules.task({
       ? await fetchMailchimpReports(mailchimpKey, sentCampaignIds)
       : [];
 
+    // Fetch Meta campaign stats (optional, won't break if Meta is down)
+    let metaStats: ReturnType<typeof formatMetaStats> | undefined = undefined;
+    if (metaAccessToken) {
+      try {
+        const metaData = await fetchMetaCampaignStats(metaAccessToken, metaCampaignId);
+        metaStats = formatMetaStats(metaData);
+      } catch (error) {
+        console.error("Failed to fetch Meta stats:", error);
+        // Continue without Meta stats rather than failing the whole report
+      }
+    }
+
     // Build HTML report
     const html = buildReport({
       apolloAccounts,
@@ -390,6 +546,7 @@ export const dailyReport = schedules.task({
       mailchimpCampaigns,
       mailchimpReports,
       mailchimpList,
+      metaStats,
       date: today,
     });
 
@@ -432,8 +589,10 @@ export const sendDailyReportNow = task({
     const gmailClientId = process.env.GMAIL_CLIENT_ID!;
     const gmailClientSecret = process.env.GMAIL_CLIENT_SECRET!;
     const gmailRefreshToken = process.env.GMAIL_REFRESH_TOKEN!;
+    const metaAccessToken = process.env.META_ACCESS_TOKEN;
     const reportEmail = process.env.REPORT_EMAIL || DAILY_REPORT_RECIPIENTS;
     const mailchimpListId = "2645503d11";
+    const metaCampaignId = "120243219649250762";
 
     const since48h = Math.floor(Date.now() / 1000) - 172800;
     const today = new Date().toLocaleDateString("en-US", {
@@ -462,6 +621,17 @@ export const sendDailyReportNow = task({
       ? await fetchMailchimpReports(mailchimpKey, sentCampaignIds)
       : [];
 
+    // Fetch Meta campaign stats (optional)
+    let metaStats: ReturnType<typeof formatMetaStats> | undefined = undefined;
+    if (metaAccessToken) {
+      try {
+        const metaData = await fetchMetaCampaignStats(metaAccessToken, metaCampaignId);
+        metaStats = formatMetaStats(metaData);
+      } catch (error) {
+        console.error("Failed to fetch Meta stats:", error);
+      }
+    }
+
     const html = buildReport({
       apolloAccounts,
       apolloCampaigns,
@@ -471,6 +641,7 @@ export const sendDailyReportNow = task({
       mailchimpCampaigns,
       mailchimpReports,
       mailchimpList,
+      metaStats,
       date: today,
     });
 
