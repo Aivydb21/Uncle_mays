@@ -390,6 +390,48 @@ export async function POST(req: NextRequest) {
       console.log(
         `[WEBHOOK] customer.subscription.deleted | sub=${subscription.id} customer=${customerId} canceledAt=${subscription.canceled_at}`
       );
+
+      const triggerKeyForCancellation = process.env.TRIGGER_SECRET_KEY;
+      if (triggerKeyForCancellation) {
+        fetch(`${TRIGGER_API_BASE}/send-subscription-cancellation-email/trigger`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${triggerKeyForCancellation}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            payload: {
+              subscriptionId: subscription.id,
+              customerId,
+              canceledAt: subscription.canceled_at,
+              accessEndsAt: subscription.items?.data?.[0]?.current_period_end ?? null,
+              productName: subscription.metadata?.product ?? null,
+            },
+            options: {
+              idempotencyKey: `sub-cancelled-${subscription.id}`,
+            },
+          }),
+        })
+          .then((r) => {
+            if (r.ok) {
+              console.log(
+                `[WEBHOOK] Queued cancellation confirmation email for sub ${subscription.id}`
+              );
+            } else {
+              r.json()
+                .catch(() => ({}))
+                .then((err) =>
+                  console.warn(
+                    "[WEBHOOK] Failed to queue cancellation confirmation email:",
+                    err
+                  )
+                );
+            }
+          })
+          .catch((e) =>
+            console.warn("[WEBHOOK] Error queuing cancellation confirmation email:", e)
+          );
+      }
       break;
     }
 
@@ -406,6 +448,54 @@ export async function POST(req: NextRequest) {
       console.log(
         `[WEBHOOK] customer.subscription.updated | sub=${subscription.id} customer=${customerId} status=${subscription.status}${previousStatus ? ` (was ${previousStatus})` : ""} plan=${subscription.metadata?.product ?? "unknown"}`
       );
+
+      // Send cancellation email when status transitions to canceled for the first time
+      if (subscription.status === "canceled" && previousStatus && previousStatus !== "canceled") {
+        const triggerKeyForCancellation = process.env.TRIGGER_SECRET_KEY;
+        if (triggerKeyForCancellation) {
+          fetch(`${TRIGGER_API_BASE}/send-subscription-cancellation-email/trigger`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${triggerKeyForCancellation}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              payload: {
+                subscriptionId: subscription.id,
+                customerId,
+                canceledAt: subscription.canceled_at,
+                accessEndsAt: subscription.items?.data?.[0]?.current_period_end ?? null,
+                productName: subscription.metadata?.product ?? null,
+              },
+              options: {
+                idempotencyKey: `sub-cancelled-${subscription.id}`,
+              },
+            }),
+          })
+            .then((r) => {
+              if (r.ok) {
+                console.log(
+                  `[WEBHOOK] Queued cancellation confirmation email for sub ${subscription.id} (updated->canceled)`
+                );
+              } else {
+                r.json()
+                  .catch(() => ({}))
+                  .then((err) =>
+                    console.warn(
+                      "[WEBHOOK] Failed to queue cancellation confirmation email (updated):",
+                      err
+                    )
+                  );
+              }
+            })
+            .catch((e) =>
+              console.warn(
+                "[WEBHOOK] Error queuing cancellation confirmation email (updated):",
+                e
+              )
+            );
+        }
+      }
       break;
     }
 
