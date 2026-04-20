@@ -48,14 +48,9 @@ export const Hero = () => {
             </div>
 
             {/* Delivery badge */}
-            <div className="inline-flex flex-col sm:flex-row sm:items-center sm:gap-3 gap-1 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
-              <span className="inline-flex items-center gap-2">
-                <Truck className="h-4 w-4 shrink-0" />
-                Now delivering in Chicago
-              </span>
-              <span className="text-primary/90 font-medium text-xs sm:text-sm sm:border-l sm:border-primary/20 sm:pl-3">
-                Wednesday delivery · Order by Tuesday night
-              </span>
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
+              <Truck className="h-4 w-4 shrink-0" />
+              <span>Now delivering in Chicago</span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">
@@ -70,7 +65,7 @@ export const Hero = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-xl md:text-2xl mb-8 text-foreground/80 font-light"
           >
-            Fresh, curated, Hyde Park delivery. Starter Box — normally $35.{" "}
+            Fresh, curated, home delivery. Starter Box — normally $35.{" "}
             First-order pricing ends this week.
           </motion.p>
 
