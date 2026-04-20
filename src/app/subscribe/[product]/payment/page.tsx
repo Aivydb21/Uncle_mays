@@ -105,9 +105,14 @@ function SubscriptionPaymentForm({
     setSubmitting(true);
     setPaymentError(null);
 
+    const returnUrl = typeof window !== "undefined"
+      ? `${window.location.origin}/order-success?subscription_id=${encodeURIComponent(subscriptionId)}&amount=${checkout.subPrice}&product=${encodeURIComponent(checkout.product)}&type=subscription`
+      : `https://unclemays.com/order-success?subscription_id=${encodeURIComponent(subscriptionId)}&type=subscription`;
+
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       redirect: "if_required",
+      confirmParams: { return_url: returnUrl },
     });
 
     if (error) {
@@ -144,6 +149,14 @@ function SubscriptionPaymentForm({
         </div>
       )}
 
+      {/* Cancel anytime badge — above CTA */}
+      <div className="mb-3 rounded-lg bg-green-50 border border-green-200 px-4 py-2.5 flex items-center gap-2">
+        <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        </svg>
+        <span className="text-sm text-green-800 font-medium">Cancel anytime, no questions asked</span>
+      </div>
+
       <button
         type="submit"
         disabled={!stripe || !elements || submitting}
@@ -151,8 +164,24 @@ function SubscriptionPaymentForm({
       >
         {submitting
           ? "Processing…"
-          : `Subscribe — $${checkout.subPrice}/wk`}
+          : `Start my subscription — $${checkout.subPrice}/wk`}
       </button>
+
+      {/* Trust signals */}
+      <div className="mt-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="text-sm text-foreground/75">Love your first box or we&apos;ll make it right</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="text-sm text-foreground/75">$30/week · Pause or cancel anytime in your account</span>
+        </div>
+      </div>
 
       {/* Security badge */}
       <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
@@ -405,7 +434,12 @@ export default function SubscribePaymentPage() {
                   <span>Weekly Total</span>
                   <span className="text-primary">${checkout.subPrice}/wk</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Cancel anytime. No commitment.</p>
+                <p className="text-xs text-muted-foreground mt-1">Billed weekly · Cancel anytime</p>
+              </div>
+
+              {/* First-delivery guarantee */}
+              <div className="rounded-lg bg-green-50 border border-green-200 px-3 py-2 mb-3">
+                <p className="text-xs text-green-800 font-medium">Love your first box or we&apos;ll make it right.</p>
               </div>
 
               <div className="text-xs text-muted-foreground space-y-1">
