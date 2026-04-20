@@ -393,44 +393,63 @@ export async function POST(req: NextRequest) {
 
       const triggerKeyForCancellation = process.env.TRIGGER_SECRET_KEY;
       if (triggerKeyForCancellation) {
-        fetch(`${TRIGGER_API_BASE}/send-subscription-cancellation-email/trigger`, {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${triggerKeyForCancellation}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            payload: {
-              subscriptionId: subscription.id,
-              customerId,
-              canceledAt: subscription.canceled_at,
-              accessEndsAt: subscription.items?.data?.[0]?.current_period_end ?? null,
-              productName: subscription.metadata?.product ?? null,
+        // Resolve customer email now so the worker task doesn't need STRIPE_API_KEY
+        let cancellationEmail: string | null = null;
+        let cancellationName: string | null = null;
+        try {
+          const customer = await stripe.customers.retrieve(customerId);
+          if (customer && !("deleted" in customer)) {
+            cancellationEmail = customer.email ?? null;
+            cancellationName = customer.name ?? null;
+          }
+        } catch (e) {
+          console.warn(`[WEBHOOK] Could not retrieve customer ${customerId} for cancellation email:`, e);
+        }
+
+        if (cancellationEmail) {
+          fetch(`${TRIGGER_API_BASE}/send-subscription-cancellation-email/trigger`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${triggerKeyForCancellation}`,
+              "Content-Type": "application/json",
             },
-            options: {
-              idempotencyKey: `sub-cancelled-${subscription.id}`,
-            },
-          }),
-        })
-          .then((r) => {
-            if (r.ok) {
-              console.log(
-                `[WEBHOOK] Queued cancellation confirmation email for sub ${subscription.id}`
-              );
-            } else {
-              r.json()
-                .catch(() => ({}))
-                .then((err) =>
-                  console.warn(
-                    "[WEBHOOK] Failed to queue cancellation confirmation email:",
-                    err
-                  )
-                );
-            }
+            body: JSON.stringify({
+              payload: {
+                subscriptionId: subscription.id,
+                customerId,
+                email: cancellationEmail,
+                customerName: cancellationName,
+                canceledAt: subscription.canceled_at,
+                accessEndsAt: subscription.items?.data?.[0]?.current_period_end ?? null,
+                productName: subscription.metadata?.product ?? null,
+              },
+              options: {
+                idempotencyKey: `sub-cancelled-${subscription.id}`,
+              },
+            }),
           })
-          .catch((e) =>
-            console.warn("[WEBHOOK] Error queuing cancellation confirmation email:", e)
-          );
+            .then((r) => {
+              if (r.ok) {
+                console.log(
+                  `[WEBHOOK] Queued cancellation confirmation email for sub ${subscription.id} email=${cancellationEmail}`
+                );
+              } else {
+                r.json()
+                  .catch(() => ({}))
+                  .then((err) =>
+                    console.warn(
+                      "[WEBHOOK] Failed to queue cancellation confirmation email:",
+                      err
+                    )
+                  );
+              }
+            })
+            .catch((e) =>
+              console.warn("[WEBHOOK] Error queuing cancellation confirmation email:", e)
+            );
+        } else {
+          console.warn(`[WEBHOOK] No email for customer ${customerId} — skipping cancellation email for sub ${subscription.id}`);
+        }
       }
       break;
     }
@@ -453,6 +472,22 @@ export async function POST(req: NextRequest) {
       if (subscription.status === "canceled" && previousStatus && previousStatus !== "canceled") {
         const triggerKeyForCancellation = process.env.TRIGGER_SECRET_KEY;
         if (triggerKeyForCancellation) {
+          // Resolve customer email now so the worker task doesn't need STRIPE_API_KEY
+          let cancellationEmail: string | null = null;
+          let cancellationName: string | null = null;
+          try {
+            const customer = await stripe.customers.retrieve(customerId);
+            if (customer && !("deleted" in customer)) {
+              cancellationEmail = customer.email ?? null;
+              cancellationName = customer.name ?? null;
+            }
+          } catch (e) {
+            console.warn(`[WEBHOOK] Could not retrieve customer ${customerId} for cancellation email (updated):`, e);
+          }
+
+          if (!cancellationEmail) {
+            console.warn(`[WEBHOOK] No email for customer ${customerId} — skipping cancellation email for sub ${subscription.id} (updated->canceled)`);
+          } else {
           fetch(`${TRIGGER_API_BASE}/send-subscription-cancellation-email/trigger`, {
             method: "POST",
             headers: {
@@ -463,6 +498,8 @@ export async function POST(req: NextRequest) {
               payload: {
                 subscriptionId: subscription.id,
                 customerId,
+                email: cancellationEmail,
+                customerName: cancellationName,
                 canceledAt: subscription.canceled_at,
                 accessEndsAt: subscription.items?.data?.[0]?.current_period_end ?? null,
                 productName: subscription.metadata?.product ?? null,
@@ -475,7 +512,7 @@ export async function POST(req: NextRequest) {
             .then((r) => {
               if (r.ok) {
                 console.log(
-                  `[WEBHOOK] Queued cancellation confirmation email for sub ${subscription.id} (updated->canceled)`
+                  `[WEBHOOK] Queued cancellation confirmation email for sub ${subscription.id} (updated->canceled) email=${cancellationEmail}`
                 );
               } else {
                 r.json()
@@ -494,8 +531,9 @@ export async function POST(req: NextRequest) {
                 e
               )
             );
-        }
-      }
+          } // end else (has email)
+        } // end if (triggerKeyForCancellation)
+      } // end if (status === canceled)
       break;
     }
 
