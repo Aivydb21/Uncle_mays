@@ -78,10 +78,19 @@ export default function CheckoutSummaryPage() {
   const [email, setEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
 
-  // Fire Meta Pixel ViewContent + InitiateCheckout on page load.
-  // Users arriving here came from a Meta ad routed directly to checkout, so both events apply.
-  // Retry once after 2s in case the Pixel script loads asynchronously after first render.
+  // Fire Meta Pixel ViewContent + InitiateCheckout on page load (client-side).
+  // Also fire server-side CAPI events to bypass ITP/ad blockers for better attribution.
+  // Retry browser pixel once after 2s in case the Pixel script loads asynchronously.
   useEffect(() => {
+    // Server-side CAPI call — fire once, non-blocking
+    fetch("/api/capi/view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug, contentName: product.name, value: effectivePrice }),
+    }).catch(() => {
+      // Never block checkout for CAPI failures
+    });
+
     function firePixelEvents() {
       const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
       if (!fbq) return false;

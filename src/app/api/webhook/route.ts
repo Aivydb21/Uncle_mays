@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { tagOrderCompleted, deleteCart } from "@/lib/mailchimp";
+import { sendCapiEvent } from "@/lib/meta-capi";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
@@ -111,6 +112,25 @@ export async function POST(req: NextRequest) {
         ],
         clientId: customerId || undefined,
       });
+
+      // Fire CAPI Purchase server-side (bypasses ITP/ad blockers, critical for Meta attribution)
+      sendCapiEvent({
+        eventName: "Purchase",
+        eventSourceUrl: `https://unclemays.com/order-success`,
+        userData: {
+          email: email !== "unknown" ? email : undefined,
+          phone: phone || undefined,
+        },
+        customData: {
+          value: amountInDollars,
+          currency: "USD",
+          content_ids: [productId],
+          content_name: productName,
+          content_type: "product",
+          order_id: session.id,
+        },
+        eventId: `purchase-${session.id}`,
+      }).catch((err) => console.error("[CAPI] Purchase (checkout.session.completed) error:", err));
 
       // Trigger SMS confirmation if phone number and delivery date are available
       // The session metadata should contain the checkout session ID from our local store
@@ -272,6 +292,26 @@ export async function POST(req: NextRequest) {
           .catch((err) => console.error("[WEBHOOK] Mailchimp tagOrderCompleted error (pi):", err));
         deleteCart(intent.id)
           .catch((err) => console.error("[WEBHOOK] Mailchimp deleteCart error (pi):", err));
+
+        // Fire CAPI Purchase for subscription first payment
+        const intentProduct = intent.metadata?.product || "subscription";
+        sendCapiEvent({
+          eventName: "Purchase",
+          eventSourceUrl: `https://unclemays.com/order-success`,
+          userData: {
+            email: intentEmail || undefined,
+            phone: intent.metadata?.phone || undefined,
+          },
+          customData: {
+            value: intent.amount / 100,
+            currency: "USD",
+            content_ids: [intentProduct],
+            content_name: intentProduct,
+            content_type: "product",
+            order_id: intent.id,
+          },
+          eventId: `purchase-sub-${intent.id}`,
+        }).catch((err) => console.error("[CAPI] Purchase (payment_intent.succeeded) error:", err));
       }
       break;
     }

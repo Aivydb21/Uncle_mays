@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { upsertContact, createCart } from "@/lib/mailchimp";
+import { sendCapiEvent } from "@/lib/meta-capi";
 
 // Subscription Price IDs (weekly, 10% discount vs one-time)
 const SUB_PRICE_MAP: Record<string, string> = {
@@ -175,6 +176,32 @@ export async function POST(req: NextRequest) {
     const priceInDollars = paymentIntent.amount / 100;
     createCart(paymentIntent.id, email, firstName, lastName, product, priceInDollars)
       .catch((err) => console.error("Mailchimp createCart error (subscribe-intent):", err));
+
+    // Fire CAPI InitiateCheckout server-side for subscription (bypasses ITP/ad blockers)
+    const clientIp =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "";
+    const userAgent = req.headers.get("user-agent") || "";
+    const referer = req.headers.get("referer") || "";
+    sendCapiEvent({
+      eventName: "InitiateCheckout",
+      eventSourceUrl: referer || `https://unclemays.com/subscribe/${product}/payment`,
+      userData: {
+        email,
+        phone,
+        client_ip_address: clientIp,
+        client_user_agent: userAgent,
+      },
+      customData: {
+        content_ids: [product],
+        content_type: "product",
+        value: priceInDollars,
+        currency: "USD",
+        num_items: 1,
+      },
+      eventId: `initiate-sub-${subscription.id}`,
+    }).catch((err) => console.error("[CAPI] InitiateCheckout (subscribe-intent) error:", err));
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
