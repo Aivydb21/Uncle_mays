@@ -12,6 +12,13 @@ import {
 } from "@stripe/react-stripe-js";
 import { PRODUCTS, type ProductSlug } from "@/lib/products";
 
+declare global {
+  interface Window {
+    fbq: (...args: unknown[]) => void;
+    gtag: (...args: unknown[]) => void;
+  }
+}
+
 // Load Stripe once outside component to avoid recreating on renders
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -220,6 +227,32 @@ export default function SubscribePaymentPage() {
         }
         setClientSecret(json.clientSecret);
         setSubscriptionId(json.subscriptionId);
+
+        // Fire Meta Pixel InitiateCheckout — subscription intent created, payment form loading
+        try {
+          if (typeof window !== "undefined") {
+            const product = data.product;
+            const value = data.subPrice;
+            if (window.fbq) {
+              window.fbq("track", "InitiateCheckout", {
+                content_ids: [product],
+                content_type: "product",
+                value,
+                currency: "USD",
+                num_items: 1,
+              });
+            }
+            if (window.gtag) {
+              window.gtag("event", "begin_checkout", {
+                currency: "USD",
+                value,
+                items: [{ item_id: product, item_name: data.productName, price: value, quantity: 1 }],
+              });
+            }
+          }
+        } catch {
+          // Never block checkout for tracking failures
+        }
       } catch {
         setIntentError("Network error. Please check your connection and try again.");
       } finally {
