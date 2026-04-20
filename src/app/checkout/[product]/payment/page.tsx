@@ -81,11 +81,9 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
 // Inner form — must live inside <Elements>
 function PaymentForm({
   checkout,
-  subscriptionId,
   onSuccess,
 }: {
   checkout: StoredCheckout;
-  subscriptionId: string | null;
   onSuccess: () => void;
 }) {
   const stripe = useStripe();
@@ -138,11 +136,7 @@ function PaymentForm({
       }
 
       onSuccess();
-      if (subscriptionId) {
-        router.push(`/order-success?sub=${encodeURIComponent(subscriptionId)}&product=${encodeURIComponent(checkout.product)}`);
-      } else {
-        router.push(`/order-success?pi=${encodeURIComponent(paymentIntent.id)}&amount=${checkout.price}&product=${encodeURIComponent(checkout.product)}`);
-      }
+      router.push(`/order-success?pi=${encodeURIComponent(paymentIntent.id)}&amount=${checkout.price}&product=${encodeURIComponent(checkout.product)}`);
     } else {
       setPaymentError("Something went wrong. Please try again.");
       setSubmitting(false);
@@ -219,7 +213,6 @@ export default function PaymentPage() {
 
   const [checkout, setCheckout] = useState<StoredCheckout | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
   const [intentError, setIntentError] = useState<string | null>(null);
   const [loadingIntent, setLoadingIntent] = useState(true);
   const [paymentComplete, setPaymentComplete] = useState(false);
@@ -237,7 +230,7 @@ export default function PaymentPage() {
           });
         } catch { /* ignore */ }
 
-        const res = await fetch("/api/checkout/subscribe-intent", {
+        const res = await fetch("/api/checkout/intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -247,8 +240,7 @@ export default function PaymentPage() {
             lastName: data.lastName,
             phone: data.phone,
             address: data.address,
-            deliveryNotes: data.deliveryNotes,
-            proteinChoices: data.proteinChoices,
+            proteins: data.proteinChoices,
             additionalProteins: data.additionalProteinChoices,
             ...utms,
           }),
@@ -259,7 +251,6 @@ export default function PaymentPage() {
           return;
         }
         setClientSecret(json.clientSecret);
-        setSubscriptionId(json.subscriptionId ?? null);
       } catch {
         setIntentError("Network error. Please check your connection and try again.");
       } finally {
@@ -383,7 +374,6 @@ export default function PaymentPage() {
                 >
                   <PaymentForm
                     checkout={checkout}
-                    subscriptionId={subscriptionId}
                     onSuccess={() => setPaymentComplete(true)}
                   />
                 </Elements>

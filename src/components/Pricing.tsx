@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getUTMParams } from "@/lib/utm";
 
 declare global {
   interface Window {
@@ -86,12 +85,11 @@ const plans = [
 export const Pricing = () => {
   const searchParams = useSearchParams();
   const [isSubscription, setIsSubscription] = useState(
-    searchParams.get("mode") !== "one-time"
+    searchParams.get("mode") === "subscription"
   );
-  const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleOrder = async (plan: typeof plans[0]) => {
+  const handleOrder = (plan: typeof plans[0]) => {
     // Extract price value from string (e.g., "$35" -> 35)
     const price = parseFloat(isSubscription ? plan.subPrice.replace('$', '') : plan.oneTimePrice.replace('$', ''));
 
@@ -124,38 +122,8 @@ export const Pricing = () => {
     if (isSubscription) {
       router.push(`/subscribe/${plan.checkoutSlug}`);
     } else {
-      // One-time purchase: Use Stripe Checkout Sessions (hosted)
-      setCheckoutLoading(plan.checkoutSlug);
-
-      try {
-        // Get UTM parameters for campaign attribution
-        const utmParams = getUTMParams();
-
-        const response = await fetch("/api/checkout/hosted", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            product: plan.checkoutSlug,
-            ...utmParams
-          }),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to create checkout session");
-        }
-
-        const { url } = await response.json();
-
-        if (url) {
-          window.location.href = url;
-        } else {
-          throw new Error("No checkout URL returned");
-        }
-      } catch (error) {
-        console.error("Checkout error:", error);
-        alert("Failed to start checkout. Please try again.");
-        setCheckoutLoading(null);
-      }
+      // One-time purchase: use embedded Stripe Elements checkout
+      router.push(`/checkout/${plan.checkoutSlug}`);
     }
   };
 
@@ -278,8 +246,7 @@ export const Pricing = () => {
                     e.stopPropagation();
                     handleOrder(plan);
                   }}
-                  disabled={checkoutLoading === plan.checkoutSlug}
-                  className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${
+                  className={`w-full inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-base font-semibold h-12 px-6 py-3 transition-all duration-300 ${
                     plan.popular
                       ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-medium"
                       : "border-2 border-primary bg-background text-primary hover:bg-primary hover:text-primary-foreground shadow-soft"
@@ -287,9 +254,7 @@ export const Pricing = () => {
                   style={{ cursor: "pointer", zIndex: 9999, position: "relative" }}
                 >
                   <span className="text-center">
-                    {checkoutLoading === plan.checkoutSlug
-                      ? "Loading..."
-                      : isSubscription
+                    {isSubscription
                       ? `Subscribe — ${plan.subPrice}/wk`
                       : `Order Now — ${plan.oneTimePrice}`}
                   </span>
