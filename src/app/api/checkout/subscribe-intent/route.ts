@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { upsertContact, createCart } from "@/lib/mailchimp";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
-
 // Subscription Price IDs (weekly, 10% discount vs one-time)
 const SUB_PRICE_MAP: Record<string, string> = {
   starter: process.env.STRIPE_STARTER_SUB_PRICE_ID || "",
@@ -19,6 +17,7 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const {
       product,

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
-
 // Map product slugs to amounts in cents (regular price)
 const AMOUNT_MAP: Record<string, number> = {
   starter: 3500,
@@ -15,20 +13,39 @@ const FIRST_ORDER_AMOUNT_MAP: Record<string, number> = {
   starter: 3000, // $30 first-order price (regular $35)
 };
 
+// Additional protein pricing in cents (10-13% markup over base protein costs)
+const ADDITIONAL_PROTEIN_PRICING: Record<string, number> = {
+  chicken: 2000,
+  "pork-chops": 1800,
+  "beef-short-ribs": 2400,
+  salmon: 2200,
+};
+
 export async function POST(req: NextRequest) {
   try {
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
     }
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const { product, email, firstName, lastName, phone, address, proteins, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await req.json();
+    const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await req.json();
 
     // Apply first-order discount for eligible products (e.g. starter box)
     const isFirstOrder = product in FIRST_ORDER_AMOUNT_MAP;
-    const amount = isFirstOrder ? FIRST_ORDER_AMOUNT_MAP[product] : AMOUNT_MAP[product];
+    let amount = isFirstOrder ? FIRST_ORDER_AMOUNT_MAP[product] : AMOUNT_MAP[product];
 
     if (!amount) {
       return NextResponse.json({ error: "Unknown product" }, { status: 400 });
+    }
+
+    // Add additional protein costs to the total amount
+    if (Array.isArray(additionalProteins) && additionalProteins.length > 0) {
+      for (const proteinId of additionalProteins) {
+        const proteinCost = ADDITIONAL_PROTEIN_PRICING[proteinId];
+        if (proteinCost) {
+          amount += proteinCost;
+        }
+      }
     }
 
     // Look up or create Stripe customer with shipping address and phone
@@ -96,6 +113,9 @@ export async function POST(req: NextRequest) {
         ...(isFirstOrder ? { first_order_discount: "true" } : {}),
         ...(Array.isArray(proteins) && proteins.length > 0
           ? { protein_selections: proteins.join(", ") }
+          : {}),
+        ...(Array.isArray(additionalProteins) && additionalProteins.length > 0
+          ? { additional_protein_selections: additionalProteins.join(", ") }
           : {}),
         ...(utm_source ? { utm_source } : {}),
         ...(utm_medium ? { utm_medium } : {}),

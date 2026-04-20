@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.error("STRIPE_SECRET_KEY is not set");
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 // Map product slugs to Stripe Price IDs (one-time prices)
 const PRICE_MAP: Record<string, string> = {
@@ -22,6 +17,7 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const { product, email } = await req.json();
     const priceId = PRICE_MAP[product];
