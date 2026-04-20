@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getUTMParams } from "@/lib/utm";
 
 declare global {
@@ -84,7 +84,10 @@ const plans = [
 ];
 
 export const Pricing = () => {
-  const [isSubscription, setIsSubscription] = useState(true);
+  const searchParams = useSearchParams();
+  const [isSubscription, setIsSubscription] = useState(
+    searchParams.get("mode") !== "one-time"
+  );
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const router = useRouter();
 

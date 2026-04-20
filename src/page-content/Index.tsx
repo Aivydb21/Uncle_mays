@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { motion } from "framer-motion";
 import { Users, Instagram, ShoppingBag, Bell, Package, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,9 @@ const Index = () => {
       <Hero />
 
       {/* 6. PRODUCT / BOXES — moved above fold to reduce scroll-to-order distance */}
-      <Pricing />
+      <Suspense>
+        <Pricing />
+      </Suspense>
 
       {/* 2. HOW IT WORKS — Live ordering flow */}
       <section className="py-24 bg-background">
