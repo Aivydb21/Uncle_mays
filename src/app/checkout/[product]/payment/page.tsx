@@ -213,7 +213,7 @@ export default function PaymentPage() {
           });
         } catch { /* ignore */ }
 
-        const res = await fetch("/api/checkout/subscribe-intent", {
+        const res = await fetch("/api/checkout/intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -224,7 +224,7 @@ export default function PaymentPage() {
             phone: data.phone,
             address: data.address,
             deliveryNotes: data.deliveryNotes,
-            proteinChoices: data.proteinChoices,
+            proteins: data.proteinChoices,
             additionalProteins: data.additionalProteinChoices,
             ...utms,
           }),
