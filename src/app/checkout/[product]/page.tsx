@@ -71,7 +71,7 @@ export default function CheckoutSummaryPage() {
 
   // First-order pricing: starter box gets $30 instead of $35
   const effectivePrice = "firstOrderPrice" in product ? product.firstOrderPrice : product.price;
-  const isFirstOrderDiscount = "firstOrderPrice" in product && product.firstOrderPrice < product.price;
+  const isFirstOrderDiscount: boolean = "firstOrderPrice" in product && (product as { firstOrderPrice: number; price: number }).firstOrderPrice < product.price;
 
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
   const [additionalProteins, setAdditionalProteins] = useState<ProteinId[]>([]);
