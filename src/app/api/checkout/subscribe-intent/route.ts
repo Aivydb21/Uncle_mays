@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
       address,
       deliveryNotes,
       proteinChoices,
+      additionalProteins,
       utm_source,
       utm_medium,
       utm_campaign,
@@ -44,16 +45,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get price details to know the amount
-    const price = await stripe.prices.retrieve(priceId);
-    const amount = price.unit_amount || 0;
-
     // Look up or create customer
     let customerId: string;
     if (email) {
       const existingCustomers = await stripe.customers.list({ email, limit: 1 });
       if (existingCustomers.data.length > 0) {
         customerId = existingCustomers.data[0].id;
+        // Update customer with latest address/phone
+        if (address || phone) {
+          await stripe.customers.update(customerId, {
+            name: `${firstName} ${lastName}`.trim(),
+            phone: phone || undefined,
+            address: address
+              ? {
+                  line1: address.street,
+                  line2: address.apt || undefined,
+                  city: address.city,
+                  state: address.state,
+                  postal_code: address.zip,
+                  country: "US",
+                }
+              : undefined,
+          });
+        }
       } else {
         const customer = await stripe.customers.create({
           email,
@@ -77,7 +91,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Build metadata
-    const metadata: Record<string, string> = { product, priceId, customer_email: email };
+    const metadata: Record<string, string> = { product, customer_email: email };
     if (firstName) metadata.firstName = firstName;
     if (lastName) metadata.lastName = lastName;
     if (phone) metadata.phone = phone;
@@ -93,38 +107,42 @@ export async function POST(req: NextRequest) {
         .join(", ");
     }
     if (deliveryNotes) metadata.deliveryNotes = deliveryNotes;
-    if (proteinChoices?.length) metadata.proteinChoices = proteinChoices.join(", ");
+    if (Array.isArray(proteinChoices) && proteinChoices.length) {
+      metadata.proteinChoices = proteinChoices.join(", ");
+    }
+    if (Array.isArray(additionalProteins) && additionalProteins.length) {
+      metadata.additionalProteins = additionalProteins.join(", ");
+    }
     if (utm_source) metadata.utm_source = utm_source;
     if (utm_medium) metadata.utm_medium = utm_medium;
     if (utm_campaign) metadata.utm_campaign = utm_campaign;
     if (utm_content) metadata.utm_content = utm_content;
     if (utm_term) metadata.utm_term = utm_term;
 
-    // Create subscription - will be incomplete until first payment succeeds
+    // Create subscription with expanded invoice PaymentIntent.
+    //
+    // CRITICAL: expand "latest_invoice.payment_intent" so we can return its
+    // client_secret directly. This is the ONLY PaymentIntent that will mark
+    // the invoice paid and activate the subscription. Creating a separate
+    // PaymentIntent here (previous bug) caused charges to succeed while the
+    // subscription invoice remained unpaid → incomplete_expired.
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: priceId }],
       payment_behavior: "default_incomplete",
       payment_settings: { save_default_payment_method: "on_subscription" },
+      expand: ["latest_invoice.payment_intent"],
       metadata,
     });
 
-    // Create a manual PaymentIntent for the first payment
-    const paymentIntent = await stripe.paymentIntents.create({
-      customer: customerId,
-      amount,
-      currency: "usd",
-      automatic_payment_methods: { enabled: true },
-      setup_future_usage: "off_session",
-      metadata: {
-        ...metadata,
-        subscriptionId: subscription.id,
-        firstPayment: "true",
-      },
-    });
+    // latest_invoice.payment_intent is typed as string in the SDK (unexpanded),
+    // but at runtime after expand it is a full PaymentIntent object.
+    const invoice = subscription.latest_invoice as Stripe.Invoice & {
+      payment_intent?: Stripe.PaymentIntent | null;
+    };
+    const paymentIntent = invoice?.payment_intent ?? null;
 
-    if (!paymentIntent.client_secret) {
-      // Clean up subscription if payment intent creation failed
+    if (!paymentIntent?.client_secret) {
       await stripe.subscriptions.cancel(subscription.id);
       return NextResponse.json(
         { error: "Could not initialize subscription payment" },
@@ -136,7 +154,7 @@ export async function POST(req: NextRequest) {
     // Journey fires if the customer abandons before completing payment.
     upsertContact(email, firstName, lastName)
       .catch((err) => console.error("Mailchimp upsertContact error (subscribe-intent):", err));
-    const priceInDollars = amount / 100;
+    const priceInDollars = paymentIntent.amount / 100;
     createCart(paymentIntent.id, email, firstName, lastName, product, priceInDollars)
       .catch((err) => console.error("Mailchimp createCart error (subscribe-intent):", err));
 

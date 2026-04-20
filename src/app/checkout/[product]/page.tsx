@@ -78,13 +78,13 @@ export default function CheckoutSummaryPage() {
   const [email, setEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
 
-  // Fire Meta Pixel ViewContent + InitiateCheckout on page load
+  // Fire Meta Pixel ViewContent + InitiateCheckout on page load.
   // Users arriving here came from a Meta ad routed directly to checkout, so both events apply.
+  // Retry once after 2s in case the Pixel script loads asynchronously after first render.
   useEffect(() => {
-    const fbq = typeof window !== "undefined"
-      ? (window as Window & { fbq?: (...args: unknown[]) => void }).fbq
-      : undefined;
-    if (fbq) {
+    function firePixelEvents() {
+      const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
+      if (!fbq) return false;
       fbq("track", "ViewContent", {
         content_name: product.name,
         content_ids: [slug],
@@ -100,6 +100,12 @@ export default function CheckoutSummaryPage() {
         currency: "USD",
         num_items: 1,
       });
+      return true;
+    }
+
+    if (!firePixelEvents()) {
+      const timer = setTimeout(firePixelEvents, 2000);
+      return () => clearTimeout(timer);
     }
   }, [slug, product.name, effectivePrice]);
 
