@@ -323,8 +323,13 @@ export async function POST(req: NextRequest) {
 
     case "payment_intent.succeeded": {
       const intent = event.data.object as Stripe.PaymentIntent;
+      const intentRaw = intent as unknown as { invoice?: string | { id?: string } | null };
+      const intentInvoice =
+        typeof intentRaw.invoice === "string"
+          ? intentRaw.invoice
+          : (intentRaw.invoice as { id?: string } | null)?.id ?? null;
       console.log(
-        `[WEBHOOK] payment_intent.succeeded | pi=${intent.id} amount=${intent.amount} status=${intent.status}`
+        `[WEBHOOK] payment_intent.succeeded | pi=${intent.id} amount=${intent.amount} status=${intent.status} invoice=${intentInvoice ?? "none"}`
       );
 
       // Non-blocking: clean up Mailchimp abandoned cart for subscribe-intent flow.
@@ -355,6 +360,63 @@ export async function POST(req: NextRequest) {
           },
           eventId: `purchase-sub-${intent.id}`,
         }).catch((err) => console.error("[CAPI] Purchase (payment_intent.succeeded) error:", err));
+      }
+
+      // Send order confirmation email for one-time purchases via the embedded
+      // checkout intent flow (/api/checkout/intent). These PIs have no invoice
+      // (invoice=null) and are not covered by checkout.session.completed.
+      // Use receipt_email or metadata.customer_email as the address.
+      const confirmEmail = intent.receipt_email || intent.metadata?.customer_email || null;
+      if (confirmEmail && !intentInvoice) {
+        const triggerKeyForOtConfirmation = process.env.TRIGGER_SECRET_KEY;
+        if (triggerKeyForOtConfirmation) {
+          const productKey = intent.metadata?.product ?? null;
+          const PRODUCT_NAMES: Record<string, string> = {
+            starter: "Essentials Box",
+            family: "Family Box",
+            community: "Community Box",
+          };
+          const productName = productKey ? (PRODUCT_NAMES[productKey] ?? productKey) : "Produce Box";
+
+          fetch(`${TRIGGER_API_BASE}/send-order-confirmation-email/trigger`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${triggerKeyForOtConfirmation}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              payload: {
+                sessionId: intent.id,
+                email: confirmEmail,
+                customerName: intent.metadata?.customer_name ?? null,
+                amountTotal: intent.amount,
+                productName,
+                isSubscription: false,
+                billingInterval: null,
+                subscriptionId: null,
+              },
+              options: {
+                idempotencyKey: `order-confirmation-pi-${intent.id}`,
+              },
+            }),
+          })
+            .then((r) => {
+              if (r.ok) {
+                console.log(
+                  `[WEBHOOK] Queued order confirmation email for PI ${intent.id} email=${confirmEmail}`
+                );
+              } else {
+                r.json()
+                  .catch(() => ({}))
+                  .then((err) =>
+                    console.warn("[WEBHOOK] Failed to queue order confirmation email (pi):", err)
+                  );
+              }
+            })
+            .catch((e) =>
+              console.warn("[WEBHOOK] Error queuing order confirmation email (pi):", e)
+            );
+        }
       }
       break;
     }
