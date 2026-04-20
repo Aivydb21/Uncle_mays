@@ -1,77 +1,43 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { tagOrderCompleted, deleteCart } from "@/lib/mailchimp";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
-/**
- * Send purchase event to GA4 via Measurement Protocol (server-side tracking).
- * This ensures 100% accurate conversion tracking, unaffected by ad blockers.
- *
- * Docs: https://developers.google.com/analytics/devguides/collection/protocol/ga4
- */
-async function sendGA4PurchaseEvent(session: Stripe.Checkout.Session) {
-  const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
-  const GA4_API_SECRET = process.env.GA4_API_SECRET;
+// GA4 Measurement Protocol for server-side conversion tracking
+async function trackGA4Purchase(params: {
+  transactionId: string;
+  value: number;
+  currency: string;
+  items: Array<{ item_id: string; item_name: string; price: number; quantity: number }>;
+  clientId?: string;
+}) {
+  const measurementId = process.env.GA4_MEASUREMENT_ID;
+  const apiSecret = process.env.GA4_API_SECRET;
 
-  if (!GA4_MEASUREMENT_ID || !GA4_API_SECRET) {
-    console.log(
-      "[WEBHOOK] GA4 tracking skipped: NEXT_PUBLIC_GA_ID or GA4_API_SECRET not set"
-    );
+  if (!measurementId || !apiSecret) {
+    console.warn("[GA4] Measurement ID or API Secret not configured, skipping server-side tracking");
     return;
   }
 
-  // Use customer ID as client_id for GA4 (or fallback to session ID)
-  const clientId =
-    (typeof session.customer === "string" ? session.customer : session.customer?.id) ||
-    session.id;
-
-  // Get product info from metadata
-  const product = session.metadata?.product || "unknown";
-  const value = session.amount_total ? session.amount_total / 100 : 0;
-
-  // Build items array for enhanced e-commerce
-  const items = [
-    {
-      item_id: product,
-      item_name: product.charAt(0).toUpperCase() + product.slice(1) + " Box",
-      affiliation: "Uncle May's Produce",
-      price: value,
-      quantity: 1,
-      item_category: "Produce Box",
-    },
-  ];
-
-  // Build event params with UTM attribution from metadata
-  const eventParams: Record<string, unknown> = {
-    transaction_id: session.id,
-    value,
-    currency: "USD",
-    tax: 0,
-    shipping: 0,
-    items,
-  };
-
-  // Add UTM parameters for campaign attribution
-  if (session.metadata?.utm_source) eventParams.campaign_source = session.metadata.utm_source;
-  if (session.metadata?.utm_medium) eventParams.campaign_medium = session.metadata.utm_medium;
-  if (session.metadata?.utm_campaign) eventParams.campaign_name = session.metadata.utm_campaign;
-  if (session.metadata?.utm_content) eventParams.campaign_content = session.metadata.utm_content;
-  if (session.metadata?.utm_term) eventParams.campaign_term = session.metadata.utm_term;
-
-  const payload = {
-    client_id: clientId,
-    events: [
-      {
-        name: "purchase",
-        params: eventParams,
-      },
-    ],
-  };
-
   try {
+    const payload = {
+      client_id: params.clientId || `stripe.${params.transactionId}`,
+      events: [
+        {
+          name: "purchase",
+          params: {
+            transaction_id: params.transactionId,
+            value: params.value,
+            currency: params.currency,
+            items: params.items,
+          },
+        },
+      ],
+    };
+
     const response = await fetch(
-      `https://www.google-analytics.com/mp/collect?measurement_id=${GA4_MEASUREMENT_ID}&api_secret=${GA4_API_SECRET}`,
+      `https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -80,20 +46,21 @@ async function sendGA4PurchaseEvent(session: Stripe.Checkout.Session) {
     );
 
     if (response.ok) {
-      console.log(
-        `[WEBHOOK] GA4 purchase event sent for session ${session.id} ($${value})`
-      );
+      console.log(`[GA4] Purchase tracked: ${params.transactionId} = $${params.value}`);
     } else {
-      console.error(
-        `[WEBHOOK] GA4 purchase event failed: ${response.status} ${response.statusText}`
-      );
+      console.error(`[GA4] Tracking failed: ${response.status} ${await response.text()}`);
     }
   } catch (error) {
-    console.error(`[WEBHOOK] GA4 purchase event error:`, error);
+    console.error("[GA4] Error tracking purchase:", error);
   }
 }
 
 export async function POST(req: NextRequest) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
+  }
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
 
@@ -118,14 +85,108 @@ export async function POST(req: NextRequest) {
         typeof session.customer === "string"
           ? session.customer
           : (session.customer as Stripe.Customer | null)?.id ?? null;
+      const email = session.customer_email ?? session.customer_details?.email ?? "unknown";
+      const phone = session.customer_details?.phone ?? null;
+
       console.log(
-        `[WEBHOOK] checkout.session.completed | session=${session.id} amount=${session.amount_total} customer=${customerId ?? "none"} email=${session.customer_email ?? session.customer_details?.email ?? "unknown"}`
+        `[WEBHOOK] checkout.session.completed | session=${session.id} amount=${session.amount_total} customer=${customerId ?? "none"} email=${email} phone=${phone ?? "none"}`
       );
 
-      // Send server-side purchase event to GA4 (unaffected by ad blockers)
-      await sendGA4PurchaseEvent(session);
+      // Track purchase in GA4 (server-side for reliability)
+      const amountInDollars = (session.amount_total ?? 0) / 100;
+      const productName = session.metadata?.productName || "Produce Box";
+      const productId = session.metadata?.productId || "produce_box";
 
-      // TODO: fulfillment logic (send confirmation email, update order DB, notify ops)
+      await trackGA4Purchase({
+        transactionId: session.id,
+        value: amountInDollars,
+        currency: "USD",
+        items: [
+          {
+            item_id: productId,
+            item_name: productName,
+            price: amountInDollars,
+            quantity: 1,
+          },
+        ],
+        clientId: customerId || undefined,
+      });
+
+      // Trigger SMS confirmation if phone number and delivery date are available
+      // The session metadata should contain the checkout session ID from our local store
+      const checkoutSessionId = session.metadata?.checkoutSessionId;
+      if (checkoutSessionId && phone) {
+        const triggerSecretKey = process.env.TRIGGER_SECRET_KEY;
+        if (triggerSecretKey) {
+          try {
+            // Fetch the local checkout session to get delivery details
+            const checkoutRes = await fetch(
+              `${process.env.SITE_BASE_URL || "https://unclemays.com"}/api/checkout/session/${checkoutSessionId}`
+            );
+
+            if (checkoutRes.ok) {
+              const checkoutSession = await checkoutRes.json();
+
+              if (checkoutSession.deliveryDate) {
+                const res = await fetch(
+                  "https://api.trigger.dev/api/v1/tasks/send-delivery-confirmation-sms/trigger",
+                  {
+                    method: "POST",
+                    headers: {
+                      Authorization: `Bearer ${triggerSecretKey}`,
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                      payload: {
+                        sessionId: checkoutSessionId,
+                        phone: phone,
+                        firstName: checkoutSession.firstName || session.customer_details?.name?.split(" ")[0] || "there",
+                        deliveryDate: checkoutSession.deliveryDate,
+                        deliveryWindow: checkoutSession.deliveryWindow,
+                        productName: checkoutSession.productName || "produce box",
+                      },
+                      options: {
+                        idempotencyKey: `sms-confirmation-${checkoutSessionId}`,
+                      },
+                    }),
+                  }
+                );
+
+                if (res.ok) {
+                  console.log(
+                    `[WEBHOOK] Queued SMS confirmation task for session ${checkoutSessionId}`
+                  );
+                } else {
+                  const err = await res.json().catch(() => ({}));
+                  console.warn(
+                    `[WEBHOOK] Failed to queue SMS confirmation task:`,
+                    err
+                  );
+                }
+              } else {
+                console.log(
+                  `[WEBHOOK] No delivery date for session ${checkoutSessionId}, skipping SMS confirmation`
+                );
+              }
+            }
+          } catch (e) {
+            console.warn(
+              `[WEBHOOK] Error queueing SMS confirmation task:`,
+              e
+            );
+          }
+        }
+      }
+
+      // Non-blocking: mark order complete and remove the Mailchimp cart so the
+      // abandoned cart Journey does not fire for customers who already paid.
+      if (email && email !== "unknown") {
+        tagOrderCompleted(email)
+          .catch((err) => console.error("[WEBHOOK] Mailchimp tagOrderCompleted error:", err));
+        deleteCart(session.id)
+          .catch((err) => console.error("[WEBHOOK] Mailchimp deleteCart error:", err));
+      }
+
       break;
     }
 
@@ -202,6 +263,16 @@ export async function POST(req: NextRequest) {
       console.log(
         `[WEBHOOK] payment_intent.succeeded | pi=${intent.id} amount=${intent.amount} status=${intent.status}`
       );
+
+      // Non-blocking: clean up Mailchimp abandoned cart for subscribe-intent flow.
+      // customer_email is stored in metadata by /api/checkout/subscribe-intent.
+      const intentEmail = intent.metadata?.customer_email || intent.receipt_email;
+      if (intentEmail && intent.metadata?.firstPayment === "true") {
+        tagOrderCompleted(intentEmail)
+          .catch((err) => console.error("[WEBHOOK] Mailchimp tagOrderCompleted error (pi):", err));
+        deleteCart(intent.id)
+          .catch((err) => console.error("[WEBHOOK] Mailchimp deleteCart error (pi):", err));
+      }
       break;
     }
 

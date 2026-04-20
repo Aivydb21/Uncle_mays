@@ -27,3 +27,7 @@ out
 *.sln
 *.sw?
 .vercel
+
+# Business ops
+.claude/scheduled_tasks.lock
+google-ads-customer-match.csv

@@ -1,0 +1,464 @@
+[
+  {
+    "id": "69cae041eddc690001739495",
+    "name": "Aaron Rudberg",
+    "email": "aaron@s2gventures.com",
+    "org": "S2G Investments",
+    "score": 50
+  },
+  {
+    "id": "69caebd5188ffa0001f61d5c",
+    "name": "Manny Martinez",
+    "email": "mmartinez@brynwoodpartners.com",
+    "org": "Brynwood Partners",
+    "score": 45
+  },
+  {
+    "id": "69cae042eddc69000173950a",
+    "name": "Bala Nagarajan",
+    "email": "bala@s2ginvestments.com",
+    "org": "S2G Investments",
+    "score": 45
+  },
+  {
+    "id": "69caebd5188ffa0001f61d2e",
+    "name": "Ami Naik",
+    "email": "ami@radicleimpact.com",
+    "org": "Radicle Impact Partners",
+    "score": 45
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c5b",
+    "name": "Stephen Bowater",
+    "email": "sbowater@brynwoodpartners.com",
+    "org": "Brynwood Partners",
+    "score": 45
+  },
+  {
+    "id": "69cae042eddc690001739503",
+    "name": "Ronald Meeusen",
+    "email": "ron@cultiviansbx.com",
+    "org": "Cultivian Sandbox Ventures",
+    "score": 45
+  },
+  {
+    "id": "69caebd4188ffa0001f61cc4",
+    "name": "Anthony Marino",
+    "email": "anthony.marino@lcatterton.com",
+    "org": "L Catterton",
+    "score": 40
+  },
+  {
+    "id": "69caebd4188ffa0001f61cb8",
+    "name": "Carle Stenmark",
+    "email": "stenmark@vmgpartners.com",
+    "org": "VMG Partners",
+    "score": 40
+  },
+  {
+    "id": "69cae042eddc690001739576",
+    "name": "Vishal Vasishth",
+    "email": "vishal@obviousventures.com",
+    "org": "Obvious Ventures",
+    "score": 40
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b7f",
+    "name": "Kirby Harris",
+    "email": "kirby@base.ventures",
+    "org": "Base Ventures",
+    "score": 40
+  },
+  {
+    "id": "69caebd4188ffa0001f61c26",
+    "name": "Jeff Weiser",
+    "email": "jeff.weiser@lcatterton.com",
+    "org": "L Catterton",
+    "score": 40
+  },
+  {
+    "id": "69cae043eddc69000173959b",
+    "name": "Angelos Dassios",
+    "email": "adassios@paineschwartz.com",
+    "org": "Paine Schwartz Partners",
+    "score": 40
+  },
+  {
+    "id": "69cae041eddc6900017394ec",
+    "name": "Mark Langley",
+    "email": "ml@unovis.vc",
+    "org": "Unovis Asset Management",
+    "score": 40
+  },
+  {
+    "id": "69cae042eddc6900017394ff",
+    "name": "Leo Guthart",
+    "email": "lguthart@topspinpartners.com",
+    "org": "Topspin Consumer Partners",
+    "score": 40
+  },
+  {
+    "id": "69cae89f0ba2840001046608",
+    "name": "Abe Yokell",
+    "email": "abe@congruentvc.com",
+    "org": "Congruent Ventures",
+    "score": 40
+  },
+  {
+    "id": "69cae6d9cfa6320001e38cdf",
+    "name": "Gabriel Kra",
+    "email": "gkra@preludeventures.com",
+    "org": "Prelude Ventures",
+    "score": 40
+  },
+  {
+    "id": "69caebd4188ffa0001f61c87",
+    "name": "Indranil Guha",
+    "email": "guha@vmgpartners.com",
+    "org": "VMG Partners",
+    "score": 40
+  },
+  {
+    "id": "69cae6d9cfa6320001e38d44",
+    "name": "Kevin Schwartz",
+    "email": "kschwartz@paineschwartz.com",
+    "org": "Paine Schwartz Partners",
+    "score": 40
+  },
+  {
+    "id": "69cae041eddc6900017394bc",
+    "name": "Gareth Asten",
+    "email": "gareth@acre.vc",
+    "org": "Acre Venture Partners",
+    "score": 40
+  },
+  {
+    "id": "69cae043eddc6900017395b0",
+    "name": "Parker Hayden",
+    "email": "parker@collabfund.com",
+    "org": "Collaborative Fund",
+    "score": 40
+  },
+  {
+    "id": "69cae041eddc6900017394bd",
+    "name": "Lucas Mann",
+    "email": "lucas@acre.vc",
+    "org": "Acre Venture Partners",
+    "score": 40
+  },
+  {
+    "id": "69caeab346508b000193be96",
+    "name": "Kate Daly",
+    "email": "kate@closedlooppartners.com",
+    "org": "Closed Loop Partners",
+    "score": 40
+  },
+  {
+    "id": "69cae6d8cfa6320001e38bad",
+    "name": "Matt Eggers",
+    "email": "meggers@preludeventures.com",
+    "org": "Prelude Ventures",
+    "score": 35
+  },
+  {
+    "id": "69cae043eddc6900017395ab",
+    "name": "Gene Smith",
+    "email": "gene.smith@nextplatformpartners.com",
+    "org": "nextplatformpartners.com",
+    "score": 35
+  },
+  {
+    "id": "69cae044eddc69000173962b",
+    "name": "Eli Kutner",
+    "email": "elikutner@harborviewcp.com",
+    "org": "Harborview Capital Partners",
+    "score": 35
+  },
+  {
+    "id": "69caebd3188ffa0001f61bf4",
+    "name": "Ela Madej",
+    "email": "ela@50y.com",
+    "org": "Fifty Years",
+    "score": 35
+  },
+  {
+    "id": "69cae041eddc690001739498",
+    "name": "Andy Cloyd",
+    "email": "andy.cloyd@revolution.com",
+    "org": "Revolution",
+    "score": 35
+  },
+  {
+    "id": "69caebd5188ffa0001f61d0a",
+    "name": "Kathy O'Brien",
+    "email": "kobrien@yellowwoodpartners.com",
+    "org": "Yellow Wood Partners, LLC",
+    "score": 35
+  },
+  {
+    "id": "69cae041eddc690001739499",
+    "name": "Ayush Jain",
+    "email": "ayush.jain@revolution.com",
+    "org": "Revolution",
+    "score": 35
+  },
+  {
+    "id": "69caeab346508b000193bef3",
+    "name": "Daniel Phan",
+    "email": "dphan@closedlooppartners.com",
+    "org": "Closed Loop Partners",
+    "score": 35
+  },
+  {
+    "id": "69caebd4188ffa0001f61cb5",
+    "name": "Rohan Ganesh",
+    "email": "rohan@obviousventures.com",
+    "org": "Obvious Ventures",
+    "score": 35
+  },
+  {
+    "id": "69caebd4188ffa0001f61c4b",
+    "name": "Ania Scigalska",
+    "email": "ania@50y.com",
+    "org": "Fifty Years",
+    "score": 35
+  },
+  {
+    "id": "69cae041eddc6900017394de",
+    "name": "Brandon Boros",
+    "email": "brandon.boros@kaporcapital.com",
+    "org": "Kapor Capital",
+    "score": 35
+  },
+  {
+    "id": "69cae043eddc6900017395a9",
+    "name": "Anders Petersen",
+    "email": "apetersen@pcrp.com",
+    "org": "Palladin Consumer Retail Partners, LLC",
+    "score": 35
+  },
+  {
+    "id": "69caebd4188ffa0001f61cb9",
+    "name": "Josh Shaw",
+    "email": "jshaw@topspincp.com",
+    "org": "Topspin Consumer Partners",
+    "score": 35
+  },
+  {
+    "id": "69caebd4188ffa0001f61c67",
+    "name": "Jay Rogers",
+    "email": "jrogers@yellowwoodpartners.com",
+    "org": "Yellow Wood Partners, LLC",
+    "score": 35
+  },
+  {
+    "id": "69cae89e0ba2840001046545",
+    "name": "Erik Moore",
+    "email": "erik@base.ventures",
+    "org": "Base Ventures",
+    "score": 35
+  },
+  {
+    "id": "69cae042eddc69000173957e",
+    "name": "Chris Robins",
+    "email": "chris.robins@revolutionbpt.com",
+    "org": "revolutionbpt.com",
+    "score": 35
+  },
+  {
+    "id": "69cae041eddc6900017394aa",
+    "name": "Jared Jacobs",
+    "email": "jared@cavuconsumer.com",
+    "org": "CAVU",
+    "score": 35
+  },
+  {
+    "id": "69cae041eddc6900017394a2",
+    "name": "Craig Wilson",
+    "email": "cwilson@collabfund.com",
+    "org": "Collaborative Fund",
+    "score": 35
+  },
+  {
+    "id": "69caebd4188ffa0001f61c77",
+    "name": "Roy Chin",
+    "email": "roy@northcastlepartners.com",
+    "org": "North Castle Partners",
+    "score": 35
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b8a",
+    "name": "Ryan Foltz",
+    "email": "rfoltz@brentwood.com",
+    "org": "Brentwood Associates",
+    "score": 35
+  },
+  {
+    "id": "69cae041eddc6900017394dc",
+    "name": "Ian Malone",
+    "email": "imalone@aspectconsumer.com",
+    "org": "Aspect Consumer Partners",
+    "score": 35
+  },
+  {
+    "id": "69caebd5188ffa0001f61d38",
+    "name": "Alan Bui",
+    "email": "alan@northcastlepartners.com",
+    "org": "North Castle Partners",
+    "score": 35
+  },
+  {
+    "id": "69caebd3188ffa0001f61c0f",
+    "name": "Kevin Boylan",
+    "email": "kb@unovis.vc",
+    "org": "Unovis Asset Management",
+    "score": 35
+  },
+  {
+    "id": "69cae89f0ba2840001046687",
+    "name": "Grace Zuncic",
+    "email": "grace@mannatreepartners.com",
+    "org": "Manna Tree",
+    "score": 35
+  },
+  {
+    "id": "69cae041eddc6900017394f3",
+    "name": "Marianne Wu",
+    "email": "marianne@congruentvc.com",
+    "org": "Congruent Ventures",
+    "score": 30
+  },
+  {
+    "id": "69cae041eddc6900017394e7",
+    "name": "Kate Wallman",
+    "email": "kate@encoreconsumercapital.com",
+    "org": "Encore Consumer Capital",
+    "score": 30
+  },
+  {
+    "id": "69caebd4188ffa0001f61c3a",
+    "name": "Pete Hartigan",
+    "email": "pete@marketplace.fund",
+    "org": "Marketplace Funds",
+    "score": 30
+  },
+  {
+    "id": "69cae89e0ba2840001046575",
+    "name": "Dan Pullman",
+    "email": "danp@freshpeakscapital.com",
+    "org": "Fresh Peaks Capital",
+    "score": 30
+  },
+  {
+    "id": "69cae042eddc690001739554",
+    "name": "Kelly Ghazarian",
+    "email": "kelly@premierconsumercapital.com",
+    "org": "Premier Consumer Capital",
+    "score": 30
+  },
+  {
+    "id": "69caebd4188ffa0001f61c71",
+    "name": "Maurice Greenberg",
+    "email": "mg@sjmmarketplace.com",
+    "org": "SJM Marketplace Ventures LLC",
+    "score": 30
+  },
+  {
+    "id": "69caebd4188ffa0001f61c73",
+    "name": "Ricardo Vernazza-Paganini",
+    "email": "vernazza@agriculturecapital.com",
+    "org": "Agriculture Capital",
+    "score": 30
+  },
+  {
+    "id": "69cae89e0ba2840001046594",
+    "name": "Madison Vine",
+    "email": "mgelia@hospitalityholdings.com",
+    "org": "Hospitality Holdings Inc.",
+    "score": 30
+  },
+  {
+    "id": "69cae042eddc69000173955c",
+    "name": "Bruce Riddle",
+    "email": "bruce@premierconsumercapital.com",
+    "org": "Premier Consumer Capital",
+    "score": 30
+  },
+  {
+    "id": "69cae042eddc690001739538",
+    "name": "Bill Cooling",
+    "email": "bcooling@tsgconsumer.com",
+    "org": "TSG Consumer Partners",
+    "score": 25
+  },
+  {
+    "id": "69cae042eddc690001739523",
+    "name": "Alec Fogarty",
+    "email": "afogarty@tsgconsumer.com",
+    "org": "TSG Consumer Partners",
+    "score": 25
+  },
+  {
+    "id": "69cae041eddc6900017394e6",
+    "name": "Scott Sellers",
+    "email": "scott@encoreconsumercapital.com",
+    "org": "Encore Consumer Capital",
+    "score": 25
+  },
+  {
+    "id": "69caebd4188ffa0001f61c43",
+    "name": "Nicole Fourgoux",
+    "email": "nicole@strideconsumer.com",
+    "org": "Stride Consumer Partners",
+    "score": 25
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b96",
+    "name": "Nicholas Pianim",
+    "email": "nick@dagventures.com",
+    "org": "DAG Ventures",
+    "score": 25
+  },
+  {
+    "id": "69cae043eddc6900017395c7",
+    "name": "Susan Overton",
+    "email": "susan@balboaretail.com",
+    "org": "Balboa Retail Partners",
+    "score": 25
+  },
+  {
+    "id": "69cae6dfcfa6320001e3972c",
+    "name": "Young Chung",
+    "email": "young@dagventures.com",
+    "org": "DAG Ventures",
+    "score": 25
+  },
+  {
+    "id": "69caebd4188ffa0001f61c60",
+    "name": "Sharon Fox",
+    "email": "sharon@strideconsumer.com",
+    "org": "Stride Consumer Partners",
+    "score": 25
+  },
+  {
+    "id": "69cae043eddc6900017395c8",
+    "name": "Alison Warner",
+    "email": "alison@balboaretail.com",
+    "org": "Balboa Retail Partners",
+    "score": 25
+  },
+  {
+    "id": "69caebd3188ffa0001f61bcd",
+    "name": "Bill Schultz",
+    "email": "bill@beliade.com",
+    "org": "Beliade Consumer Partners",
+    "score": 25
+  },
+  {
+    "id": "69cae041eddc6900017394a8",
+    "name": "Hiro Hasegawa",
+    "email": "hiro@futurefoodfund.co.jp",
+    "org": "Future Food Fund",
+    "score": 25
+  }
+]

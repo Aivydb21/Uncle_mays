@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { upsertContact, createCart } from "@/lib/mailchimp";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
-
+// Subscription Price IDs (weekly, 10% discount vs one-time)
 const SUB_PRICE_MAP: Record<string, string> = {
   starter: process.env.STRIPE_STARTER_SUB_PRICE_ID || "",
   family: process.env.STRIPE_FAMILY_SUB_PRICE_ID || "",
@@ -12,8 +12,12 @@ const SUB_PRICE_MAP: Record<string, string> = {
 export async function POST(req: NextRequest) {
   try {
     if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Stripe is not configured" },
+        { status: 500 }
+      );
     }
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const {
       product,
@@ -24,6 +28,7 @@ export async function POST(req: NextRequest) {
       address,
       deliveryNotes,
       proteinChoices,
+      additionalProteins,
       utm_source,
       utm_medium,
       utm_campaign,
@@ -32,6 +37,7 @@ export async function POST(req: NextRequest) {
     } = await req.json();
 
     const priceId = SUB_PRICE_MAP[product];
+
     if (!priceId) {
       return NextResponse.json(
         { error: "Subscription not available for this product" },
@@ -39,13 +45,58 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Build delivery metadata
-    const deliveryMeta: Record<string, string> = { product };
-    if (firstName) deliveryMeta.firstName = firstName;
-    if (lastName) deliveryMeta.lastName = lastName;
-    if (phone) deliveryMeta.phone = phone;
+    // Look up or create customer
+    let customerId: string;
+    if (email) {
+      const existingCustomers = await stripe.customers.list({ email, limit: 1 });
+      if (existingCustomers.data.length > 0) {
+        customerId = existingCustomers.data[0].id;
+        // Update customer with latest address/phone
+        if (address || phone) {
+          await stripe.customers.update(customerId, {
+            name: `${firstName} ${lastName}`.trim(),
+            phone: phone || undefined,
+            address: address
+              ? {
+                  line1: address.street,
+                  line2: address.apt || undefined,
+                  city: address.city,
+                  state: address.state,
+                  postal_code: address.zip,
+                  country: "US",
+                }
+              : undefined,
+          });
+        }
+      } else {
+        const customer = await stripe.customers.create({
+          email,
+          name: `${firstName} ${lastName}`.trim(),
+          phone,
+          address: address
+            ? {
+                line1: address.street,
+                line2: address.apt || undefined,
+                city: address.city,
+                state: address.state,
+                postal_code: address.zip,
+                country: "US",
+              }
+            : undefined,
+        });
+        customerId = customer.id;
+      }
+    } else {
+      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    }
+
+    // Build metadata
+    const metadata: Record<string, string> = { product, customer_email: email };
+    if (firstName) metadata.firstName = firstName;
+    if (lastName) metadata.lastName = lastName;
+    if (phone) metadata.phone = phone;
     if (address?.street) {
-      deliveryMeta.deliveryAddress = [
+      metadata.deliveryAddress = [
         address.street,
         address.apt,
         address.city,
@@ -55,88 +106,83 @@ export async function POST(req: NextRequest) {
         .filter(Boolean)
         .join(", ");
     }
-    if (deliveryNotes) deliveryMeta.deliveryNotes = deliveryNotes;
-    if (proteinChoices?.length) deliveryMeta.proteinChoices = proteinChoices.join(", ");
-    if (utm_source) deliveryMeta.utm_source = utm_source;
-    if (utm_medium) deliveryMeta.utm_medium = utm_medium;
-    if (utm_campaign) deliveryMeta.utm_campaign = utm_campaign;
-    if (utm_content) deliveryMeta.utm_content = utm_content;
-    if (utm_term) deliveryMeta.utm_term = utm_term;
-
-    // Find or create Stripe customer to avoid duplicates
-    let customerId: string;
-    if (email) {
-      const existing = await stripe.customers.list({ email, limit: 1 });
-      if (existing.data.length > 0) {
-        customerId = existing.data[0].id;
-      } else {
-        const customer = await stripe.customers.create({
-          email,
-          name: `${firstName || ""} ${lastName || ""}`.trim() || undefined,
-          metadata: deliveryMeta,
-        });
-        customerId = customer.id;
-      }
-    } else {
-      const customer = await stripe.customers.create({ metadata: deliveryMeta });
-      customerId = customer.id;
+    if (deliveryNotes) metadata.deliveryNotes = deliveryNotes;
+    if (Array.isArray(proteinChoices) && proteinChoices.length) {
+      metadata.proteinChoices = proteinChoices.join(", ");
     }
+    if (Array.isArray(additionalProteins) && additionalProteins.length) {
+      metadata.additionalProteins = additionalProteins.join(", ");
+    }
+    if (utm_source) metadata.utm_source = utm_source;
+    if (utm_medium) metadata.utm_medium = utm_medium;
+    if (utm_campaign) metadata.utm_campaign = utm_campaign;
+    if (utm_content) metadata.utm_content = utm_content;
+    if (utm_term) metadata.utm_term = utm_term;
 
-    // Create subscription in incomplete state so we always get an intent to confirm.
-    // payment_behavior:"default_incomplete" keeps the sub inactive until payment confirmed.
-    // If the price has a trial (first invoice $0), Stripe creates a pending_setup_intent
-    // instead of a payment_intent — we fall back to that so the card is saved for billing.
+    // Create subscription and expand latest_invoice.payments.
+    //
+    // CRITICAL: In Stripe API 2025-11-17+, invoice.payment_intent is no longer
+    // populated. The PaymentIntent ID is now found under:
+    //   invoice.payments.data[0].payment.payment_intent
+    // We expand payments, extract the PI ID, then retrieve it to get client_secret.
+    // This is the ONLY PaymentIntent that will mark the invoice paid and activate
+    // the subscription. Using a separate PaymentIntent (previous bug) caused
+    // charges to succeed while the subscription invoice remained unpaid.
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: priceId }],
       payment_behavior: "default_incomplete",
       payment_settings: { save_default_payment_method: "on_subscription" },
-      metadata: deliveryMeta,
-      expand: ["latest_invoice.payment_intent", "pending_setup_intent"],
+      expand: ["latest_invoice.payments"],
+      metadata,
     });
 
-    // latest_invoice.payment_intent and pending_setup_intent are expanded objects,
-    // not available on the base types — cast through unknown to access them.
-    type ExpandedInvoice = Stripe.Invoice & { payment_intent?: Stripe.PaymentIntent | null };
-    const invoice = subscription.latest_invoice as ExpandedInvoice | null;
-    const paymentIntent = invoice?.payment_intent ?? null;
-    const setupIntent = subscription.pending_setup_intent as Stripe.SetupIntent | null;
+    // In Stripe API 2025-11-17, the PaymentIntent is nested under payments list.
+    const invoice = subscription.latest_invoice as Stripe.Invoice & {
+      payments?: {
+        data: Array<{
+          payment: { payment_intent: string | null; type: string };
+          status: string;
+        }>;
+      };
+    };
 
-    const clientSecret = paymentIntent?.client_secret ?? setupIntent?.client_secret ?? null;
-    const intentType: "payment" | "setup" = paymentIntent?.client_secret ? "payment" : "setup";
+    const paymentIntentId = invoice?.payments?.data?.[0]?.payment?.payment_intent ?? null;
 
-    if (!clientSecret) {
-      // Stripe returned neither intent — this should not happen with default_incomplete,
-      // but log diagnostic info and surface a clear error.
-      console.error("[subscribe-intent] null client_secret", {
-        subscriptionId: subscription.id,
-        subscriptionStatus: subscription.status,
-        invoiceId: (invoice as Stripe.Invoice & { id?: string })?.id,
-        invoiceAmountDue: (invoice as Stripe.Invoice & { amount_due?: number })?.amount_due,
-        paymentIntentStatus: paymentIntent?.status,
-        hasPendingSetupIntent: !!setupIntent,
-        priceId,
-      });
+    if (!paymentIntentId) {
+      await stripe.subscriptions.cancel(subscription.id);
       return NextResponse.json(
         { error: "Could not initialize subscription payment" },
         { status: 500 }
       );
     }
 
-    console.log("[subscribe-intent] created", {
-      subscriptionId: subscription.id,
-      intentType,
-      priceId,
-    });
+    // Retrieve the full PaymentIntent to get client_secret.
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    if (!paymentIntent.client_secret) {
+      await stripe.subscriptions.cancel(subscription.id);
+      return NextResponse.json(
+        { error: "Could not initialize subscription payment — no client secret" },
+        { status: 500 }
+      );
+    }
+
+    // Non-blocking: upsert subscriber + create abandoned cart so Mailchimp
+    // Journey fires if the customer abandons before completing payment.
+    upsertContact(email, firstName, lastName)
+      .catch((err) => console.error("Mailchimp upsertContact error (subscribe-intent):", err));
+    const priceInDollars = paymentIntent.amount / 100;
+    createCart(paymentIntent.id, email, firstName, lastName, product, priceInDollars)
+      .catch((err) => console.error("Mailchimp createCart error (subscribe-intent):", err));
 
     return NextResponse.json({
-      clientSecret,
+      clientSecret: paymentIntent.client_secret,
       subscriptionId: subscription.id,
-      intentType,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    console.error("[subscribe-intent] error:", message);
+    console.error("Subscribe intent API error:", message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

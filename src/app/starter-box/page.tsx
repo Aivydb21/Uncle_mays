@@ -2,20 +2,12 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { Truck, ShieldCheck, Star, Check, ArrowRight, Leaf } from "lucide-react";
 import { PRODUCTS } from "@/lib/products";
-import { getUTMParams } from "@/lib/utm";
 
 const starterBox = PRODUCTS.starter;
 const FIRST_ORDER_PRICE = starterBox.firstOrderPrice; // $30
 const REGULAR_PRICE = starterBox.price; // $35
-
-declare global {
-  interface Window {
-    fbq: (...args: unknown[]) => void;
-  }
-}
 
 const testimonial = {
   quote:
@@ -25,100 +17,30 @@ const testimonial = {
 };
 
 function CTAButton({ className = "" }: { className?: string }) {
-  const [loading, setLoading] = useState(false);
-
-  const handleClick = async () => {
-    setLoading(true);
-
-    // Fire tracking events
-    if (typeof window !== "undefined") {
-      // Meta Pixel
-      if (typeof (window as Window & { fbq?: (...a: unknown[]) => void }).fbq === "function") {
-        (window as Window & { fbq: (...a: unknown[]) => void }).fbq("track", "InitiateCheckout", {
-          content_name: "Starter Box",
-          content_ids: ["starter"],
-          content_type: "product",
-          value: FIRST_ORDER_PRICE,
-          currency: "USD",
-        });
-      }
-
-      // GA4 begin_checkout event with enhanced e-commerce parameters
-      if (typeof (window as Window & { gtag?: (...a: unknown[]) => void }).gtag === "function") {
-        (window as Window & { gtag: (...a: unknown[]) => void }).gtag("event", "begin_checkout", {
-          currency: "USD",
-          value: FIRST_ORDER_PRICE,
-          items: [{
-            item_id: "starter",
-            item_name: "Starter Box",
-            affiliation: "Uncle May's Produce",
-            price: FIRST_ORDER_PRICE,
-            quantity: 1,
-            item_category: "Produce Box",
-          }]
-        });
-      }
-    }
-
-    try {
-      // Get UTM parameters for campaign attribution
-      const utmParams = getUTMParams();
-
-      // Create Stripe Checkout Session
-      const response = await fetch("/api/checkout/hosted", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          product: "starter",
-          ...utmParams
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create checkout session");
-      }
-
-      const { url } = await response.json();
-
-      // Redirect to Stripe Checkout
-      if (url) {
-        window.location.href = url;
-      } else {
-        throw new Error("No checkout URL returned");
-      }
-    } catch (error) {
-      console.error("Checkout error:", error);
-      alert("Failed to start checkout. Please try again.");
-      setLoading(false);
-    }
-  };
-
   return (
-    <button
-      onClick={handleClick}
-      disabled={loading}
-      className={`inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold text-lg rounded-xl px-8 py-4 shadow-lg hover:bg-primary/90 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+    <Link
+      href="/subscribe/starter"
+      className={`inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold text-lg rounded-xl px-8 py-4 shadow-lg hover:bg-primary/90 transition-all duration-200 active:scale-95 ${className}`}
+      onClick={() => {
+        // Fire Meta pixel ViewContent + InitiateCheckout for conversion tracking
+        if (typeof window !== "undefined" && typeof (window as Window & { fbq?: (...a: unknown[]) => void }).fbq === "function") {
+          (window as Window & { fbq: (...a: unknown[]) => void }).fbq("track", "InitiateCheckout", {
+            content_name: "Starter Box",
+            content_ids: ["starter"],
+            content_type: "product",
+            value: FIRST_ORDER_PRICE,
+            currency: "USD",
+          });
+        }
+      }}
     >
-      {loading ? "Loading..." : "Claim Your $30 Box"}
-      {!loading && <ArrowRight className="h-5 w-5" />}
-    </button>
+      Claim Your $30 Box
+      <ArrowRight className="h-5 w-5" />
+    </Link>
   );
 }
 
 export default function StarterBoxLandingPage() {
-  // Fire Meta Pixel ViewContent event when page loads
-  useEffect(() => {
-    if (typeof window !== "undefined" && typeof window.fbq === "function") {
-      window.fbq("track", "ViewContent", {
-        content_name: "Starter Box",
-        content_ids: ["starter"],
-        content_type: "product",
-        value: FIRST_ORDER_PRICE,
-        currency: "USD",
-      });
-    }
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
       {/* Minimal header — logo only, no nav links */}

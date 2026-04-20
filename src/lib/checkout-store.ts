@@ -22,10 +22,19 @@ export interface CheckoutSession {
   };
   deliveryNotes?: string;
   deliveryDate?: string;
+  deliveryWindow?: string;
   proteins?: string[];
+  additionalProteins?: string[];
   paymentIntentId?: string;
   completedAt?: string;
-  recoveryEmailSent?: boolean;
+  recoveryEmailSent?: boolean; // Legacy field, use recoveryEmail1SentAt instead
+  recoveryEmail1SentAt?: string;
+  recoveryEmail2SentAt?: string;
+  recoveryEmail3SentAt?: string;
+  smsConfirmationSent?: boolean;
+  smsConfirmationResponse?: "pending" | "confirmed" | "declined" | null;
+  smsConfirmationSentAt?: string;
+  smsConfirmationRespondedAt?: string;
   createdAt: string;
   updatedAt: string;
 }

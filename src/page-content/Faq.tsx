@@ -79,11 +79,11 @@ const faqs = [
   },
   {
     q: "What's actually in the box?",
-    a: "Every box is sourced from a Black-owned farm and packed with what's freshest. The Starter Box includes sweet potatoes, Carola potatoes, Candy orange carrots, green curly kale, and fresh salad mix (~12-15 lbs). The Family Box adds Tuscan kale, rainbow chard, a dozen farm eggs, and your choice of protein: whole chicken, beef short ribs, or lamb chops. The Community Box includes the full produce spread plus organic pinto beans, organic black turtle beans, and your choice of protein.",
+    a: "Every box is sourced from a Black-owned farm and packed with what's freshest. The Starter Box currently includes collard greens, asparagus, spring onions, heirloom cherry tomatoes, Persian cucumbers, and snap peas (~12-15 lbs). The Family Box includes 10 seasonal produce items, a dozen farm eggs, and pasture-raised whole chicken. The Community Box includes 10 specialty and heirloom varieties, a dozen farm eggs, and your choice of one protein: chicken, pork chops, beef short ribs, or salmon. Contents rotate each delivery based on what's in season.",
   },
   {
     q: "How much does a box cost?",
-    a: "The Starter Box is $35 (~12-15 lbs of produce). The Family Box is $65 and includes sweet potatoes, carrots, four greens, a dozen farm eggs, and one protein choice (whole chicken, beef short ribs, or lamb chops). The Community Box is $95 and includes the full harvest, pantry beans, and your choice of protein. No subscription required. Order when you want.",
+    a: "The Starter Box is $35 (~12-15 lbs of produce). The Family Box is $65 and includes 10 seasonal produce items, a dozen farm eggs, and pasture-raised whole chicken. The Community Box is $95 and includes 10 specialty and heirloom produce items, a dozen farm eggs, and your choice of one protein (chicken, pork chops, beef short ribs, or salmon). No subscription required. Order when you want.",
   },
   {
     q: "How do I cancel my order?",
@@ -92,11 +92,12 @@ const faqs = [
 ];
 
 const sampleStarterBox = [
-  "Sweet potatoes (3 lb)",
-  "Carola potatoes, farm-select (2 lb)",
-  "Candy orange carrots (2 lb)",
-  "Green curly kale (1 bunch)",
-  "Fresh salad mix (5 oz)",
+  "Collard greens (1 bunch)",
+  "Asparagus (1 lb)",
+  "Spring onions (1 bunch)",
+  "Heirloom cherry tomatoes (1 pint)",
+  "Persian cucumbers (4 ct)",
+  "Snap peas (1/2 lb)",
 ];
 
 const FaqContent = () => {

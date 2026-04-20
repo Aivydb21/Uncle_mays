@@ -33,21 +33,21 @@ export const MobileCTA = () => {
         >
           <div className="flex items-center gap-2">
             <Link
-              href="/checkout/starter"
+              href="/subscribe/starter"
               className="flex-1 flex flex-col items-center justify-center rounded-xl border border-border bg-muted/50 py-2.5 text-center"
             >
               <span className="text-xs text-muted-foreground">Starter</span>
               <span className="text-base font-bold text-primary">$35</span>
             </Link>
             <Link
-              href="/checkout/family"
+              href="/subscribe/family"
               className="flex-[2] flex flex-col items-center justify-center rounded-xl bg-primary text-primary-foreground py-2.5 text-center shadow-soft"
             >
               <span className="text-xs opacity-80">Family Box</span>
               <span className="text-base font-bold">Order — $65</span>
             </Link>
             <Link
-              href="/checkout/community"
+              href="/subscribe/community"
               className="flex-1 flex flex-col items-center justify-center rounded-xl border border-border bg-muted/50 py-2.5 text-center"
             >
               <span className="text-xs text-muted-foreground">Community</span>

@@ -33,6 +33,7 @@ interface StoredCheckout {
   };
   deliveryNotes?: string;
   proteinChoices?: string[];
+  additionalProteinChoices?: string[];
 }
 
 // Step indicator component
@@ -237,7 +238,11 @@ export default function PaymentPage() {
             email: data.email,
             firstName: data.firstName,
             lastName: data.lastName,
+            phone: data.phone,
+            address: data.address,
+            deliveryNotes: data.deliveryNotes,
             proteins: data.proteinChoices,
+            additionalProteins: data.additionalProteinChoices,
             ...utms,
           }),
         });
@@ -398,10 +403,23 @@ export default function PaymentPage() {
               {checkout.proteinChoices && checkout.proteinChoices.length > 0 && (
                 <div className="mb-2">
                   <p className="text-xs text-muted-foreground font-medium mb-1">
-                    Protein{checkout.proteinChoices.length > 1 ? "s" : ""}:
+                    Included Protein:
                   </p>
                   <ul className="space-y-0.5">
                     {checkout.proteinChoices.map((p) => (
+                      <li key={p} className="text-xs text-foreground/80">• {p.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {checkout.additionalProteinChoices && checkout.additionalProteinChoices.length > 0 && (
+                <div className="mb-2">
+                  <p className="text-xs text-muted-foreground font-medium mb-1">
+                    Additional Protein{checkout.additionalProteinChoices.length > 1 ? "s" : ""}:
+                  </p>
+                  <ul className="space-y-0.5">
+                    {checkout.additionalProteinChoices.map((p) => (
                       <li key={p} className="text-xs text-foreground/80">• {p.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</li>
                     ))}
                   </ul>

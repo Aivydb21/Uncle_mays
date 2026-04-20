@@ -1,0 +1,3326 @@
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "cs_live_a1stBhKYwyNx9LqrOtZQpLcEC33GikA0uHhElmxchT4JDtprcQGB1ixjvQ",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Uncle Mays's Produce",
+        "font_family": "default",
+        "icon": null,
+        "logo": null
+      },
+      "cancel_url": null,
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": {
+        "business_name": null,
+        "individual_name": null,
+        "shipping_details": null
+      },
+      "consent": null,
+      "consent_collection": null,
+      "created": 1776269862,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery ZIP Code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": {
+        "address": null,
+        "business_name": null,
+        "email": "cto-test@unclemays.com",
+        "individual_name": null,
+        "name": null,
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": null
+      },
+      "customer_email": "cto-test@unclemays.com",
+      "discounts": [],
+      "expires_at": 1776356262,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": null,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "redirect_on_completion": "always",
+      "return_url": "https://unclemays.com/order-success?session_id={CHECKOUT_SESSION_ID}",
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": null,
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "embedded",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1zsULwr7PoEsoUYXWJS1V2opiIYPzFR1wJAdpw35ovGoae224wyiDyKhB",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Uncle Mays's Produce",
+        "font_family": "default",
+        "icon": null,
+        "logo": null
+      },
+      "cancel_url": null,
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": {
+        "business_name": null,
+        "individual_name": null,
+        "shipping_details": null
+      },
+      "consent": null,
+      "consent_collection": null,
+      "created": 1776269855,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery ZIP Code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": {
+        "address": null,
+        "business_name": null,
+        "email": "test@unclemays.com",
+        "individual_name": null,
+        "name": null,
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": null
+      },
+      "customer_email": "test@unclemays.com",
+      "discounts": [],
+      "expires_at": 1776356255,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": null,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "redirect_on_completion": "always",
+      "return_url": "https://unclemays.com/order-success?session_id={CHECKOUT_SESSION_ID}",
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": null,
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "embedded",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1cxnQNPmHMtSW3LY2GX65Agspf2jOSVbzwGF75ionRTpLZcxhej69vho8",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 8550,
+      "amount_total": 8550,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Uncle Mays's Produce",
+        "font_family": "default",
+        "icon": null,
+        "logo": null
+      },
+      "cancel_url": "https://unclemays.com/subscribe/community",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": {
+        "business_name": null,
+        "individual_name": null,
+        "shipping_details": null
+      },
+      "consent": null,
+      "consent_collection": null,
+      "created": 1776252876,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": {
+        "address": null,
+        "business_name": null,
+        "email": "anthony@unclemays.com",
+        "individual_name": null,
+        "name": null,
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": null
+      },
+      "customer_email": "anthony@unclemays.com",
+      "discounts": [],
+      "expires_at": 1776339276,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": null,
+      "livemode": true,
+      "locale": null,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "subscription",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success?session_id={CHECKOUT_SESSION_ID}",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1fuESk6uIrtgFFW5okV1UkGsgHsnQgTNSf8zXOzpEB5t6mfi3HVitVSDp",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 3150,
+      "amount_total": 3150,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Uncle Mays's Produce",
+        "font_family": "default",
+        "icon": null,
+        "logo": null
+      },
+      "cancel_url": "https://unclemays.com/subscribe/starter",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": {
+        "business_name": null,
+        "individual_name": null,
+        "shipping_details": null
+      },
+      "consent": null,
+      "consent_collection": null,
+      "created": 1776252775,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": {
+        "address": null,
+        "business_name": null,
+        "email": "anthony@unclemays.com",
+        "individual_name": null,
+        "name": null,
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": null
+      },
+      "customer_email": "anthony@unclemays.com",
+      "discounts": [],
+      "expires_at": 1776339174,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": null,
+      "livemode": true,
+      "locale": null,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "subscription",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success?session_id={CHECKOUT_SESSION_ID}",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1nDf86zJuXXp5WsFtPS0KL3xv8DPGVwB3ZtSnW8htFCINJHnqrJaM9bOX",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 3150,
+      "amount_total": 3150,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Uncle Mays's Produce",
+        "font_family": "default",
+        "icon": null,
+        "logo": null
+      },
+      "cancel_url": "https://unclemays.com/subscribe/starter",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": {
+        "business_name": null,
+        "individual_name": null,
+        "shipping_details": null
+      },
+      "consent": null,
+      "consent_collection": null,
+      "created": 1776185925,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": {
+        "address": null,
+        "business_name": null,
+        "email": "anthonypivy@gmail.com",
+        "individual_name": null,
+        "name": null,
+        "phone": null,
+        "tax_exempt": "none",
+        "tax_ids": null
+      },
+      "customer_email": "anthonypivy@gmail.com",
+      "discounts": [],
+      "expires_at": 1776272325,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": null,
+      "livemode": true,
+      "locale": null,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "subscription",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success?session_id={CHECKOUT_SESSION_ID}",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1N0o4I4hFV9YlleTPnrHMUmp2evFDyIHItmFxfSKSpdMJVhfm1LdfGW5m",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 7500,
+      "amount_total": 7500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "required",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775939694,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "if_required",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1776026093,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": null,
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {
+        "box_size": "premium",
+        "type": "subscription"
+      },
+      "mode": "subscription",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1TL88wG67LsNxpTojxjOvhTQ",
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/subscription-confirmed?session_id={CHECKOUT_SESSION_ID}",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1zvSP0jlXE1ZP5v2ZiaxDanSDF59qdpjsU6Dy7Olf4ZncLjQuLHug02dI",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 5500,
+      "amount_total": 5500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "required",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775939693,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "if_required",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1776026092,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": null,
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {
+        "box_size": "family",
+        "type": "subscription"
+      },
+      "mode": "subscription",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1TL88vG67LsNxpTokErPsWBS",
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/subscription-confirmed?session_id={CHECKOUT_SESSION_ID}",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a16lzc3yJOb7mwogh3n50rpmsQevzqJRuJdEwrTExqu2DXo0DvJ8nLDupI",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 3000,
+      "amount_total": 3000,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "required",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775939691,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "if_required",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1776026091,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": null,
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {
+        "box_size": "small",
+        "type": "subscription"
+      },
+      "mode": "subscription",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1TL88uG67LsNxpTo22RcsjJx",
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/subscription-confirmed?session_id={CHECKOUT_SESSION_ID}",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1y2l8tqcFY7ua2YzCkIKOPjvIlIxUSJo3iHFdFAxQ0ccWvdvWo3NAQmOu",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 3150,
+      "amount_total": 3150,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Uncle Mays's Produce",
+        "font_family": "default",
+        "icon": null,
+        "logo": null
+      },
+      "cancel_url": "https://unclemays.com/#boxes",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775938428,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1776024827,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": null,
+      "livemode": true,
+      "locale": null,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "subscription",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success?session_id={CHECKOUT_SESSION_ID}",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1tv1D2EBwRypJ7KXJ6qPXctSce5vmoKntqIxEXfdcw7YgoLFvtQdqUqa2",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 8550,
+      "amount_total": 8550,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Uncle Mays's Produce",
+        "font_family": "default",
+        "icon": null,
+        "logo": null
+      },
+      "cancel_url": "https://unclemays.com/#boxes",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775935653,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1776022053,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": null,
+      "livemode": true,
+      "locale": null,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "subscription",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success?session_id={CHECKOUT_SESSION_ID}",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1Fq2jsydVH7M5TYRqMpzjdfp8XLL3waYuOzRvSlTD3guSn8q325H4fNy9",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 5850,
+      "amount_total": 5850,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Uncle Mays's Produce",
+        "font_family": "default",
+        "icon": null,
+        "logo": null
+      },
+      "cancel_url": "https://unclemays.com/#boxes",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775935652,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1776022052,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": null,
+      "livemode": true,
+      "locale": null,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "subscription",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success?session_id={CHECKOUT_SESSION_ID}",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1QAXBjTNnhu3KoyjZSj9JmmJ8AZkYd2iA8tUR0EgYbrmo66GXuGoV3Ejy",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 3150,
+      "amount_total": 3150,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Uncle Mays's Produce",
+        "font_family": "default",
+        "icon": null,
+        "logo": null
+      },
+      "cancel_url": "https://unclemays.com/#boxes",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775935647,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1776022047,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": null,
+      "livemode": true,
+      "locale": null,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "subscription",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "always",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success?session_id={CHECKOUT_SESSION_ID}",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1zLVZgBNvetgYTdwMPCRZc34xDc7ZkVbda2WClkx1AwWvGKfFfYhBZnxw",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775879892,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775966292,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb52iG67LsNxpToJA9j30gR",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a11tH1tmSB3aJOMnRgEdztNpH4idyrDe5oEHYH1tKKKRWdSpCvTE1n7lmK",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775856060,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "if_required",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775942460,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1TKjReG67LsNxpToSCuJ1O31",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-confirmed",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1jrli31nryK9zZxmT0WZo3UI2PwHWVrIM8fP05hon1f7u3D0pvUdEnSZC",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 6500,
+      "amount_total": 6500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775852923,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775939323,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb5Q6G67LsNxpToXpGbA8Np",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1867XKWszWnkubNjy6sY6M3gvycHTYLPF6ttSiGkmYd4hEjYN5oYhQF4S",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775850506,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "if_required",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775936906,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1TKjReG67LsNxpToSCuJ1O31",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-confirmed",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1mEwFeMGGFNoKNOGpdNYGGP9YHsFVxXeBLLhY28gNpakYqjBO8BZDn1lA",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 9500,
+      "amount_total": 9500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775846568,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775932968,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb5OdG67LsNxpTo6vxxc1CP",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1p2kYLiF0aLjb52kNPR1uuVK5nBBA0cR6f80FmzAc1Hh3FC1VTbCGD2GL",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775845098,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": null,
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "if_required",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775931498,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1TKjReG67LsNxpToSCuJ1O31",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": false
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": null,
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-confirmed",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1RVQ9UsQoAKzVAz95xTh38jqUu3ASH1vms2JZ0tZQMchpLySdZcnaadxJ",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 9500,
+      "amount_total": 9500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775844146,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775930546,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb5OdG67LsNxpTo6vxxc1CP",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1XEiUktAixHpTU5LWEY3Syov73xHt7uSzHLfmTRfkXHRFMjPquBjgum22",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 6500,
+      "amount_total": 6500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775842830,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775929229,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb5Q6G67LsNxpToXpGbA8Np",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1tO99uaOCbFcHWpGi7QI2GvfjChHMojp2eh4RqLaEKL3mMhIIi7TDGcr5",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775842824,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775929224,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb52iG67LsNxpToJA9j30gR",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1Gzm9Oah78Usn0TtHp5rn1hxJMXSOwEg3eMT7EIQwNyEj7CpXbm2SzoId",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775796652,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775883052,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb52iG67LsNxpToJA9j30gR",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1661ruB5Sj15KciY98S4wrham1gxqoEWkEg0jWVhEI7dDUkxNIAYXHu4e",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 9500,
+      "amount_total": 9500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775776072,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775862472,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb5OdG67LsNxpTo6vxxc1CP",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1uIOJOJqz9uOFlmi2IwrVE1P2TAnboDtw9S9n8bCfEtnYQDzdGdiw4Irs",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 6500,
+      "amount_total": 6500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775776062,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775862462,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb5Q6G67LsNxpToXpGbA8Np",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1AT7yzuEmZzvNThFm7rHFEEjLXcmmrsXyHHJjIJBxe1nSKvaDx80wgrJi",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775776054,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775862454,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb52iG67LsNxpToJA9j30gR",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1m10DnX3d9nUym3593xpwqhfRrnDKufU7yxo1EW0idRvD7aR1ma2G3hTe",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": false,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": "auto",
+      "cancel_url": "https://stripe.com",
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": {
+        "payment_method_reuse_agreement": null,
+        "promotions": "none",
+        "terms_of_service": "none"
+      },
+      "created": 1775776045,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery zip code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "always",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775862445,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": true,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": {
+            "type": "self"
+          },
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": "auto",
+      "managed_payments": null,
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": "plink_1Sb52iG67LsNxpToJA9j30gR",
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": {
+        "id": "pmc_1SWNQWG67LsNxpToeJ8q8EFH",
+        "parent": null
+      },
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card",
+        "link"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "saved_payment_method_options": {
+        "allow_redisplay_filters": [
+          "always"
+        ],
+        "payment_method_remove": "disabled",
+        "payment_method_save": null
+      },
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": "auto",
+      "subscription": null,
+      "success_url": "https://unclemays.com/order-success",
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "hosted",
+      "url": null,
+      "wallet_options": null
+    },
+    {
+      "id": "cs_live_a1SF6AvhaKQO1fBXtdKXE43cx0W9J0DTpMjnXK5ptg4k540t8glKfPviPu",
+      "object": "checkout.session",
+      "adaptive_pricing": {
+        "enabled": true
+      },
+      "after_expiration": null,
+      "allow_promotion_codes": null,
+      "amount_subtotal": 3500,
+      "amount_total": 3500,
+      "automatic_tax": {
+        "enabled": false,
+        "liability": null,
+        "provider": null,
+        "status": null
+      },
+      "billing_address_collection": null,
+      "branding_settings": {
+        "background_color": "#ffffff",
+        "border_style": "rounded",
+        "button_color": "#0074d4",
+        "display_name": "Uncle Mays's Produce",
+        "font_family": "default",
+        "icon": null,
+        "logo": null
+      },
+      "cancel_url": null,
+      "client_reference_id": null,
+      "client_secret": null,
+      "collected_information": null,
+      "consent": null,
+      "consent_collection": null,
+      "created": 1775761962,
+      "currency": "usd",
+      "currency_conversion": null,
+      "custom_fields": [
+        {
+          "key": "delivery_zip",
+          "label": {
+            "custom": "Delivery ZIP Code",
+            "type": "custom"
+          },
+          "optional": false,
+          "text": {
+            "default_value": null,
+            "maximum_length": null,
+            "minimum_length": null,
+            "value": null
+          },
+          "type": "text"
+        }
+      ],
+      "custom_text": {
+        "after_submit": null,
+        "shipping_address": null,
+        "submit": {
+          "message": "Chicago delivery on Wednesdays. Order by Tuesday night when you can for this week's route."
+        },
+        "terms_of_service_acceptance": null
+      },
+      "customer": null,
+      "customer_account": null,
+      "customer_creation": "if_required",
+      "customer_details": null,
+      "customer_email": null,
+      "discounts": [],
+      "expires_at": 1775848362,
+      "integration_identifier": null,
+      "invoice": null,
+      "invoice_creation": {
+        "enabled": false,
+        "invoice_data": {
+          "account_tax_ids": null,
+          "custom_fields": null,
+          "description": null,
+          "footer": null,
+          "issuer": null,
+          "metadata": {},
+          "rendering_options": null
+        }
+      },
+      "livemode": true,
+      "locale": null,
+      "managed_payments": {
+        "enabled": false
+      },
+      "metadata": {},
+      "mode": "payment",
+      "origin_context": null,
+      "payment_intent": null,
+      "payment_link": null,
+      "payment_method_collection": "if_required",
+      "payment_method_configuration_details": null,
+      "payment_method_options": {
+        "card": {
+          "request_three_d_secure": "automatic"
+        }
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "payment_status": "unpaid",
+      "permissions": null,
+      "phone_number_collection": {
+        "enabled": true
+      },
+      "recovered_from": null,
+      "redirect_on_completion": "always",
+      "return_url": "https://unclemays.com/order-success?session_id={CHECKOUT_SESSION_ID}",
+      "saved_payment_method_options": null,
+      "setup_intent": null,
+      "shipping_address_collection": {
+        "allowed_countries": [
+          "US"
+        ]
+      },
+      "shipping_cost": null,
+      "shipping_details": null,
+      "shipping_options": [],
+      "status": "expired",
+      "submit_type": null,
+      "subscription": null,
+      "success_url": null,
+      "total_details": {
+        "amount_discount": 0,
+        "amount_shipping": 0,
+        "amount_tax": 0
+      },
+      "ui_mode": "embedded",
+      "url": null,
+      "wallet_options": null
+    }
+  ],
+  "has_more": false,
+  "url": "/v1/checkout/sessions"
+}

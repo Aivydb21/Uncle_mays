@@ -1,0 +1,127 @@
+{
+  "ads": [
+    {
+      "ad_set": "instagram_feed",
+      "ad_name": "Instagram Feed - Static Image 1",
+      "ad_id": "120243222564200762",
+      "creative_id": "963494776091825",
+      "image_hash": "7aef798892a38251a52c4e3f72716993",
+      "image_filename": "meta_feed_chicago_families_1080x1080.png"
+    },
+    {
+      "ad_set": "instagram_feed",
+      "ad_name": "Instagram Feed - Static Image 2",
+      "ad_id": "120243222564750762",
+      "creative_id": "1672932547491772",
+      "image_hash": "0261a48f479da33ca3b6ec06a43b8b45",
+      "image_filename": "meta_feed_farm_to_table_1080x1080.png"
+    },
+    {
+      "ad_set": "instagram_feed",
+      "ad_name": "Instagram Feed - Static Image 3",
+      "ad_id": "120243222565310762",
+      "creative_id": "1482830730056011",
+      "image_hash": "fdf532a181cd428ffd571067d6a43524",
+      "image_filename": "meta_feed_grandmas_greens_1080x1080.png"
+    },
+    {
+      "ad_set": "instagram_feed",
+      "ad_name": "Instagram Feed - Static Image 4",
+      "ad_id": "120243222566130762",
+      "creative_id": "2219142068894374",
+      "image_hash": "b30c99b43c0f6b32f3681fcced9a4156",
+      "image_filename": "meta_feed_whats_in_box_1080x1080.png"
+    },
+    {
+      "ad_set": "instagram_feed",
+      "ad_name": "Instagram Feed - Static Image 5",
+      "ad_id": "120243222567270762",
+      "creative_id": "2556586018070180",
+      "image_hash": "59d87187461d2c586186c1d4cf051a54",
+      "image_filename": "meta_feed_zero_hassle_1080x1080.png"
+    },
+    {
+      "ad_set": "instagram_stories",
+      "ad_name": "Instagram Stories - Static Image 1",
+      "ad_id": "120243222567860762",
+      "creative_id": "2215262499008461",
+      "image_hash": "7a5f2fe6e5561b056bbc84bed977b033",
+      "image_filename": "meta_story_blackowned_1080x1920.png"
+    },
+    {
+      "ad_set": "instagram_stories",
+      "ad_name": "Instagram Stories - Static Image 2",
+      "ad_id": "120243222568560762",
+      "creative_id": "1410099744467879",
+      "image_hash": "eb13633d8989587a4af0de1e6541b94d",
+      "image_filename": "meta_story_convenience_1080x1920.png"
+    },
+    {
+      "ad_set": "instagram_stories",
+      "ad_name": "Instagram Stories - Static Image 3",
+      "ad_id": "120243222569510762",
+      "creative_id": "2972653666409834",
+      "image_hash": "cbb8515ca47a9cd80be1480422d3b6cc",
+      "image_filename": "meta_story_cultural_1080x1920.png"
+    },
+    {
+      "ad_set": "instagram_stories",
+      "ad_name": "Instagram Stories - Static Image 4",
+      "ad_id": "120243222570040762",
+      "creative_id": "1274428311519330",
+      "image_hash": "8e319a63d28cbf1550eac128797464c2",
+      "image_filename": "meta_story_offer_1080x1920.png"
+    },
+    {
+      "ad_set": "instagram_stories",
+      "ad_name": "Instagram Stories - Static Image 5",
+      "ad_id": "120243222571630762",
+      "creative_id": "4422140048043457",
+      "image_hash": "b9d3bbe9d8055cdd22ede5d6c1ef65a2",
+      "image_filename": "meta_story_subscription_value_1080x1920.png"
+    },
+    {
+      "ad_set": "facebook_feed",
+      "ad_name": "Facebook Feed - Static Image 1",
+      "ad_id": "120243222572660762",
+      "creative_id": "2081699299060396",
+      "image_hash": "7aef798892a38251a52c4e3f72716993",
+      "image_filename": "meta_feed_chicago_families_1080x1080.png"
+    },
+    {
+      "ad_set": "facebook_feed",
+      "ad_name": "Facebook Feed - Static Image 2",
+      "ad_id": "120243222574460762",
+      "creative_id": "1883322942413909",
+      "image_hash": "0261a48f479da33ca3b6ec06a43b8b45",
+      "image_filename": "meta_feed_farm_to_table_1080x1080.png"
+    },
+    {
+      "ad_set": "facebook_feed",
+      "ad_name": "Facebook Feed - Static Image 3",
+      "ad_id": "120243222575490762",
+      "creative_id": "1248625637387418",
+      "image_hash": "fdf532a181cd428ffd571067d6a43524",
+      "image_filename": "meta_feed_grandmas_greens_1080x1080.png"
+    },
+    {
+      "ad_set": "facebook_feed",
+      "ad_name": "Facebook Feed - Static Image 4",
+      "ad_id": "120243222576400762",
+      "creative_id": "2495177864245274",
+      "image_hash": "b30c99b43c0f6b32f3681fcced9a4156",
+      "image_filename": "meta_feed_whats_in_box_1080x1080.png"
+    },
+    {
+      "ad_set": "facebook_feed",
+      "ad_name": "Facebook Feed - Static Image 5",
+      "ad_id": "120243222577640762",
+      "creative_id": "1941801663878940",
+      "image_hash": "59d87187461d2c586186c1d4cf051a54",
+      "image_filename": "meta_feed_zero_hassle_1080x1080.png"
+    }
+  ],
+  "total": 15,
+  "created_count": 15,
+  "timestamp": "2026-04-17"
+}

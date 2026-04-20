@@ -1,0 +1,197 @@
+{
+  "campaign_name": "CRE & HNW - Black Professionals v2",
+  "campaign_id": "69d9670d516fcc0011c0ee34",
+  "sender": "anthony@unclemays.com",
+  "sender_account_id": "69ce9758234a71001971b038",
+  "status": "ready_pending_ui_activation",
+  "note": "Fully loaded: 4 steps with templates, 20 contacts, schedule set. Activate in Apollo UI.",
+  "sequence_steps": 4,
+  "total_contacts_in_campaign": 20,
+  "contacts_in_campaign": [
+    {
+      "name": "Don Peebles",
+      "email": "donpeebles@peeblescorp.com",
+      "id": "69d91aee1e88ce00212140dd",
+      "org": "The Peebles Corporation"
+    },
+    {
+      "name": "Quintin Primo",
+      "email": "qprimo@capri.global",
+      "id": "69d91aeff903500019d44235",
+      "org": "Capri Investment Group"
+    },
+    {
+      "name": "Leon Walker",
+      "email": "lwalker@dl3realty.com",
+      "id": "69d91af01d6477001dd2312c",
+      "org": "DL3 Realty"
+    },
+    {
+      "name": "Jair Lynch",
+      "email": "jlynch@cubesmart.com",
+      "id": "69d91af01e88ce00157ea306",
+      "org": "Jair Lynch Real Estate Partners"
+    },
+    {
+      "name": "Robin Zeigler",
+      "email": "rzeigler@muralrealestate.com",
+      "id": "69d91af1080ca80019c33cad",
+      "org": "MURAL Real Estate Partners"
+    },
+    {
+      "name": "Amin Irving",
+      "email": "airving@ginosko.com",
+      "id": "69d91af27d23bb0021b7567d",
+      "org": "Ginosko Development Company"
+    },
+    {
+      "name": "Greg Reaves",
+      "email": "greg_reaves@mosaicdp.com",
+      "id": "69d91af3f903500019d442ad",
+      "org": "Mosaic Development Partners"
+    },
+    {
+      "name": "Leslie Smallwood-Lewis",
+      "email": "lsl@mosaicdp.com",
+      "id": "69d91af47343f0000dff9770",
+      "org": "Mosaic Development Partners"
+    },
+    {
+      "name": "Bo Menkiti",
+      "email": "bo@menkitigroup.com",
+      "id": "69d91af5080ca80019c33cb9",
+      "org": "The Menkiti Group"
+    },
+    {
+      "name": "Victor MacFarlane",
+      "email": "vmacfarlane@macfarlanepartners.com",
+      "id": "69d91af6c72f8b0019ded1e4",
+      "org": "MacFarlane Partners"
+    },
+    {
+      "name": "Tammy Jones",
+      "email": "tammyjones@basisinvgroup.com",
+      "id": "69d91af7648b83000d415867",
+      "org": "Basis Investment Group"
+    },
+    {
+      "name": "Daryl Carter",
+      "email": "dcarter@avanath.com",
+      "id": "69d91af84f78710015173b56",
+      "org": "Avanath Capital"
+    },
+    {
+      "name": "Kirk Goodrich",
+      "email": "kgoodrich@monadnockdevelopment.com",
+      "id": "69d91afab2ebe90019db4076",
+      "org": "Monadnock Development"
+    },
+    {
+      "name": "Kimberly Hardy",
+      "email": "khardy@mckissack.com",
+      "id": "69d91afb97482c00158a492d",
+      "org": "McKissack & McKissack"
+    },
+    {
+      "name": "Ashley Thomas",
+      "email": "ashley.thomas@nareb.com",
+      "id": "69d91afcb254c80015a20c6a",
+      "org": "NAREB"
+    },
+    {
+      "name": "Kimberly Dowdell",
+      "email": "kimberlydowdell@aia.org",
+      "id": "69d91afe490c75000d70f59c",
+      "org": "AIA"
+    },
+    {
+      "name": "Mellody Hobson",
+      "email": "mhobson@arielinvestments.com",
+      "id": "69d91aff4bdc6d000d9dad2e",
+      "org": "Ariel Investments"
+    },
+    {
+      "name": "Jim Reynolds",
+      "email": "jim.reynolds@loopcapital.com",
+      "id": "69d91b0074fb1d000d8b5253",
+      "org": "Loop Capital"
+    },
+    {
+      "name": "Robert Smith",
+      "email": "rsmith@vistaequitypartners.com",
+      "id": "69d91b02fd4515001164b8e8",
+      "org": "Vista Equity Partners"
+    },
+    {
+      "name": "Michael Russell",
+      "email": "mrussell@hjrussell.com",
+      "id": "69d91b05dbf1280019f6279e",
+      "org": "H.J. Russell & Company"
+    }
+  ],
+  "excluded": [
+    {
+      "name": "Martin Nesbitt",
+      "reason": "Already in direct conversation with Anthony"
+    }
+  ],
+  "no_email": [
+    {
+      "name": "Christopher Bramwell",
+      "id": "69d91af6b2ebe90019db406d",
+      "org": "CB Emmanuel Realty"
+    },
+    {
+      "name": "Devon Prioleau",
+      "id": "69d91af96cd277000dba44a1",
+      "org": "PDG"
+    },
+    {
+      "name": "Leonard Allen-Smith",
+      "id": "69d91afa8e3b640021f52376",
+      "org": "Allen Smith Equities"
+    },
+    {
+      "name": "Emmitt Smith",
+      "id": "69d91afdb2ebe90019db408d",
+      "org": "Emmitt Smith Advisors"
+    },
+    {
+      "name": "John Rogers",
+      "id": "69d91afe36b6530021c3ee10",
+      "org": "Ariel Investments"
+    },
+    {
+      "name": "Bernard Loyd",
+      "id": "69d91b02b2ebe90019db40ac",
+      "org": "Mesirow"
+    },
+    {
+      "name": "Desiree Rogers",
+      "id": "69d91b03c7ad640013b10e87",
+      "org": ""
+    },
+    {
+      "name": "Valerie Jarrett",
+      "id": "69d91b04bbc4aa001ddf3c0c",
+      "org": ""
+    },
+    {
+      "name": "Benathan Upshaw",
+      "id": "69d91b067d23bb0021b756e5",
+      "org": "CB Emmanuel Realty"
+    },
+    {
+      "name": "Jemal King",
+      "id": "69d91b07b2ebe90019db40c4",
+      "org": "Model of Transformation"
+    },
+    {
+      "name": "Morgan Malone",
+      "id": "69d91b078e3b640021f5239a",
+      "org": ""
+    }
+  ],
+  "updated_at": "2026-04-10",
+  "old_campaign_id": "69d91b08db5ac5001dad04d3"
+}

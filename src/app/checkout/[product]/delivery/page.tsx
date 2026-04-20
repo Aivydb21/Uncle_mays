@@ -6,7 +6,6 @@ import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
 
 declare global {
   interface Window {
@@ -68,10 +67,82 @@ interface FormFields {
   state: string;
   zip: string;
   deliveryNotes: string;
-  deliveryDate: Date | undefined;
+  deliveryDate: string;
+  deliveryWindow: string;
 }
 
 type FormErrors = Partial<Record<keyof FormFields, string>>;
+
+// Check if a date is a Wednesday
+function isWednesday(date: Date): boolean {
+  return date.getDay() === 3; // 0 = Sunday, 3 = Wednesday
+}
+
+// Get the earliest selectable delivery date (next Wednesday)
+function getEarliestDeliveryDate(): Date {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let current = new Date(today);
+  const daysUntilWednesday = (3 - current.getDay() + 7) % 7;
+
+  if (daysUntilWednesday === 0) {
+    // If today is Wednesday, start from next Wednesday to give processing time
+    current.setDate(current.getDate() + 7);
+  } else {
+    current.setDate(current.getDate() + daysUntilWednesday);
+  }
+
+  return current;
+}
+
+// Check if a date is a valid delivery date
+function isValidDeliveryDate(date: Date): boolean {
+  const earliest = getEarliestDeliveryDate();
+  const maxDate = new Date(earliest);
+  maxDate.setDate(maxDate.getDate() + (8 * 7)); // 8 weeks out
+
+  const dateTime = date.getTime();
+  return (
+    isWednesday(date) &&
+    dateTime >= earliest.getTime() &&
+    dateTime <= maxDate.getTime()
+  );
+}
+
+// Generate next 4 available Wednesday delivery dates
+function getAvailableDeliveryDates(): Array<{ value: string; label: string }> {
+  const dates: Array<{ value: string; label: string }> = [];
+  const firstWednesday = getEarliestDeliveryDate();
+
+  for (let i = 0; i < 4; i++) {
+    const date = new Date(firstWednesday);
+    date.setDate(date.getDate() + (i * 7)); // Add weeks
+
+    // Use local date components to avoid timezone conversion issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+
+    const label = date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    dates.push({ value: dateStr, label });
+  }
+
+  return dates;
+}
+
+const TIME_WINDOWS = [
+  { id: '9am-12pm', label: '9:00 AM - 12:00 PM' },
+  { id: '12pm-3pm', label: '12:00 PM - 3:00 PM' },
+  { id: '3pm-6pm', label: '3:00 PM - 6:00 PM' },
+  { id: '6pm-9pm', label: '6:00 PM - 9:00 PM' },
+];
 
 function validate(fields: FormFields): FormErrors {
   const errors: FormErrors = {};
@@ -80,13 +151,14 @@ function validate(fields: FormFields): FormErrors {
   if (!fields.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) {
     errors.email = "A valid email address is required.";
   }
-  if (!fields.deliveryDate) errors.deliveryDate = "Please select a delivery date.";
   if (!fields.street.trim()) errors.street = "Street address is required.";
   if (!fields.city.trim()) errors.city = "City is required.";
   if (!fields.state.trim()) errors.state = "State is required.";
   if (!fields.zip.trim() || !/^\d{5}(-\d{4})?$/.test(fields.zip.trim())) {
     errors.zip = "A valid ZIP code is required.";
   }
+  if (!fields.deliveryDate) errors.deliveryDate = "Please select a delivery date.";
+  if (!fields.deliveryWindow) errors.deliveryWindow = "Please select a delivery time window.";
   return errors;
 }
 
@@ -126,7 +198,8 @@ export default function DeliveryPage() {
     state: "IL",
     zip: "",
     deliveryNotes: "",
-    deliveryDate: undefined,
+    deliveryDate: "",
+    deliveryWindow: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
@@ -185,27 +258,6 @@ export default function DeliveryPage() {
     }
   }
 
-  function handleDateSelect(date: Date | undefined) {
-    setFields((prev) => ({ ...prev, deliveryDate: date }));
-    if (errors.deliveryDate) {
-      setErrors((prev) => ({ ...prev, deliveryDate: undefined }));
-    }
-  }
-
-  // Only allow Thursdays that are in the future
-  function isDeliveryDateDisabled(date: Date): boolean {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    // Disable if date is in the past
-    if (date < today) return true;
-
-    // Disable if not Thursday (day 4)
-    if (date.getDay() !== 4) return true;
-
-    return false;
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const validationErrors = validate(fields);
@@ -219,11 +271,16 @@ export default function DeliveryPage() {
 
     // Read protein choices for family/community boxes
     let proteinChoices: ProteinId[] | undefined;
+    let additionalProteinChoices: ProteinId[] | undefined;
     if (product.proteinCount > 0 && typeof window !== "undefined") {
       try {
         const saved = sessionStorage.getItem(`unc-proteins-${slug}`);
         if (saved) {
           proteinChoices = JSON.parse(saved) as ProteinId[];
+        }
+        const savedAdditional = sessionStorage.getItem(`unc-additional-proteins-${slug}`);
+        if (savedAdditional) {
+          additionalProteinChoices = JSON.parse(savedAdditional) as ProteinId[];
         }
       } catch {
         // ignore
@@ -262,8 +319,10 @@ export default function DeliveryPage() {
             zip: fields.zip.trim(),
           },
           deliveryNotes: fields.deliveryNotes.trim() || undefined,
-          deliveryDate: fields.deliveryDate?.toISOString(),
+          deliveryDate: fields.deliveryDate,
+          deliveryWindow: fields.deliveryWindow,
           proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
+          additionalProteinChoices: additionalProteinChoices?.length ? additionalProteinChoices : undefined,
         }),
       });
 
@@ -294,12 +353,15 @@ export default function DeliveryPage() {
               zip: fields.zip.trim(),
             },
             deliveryNotes: fields.deliveryNotes.trim() || undefined,
-            deliveryDate: fields.deliveryDate?.toISOString(),
+            deliveryDate: fields.deliveryDate,
+            deliveryWindow: fields.deliveryWindow,
             proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
+            additionalProteinChoices: additionalProteinChoices?.length ? additionalProteinChoices : undefined,
           })
         );
         // Clear protein sessionStorage once saved
         sessionStorage.removeItem(`unc-proteins-${slug}`);
+        sessionStorage.removeItem(`unc-additional-proteins-${slug}`);
       }
 
       router.push(`/checkout/${slug}/payment`);
@@ -335,19 +397,9 @@ export default function DeliveryPage() {
               >
                 Delivery Details
               </h1>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p className="text-sm text-muted-foreground mb-6">
                 Where should we deliver your box?
               </p>
-
-              {/* Urgency callout */}
-              <div className="mb-6 p-3 rounded-lg border border-primary/20 bg-primary/5">
-                <div className="flex items-center gap-2 text-xs">
-                  <span className="text-lg">⏰</span>
-                  <span className="font-medium text-primary">
-                    Order by Thursday 11:59pm for delivery this Sunday
-                  </span>
-                </div>
-              </div>
 
               <form onSubmit={handleSubmit} noValidate>
                 {/* Name row */}
@@ -418,28 +470,6 @@ export default function DeliveryPage() {
                     autoComplete="tel"
                     placeholder="(312) 555-0100"
                   />
-                </div>
-
-                {/* Delivery Date */}
-                <div className="space-y-1.5 mb-4">
-                  <Label>
-                    Delivery Date <span className="text-destructive">*</span>
-                  </Label>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Select a Thursday for delivery (deliveries every Thursday)
-                  </p>
-                  <div className="flex justify-center border rounded-lg p-3 bg-muted/20">
-                    <Calendar
-                      mode="single"
-                      selected={fields.deliveryDate}
-                      onSelect={handleDateSelect}
-                      disabled={isDeliveryDateDisabled}
-                      initialFocus
-                    />
-                  </div>
-                  {errors.deliveryDate && (
-                    <p className="text-destructive text-xs">{errors.deliveryDate}</p>
-                  )}
                 </div>
 
                 {/* Street + Apt */}
@@ -527,6 +557,75 @@ export default function DeliveryPage() {
                   </div>
                 </div>
 
+                {/* Delivery Date Selection */}
+                <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+                  <Label htmlFor="deliveryDate" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                    Choose Your Delivery Date <span className="text-destructive">*</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    We deliver every Wednesday. Select your preferred date:
+                  </p>
+                  <select
+                    id="deliveryDate"
+                    name="deliveryDate"
+                    value={fields.deliveryDate}
+                    onChange={(e) => {
+                      setFields((prev) => ({ ...prev, deliveryDate: e.target.value }));
+                      if (errors.deliveryDate) {
+                        setErrors((prev) => ({ ...prev, deliveryDate: undefined }));
+                      }
+                    }}
+                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <option value="">Select a delivery date...</option>
+                    {getAvailableDeliveryDates().map((date) => (
+                      <option key={date.value} value={date.value}>
+                        {date.label}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.deliveryDate && (
+                    <p className="text-destructive text-xs mt-2">{errors.deliveryDate}</p>
+                  )}
+                </div>
+
+                {/* Delivery Time Window Selection */}
+                <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+                  <Label className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                    Choose Your Delivery Window <span className="text-destructive">*</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Select a 3-hour delivery window
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {TIME_WINDOWS.map((window) => {
+                      const selected = fields.deliveryWindow === window.id;
+                      return (
+                        <button
+                          key={window.id}
+                          type="button"
+                          onClick={() => {
+                            setFields((prev) => ({ ...prev, deliveryWindow: window.id }));
+                            if (errors.deliveryWindow) {
+                              setErrors((prev) => ({ ...prev, deliveryWindow: undefined }));
+                            }
+                          }}
+                          className={`px-4 py-3 rounded-lg border text-sm font-medium transition-all ${
+                            selected
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
+                          }`}
+                        >
+                          {window.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.deliveryWindow && (
+                    <p className="text-destructive text-xs mt-2">{errors.deliveryWindow}</p>
+                  )}
+                </div>
+
                 {/* Delivery notes */}
                 <div className="space-y-1.5 mb-6">
                   <Label htmlFor="deliveryNotes">Delivery Notes (optional)</Label>
@@ -577,26 +676,6 @@ export default function DeliveryPage() {
               <p className="text-xs text-muted-foreground mt-3">
                 Delivered this Wednesday. No subscription — order when you want.
               </p>
-
-              {/* Trust signals */}
-              <div className="mt-4 pt-4 border-t border-border space-y-2">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span>89% of customers refer friends</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                  <span>Secure checkout with Stripe</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>💡</span>
-                  <span>Just $3-5 per meal</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>

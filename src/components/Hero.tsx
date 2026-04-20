@@ -84,7 +84,7 @@ export const Hero = () => {
             {HERO_BOXES.map((box) => (
               <Link
                 key={box.slug}
-                href={`/checkout/${box.slug}`}
+                href={`/subscribe/${box.slug}`}
                 className={`group flex flex-col gap-1 rounded-xl px-5 py-4 border transition-all duration-200 ${
                   box.popular
                     ? "bg-primary text-primary-foreground border-primary shadow-md hover:bg-primary/90"

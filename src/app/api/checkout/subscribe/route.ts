@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+import { upsertContact, createCart } from "@/lib/mailchimp";
 
 // Subscription Price IDs (weekly, 10% discount vs one-time)
 // Set these in .env: STRIPE_STARTER_SUB_PRICE_ID, STRIPE_FAMILY_SUB_PRICE_ID, STRIPE_COMMUNITY_SUB_PRICE_ID
@@ -19,6 +18,7 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
     const { product, email, firstName, lastName, phone, address, deliveryNotes, proteinChoices, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await req.json();
     const priceId = SUB_PRICE_MAP[product];
@@ -82,6 +82,16 @@ export async function POST(req: NextRequest) {
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams);
+
+    // Non-blocking: upsert subscriber + create abandoned cart so Mailchimp
+    // Journey fires if the customer abandons the Stripe Checkout page.
+    if (email && firstName && lastName) {
+      upsertContact(email, firstName, lastName)
+        .catch((err) => console.error("Mailchimp upsertContact error (subscribe):", err));
+      const priceInDollars = (session.amount_total ?? 0) / 100;
+      createCart(session.id, email, firstName, lastName, product, priceInDollars)
+        .catch((err) => console.error("Mailchimp createCart error (subscribe):", err));
+    }
 
     return NextResponse.json({ url: session.url });
   } catch (err: unknown) {

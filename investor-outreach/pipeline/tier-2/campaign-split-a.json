@@ -1,0 +1,1361 @@
+[
+  {
+    "id": "69caebd4188ffa0001f61ca9",
+    "name": "Peter Chang",
+    "email": "peter.chang@lcatterton.com",
+    "org": "L Catterton",
+    "title": "Managing Partner & Co-Head of Private Credit",
+    "location": "New York, New York",
+    "score": 40
+  },
+  {
+    "id": "69caebd3188ffa0001f61bce",
+    "name": "Dirk Donath",
+    "email": "dirk.donath@lcatterton.com",
+    "org": "L Catterton",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 40
+  },
+  {
+    "id": "69caebd4188ffa0001f61c49",
+    "name": "Tehmina Haider",
+    "email": "tehmina.haider@lcatterton.com",
+    "org": "L Catterton",
+    "title": "Partner",
+    "location": "New York, New York",
+    "score": 35
+  },
+  {
+    "id": "69caebd4188ffa0001f61c30",
+    "name": "Marc-David Bismuth",
+    "email": "marc-david.bismuth@lcatterton.com",
+    "org": "L Catterton",
+    "title": "Partner",
+    "location": "Los Angeles, California",
+    "score": 35
+  },
+  {
+    "id": "69cae89e0ba28400010465da",
+    "name": "Todd Novak",
+    "email": "tnovak@mdcp.com",
+    "org": "Madison Dearborn Partners, LLC",
+    "title": "Managing Director: Head of Portfolio Finance at Madison Dearborn Partners",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69caeab346508b000193be75",
+    "name": "Brandon Levitan",
+    "email": "blevitan@mdcp.com",
+    "org": "Madison Dearborn Partners, LLC",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae89e0ba284000104654d",
+    "name": "Michael Mauze",
+    "email": "mauze@vmgpartners.com",
+    "org": "VMG Partners",
+    "title": "General Partner",
+    "location": "San Francisco, California",
+    "score": 40
+  },
+  {
+    "id": "69caebd4188ffa0001f61c91",
+    "name": "Alisa Carmichael",
+    "email": "carmichael@vmgpartners.com",
+    "org": "VMG Partners",
+    "title": "Partner",
+    "location": "Oakland, California",
+    "score": 35
+  },
+  {
+    "id": "69caeab346508b000193bea6",
+    "name": "Don Kremin",
+    "email": "dkremin@akoyacapital.com",
+    "org": "Akoya Capital, LLC",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae042eddc690001739539",
+    "name": "Sam Pritzker",
+    "email": "spritzker@tsgconsumer.com",
+    "org": "TSG Consumer Partners",
+    "title": "Managing Director",
+    "location": "New York, New York",
+    "score": 25
+  },
+  {
+    "id": "69caebd4188ffa0001f61cd3",
+    "name": "Jim Pettit",
+    "email": "jim@navitascap.com",
+    "org": "Navitas Capital",
+    "title": "Managing Partner",
+    "location": "Oakland, California",
+    "score": 10
+  },
+  {
+    "id": "69caeab346508b000193be1d",
+    "name": "Aron Beach",
+    "email": "abeach@wynnchurch.com",
+    "org": "Wynnchurch Capital, L.P.",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69caeab346508b000193be18",
+    "name": "Joe Lawler",
+    "email": "jcl@wppartners.com",
+    "org": "Wind Point Partners",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae061eddc69000173a0ec",
+    "name": "Matthew Iantosca",
+    "email": "matt@gerberkawasaki.com",
+    "org": "Gerber Kawasaki Wealth & Investment Management",
+    "title": "Managing Partner and Director of Wealth Management",
+    "location": "Santa Monica, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c9d",
+    "name": "Renata Dinkelmann",
+    "email": "rdinkelmann@paineschwartz.com",
+    "org": "Paine Schwartz Partners",
+    "title": "Managing Director, Head of Human Capital",
+    "location": "New York, New York",
+    "score": 35
+  },
+  {
+    "id": "69cae89f0ba28400010465ff",
+    "name": "John Underwood",
+    "email": "junderwood@pfingsten.com",
+    "org": "Pfingsten Partners",
+    "title": "Senior Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae89f0ba28400010466a6",
+    "name": "Scott Finegan",
+    "email": "sfinegan@pfingsten.com",
+    "org": "Pfingsten Partners",
+    "title": "Senior Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c98",
+    "name": "Renee Rempe",
+    "email": "r.rempe@comvest.com",
+    "org": "Manulife",
+    "title": "Comvest Credit Partners | Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae044eddc6900017395ec",
+    "name": "Chip Roellig",
+    "email": "croellig@cpclp.com",
+    "org": "Century Park Capital Partners",
+    "title": "Managing Partner",
+    "location": "Menlo Park, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38d4f",
+    "name": "Guy Zaczepinski",
+    "email": "gzaczepinski@cpclp.com",
+    "org": "Century Park Capital Partners",
+    "title": "Managing Partner",
+    "location": "Los Angeles, California",
+    "score": 10
+  },
+  {
+    "id": "69cae061eddc69000173a101",
+    "name": "Jay Waters",
+    "email": "jay@monetcap.com",
+    "org": "Monet Capital",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69caebd3188ffa0001f61c18",
+    "name": "Deepa Shiva",
+    "email": "deepa@obviousventures.com",
+    "org": "Obvious Ventures",
+    "title": "Limited Partner",
+    "location": "Menlo Park, California",
+    "score": 35
+  },
+  {
+    "id": "69cae061eddc69000173a0fa",
+    "name": "Tim Woodward",
+    "email": "twoodward@preludeventures.com",
+    "org": "Prelude Ventures",
+    "title": "Managing Director",
+    "location": "San Francisco, California",
+    "score": 35
+  },
+  {
+    "id": "69cae044eddc69000173961a",
+    "name": "Mark Holroyd",
+    "email": "mark@citycapitalventures.com",
+    "org": "Uncommon Equity (f/k/a City Capital Ventures)",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69caebd4188ffa0001f61c63",
+    "name": "Jason Sowers",
+    "email": "jsowers@winonacapital.com",
+    "org": "Winona Capital Management",
+    "title": "Partner",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae6dfcfa6320001e3972f",
+    "name": "Barb Sullivan",
+    "email": "bsullivan@roundtablehp.com",
+    "org": "RoundTable Healthcare Partners",
+    "title": "Managing Partner",
+    "location": "Chicago, Illinois",
+    "score": 20
+  },
+  {
+    "id": "69caeab946508b000193c7f6",
+    "name": "Soren Reynertson",
+    "email": "soren.reynertson@glca.com",
+    "org": "GLC Advisors & Co., LLC",
+    "title": "Managing General Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae89e0ba2840001046570",
+    "name": "Dustin Weinberger",
+    "email": "dustin@codacapitalco.com",
+    "org": "Coda Capital LLC",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae89e0ba2840001046555",
+    "name": "Margaret Mueller",
+    "email": "mmueller@tiliallc.com",
+    "org": "Tilia Holdings",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69caeab446508b000193bf8d",
+    "name": "John Servatius",
+    "email": "jservatius@newpointadvisors.us",
+    "org": "Newpoint Advisors Corporation",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae6d9cfa6320001e38d13",
+    "name": "Mark Reich",
+    "email": "mreich@riveredgeadvisors.com",
+    "org": "River Edge Advisors : Complete Back Office Solutions",
+    "title": "Managing Partner",
+    "location": "Cedarhurst, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae045eddc690001739676",
+    "name": "Alex Brown",
+    "email": "abrown@ncpartners.com",
+    "org": "NorthCurrent Partners",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c34",
+    "name": "Justin Yousefi",
+    "email": "justin@twinfoldcapital.com",
+    "org": "TwinFold Capital",
+    "title": "Managing Partner",
+    "location": "Los Angeles, California",
+    "score": 10
+  },
+  {
+    "id": "69caeab446508b000193bfc8",
+    "name": "Andrew Boszhardt",
+    "email": "ab@greatoaksvc.com",
+    "org": "Great Oaks Venture Capital",
+    "title": "Founder and Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae045eddc690001739667",
+    "name": "Hironobu Maeda",
+    "email": "maeda@dnx.vc",
+    "org": "DNX Ventures - US",
+    "title": "Managing Partner",
+    "location": "San Mateo, California",
+    "score": 10
+  },
+  {
+    "id": "69caeab446508b000193bfd6",
+    "name": "Selene Casabal",
+    "email": "selene@fuelventurecapital.com",
+    "org": "Fuel Venture Capital",
+    "title": "Managing General Partner, Chief Venture Officer",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38bbb",
+    "name": "Ben Brachot",
+    "email": "ben.brachot@dwightfunding.com",
+    "org": "Dwight Funding",
+    "title": "Co-Founder & Managing Director",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae89f0ba284000104664f",
+    "name": "Thomas Ball",
+    "email": "tball@nextcoastventures.com",
+    "org": "Next Coast Ventures",
+    "title": "Co-Founder & Managing Director",
+    "location": "Austin, Texas",
+    "score": 10
+  },
+  {
+    "id": "69cae044eddc69000173962a",
+    "name": "John McPheters",
+    "email": "john@smv.co",
+    "org": "SMVentures",
+    "title": "Co-Founder/Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38bc3",
+    "name": "TJ Nahigian",
+    "email": "tj@base10.vc",
+    "org": "Base10 Partners",
+    "title": "Co-Founder & Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae044eddc69000173960d",
+    "name": "Jesse Yao",
+    "email": "jesse.yao@roninequitypartners.com",
+    "org": "Ronin Equity Partners",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69caeab446508b000193bf36",
+    "name": "Howard Morgan",
+    "email": "hmorgan@argandequity.com",
+    "org": "Argand Partners",
+    "title": "Managing Partner & Co-Founder",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69caeab446508b000193bfbe",
+    "name": "Nicole Quinn",
+    "email": "nicole@connectventures.com",
+    "org": "Connect Ventures",
+    "title": "Managing Partner, Co-Founder @ Connect Ventures",
+    "location": "San Mateo, California",
+    "score": 10
+  },
+  {
+    "id": "69cae045eddc690001739640",
+    "name": "Eric Kim",
+    "email": "ekim@goodwatercap.com",
+    "org": "Goodwater Capital",
+    "title": "Co-Founder and Managing Partner",
+    "location": "Burlingame, California",
+    "score": 10
+  },
+  {
+    "id": "69cae043eddc69000173958f",
+    "name": "Xiaoming Yin",
+    "email": "xy@gritventures.com",
+    "org": "Grit Ventures",
+    "title": "Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6dfcfa6320001e39746",
+    "name": "Chris Aydam",
+    "email": "caydam@midnightvp.com",
+    "org": "Midnight Venture Partners",
+    "title": "Co-founder, Managing Partner",
+    "location": "Austin, Texas",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38ba4",
+    "name": "Sumant Mandal",
+    "email": "sumant@marchcp.com",
+    "org": "March Capital",
+    "title": "Co-Founder & Managing Partner",
+    "location": "Santa Monica, California",
+    "score": 10
+  },
+  {
+    "id": "69cae041eddc6900017394c1",
+    "name": "Daniel Gluck",
+    "email": "daniel.gluck@groundforcecapital.com",
+    "org": "GroundForce Capital",
+    "title": "Managing Partner and Co-Founder",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae061eddc69000173a0d6",
+    "name": "Madhu Iyer",
+    "email": "madhu@rocketship.vc",
+    "org": "Rocketship.vc",
+    "title": "Managing Partner",
+    "location": "Menlo Park, California",
+    "score": 10
+  },
+  {
+    "id": "69cae044eddc690001739620",
+    "name": "Steve Dempsey",
+    "email": "dempsey@greyrockcapitalgroup.com",
+    "org": "Greyrock Capital Group",
+    "title": "Managing Partner",
+    "location": "Armonk, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c6e",
+    "name": "Kerri Kimball",
+    "email": "kkimball@apogeewealthadvisors.com",
+    "org": "Apogee Wealth Advisors",
+    "title": "Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae89e0ba2840001046578",
+    "name": "Jeff Safferman",
+    "email": "jeff@timbergrovevc.com",
+    "org": "Timber Grove Ventures",
+    "title": "Managing Partner",
+    "location": "Los Angeles, California",
+    "score": 10
+  },
+  {
+    "id": "69cae045eddc690001739654",
+    "name": "Allison Czap",
+    "email": "aczap@huntercaroline.com",
+    "org": "Hunter Caroline Holdings, LLC",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69caebd5188ffa0001f61d4f",
+    "name": "Alyse Skidmore",
+    "email": "alyse@northcastlepartners.com",
+    "org": "North Castle Partners",
+    "title": "Partner",
+    "location": "Easton, Connecticut",
+    "score": 35
+  },
+  {
+    "id": "69cae042eddc690001739546",
+    "name": "Sam Bremner",
+    "email": "sam@ivestconsumer.com",
+    "org": "IVEST Consumer Partners",
+    "title": "Co-Founder Managing Partner",
+    "location": "Miami, Florida",
+    "score": 30
+  },
+  {
+    "id": "69cae6d8cfa6320001e38bab",
+    "name": "Paul Fischer",
+    "email": "paul.fischer@oneeightycapital.com",
+    "org": "One Eighty Capital",
+    "title": "Managing Partner",
+    "location": "Chicago, Illinois",
+    "score": 20
+  },
+  {
+    "id": "69cae6d9cfa6320001e38ca9",
+    "name": "Joe Shenton",
+    "email": "joe@permanent-capital.com",
+    "org": "Permanent Capital Partners",
+    "title": "Co-Founder and Managing Partner",
+    "location": "Chicago, Illinois",
+    "score": 20
+  },
+  {
+    "id": "69cae89e0ba284000104657e",
+    "name": "Jay Weaver",
+    "email": "weaver@quartzlakecap.com",
+    "org": "Quartz Lake Capital",
+    "title": "Founder and Managing Partner",
+    "location": "Chicago, Illinois",
+    "score": 20
+  },
+  {
+    "id": "69cae061eddc69000173a0df",
+    "name": "Matthew Schutzman",
+    "email": "ms@providence-heights.com",
+    "org": "Providence Heights Capital Management, LLC",
+    "title": "Founder and Managing Partner",
+    "location": "Chicago, Illinois",
+    "score": 20
+  },
+  {
+    "id": "69cae89f0ba2840001046652",
+    "name": "Curtis Williams",
+    "email": "curtis.williams@dunamispartners.com",
+    "org": "Dunamis Partners",
+    "title": "Managing Partner & CEO",
+    "location": "Chicago, Illinois",
+    "score": 20
+  },
+  {
+    "id": "69cae061eddc69000173a0eb",
+    "name": "Jerry Bednyak",
+    "email": "jerry@skyboxcapital.com",
+    "org": "SkyBox Capital",
+    "title": "Managing Partner",
+    "location": "Chicago, Illinois",
+    "score": 20
+  },
+  {
+    "id": "69caeab346508b000193be58",
+    "name": "John Pascal",
+    "email": "john@paramountcapital.com",
+    "org": "Paramount Lodging Advisors",
+    "title": "Principal/Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae89f0ba28400010466ac",
+    "name": "Tom Demery",
+    "email": "tdemery@valorep.com",
+    "org": "Valor Equity Partners",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cd5fe5111389000176dc3b",
+    "name": "Mike McInerney",
+    "email": "mmcinerney@prospect-partners.com",
+    "org": "Prospect Partners",
+    "title": "Partner",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69caebd4188ffa0001f61cbf",
+    "name": "John Sheehy",
+    "email": "john@newroadcp.com",
+    "org": "NewRoad Capital Partners",
+    "title": "Operating Partner",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae6d8cfa6320001e38ba1",
+    "name": "David Rooney",
+    "email": "david.rooney@ansleyparkcapital.com",
+    "org": "Ansley Park Capital",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cae045eddc69000173967c",
+    "name": "Kenneth Johnson",
+    "email": "kjohnson@actcapitaladvisors.com",
+    "org": "ACT Capital Advisors",
+    "title": "Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69caeab346508b000193be48",
+    "name": "Kevin Broz",
+    "email": "kevinbroz@wedgewoodllc.com",
+    "org": "Wedgewood Investment Group, LLC",
+    "title": "Senior Managing Director",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69caeab446508b000193bf32",
+    "name": "Matthew Jones",
+    "email": "mjones@bcap.com",
+    "org": "Bertram Capital",
+    "title": "Managing Director, Origination and Capital Markets",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cd5fe5111389000176dc10",
+    "name": "John Findlay",
+    "email": "jfindlay@periscopeequity.com",
+    "org": "Periscope Equity",
+    "title": "Partner",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69cd5fe6111389000176dce5",
+    "name": "Jeff Smith",
+    "email": "jsmith@shorecp.com",
+    "org": "Shore Capital Partners",
+    "title": "Partner",
+    "location": "Chicago, Illinois",
+    "score": 15
+  },
+  {
+    "id": "69caeab346508b000193be66",
+    "name": "Steve Ditursi",
+    "email": "sditursi@oneoakcapitalmgmt.com",
+    "org": "One Oak Capital Management, LLC",
+    "title": "Managing Partner / CEO",
+    "location": "Rye, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b9d",
+    "name": "Justin Burris",
+    "email": "justin@portraitcap.com",
+    "org": "Portrait Capital",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38cfc",
+    "name": "David Stonehill",
+    "email": "dstonehill@rockmountaincapital.com",
+    "org": "Rock Mountain Capital",
+    "title": "Founder, Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b63",
+    "name": "Peter Boboff",
+    "email": "peter@transmediacapital.com",
+    "org": "Transmedia Capital",
+    "title": "Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae042eddc690001739584",
+    "name": "William Detwiler",
+    "email": "bill@fernbrookmgmt.com",
+    "org": "Fernbrook Capital Management LLC",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae8a00ba28400010466e7",
+    "name": "David Perez",
+    "email": "dperez@avanceinv.com",
+    "org": "Avance Investment Management",
+    "title": "Co-Founder & Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b5f",
+    "name": "Andy Ambrose",
+    "email": "andy@palmventurestudios.com",
+    "org": "Palm Venture Studios",
+    "title": "Managing Partner",
+    "location": "Austin, Texas",
+    "score": 10
+  },
+  {
+    "id": "69cae89e0ba2840001046564",
+    "name": "Sherif Nessim",
+    "email": "snessim@jedarcapital.com",
+    "org": "Jedar Capital",
+    "title": "Founding Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69caeab946508b000193c7e1",
+    "name": "Marc Averitt",
+    "email": "averitt@okapivc.com",
+    "org": "Okapi Venture Capital",
+    "title": "Co-Founder & Managing Director",
+    "location": "Newport Beach, California",
+    "score": 10
+  },
+  {
+    "id": "69caebd4188ffa0001f61c7e",
+    "name": "Jack Toyama",
+    "email": "jack@msad.vc",
+    "org": "MS&AD Ventures",
+    "title": "President & Managing Partner, Director",
+    "location": "Menlo Park, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38ce0",
+    "name": "Ryan Renker",
+    "email": "ryan@airventurepartners.com",
+    "org": "AIR Ventures",
+    "title": "Co-Founder, Managing Partner",
+    "location": "Santa Monica, California",
+    "score": 10
+  },
+  {
+    "id": "69cae043eddc6900017395ce",
+    "name": "Gavin Reardon",
+    "email": "gavin@kingsoncapital.com",
+    "org": "Kingson Capital",
+    "title": "Managing Partner",
+    "location": "San Jose, California",
+    "score": 10
+  },
+  {
+    "id": "69cae061eddc69000173a0fe",
+    "name": "Jacky X",
+    "email": "jx@arccapm.com",
+    "org": "ARC Capital Management",
+    "title": "Managing Partner",
+    "location": "None, None",
+    "score": 10
+  },
+  {
+    "id": "69cae045eddc690001739641",
+    "name": "Max P",
+    "email": "max@mintfunding.com",
+    "org": "Mint Funding",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae89e0ba2840001046566",
+    "name": "Ryan Martin",
+    "email": "rmartin@fairchildcp.com",
+    "org": "Fairchild Capital Partners, LLC",
+    "title": "Managing Partner",
+    "location": "Buffalo, New York",
+    "score": 10
+  },
+  {
+    "id": "69caeab446508b000193bfa4",
+    "name": "David Ibnale",
+    "email": "david@avp.vc",
+    "org": "AVP",
+    "title": "Advance Venture Partners | Co-founder & Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae8a70ba2840001047043",
+    "name": "Aatif Awan",
+    "email": "aatif@indus.vc",
+    "org": "Indus Valley Capital",
+    "title": "Founder & Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38ba5",
+    "name": "Kiva Dickinson",
+    "email": "kiva@selvaventures.com",
+    "org": "Selva Ventures",
+    "title": "Founder & Managing Partner",
+    "location": "Los Angeles, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c65",
+    "name": "Eugene Song",
+    "email": "esong@madbaycap.com",
+    "org": "Madison Bay Capital Partners",
+    "title": "Co-Founder & Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38cc1",
+    "name": "Adam Slutsky",
+    "email": "adam@gatherventures.com",
+    "org": "Gather Ventures",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae045eddc690001739649",
+    "name": "Dileep Saksena",
+    "email": "dsaksena@4073capital.com",
+    "org": "40",
+    "title": "73 Capital | Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae061eddc69000173a0d8",
+    "name": "Alexander Holt",
+    "email": "alexander@limitlessventures.us",
+    "org": "Limitless Ventures",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b6c",
+    "name": "Cristina Nunez",
+    "email": "cristina@truebeautyventures.com",
+    "org": "True Beauty Ventures",
+    "title": "Co-Founder & Managing Partner",
+    "location": "Miami, Florida",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38beb",
+    "name": "Evan Behrens",
+    "email": "evan@behrensig.com",
+    "org": "Behrens Investment Group",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38bac",
+    "name": "Rick Rosenbloom",
+    "email": "rick@fuelbreakcapital.com",
+    "org": "Fuel Break Capital Partners",
+    "title": "Founder, Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae061eddc69000173a105",
+    "name": "Jeffrey Marron",
+    "email": "jmarron@sheridancapital.com",
+    "org": "Sheridan Asset Management, LLC",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae045eddc690001739670",
+    "name": "Todd Kimmel",
+    "email": "tkimmel@montageventures.com",
+    "org": "Montage Ventures",
+    "title": "Managing Partner",
+    "location": "Menlo Park, California",
+    "score": 10
+  },
+  {
+    "id": "69cae041eddc690001739490",
+    "name": "Noramay Cadena",
+    "email": "noramay@supplychange.fund",
+    "org": "Supply Change Capital",
+    "title": "Managing Partner",
+    "location": "Los Angeles, California",
+    "score": 10
+  },
+  {
+    "id": "69cae89e0ba28400010465d6",
+    "name": "David Burgstahler",
+    "email": "burgstahler@avistacap.com",
+    "org": "Avista Fund",
+    "title": "Managing Partner and CEO of Avista Healthcare Partners",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69caebd4188ffa0001f61cf3",
+    "name": "Diana Melencio",
+    "email": "diana@xrcventures.com",
+    "org": "XRC Ventures",
+    "title": "General Partner",
+    "location": "Los Angeles, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38ba8",
+    "name": "William Ventura",
+    "email": "william@resopartners.com",
+    "org": "Resonance Partners",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38d20",
+    "name": "Brady Schmidt",
+    "email": "brady@accrualequitypartners.com",
+    "org": "Accrual Equity Partners",
+    "title": "Founder and Managing Partner",
+    "location": "Irvine, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b8e",
+    "name": "Eric Scheuermann",
+    "email": "efs@solamerecapital.com",
+    "org": "Solamere Capital, LLC",
+    "title": "Co-Founder and Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae042eddc690001739571",
+    "name": "Roger Wyse",
+    "email": "roger@sprucecp.com",
+    "org": "Spruce Capital Partners, LLC",
+    "title": "Managing Partner",
+    "location": "Austin, Texas",
+    "score": 10
+  },
+  {
+    "id": "69cae89f0ba2840001046665",
+    "name": "Mark Lotke",
+    "email": "mark@harmonyvp.com",
+    "org": "Harmony Partners",
+    "title": "Founder & Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69caeab446508b000193bf16",
+    "name": "Evangelos Simoudis",
+    "email": "esimoudis@synapsepartners.co",
+    "org": "Synapse Partners",
+    "title": "Founder and Managing Director",
+    "location": "Palo Alto, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38bb4",
+    "name": "Robert Fitzsimmons",
+    "email": "rfitzsimmons@highroadcap.com",
+    "org": "High Road Capital Partners",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c97",
+    "name": "Michael Berolzheimer",
+    "email": "michael@beepartners.vc",
+    "org": "Bee Partners",
+    "title": "Founder & Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae89e0ba284000104655f",
+    "name": "Jacob Israelow",
+    "email": "jacob@dirtpartners.com",
+    "org": "Dirt Capital Partners",
+    "title": "Founder and Managing Director",
+    "location": "Albany, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae061eddc69000173a0f2",
+    "name": "Peter Comisar",
+    "email": "peter@story3capital.com",
+    "org": "STORY3 Capital Partners",
+    "title": "Founder + Managing Partner",
+    "location": "Los Angeles, California",
+    "score": 10
+  },
+  {
+    "id": "69cae042eddc69000173955f",
+    "name": "Scott Potter",
+    "email": "spotter@sfequitypartners.com",
+    "org": "San Francisco Equity Partners",
+    "title": "Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69caebd4188ffa0001f61c1e",
+    "name": "Matt Logan",
+    "email": "matt@earthshot.vc",
+    "org": "Earthshot Ventures",
+    "title": "General Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69caeab346508b000193be65",
+    "name": "Andrew Weinberg",
+    "email": "andrew@brightstarcp.com",
+    "org": "Brightstar Capital Partners",
+    "title": "Founder, CEO & Co-Chair",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c2d",
+    "name": "Roberto Charvel",
+    "email": "roberto@matterscale.com",
+    "org": "MatterScale Ventures",
+    "title": "Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c90",
+    "name": "Kiki Somers",
+    "email": "kiki.somers@rodeogp.com",
+    "org": "Rodeo Growth Partners",
+    "title": "Co-Managing Partner",
+    "location": "Los Angeles, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b6a",
+    "name": "Randy Bianchi",
+    "email": "rbianchi@lakeletcapital.com",
+    "org": "Lakelet Capital LLC",
+    "title": "Managing Partner",
+    "location": "Buffalo, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae044eddc690001739623",
+    "name": "Michael Ranson",
+    "email": "michael@astaracapital.com",
+    "org": "Astara Capital Partners",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae044eddc690001739625",
+    "name": "Raymond Tonsing",
+    "email": "raymond@caffeinated.com",
+    "org": "Caffeinated Capital",
+    "title": "Founder & Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69caeab446508b000193bfca",
+    "name": "Paul Palmieri",
+    "email": "paul@grit.vc",
+    "org": "Grit Capital Partners",
+    "title": "Managing General Partner / Founder",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae044eddc690001739600",
+    "name": "Samyr Laine",
+    "email": "samyr@freedomtrail.capital",
+    "org": "Freedom Trail Capital",
+    "title": "Co-Founder & Managing Partner",
+    "location": "Los Angeles, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38d33",
+    "name": "Brian Reilly",
+    "email": "brian@willventures.com",
+    "org": "Will Ventures",
+    "title": "Co-Founder and Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6dfcfa6320001e39738",
+    "name": "Richard Steere",
+    "email": "rsteere@newheightscap.com",
+    "org": "New Heights Capital",
+    "title": "Managing Partner / Founder",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae89e0ba2840001046567",
+    "name": "Elizabeth Galbut",
+    "email": "elizabeth@sogalventures.com",
+    "org": "SoGal Ventures",
+    "title": "Co-Founder & Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae89f0ba2840001046635",
+    "name": "Bryce May",
+    "email": "bryce.may@awcfund.com",
+    "org": "American Working Capital, LLC",
+    "title": "Founder and Co-Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c8e",
+    "name": "John Masotti",
+    "email": "john.masotti@wfafinet.com",
+    "org": "Wells Fargo Advisors Finet",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c5f",
+    "name": "Nikolai Oreshkin",
+    "email": "nikolai@elysium.vc",
+    "org": "Elysium Venture Capital",
+    "title": "Managing Partner",
+    "location": "Palo Alto, California",
+    "score": 10
+  },
+  {
+    "id": "69cae041eddc6900017394e2",
+    "name": "Margot Shapiro",
+    "email": "margot@spiralsunventures.com",
+    "org": "Spiral Sun Ventures",
+    "title": "Managing Partner",
+    "location": "Newport Beach, California",
+    "score": 10
+  },
+  {
+    "id": "69cae044eddc690001739632",
+    "name": "Thomas McDonald",
+    "email": "tm@jaguargrowth.com",
+    "org": "Jaguar Growth Partners",
+    "title": "Managing Partner",
+    "location": "Miami, Florida",
+    "score": 10
+  },
+  {
+    "id": "69cae042eddc69000173957c",
+    "name": "Xavier Santana",
+    "email": "xavier.santana@calturas.com",
+    "org": "Calturas Capital",
+    "title": "Managing Partner",
+    "location": "Newport Beach, California",
+    "score": 10
+  },
+  {
+    "id": "69cae043eddc690001739591",
+    "name": "Jason Winship",
+    "email": "jason@whiteroadinvestments.com",
+    "org": "White Road Investments",
+    "title": "Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69caeab346508b000193be68",
+    "name": "Rami Assal",
+    "email": "rami@boutiquevc.com",
+    "org": "Boutique Venture Partners",
+    "title": "Managing General Partner & Founder",
+    "location": "Palo Alto, California",
+    "score": 10
+  },
+  {
+    "id": "69cae89e0ba28400010465bb",
+    "name": "Wen Hsieh",
+    "email": "whsieh@mattervp.com",
+    "org": "Matter Venture Partners",
+    "title": "Founding Managing Partner",
+    "location": "Menlo Park, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c6b",
+    "name": "Brandon Alster",
+    "email": "brandon@slingvc.com",
+    "org": "Sling Ventures",
+    "title": "Founder / Investor",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c70",
+    "name": "Andre Haroche",
+    "email": "andre@slvp.co",
+    "org": "Silverleaf Venture Partners LLC",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c12",
+    "name": "Eric Tao",
+    "email": "eric@l37development.com",
+    "org": "L37 Ventures",
+    "title": "Managing Partner",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69caeab446508b000193bfee",
+    "name": "Dinkar Jetley",
+    "email": "dinkar.jetley@pivotinvestment.com",
+    "org": "Pivot Investment Partners",
+    "title": "Co-Founder and Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69caebd4188ffa0001f61cb2",
+    "name": "Chris Young",
+    "email": "chris@revel.vc",
+    "org": "Revel Partners",
+    "title": "General Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae044eddc690001739635",
+    "name": "Wen Wei",
+    "email": "wenw@ccwcapital.com",
+    "org": "CCW Capital",
+    "title": "Managing Partner",
+    "location": "San Ramon, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b83",
+    "name": "Jessica Adams",
+    "email": "adams@atlanticinvestment.net",
+    "org": "Atlantic Investment Management, Inc.",
+    "title": "Team Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38b9f",
+    "name": "Nick Rhoads",
+    "email": "nick@heritage-pg.com",
+    "org": "Heritage Partners Group",
+    "title": "Co-Founder & Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38bd5",
+    "name": "Jonathan Greenglass",
+    "email": "jonathan@dynamism.capital",
+    "org": "Dynamism Capital",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae89e0ba2840001046536",
+    "name": "David Brown",
+    "email": "david@impellent.vc",
+    "org": "Impellent Ventures",
+    "title": "Founding Managing Partner",
+    "location": "Rochester, New York",
+    "score": 10
+  },
+  {
+    "id": "69caeab346508b000193bebc",
+    "name": "Richard Koe",
+    "email": "rk@alignecap.com",
+    "org": "Aligne Capital Partners",
+    "title": "Managing General Partner/ Co-Founder",
+    "location": "San Francisco, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38ce5",
+    "name": "Andrew Goldman",
+    "email": "agoldman@hildredcapital.com",
+    "org": "Hildred Capital",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae6d8cfa6320001e38bc6",
+    "name": "Mani Honigstein",
+    "email": "mani@honeystonevc.com",
+    "org": "Honeystone Ventures",
+    "title": "Managing Partner",
+    "location": "Palo Alto, California",
+    "score": 10
+  },
+  {
+    "id": "69cae6d9cfa6320001e38c31",
+    "name": "Demetrios Dounis",
+    "email": "ddounis@heartwoodpartners.com",
+    "org": "Heartwood Partners",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae043eddc6900017395c6",
+    "name": "David Landau",
+    "email": "david.landau@lnkpartners.com",
+    "org": "LNK Partners",
+    "title": "Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae045eddc69000173966f",
+    "name": "Jonathan Hung",
+    "email": "jon@entrepreneur.vc",
+    "org": "Entrepreneur Ventures",
+    "title": "Managing Partner",
+    "location": "Los Angeles, California",
+    "score": 10
+  },
+  {
+    "id": "69cae89f0ba28400010466ca",
+    "name": "Bryan Binder",
+    "email": "bryan@jettyrockcapital.com",
+    "org": "Jetty Rock Capital",
+    "title": "Founder & Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  },
+  {
+    "id": "69cae89e0ba28400010465e6",
+    "name": "Mohona Paul",
+    "email": "mohona@aegisventures.com",
+    "org": "Aegis Ventures",
+    "title": "Chief of Staff to Managing Partner",
+    "location": "New York, New York",
+    "score": 10
+  }
+]

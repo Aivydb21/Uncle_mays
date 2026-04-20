@@ -16,6 +16,11 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://unclemays.com/press</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://unclemays.com/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

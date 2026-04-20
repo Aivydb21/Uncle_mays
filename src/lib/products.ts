@@ -51,6 +51,7 @@ export const PRODUCTS = {
       "Strawberries — 1 quart",
       "Early beets with tops — 1 bunch",
       "Zucchini — 2 ct",
+      "Farm eggs — 1 dozen",
       "Pasture-raised whole chicken — included",
     ],
   },
@@ -61,6 +62,14 @@ export const PRODUCTS = {
     // Protein included in price — customer picks 1 from full options, no upcharge
     proteinCount: 1,
     proteinIncluded: true as const,
+    // Allow customers to add 2nd/3rd proteins as paid add-ons
+    additionalProteinAllowed: true as const,
+    additionalProteinPricing: {
+      chicken: 20,
+      "pork-chops": 18,
+      "beef-short-ribs": 24,
+      salmon: 22,
+    } as Record<ProteinId, number>,
     items: [
       "Watermelon radishes — 1 bunch",
       "Fairy tale eggplant — 1/2 lb",
@@ -72,6 +81,7 @@ export const PRODUCTS = {
       "Rainbow chard — 1 bunch",
       "Heirloom cucumber — 2 ct",
       "Ramps — 1/2 lb",
+      "Farm eggs — 1 dozen",
     ],
   },
 } as const;

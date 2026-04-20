@@ -72,7 +72,7 @@ const productListSchema = {
         "@type": "Product",
         name: "Starter Box",
         description:
-          "6 seasonal produce items (~12–15 lbs) from current harvests: asparagus, kale or chard, lettuce, radishes, sweet potatoes, and rotating microgreens. Perfect for individuals or couples.",
+          "6 seasonal produce items (~12–15 lbs): collard greens, asparagus, spring onions, heirloom cherry tomatoes, Persian cucumbers, and snap peas. Perfect for individuals or couples.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
@@ -91,7 +91,7 @@ const productListSchema = {
         "@type": "Product",
         name: "Family Box",
         description:
-          "9+ seasonal produce items (~22–26 lbs), 1 dozen eggs, and your choice of one protein: pastured whole chicken or beef short ribs. Ideal for families of 3–5.",
+          "10 seasonal produce items (~22–26 lbs) plus farm eggs (1 dozen) and pasture-raised whole chicken included. Collard greens, asparagus, spring onions, cherry tomatoes, cucumbers, snap peas, rainbow chard, strawberries, beets, and zucchini. Ideal for families of 3–5.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
@@ -110,7 +110,7 @@ const productListSchema = {
         "@type": "Product",
         name: "Community Box",
         description:
-          "10+ seasonal produce items (~30–35 lbs), 2 dozen eggs, and your choice of two proteins from: whole chicken, beef short ribs, and lamb chops. For large families or splitting across households.",
+          "10 specialty and heirloom produce items (~30–35 lbs) plus farm eggs (1 dozen) and your choice of one protein (chicken, pork chops, beef short ribs, or salmon). Watermelon radishes, fairy tale eggplant, shishito peppers, turnips, cherry tomatoes, pattypan squash, dragon tongue beans, chard, cucumber, and ramps. For large families or splitting across households.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
@@ -142,7 +142,7 @@ const faqSchema = {
       name: "What's actually in the box?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. A Starter Box currently includes items like asparagus, kale, lettuce, radishes, sweet potatoes, and microgreens. The contents vary each delivery.",
+        text: "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. A Starter Box currently includes items like collard greens, asparagus, spring onions, heirloom cherry tomatoes, Persian cucumbers, and snap peas. The contents vary each delivery based on what's in season.",
       },
     },
     {
@@ -150,7 +150,7 @@ const faqSchema = {
       name: "How much does a box cost?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Boxes start at $35 for a Starter Box (5-7 seasonal items, 12-15 lbs), $65 for a Family Box (12-15 items, 22-26 lbs), and $95 for a Community Box (20-25 items, 30-35 lbs). No subscription required. Order when you want.",
+        text: "Boxes start at $35 for a Starter Box (6 seasonal items, 12-15 lbs), $65 for a Family Box (10 produce items, eggs, and chicken, 22-26 lbs), and $95 for a Community Box (10 specialty items, eggs, and choice of protein, 30-35 lbs). No subscription required. Order when you want.",
       },
     },
     {

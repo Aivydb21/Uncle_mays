@@ -5,7 +5,7 @@ import { upsertContact, createCart, deleteCart, tagOrderCompleted } from "@/lib/
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { product, price, productName, email, firstName, lastName, phone, address, deliveryNotes, deliveryDate, proteinChoices } = body;
+    const { product, price, productName, email, firstName, lastName, phone, address, deliveryNotes, deliveryDate, deliveryWindow, proteinChoices, additionalProteinChoices } = body;
 
     if (!product || !price || !email || !firstName || !lastName || !address) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -22,7 +22,9 @@ export async function POST(req: NextRequest) {
       address,
       deliveryNotes,
       deliveryDate,
+      deliveryWindow,
       proteins: Array.isArray(proteinChoices) && proteinChoices.length > 0 ? proteinChoices : undefined,
+      additionalProteins: Array.isArray(additionalProteinChoices) && additionalProteinChoices.length > 0 ? additionalProteinChoices : undefined,
     });
 
     // Non-blocking: upsert subscriber + create abandoned cart trigger
