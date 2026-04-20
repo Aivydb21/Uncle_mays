@@ -239,24 +239,24 @@ export default function CheckoutSummaryPage() {
               </div>
               <div className="text-right shrink-0">
                 <span className="text-3xl font-bold text-primary">${totalPrice}</span>
-                {isFirstOrderDiscount && (
+                {isFirstOrderDiscount ? (
                   <div className="text-xs text-muted-foreground line-through">${product.price + additionalProteinCost}</div>
-                )}
-                {additionalProteinCost > 0 && (
+                ) : null}
+                {additionalProteinCost > 0 ? (
                   <div className="text-xs text-muted-foreground mt-1">
                     Box: ${effectivePrice} + Proteins: ${additionalProteinCost}
                   </div>
-                )}
+                ) : null}
               </div>
             </div>
 
             {/* First-order discount callout */}
-            {isFirstOrderDiscount && (
+            {isFirstOrderDiscount ? (
               <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2.5 text-sm text-primary font-medium">
                 <span>🎉</span>
                 <span>First-order discount applied — you save ${product.price - effectivePrice}!</span>
               </div>
-            )}
+            ) : null}
 
             {/* What's in the box */}
             <div className="mb-6">
@@ -274,7 +274,7 @@ export default function CheckoutSummaryPage() {
             </div>
 
             {/* Protein section — only for boxes that include/offer protein */}
-            {product.proteinCount > 0 && <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
+            {product.proteinCount > 0 ? <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
               {proteinIncluded ? (
                 <>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
@@ -324,10 +324,10 @@ export default function CheckoutSummaryPage() {
                   );
                 })}
               </div>
-            </div>}
+            </div> : null}
 
             {/* Additional proteins section — only for boxes that allow it */}
-            {"additionalProteinAllowed" in product && product.additionalProteinAllowed && (
+            {"additionalProteinAllowed" in product && product.additionalProteinAllowed ? (
               <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
                   Add More Proteins — Optional
@@ -373,7 +373,7 @@ export default function CheckoutSummaryPage() {
                     })}
                 </div>
               </div>
-            )}
+            ) : null}
 
             {/* Trust signals */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
@@ -432,11 +432,11 @@ export default function CheckoutSummaryPage() {
             >
               Continue to Delivery →
             </button>
-            {proteinIncluded && selectedProteins.length === 0 && (
+            {proteinIncluded && selectedProteins.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center mt-2">
                 Don&apos;t forget to select your protein above before continuing.
               </p>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
