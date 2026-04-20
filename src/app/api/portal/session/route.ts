@@ -9,9 +9,18 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { session_id, customer_id, email } = await req.json();
+    const { session_id, subscription_id, customer_id, email } = await req.json();
 
     let customerId: string | null = customer_id ?? null;
+
+    // Resolve customer from a Subscription ID
+    if (!customerId && subscription_id) {
+      const subscription = await stripe.subscriptions.retrieve(subscription_id);
+      customerId =
+        typeof subscription.customer === "string"
+          ? subscription.customer
+          : subscription.customer.id;
+    }
 
     // Resolve customer from a Checkout Session if no direct customer_id provided
     if (!customerId && session_id) {

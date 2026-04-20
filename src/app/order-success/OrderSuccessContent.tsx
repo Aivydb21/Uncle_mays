@@ -74,12 +74,32 @@ export default function OrderSuccessContent() {
   const paymentIntentId = searchParams.get("pi");
   const amountParam = searchParams.get("amount");
   const productParam = searchParams.get("product") ?? undefined;
+  // Subscription intent flow: ?sub=sub_xxx&product=starter
+  const subscriptionId = searchParams.get("sub");
   const fired = useRef(false);
   const [isSubscription, setIsSubscription] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
 
+  // Weekly subscription amounts by product (cents → dollars)
+  const SUB_AMOUNT: Record<string, number> = {
+    starter: 31.5,
+    family: 58.5,
+    community: 85.5,
+  };
+
   useEffect(() => {
     if (fired.current) return;
+
+    // Subscription intent flow — amount derived from product slug
+    if (subscriptionId) {
+      fired.current = true;
+      setIsSubscription(true);
+      const value = productParam ? (SUB_AMOUNT[productParam] ?? 0) : 0;
+      if (value > 0) {
+        try { trackPurchase(subscriptionId, value, productParam); } catch { /* ignore */ }
+      }
+      return;
+    }
 
     // PaymentIntent flow — data is available from URL params directly
     if (paymentIntentId && amountParam) {
@@ -103,16 +123,20 @@ export default function OrderSuccessContent() {
         })
         .catch(() => {});
     }
-  }, [sessionId, paymentIntentId, amountParam, productParam]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, paymentIntentId, amountParam, productParam, subscriptionId]);
 
   const handleManageSubscription = async () => {
-    if (!sessionId) return;
+    if (!sessionId && !subscriptionId) return;
     setPortalLoading(true);
     try {
+      const body = subscriptionId
+        ? { subscription_id: subscriptionId }
+        : { session_id: sessionId };
       const res = await fetch("/api/portal/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ session_id: sessionId }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (data.url) {
@@ -124,7 +148,7 @@ export default function OrderSuccessContent() {
     setPortalLoading(false);
   };
 
-  const ref = sessionId || paymentIntentId;
+  const ref = sessionId || paymentIntentId || subscriptionId;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
@@ -147,7 +171,7 @@ export default function OrderSuccessContent() {
               size="lg"
               className="rounded-xl w-full"
               onClick={handleManageSubscription}
-              disabled={portalLoading}
+              disabled={portalLoading || (!sessionId && !subscriptionId)}
             >
               {portalLoading ? "Loading…" : "Manage Subscription"}
             </Button>
