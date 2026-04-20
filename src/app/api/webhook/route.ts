@@ -3,6 +3,8 @@ import Stripe from "stripe";
 import { tagOrderCompleted, deleteCart } from "@/lib/mailchimp";
 import { sendCapiEvent } from "@/lib/meta-capi";
 
+const TRIGGER_API_BASE = "https://api.trigger.dev/api/v1/tasks";
+
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
 // GA4 Measurement Protocol for server-side conversion tracking
@@ -196,6 +198,47 @@ export async function POST(req: NextRequest) {
             );
           }
         }
+      }
+
+      // Send order confirmation email
+      const triggerSecretKeyForConfirmation = process.env.TRIGGER_SECRET_KEY;
+      if (triggerSecretKeyForConfirmation && email && email !== "unknown") {
+        const isSubscription = session.mode === "subscription";
+        fetch(`${TRIGGER_API_BASE}/send-order-confirmation-email/trigger`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${triggerSecretKeyForConfirmation}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            payload: {
+              sessionId: session.id,
+              email,
+              customerName: session.customer_details?.name ?? null,
+              amountTotal: session.amount_total ?? 0,
+              productName,
+              isSubscription,
+              billingInterval: null, // populated from subscription metadata if needed
+              subscriptionId:
+                typeof session.subscription === "string" ? session.subscription : null,
+            },
+            options: {
+              idempotencyKey: `order-confirmation-${session.id}`,
+            },
+          }),
+        })
+          .then((r) => {
+            if (r.ok) {
+              console.log(`[WEBHOOK] Queued order confirmation email for session ${session.id}`);
+            } else {
+              r.json()
+                .catch(() => ({}))
+                .then((err) =>
+                  console.warn("[WEBHOOK] Failed to queue order confirmation email:", err)
+                );
+            }
+          })
+          .catch((e) => console.warn("[WEBHOOK] Error queuing order confirmation email:", e));
       }
 
       // Non-blocking: mark order complete and remove the Mailchimp cart so the
