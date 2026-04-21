@@ -266,6 +266,27 @@ export default function CheckoutSummaryPage() {
               </div>
             </div>
 
+            {/* Value anchor — Whole Foods quality, Aldi price */}
+            <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 overflow-hidden">
+              <div className="px-4 py-2 bg-primary/10 border-b border-primary/15">
+                <p className="text-xs font-semibold uppercase tracking-wide text-primary text-center">
+                  Better than Whole Foods. Cheaper than Aldi.
+                </p>
+              </div>
+              <div className="divide-y divide-primary/10">
+                {[
+                  { icon: "🥬", text: "No chemical washes on produce — unlike Whole Foods" },
+                  { icon: "🥩", text: "No chemical bath on meat — unlike Whole Foods" },
+                  { icon: "💰", text: "Priced less than Aldi per serving" },
+                ].map(({ icon, text }) => (
+                  <div key={text} className="flex items-center gap-3 px-4 py-2.5">
+                    <span className="text-base leading-none">{icon}</span>
+                    <span className="text-xs text-foreground/80">{text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* First-order discount callout */}
             {isFirstOrderDiscount ? (
               <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2.5 text-sm text-primary font-medium">

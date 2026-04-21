@@ -147,16 +147,27 @@ function PaymentForm({
     <form onSubmit={handleSubmit}>
       <PaymentElement className="mb-4" />
 
-      {/* Value reinforcement */}
-      <div className="mb-6 p-3 rounded-lg bg-muted/30 border border-border">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-          <span>💡</span>
-          <span className="font-medium text-foreground">Smart Value</span>
+      {/* Value anchor — Whole Foods quality, Aldi price */}
+      <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 overflow-hidden">
+        <div className="px-3 py-1.5 bg-primary/10 border-b border-primary/15">
+          <p className="text-xs font-semibold text-primary text-center">
+            Better than Whole Foods. Cheaper than Aldi.
+          </p>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Your ${checkout.price} box provides 8-10 servings of fresh produce — just $3-5 per meal.
-          Weekly subscription — fresh produce every Wednesday. Cancel anytime.
-        </p>
+        <div className="flex divide-x divide-primary/10">
+          <div className="flex-1 flex flex-col items-center gap-0.5 px-2 py-2 text-center">
+            <span className="text-base">🥬</span>
+            <span className="text-[10px] text-foreground/75 leading-tight">No chemical washes</span>
+          </div>
+          <div className="flex-1 flex flex-col items-center gap-0.5 px-2 py-2 text-center">
+            <span className="text-base">🥩</span>
+            <span className="text-[10px] text-foreground/75 leading-tight">No chemical baths</span>
+          </div>
+          <div className="flex-1 flex flex-col items-center gap-0.5 px-2 py-2 text-center">
+            <span className="text-base">💰</span>
+            <span className="text-[10px] text-foreground/75 leading-tight">Less than Aldi/serving</span>
+          </div>
+        </div>
       </div>
 
       {paymentError && (
@@ -430,7 +441,7 @@ export default function PaymentPage() {
               </div>
 
               {/* Trust signals in sidebar */}
-              <div className="pt-4 border-t border-border space-y-2">
+              <div className="pt-4 border-t border-border space-y-2 mb-3">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -438,8 +449,12 @@ export default function PaymentPage() {
                   <span>Delivered this Sunday</span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>💡</span>
-                  <span>Just $3-5 per meal</span>
+                  <span>💰</span>
+                  <span>Less than Aldi per serving</span>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>🥬</span>
+                  <span>No chemical washes — cleaner than Whole Foods</span>
                 </div>
               </div>
             </div>
