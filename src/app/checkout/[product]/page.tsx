@@ -217,7 +217,7 @@ export default function CheckoutSummaryPage() {
       bullets: [
         "No chemical washes on your produce",
         "No chemical bath on your meat",
-        "8 servings delivered for $35 (first order $30)",
+        "First order $30 — less than dinner out in Chicago",
       ],
     },
     family: {
