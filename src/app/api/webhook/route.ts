@@ -526,11 +526,84 @@ export async function POST(req: NextRequest) {
         | Partial<Stripe.Subscription>
         | undefined;
       const previousStatus = prevAttrs?.status;
+      const prevCancelAtPeriodEnd = (prevAttrs as (Partial<Stripe.Subscription> & { cancel_at_period_end?: boolean }) | undefined)?.cancel_at_period_end;
       console.log(
-        `[WEBHOOK] customer.subscription.updated | sub=${subscription.id} customer=${customerId} status=${subscription.status}${previousStatus ? ` (was ${previousStatus})` : ""} plan=${subscription.metadata?.product ?? "unknown"}`
+        `[WEBHOOK] customer.subscription.updated | sub=${subscription.id} customer=${customerId} status=${subscription.status}${previousStatus ? ` (was ${previousStatus})` : ""} cancel_at_period_end=${subscription.cancel_at_period_end} plan=${subscription.metadata?.product ?? "unknown"}`
       );
 
+      // Send cancellation email when cancel_at_period_end transitions to true.
+      // This is the typical portal flow: user clicks Cancel, subscription stays active
+      // until end of period but cancel_at_period_end flips to true immediately.
+      if (
+        subscription.cancel_at_period_end === true &&
+        prevCancelAtPeriodEnd === false
+      ) {
+        const triggerKeyForCancellation = process.env.TRIGGER_SECRET_KEY;
+        if (triggerKeyForCancellation) {
+          let cancellationEmail: string | null = null;
+          let cancellationName: string | null = null;
+          try {
+            const customer = await stripe.customers.retrieve(customerId);
+            if (customer && !("deleted" in customer)) {
+              cancellationEmail = customer.email ?? null;
+              cancellationName = customer.name ?? null;
+            }
+          } catch (e) {
+            console.warn(`[WEBHOOK] Could not retrieve customer ${customerId} for cancellation email (cancel_at_period_end):`, e);
+          }
+
+          if (!cancellationEmail) {
+            console.warn(`[WEBHOOK] No email for customer ${customerId} — skipping cancellation email for sub ${subscription.id} (cancel_at_period_end)`);
+          } else {
+            fetch(`${TRIGGER_API_BASE}/send-subscription-cancellation-email/trigger`, {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${triggerKeyForCancellation}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                payload: {
+                  subscriptionId: subscription.id,
+                  customerId,
+                  email: cancellationEmail,
+                  customerName: cancellationName,
+                  canceledAt: subscription.canceled_at,
+                  accessEndsAt: subscription.cancel_at ?? (subscription as unknown as { current_period_end?: number }).current_period_end ?? null,
+                  productName: subscription.metadata?.product ?? null,
+                },
+                options: {
+                  idempotencyKey: `sub-cancelled-${subscription.id}`,
+                },
+              }),
+            })
+              .then((r) => {
+                if (r.ok) {
+                  console.log(
+                    `[WEBHOOK] Queued cancellation confirmation email for sub ${subscription.id} (cancel_at_period_end=true) email=${cancellationEmail}`
+                  );
+                } else {
+                  r.json()
+                    .catch(() => ({}))
+                    .then((err) =>
+                      console.warn(
+                        "[WEBHOOK] Failed to queue cancellation confirmation email (cancel_at_period_end):",
+                        err
+                      )
+                    );
+                }
+              })
+              .catch((e) =>
+                console.warn(
+                  "[WEBHOOK] Error queuing cancellation confirmation email (cancel_at_period_end):",
+                  e
+                )
+              );
+          }
+        }
+      }
+
       // Send cancellation email when status transitions to canceled for the first time
+      // (covers immediate cancellation path where status goes directly to canceled)
       if (subscription.status === "canceled" && previousStatus && previousStatus !== "canceled") {
         const triggerKeyForCancellation = process.env.TRIGGER_SECRET_KEY;
         if (triggerKeyForCancellation) {
