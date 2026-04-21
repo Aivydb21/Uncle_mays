@@ -402,20 +402,6 @@ export default function CheckoutSummaryPage() {
               </div>
             ) : null}
 
-            {/* Trust signals */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
-              {[
-                { icon: "🌱", text: "Locally sourced" },
-                { icon: "🚚", text: "Delivered fresh Sundays" },
-                { icon: "🔒", text: "Secure checkout" },
-              ].map(({ icon, text }) => (
-                <div key={text} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>{icon}</span>
-                  <span>{text}</span>
-                </div>
-              ))}
-            </div>
-
             {/* Email capture — earliest possible point for abandoned cart recovery */}
             <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
               <Label htmlFor="email" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
