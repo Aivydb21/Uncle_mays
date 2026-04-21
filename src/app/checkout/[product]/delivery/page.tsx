@@ -157,6 +157,7 @@ function validate(fields: FormFields): FormErrors {
   if (!fields.zip.trim() || !/^\d{5}(-\d{4})?$/.test(fields.zip.trim())) {
     errors.zip = "A valid ZIP code is required.";
   }
+  if (!fields.phone.trim()) errors.phone = "Phone number is required for delivery coordination.";
   if (!fields.deliveryDate) errors.deliveryDate = "Please select a delivery date.";
   if (!fields.deliveryWindow) errors.deliveryWindow = "Please select a delivery time window.";
   return errors;
@@ -460,7 +461,9 @@ export default function DeliveryPage() {
 
                 {/* Phone */}
                 <div className="space-y-1.5 mb-4">
-                  <Label htmlFor="phone">Phone (optional)</Label>
+                  <Label htmlFor="phone">
+                    Phone <span className="text-destructive">*</span>
+                  </Label>
                   <Input
                     id="phone"
                     name="phone"
@@ -470,6 +473,9 @@ export default function DeliveryPage() {
                     autoComplete="tel"
                     placeholder="(312) 555-0100"
                   />
+                  {errors.phone && (
+                    <p className="text-destructive text-xs">{errors.phone}</p>
+                  )}
                 </div>
 
                 {/* Street + Apt */}

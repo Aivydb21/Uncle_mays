@@ -342,21 +342,6 @@ export default function PaymentPage() {
                 Complete your order to get fresh produce delivered this Wednesday.
               </p>
 
-              {/* Urgency + Trust callout */}
-              <div className="mb-6 p-4 rounded-xl border border-primary/20 bg-primary/5">
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl mt-0.5">⏰</span>
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-primary mb-1">
-                      Order by Thursday 11:59pm for delivery this Sunday
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Limited boxes available this week. 89% of customers refer friends to Uncle May's.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
               {clientSecret && !paymentComplete ? (
                 <Elements
                   stripe={stripePromise}
