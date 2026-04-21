@@ -74,8 +74,8 @@ export default function OrderSuccessContent() {
   const paymentIntentId = searchParams.get("pi");
   const amountParam = searchParams.get("amount");
   const productParam = searchParams.get("product") ?? undefined;
-  // Subscription intent flow: ?sub=sub_xxx&product=starter
-  const subscriptionId = searchParams.get("sub");
+  // Subscription intent flow: ?subscription_id=sub_xxx&product=starter (fallback: ?sub=)
+  const subscriptionId = searchParams.get("subscription_id") || searchParams.get("sub");
   const fired = useRef(false);
   const [isSubscription, setIsSubscription] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
