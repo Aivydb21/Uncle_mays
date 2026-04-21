@@ -150,7 +150,7 @@ function PaymentForm({
       {/* Value anchor */}
       <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 px-3 py-3">
         <p className="text-sm font-bold text-primary mb-1.5">
-          Better than Whole Foods. Cheaper than Aldi.
+          Cleaner than Whole Foods. Cheaper than Aldi.
         </p>
         <ul className="space-y-0.5">
           <li className="text-xs text-foreground/80">No chemical washes on your produce</li>
@@ -443,7 +443,7 @@ export default function PaymentPage() {
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>🥬</span>
-                  <span>No chemical washes, cleaner than Whole Foods</span>
+                  <span>Cleaner than Whole Foods, cheaper than Aldi</span>
                 </div>
               </div>
             </div>

@@ -268,7 +268,7 @@ export default function CheckoutSummaryPage() {
             {/* Value anchor */}
             <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
               <p className="text-sm font-bold text-primary mb-2">
-                Better than Whole Foods. Cheaper than Aldi.
+                Cleaner than Whole Foods. Cheaper than Aldi.
               </p>
               <ul className="space-y-1">
                 <li className="text-xs text-foreground/80">No chemical washes on your produce</li>
