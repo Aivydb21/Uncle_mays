@@ -16,7 +16,14 @@ async function upsertMailchimpContact(
   const emailHash = md5(email.toLowerCase());
   const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
 
-  const body: Record<string, unknown> = { email_address: email, status_if_new: "subscribed" };
+  // status_if_new handles truly new contacts; status: "subscribed" also
+  // reactivates archived contacts (e.g. from audience cleanups). Both fields
+  // are required to reliably subscribe customers for transactional emails.
+  const body: Record<string, unknown> = {
+    email_address: email,
+    status_if_new: "subscribed",
+    status: "subscribed",
+  };
   const mergeFields: Record<string, string> = {};
   if (name.first) mergeFields.FNAME = name.first;
   if (name.last) mergeFields.LNAME = name.last;
