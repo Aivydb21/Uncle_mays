@@ -31,6 +31,9 @@ export const PRODUCTS = {
       "Persian cucumbers — 4 ct",
       "Snap peas — 1/2 lb",
     ],
+    valueCallout: "Your $35 box (or $30 first order) delivers ~8 servings of fresh, seasonally sourced produce -- about $4-5 per serving. Less than a salad at Whole Foods, with produce that actually tastes like something.",
+    servingNote: "~8 servings of fresh, seasonal produce",
+    servingBadge: "~8 servings | perfect for 1-2 people",
   },
   family: {
     name: "Family Box",
@@ -54,6 +57,9 @@ export const PRODUCTS = {
       "Farm eggs — 1 dozen",
       "Pasture-raised whole chicken — included",
     ],
+    valueCallout: "Your $65 Family Box delivers ~14-18 servings -- produce, a dozen farm eggs, and a pasture-raised whole chicken, all included. About $4 per meal for a family of 4. No extra grocery run required.",
+    servingNote: "~14-18 servings including produce, eggs, and whole chicken",
+    servingBadge: "~14-18 servings | feeds a family of 4",
   },
   community: {
     name: "Community Box",
@@ -83,6 +89,9 @@ export const PRODUCTS = {
       "Ramps — 1/2 lb",
       "Farm eggs — 1 dozen",
     ],
+    valueCallout: "Your $95 Community Box delivers ~20-24 servings of specialty and heirloom produce plus your choice of protein and farm eggs. Split between two or three households: about $32-48 each.",
+    servingNote: "~20-24 servings of specialty and heirloom produce plus protein",
+    servingBadge: "~20-24 servings | great for sharing",
   },
 } as const;
 

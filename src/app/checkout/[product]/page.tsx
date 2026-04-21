@@ -237,7 +237,7 @@ export default function CheckoutSummaryPage() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute bottom-4 left-5">
               <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
-                ${effectivePrice} per delivery
+                {product.servingBadge}
               </span>
             </div>
           </div>
@@ -428,7 +428,7 @@ export default function CheckoutSummaryPage() {
                 <span className="text-sm font-semibold">Smart Value</span>
               </div>
               <p className="text-xs text-muted-foreground">
-                Your ${effectivePrice} box provides 8-10 servings of fresh, locally sourced produce — just $3-5 per meal.
+                {product.valueCallout}
               </p>
             </div>
 

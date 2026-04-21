@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DeadlineCountdown } from "@/components/DeadlineCountdown";
+import { PRODUCTS } from "@/lib/products";
 
 declare global {
   interface Window {
@@ -214,6 +215,9 @@ export const Pricing = () => {
                     </p>
                   )}
                   <p className="text-xs font-medium text-primary/80 mt-1">{plan.priceAnchor}</p>
+                  <p className="text-sm text-primary/80 font-medium mt-2">
+                    {PRODUCTS[plan.checkoutSlug as keyof typeof PRODUCTS].servingNote}
+                  </p>
                   <p className="text-sm font-semibold mt-3">
                     Order by Thursday 11:59pm. Delivered this Sunday.
                   </p>
@@ -263,6 +267,12 @@ export const Pricing = () => {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Tier recommendation bar */}
+        <div className="max-w-6xl mx-auto mt-4 rounded-xl bg-muted/50 px-6 py-3 text-sm text-muted-foreground text-center">
+          <span className="font-semibold text-foreground">Not sure which box?</span>{" "}
+          1-2 people: Starter. &middot; Family of 4: Family (chicken included, best value). &middot; Large household or splitting with neighbors: Community.
         </div>
 
         {/* Produce box image */}

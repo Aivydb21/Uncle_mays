@@ -150,6 +150,10 @@ export default function StarterBoxLandingPage() {
                 ))}
               </ul>
 
+              <p className="text-sm text-muted-foreground px-6 mt-3">
+                ~8 servings of fresh, seasonal produce &mdash; about $4&ndash;5 per serving.
+              </p>
+
               <div className="px-6 pb-6">
                 <div className="flex items-center justify-between rounded-xl bg-muted/50 px-5 py-3 text-sm">
                   <span className="text-muted-foreground">First order price</span>
