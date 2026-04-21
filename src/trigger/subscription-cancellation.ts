@@ -1,4 +1,4 @@
-import { task } from "@trigger.dev/sdk/v3";
+import { task, wait } from "@trigger.dev/sdk/v3";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
@@ -164,11 +164,14 @@ export const sendSubscriptionCancellationEmail = task({
       `unclemays.com`,
     ].join("\n");
 
-    // Ensure contact exists in Mailchimp before sending
+    // Ensure contact exists in Mailchimp before sending.
+    // Wait 2s after upsert so Mailchimp indexes the contact before the
+    // segment-targeted campaign send (avoids "recipients not ready" error).
     await upsertMailchimpContact(mailchimpKey, email, {
       first: firstName !== "there" ? firstName : undefined,
       last: lastName || undefined,
     }).catch((e: Error) => console.warn("[CancellationEmail] Mailchimp upsert warning:", e.message));
+    await wait.for({ seconds: 2 });
 
     // Create and send a targeted Mailchimp campaign
     const campaignRes = await fetch(`https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns`, {

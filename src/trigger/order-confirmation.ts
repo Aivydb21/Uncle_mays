@@ -1,4 +1,4 @@
-import { task } from "@trigger.dev/sdk/v3";
+import { task, wait } from "@trigger.dev/sdk/v3";
 import { createHash } from "crypto";
 
 const MAILCHIMP_DC = "us19";
@@ -213,11 +213,15 @@ export const sendOrderConfirmationEmail = task({
     const lastName = nameParts.slice(1).join(" ") || "";
     const amountDollars = payload.amountTotal / 100;
 
-    // Ensure contact exists in Mailchimp before sending
+    // Ensure contact exists in Mailchimp before sending.
+    // Wait 2s after upsert so Mailchimp has time to index the contact —
+    // sending a segment-targeted campaign immediately after upsert causes
+    // "recipients not ready" because the member hasn't been indexed yet.
     await upsertMailchimpContact(mailchimpKey, payload.email, {
       first: firstName,
       last: lastName,
     }).catch((e: Error) => console.warn("[OrderConfirmation] Mailchimp upsert warning:", e.message));
+    await wait.for({ seconds: 2 });
 
     const { campaignId } = await sendConfirmationEmail(mailchimpKey, {
       email: payload.email,
