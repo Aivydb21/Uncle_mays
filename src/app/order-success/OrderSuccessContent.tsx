@@ -20,33 +20,20 @@ interface TrackingItem {
   quantity: number;
 }
 
-function trackPurchase(transactionId: string, value: number, product?: string, items?: TrackingItem[]) {
+/**
+ * Fire GA4/dataLayer purchase events. These don't depend on fbq loading order.
+ */
+function trackGA(transactionId: string, value: number, items: TrackingItem[]) {
   if (typeof window === "undefined") return;
 
-  const resolvedItems: TrackingItem[] = items && items.length > 0
-    ? items
-    : [{ item_id: product || "produce_box", item_name: product || "Produce Box", price: value, quantity: 1 }];
-
-  // Push to dataLayer first — GTM routes to GA4/Ads even before gtag loads
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
     event: "purchase",
-    ecommerce: {
-      transaction_id: transactionId,
-      value: value,
-      currency: "USD",
-      items: resolvedItems,
-    },
+    ecommerce: { transaction_id: transactionId, value, currency: "USD", items },
   });
 
-  // Also direct gtag if already initialized
   if (typeof window.gtag === "function") {
-    window.gtag("event", "purchase", {
-      transaction_id: transactionId,
-      value,
-      currency: "USD",
-      items: resolvedItems,
-    });
+    window.gtag("event", "purchase", { transaction_id: transactionId, value, currency: "USD", items });
 
     const gAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
     const gAdsLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
@@ -59,10 +46,38 @@ function trackPurchase(transactionId: string, value: number, product?: string, i
       });
     }
   }
+}
 
-  // Meta pixel
-  if (typeof window.fbq === "function") {
-    window.fbq("track", "Purchase", { value, currency: "USD", content_type: "product" });
+/**
+ * Fire Meta Pixel Purchase event. Returns true if fbq was available and the
+ * event fired. Returns false if fbq hasn't loaded yet — caller should retry.
+ */
+function fireMetaPurchase(value: number, product: string): boolean {
+  if (typeof window === "undefined" || typeof window.fbq !== "function") return false;
+  window.fbq("track", "Purchase", {
+    value,
+    currency: "USD",
+    content_type: "product",
+    content_ids: [product],
+  });
+  return true;
+}
+
+function trackPurchase(transactionId: string, value: number, product?: string, items?: TrackingItem[]) {
+  if (typeof window === "undefined") return;
+
+  const resolvedProduct = product || "produce_box";
+  const resolvedItems: TrackingItem[] = items && items.length > 0
+    ? items
+    : [{ item_id: resolvedProduct, item_name: resolvedProduct, price: value, quantity: 1 }];
+
+  trackGA(transactionId, value, resolvedItems);
+
+  // Fire Meta Pixel — retry after 2s if fbq script hasn't loaded yet.
+  // This mirrors the pattern used in checkout pages. The order-success page
+  // may be reached via a full browser redirect (3DS auth) where fbq loads async.
+  if (!fireMetaPurchase(value, resolvedProduct)) {
+    setTimeout(() => fireMetaPurchase(value, resolvedProduct), 2000);
   }
 }
 
