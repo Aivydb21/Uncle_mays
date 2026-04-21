@@ -367,6 +367,33 @@ export async function POST(req: NextRequest) {
       // (invoice=null) and are not covered by checkout.session.completed.
       // Use receipt_email or metadata.customer_email as the address.
       const confirmEmail = intent.receipt_email || intent.metadata?.customer_email || null;
+
+      // Fire CAPI Purchase for one-time intent purchases (not covered by firstPayment branch above).
+      // Subscription first payments use /api/checkout/subscribe-intent and set firstPayment=true,
+      // so they are already tracked above. One-time purchases via /api/checkout/intent do not
+      // set firstPayment, so we fire CAPI here when: email exists, no invoice (not a renewal),
+      // and this is not already covered by the firstPayment branch.
+      if (confirmEmail && !intentInvoice && intent.metadata?.firstPayment !== "true") {
+        const otProduct = intent.metadata?.product || "produce_box";
+        sendCapiEvent({
+          eventName: "Purchase",
+          eventSourceUrl: `https://unclemays.com/order-success`,
+          userData: {
+            email: confirmEmail,
+            phone: intent.metadata?.customer_phone || intent.metadata?.phone || undefined,
+          },
+          customData: {
+            value: intent.amount / 100,
+            currency: "USD",
+            content_ids: [otProduct],
+            content_name: otProduct,
+            content_type: "product",
+            order_id: intent.id,
+          },
+          eventId: `purchase-ot-${intent.id}`,
+        }).catch((err) => console.error("[CAPI] Purchase (payment_intent.succeeded one-time) error:", err));
+      }
+
       if (confirmEmail && !intentInvoice) {
         const triggerKeyForOtConfirmation = process.env.TRIGGER_SECRET_KEY;
         if (triggerKeyForOtConfirmation) {
