@@ -91,8 +91,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
+    const isTestKey = process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ?? false;
+
     // Build metadata
-    const metadata: Record<string, string> = { product, customer_email: email };
+    const metadata: Record<string, string> = { product, customer_email: email, ...(isTestKey ? { is_test: "true" } : {}) };
     if (firstName) metadata.firstName = firstName;
     if (lastName) metadata.lastName = lastName;
     if (phone) metadata.phone = phone;

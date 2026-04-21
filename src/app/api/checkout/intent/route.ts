@@ -91,6 +91,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const isTestKey = process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ?? false;
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: "usd",
@@ -98,6 +100,7 @@ export async function POST(req: NextRequest) {
       receipt_email: email || undefined,
       metadata: {
         product,
+        ...(isTestKey ? { is_test: "true" } : {}),
         customer_name: `${firstName || ""} ${lastName || ""}`.trim(),
         customer_email: email || "",
         ...(phone ? { customer_phone: phone } : {}),

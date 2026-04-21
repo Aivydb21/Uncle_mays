@@ -29,6 +29,8 @@ export async function POST(req: NextRequest) {
 
     const origin = req.headers.get("origin") || "https://unclemays.com";
 
+    const isTestKey = process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ?? false;
+
     const session = await stripe.checkout.sessions.create({
       ui_mode: "embedded_page",
       mode: "payment",
@@ -38,6 +40,7 @@ export async function POST(req: NextRequest) {
       customer_creation: "always",
       phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: ["US"] },
+      ...(isTestKey ? { metadata: { is_test: "true" } } : {}),
       custom_fields: [
         {
           key: "delivery_zip",

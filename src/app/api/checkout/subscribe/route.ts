@@ -56,12 +56,16 @@ export async function POST(req: NextRequest) {
     if (utm_content) deliveryMeta.utm_content = utm_content;
     if (utm_term) deliveryMeta.utm_term = utm_term;
 
+    const isTestKey = process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ?? false;
+    if (isTestKey) deliveryMeta.is_test = "true";
+
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       mode: "subscription",
       payment_method_types: ["card"],
       line_items: [{ price: priceId, quantity: 1 }],
       phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: ["US"] },
+      ...(isTestKey ? { metadata: { is_test: "true" } } : {}),
       subscription_data: {
         metadata: deliveryMeta,
       },

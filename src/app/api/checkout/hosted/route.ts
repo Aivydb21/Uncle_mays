@@ -39,10 +39,13 @@ export async function POST(req: NextRequest) {
 
     const origin = req.headers.get("origin") || "https://unclemays.com";
 
+    const isTestKey = process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ?? false;
+
     // Build metadata object with product info + UTM parameters for campaign attribution
     const metadata: Record<string, string> = {
       product,
       source: "website",
+      ...(isTestKey ? { is_test: "true" } : {}),
     };
 
     // Add UTM parameters to metadata for GA4 server-side tracking
