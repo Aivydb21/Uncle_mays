@@ -147,27 +147,16 @@ function PaymentForm({
     <form onSubmit={handleSubmit}>
       <PaymentElement className="mb-4" />
 
-      {/* Value anchor — Whole Foods quality, Aldi price */}
-      <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 overflow-hidden">
-        <div className="px-3 py-1.5 bg-primary/10 border-b border-primary/15">
-          <p className="text-xs font-semibold text-primary text-center">
-            Better than Whole Foods. Cheaper than Aldi.
-          </p>
-        </div>
-        <div className="flex divide-x divide-primary/10">
-          <div className="flex-1 flex flex-col items-center gap-0.5 px-2 py-2 text-center">
-            <span className="text-base">🥬</span>
-            <span className="text-[10px] text-foreground/75 leading-tight">No chemical washes</span>
-          </div>
-          <div className="flex-1 flex flex-col items-center gap-0.5 px-2 py-2 text-center">
-            <span className="text-base">🥩</span>
-            <span className="text-[10px] text-foreground/75 leading-tight">No chemical baths</span>
-          </div>
-          <div className="flex-1 flex flex-col items-center gap-0.5 px-2 py-2 text-center">
-            <span className="text-base">💰</span>
-            <span className="text-[10px] text-foreground/75 leading-tight">Less than Aldi/serving</span>
-          </div>
-        </div>
+      {/* Value anchor */}
+      <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 px-3 py-3">
+        <p className="text-sm font-bold text-primary mb-1.5">
+          Better than Whole Foods. Cheaper than Aldi.
+        </p>
+        <ul className="space-y-0.5">
+          <li className="text-xs text-foreground/80">No chemical washes on your produce</li>
+          <li className="text-xs text-foreground/80">No chemical bath on your meat</li>
+          <li className="text-xs text-foreground/80">Priced below Aldi per serving</li>
+        </ul>
       </div>
 
       {paymentError && (
@@ -183,7 +172,7 @@ function PaymentForm({
       >
         {submitting
           ? "Processing…"
-          : `Place Order — $${checkout.price}.00`}
+          : `Place Order: $${checkout.price}.00`}
       </button>
 
       {/* Enhanced security badges */}

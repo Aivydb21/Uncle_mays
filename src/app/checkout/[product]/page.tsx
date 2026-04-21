@@ -7,7 +7,6 @@ import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DeadlineCountdown } from "@/components/DeadlineCountdown";
 
 // Resolve which protein options are available for a given product
 function getAvailableProteins(product: typeof PRODUCTS[ProductSlug]) {
@@ -266,25 +265,16 @@ export default function CheckoutSummaryPage() {
               </div>
             </div>
 
-            {/* Value anchor — Whole Foods quality, Aldi price */}
-            <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 overflow-hidden">
-              <div className="px-4 py-2 bg-primary/10 border-b border-primary/15">
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary text-center">
-                  Better than Whole Foods. Cheaper than Aldi.
-                </p>
-              </div>
-              <div className="divide-y divide-primary/10">
-                {[
-                  { icon: "🥬", text: "No chemical washes on produce (unlike Whole Foods)" },
-                  { icon: "🥩", text: "No chemical bath on meat (unlike Whole Foods)" },
-                  { icon: "💰", text: "Priced less than Aldi per serving" },
-                ].map(({ icon, text }) => (
-                  <div key={text} className="flex items-center gap-3 px-4 py-2.5">
-                    <span className="text-base leading-none">{icon}</span>
-                    <span className="text-xs text-foreground/80">{text}</span>
-                  </div>
-                ))}
-              </div>
+            {/* Value anchor */}
+            <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+              <p className="text-sm font-bold text-primary mb-2">
+                Better than Whole Foods. Cheaper than Aldi.
+              </p>
+              <ul className="space-y-1">
+                <li className="text-xs text-foreground/80">No chemical washes on your produce</li>
+                <li className="text-xs text-foreground/80">No chemical bath on your meat</li>
+                <li className="text-xs text-foreground/80">Priced below Aldi per serving</li>
+              </ul>
             </div>
 
             {/* First-order discount callout */}
@@ -294,33 +284,6 @@ export default function CheckoutSummaryPage() {
                 <span>First-order discount applied — you save ${product.price - effectivePrice}!</span>
               </div>
             ) : null}
-
-            {/* Social proof stats — above the fold, near the top */}
-            <div className="mb-6 p-4 rounded-xl bg-primary/5 border border-primary/15">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3 text-center">
-                What Our Community Says
-              </p>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary">97%</div>
-                  <div className="text-xs text-muted-foreground leading-snug mt-1">
-                    of surveyed customers want Uncle May&apos;s in their neighborhood
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary">89%</div>
-                  <div className="text-xs text-muted-foreground leading-snug mt-1">
-                    would refer friends and family
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-3 border-t border-primary/10 pt-3">
-                <blockquote className="text-sm text-foreground italic">
-                  &ldquo;Finally a grocery that actually gets our community. The produce is fresher than anything I&apos;ve found on the South Side.&rdquo;
-                </blockquote>
-                <p className="text-xs text-muted-foreground">— Hyde Park customer survey</p>
-              </div>
-            </div>
 
             {/* What's in the box */}
             <div className="mb-6">
@@ -342,7 +305,7 @@ export default function CheckoutSummaryPage() {
               {proteinIncluded ? (
                 <>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                    Choose Your Protein — Included
+                    Choose Your Protein: Included
                   </h2>
                   <p className="text-xs text-muted-foreground mb-3">
                     Protein is included with your box at no extra charge. Select one.
@@ -351,7 +314,7 @@ export default function CheckoutSummaryPage() {
               ) : (
                 <>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                    Add a Protein — Optional
+                    Add a Protein (Optional)
                   </h2>
                   <p className="text-xs text-muted-foreground mb-3">
                     Add one locally sourced protein to your box (+$16–$22). Skip if you prefer.
@@ -394,7 +357,7 @@ export default function CheckoutSummaryPage() {
             {"additionalProteinAllowed" in product && product.additionalProteinAllowed ? (
               <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
                 <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                  Add More Proteins — Optional
+                  Add More Proteins (Optional)
                 </h2>
                 <p className="text-xs text-muted-foreground mb-3">
                   Add 2nd or 3rd protein options to your box (+${18}–${24}). You can select up to 3 additional proteins.
@@ -438,9 +401,6 @@ export default function CheckoutSummaryPage() {
                 </div>
               </div>
             ) : null}
-
-            {/* Urgency */}
-            <DeadlineCountdown variant="box" />
 
             {/* Trust signals */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
