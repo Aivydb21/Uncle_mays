@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Truck, Star, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { DeadlineCountdown } from "@/components/DeadlineCountdown";
 
 const heroImage = "/images/hero-produce.jpg";
 
@@ -48,9 +49,14 @@ export const Hero = () => {
             </div>
 
             {/* Delivery badge */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-3">
               <Truck className="h-4 w-4 shrink-0" />
               <span>Now delivering in Chicago</span>
+            </div>
+
+            {/* Cutoff countdown */}
+            <div className="mb-6">
+              <DeadlineCountdown variant="inline" />
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">

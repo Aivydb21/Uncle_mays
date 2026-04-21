@@ -7,6 +7,7 @@ import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DeadlineCountdown } from "@/components/DeadlineCountdown";
 
 function getAvailableProteins(product: typeof PRODUCTS[ProductSlug]) {
   const allowed = "proteinOptions" in product ? (product.proteinOptions as ProteinId[]) : null;
@@ -169,7 +170,7 @@ export default function SubscribeSummaryPage() {
                   {product.name}
                 </h1>
                 <p className="text-muted-foreground text-sm mt-1">
-                  Delivered fresh every Wednesday
+                  Delivered fresh every Sunday
                 </p>
               </div>
               <div className="text-right shrink-0">
@@ -252,11 +253,14 @@ export default function SubscribeSummaryPage() {
               </div>
             </div>}
 
+            {/* Urgency countdown */}
+            <DeadlineCountdown variant="box" />
+
             {/* Trust signals */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
               {[
                 { icon: "🔄", text: "Cancel anytime, no fees" },
-                { icon: "🚚", text: "Free delivery, every Wednesday" },
+                { icon: "🚚", text: "Free delivery, every Sunday" },
                 { icon: "🌱", text: "Locally sourced, Black-owned farms" },
               ].map(({ icon, text }) => (
                 <div key={text} className="flex items-center gap-2 text-sm text-muted-foreground">

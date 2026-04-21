@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { DeadlineCountdown } from "@/components/DeadlineCountdown";
 
 declare global {
   interface Window {
@@ -143,11 +144,11 @@ export const Pricing = () => {
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Box</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Seasonal, rotating produce sourced directly from Black farmers and delivered to your Chicago door every Wednesday.
+            Seasonal, rotating produce sourced directly from Black farmers and delivered to your Chicago door every Sunday.
           </p>
-          <p className="text-sm text-muted-foreground mt-3">
-            🚚 Orders deliver every Wednesday. Place yours any day and it ships the following Wednesday.
-          </p>
+          <div className="flex justify-center mt-4">
+            <DeadlineCountdown variant="inline" />
+          </div>
         </motion.div>
 
         {/* Subscription / One-Time toggle */}
@@ -214,7 +215,7 @@ export const Pricing = () => {
                   )}
                   <p className="text-xs font-medium text-primary/80 mt-1">{plan.priceAnchor}</p>
                   <p className="text-sm font-semibold mt-3">
-                    Order by Tuesday night. Delivered this Wednesday.
+                    Order by Thursday 11:59pm. Delivered this Sunday.
                   </p>
                   <p className="text-xs text-muted-foreground mt-2">
                     100% freshness guarantee. Not happy? Full refund, no questions.

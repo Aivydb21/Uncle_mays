@@ -7,6 +7,7 @@ import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DeadlineCountdown } from "@/components/DeadlineCountdown";
 
 // Resolve which protein options are available for a given product
 function getAvailableProteins(product: typeof PRODUCTS[ProductSlug]) {
@@ -249,7 +250,7 @@ export default function CheckoutSummaryPage() {
                   {product.name}
                 </h1>
                 <p className="text-muted-foreground text-sm mt-1">
-                  Delivered fresh every Wednesday
+                  Delivered fresh every Sunday
                 </p>
               </div>
               <div className="text-right shrink-0">
@@ -418,19 +419,7 @@ export default function CheckoutSummaryPage() {
             ) : null}
 
             {/* Trust signals + Urgency */}
-            <div className="mb-6 p-4 rounded-xl border border-primary/20 bg-primary/5">
-              <div className="flex items-start gap-3 mb-3">
-                <span className="text-2xl">⏰</span>
-                <div>
-                  <p className="text-sm font-semibold text-primary mb-1">
-                    Order by Thursday 11:59pm for delivery this Sunday
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Limited boxes available this week.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <DeadlineCountdown variant="box" />
 
             {/* Value proposition */}
             <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
