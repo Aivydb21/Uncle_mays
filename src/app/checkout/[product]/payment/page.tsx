@@ -454,7 +454,7 @@ export default function PaymentPage() {
                 </div>
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>🥬</span>
-                  <span>No chemical washes — cleaner than Whole Foods</span>
+                  <span>No chemical washes, cleaner than Whole Foods</span>
                 </div>
               </div>
             </div>

@@ -275,8 +275,8 @@ export default function CheckoutSummaryPage() {
               </div>
               <div className="divide-y divide-primary/10">
                 {[
-                  { icon: "🥬", text: "No chemical washes on produce — unlike Whole Foods" },
-                  { icon: "🥩", text: "No chemical bath on meat — unlike Whole Foods" },
+                  { icon: "🥬", text: "No chemical washes on produce (unlike Whole Foods)" },
+                  { icon: "🥩", text: "No chemical bath on meat (unlike Whole Foods)" },
                   { icon: "💰", text: "Priced less than Aldi per serving" },
                 ].map(({ icon, text }) => (
                   <div key={text} className="flex items-center gap-3 px-4 py-2.5">
