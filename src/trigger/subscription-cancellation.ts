@@ -42,7 +42,7 @@ async function upsertMailchimpContact(
  */
 export const sendSubscriptionCancellationEmail = task({
   id: "send-subscription-cancellation-email",
-  maxDuration: 60,
+  maxDuration: 120,
   run: async (payload: {
     subscriptionId: string;
     customerId: string;
@@ -171,7 +171,6 @@ export const sendSubscriptionCancellationEmail = task({
       first: firstName !== "there" ? firstName : undefined,
       last: lastName || undefined,
     }).catch((e: Error) => console.warn("[CancellationEmail] Mailchimp upsert warning:", e.message));
-    await wait.for({ seconds: 2 });
 
     // Create and send a targeted Mailchimp campaign
     const campaignRes = await fetch(`https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns`, {
@@ -211,6 +210,27 @@ export const sendSubscriptionCancellationEmail = task({
       headers: { Authorization: authHeader, "Content-Type": "application/json" },
       body: JSON.stringify({ html: htmlContent, plain_text: plainText }),
     });
+
+    // Poll until Mailchimp finishes computing segment recipients.
+    // Sending before recipient_count > 0 causes "recipients not ready" (HTTP 400).
+    let recipientCount = 0;
+    for (let attempt = 0; attempt < 12; attempt++) {
+      await wait.for({ seconds: 5 });
+      const statusRes = await fetch(
+        `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}`,
+        { headers: { Authorization: authHeader } }
+      );
+      const status = await statusRes.json() as { recipients?: { recipient_count?: number } };
+      recipientCount = status.recipients?.recipient_count ?? 0;
+      if (recipientCount > 0) break;
+    }
+
+    if (recipientCount === 0) {
+      throw new Error(
+        `[CancellationEmail] Campaign ${campaign.id} has 0 recipients after polling. ` +
+        `Contact ${email} may not be subscribed to list ${MAILCHIMP_LIST_ID}.`
+      );
+    }
 
     const sendRes = await fetch(
       `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}/actions/send`,

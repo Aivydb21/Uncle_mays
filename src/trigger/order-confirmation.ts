@@ -173,6 +173,28 @@ unclemays.com`;
     body: JSON.stringify({ html: htmlContent, plain_text: plainText }),
   });
 
+  // Poll until Mailchimp finishes computing segment recipients.
+  // Sending before recipient_count > 0 causes "recipients not ready" (HTTP 400).
+  // Mailchimp segment calculation is async and typically completes in 5-20s.
+  let recipientCount = 0;
+  for (let attempt = 0; attempt < 12; attempt++) {
+    await wait.for({ seconds: 5 });
+    const statusRes = await fetch(
+      `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}`,
+      { headers: { Authorization: authHeader } }
+    );
+    const status = await statusRes.json() as { recipients?: { recipient_count?: number } };
+    recipientCount = status.recipients?.recipient_count ?? 0;
+    if (recipientCount > 0) break;
+  }
+
+  if (recipientCount === 0) {
+    throw new Error(
+      `Mailchimp campaign ${campaign.id} has 0 recipients after polling. ` +
+      `Contact ${email} may not be subscribed to list ${MAILCHIMP_LIST_ID}.`
+    );
+  }
+
   const sendRes = await fetch(
     `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}/actions/send`,
     { method: "POST", headers: { Authorization: authHeader } }
@@ -192,7 +214,7 @@ unclemays.com`;
  */
 export const sendOrderConfirmationEmail = task({
   id: "send-order-confirmation-email",
-  maxDuration: 60,
+  maxDuration: 120,
   run: async (payload: {
     sessionId: string;
     email: string;
@@ -214,14 +236,10 @@ export const sendOrderConfirmationEmail = task({
     const amountDollars = payload.amountTotal / 100;
 
     // Ensure contact exists in Mailchimp before sending.
-    // Wait 2s after upsert so Mailchimp has time to index the contact —
-    // sending a segment-targeted campaign immediately after upsert causes
-    // "recipients not ready" because the member hasn't been indexed yet.
     await upsertMailchimpContact(mailchimpKey, payload.email, {
       first: firstName,
       last: lastName,
     }).catch((e: Error) => console.warn("[OrderConfirmation] Mailchimp upsert warning:", e.message));
-    await wait.for({ seconds: 2 });
 
     const { campaignId } = await sendConfirmationEmail(mailchimpKey, {
       email: payload.email,
