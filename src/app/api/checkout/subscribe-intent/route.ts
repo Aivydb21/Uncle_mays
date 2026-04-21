@@ -158,7 +158,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Retrieve the full PaymentIntent to get client_secret.
+    // Retrieve the full PaymentIntent to get client_secret, then stamp it with
+    // subscription metadata so the payment_intent.succeeded webhook handler can:
+    // (1) fire the CAPI Purchase event, and (2) clean up the Mailchimp cart.
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (!paymentIntent.client_secret) {
@@ -168,6 +170,17 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Stamp the PaymentIntent with subscription metadata so the
+    // payment_intent.succeeded webhook can fire CAPI Purchase and Mailchimp cleanup.
+    // Without this the webhook's firstPayment check would always fail.
+    await stripe.paymentIntents.update(paymentIntentId, {
+      metadata: {
+        ...metadata,
+        firstPayment: "true",
+        subscriptionId: subscription.id,
+      },
+    });
 
     // Non-blocking: upsert subscriber + create abandoned cart so Mailchimp
     // Journey fires if the customer abandons before completing payment.
