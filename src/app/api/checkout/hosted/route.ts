@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
       utm_campaign,
       utm_content,
       utm_term,
+      gclid,
     } = body;
 
     const priceId = PRICE_MAP[product];
@@ -54,6 +55,7 @@ export async function POST(req: NextRequest) {
     if (utm_campaign) metadata.utm_campaign = utm_campaign;
     if (utm_content) metadata.utm_content = utm_content;
     if (utm_term) metadata.utm_term = utm_term;
+    if (gclid) metadata.gclid = gclid;
 
     // Create HOSTED Checkout Session (redirects to checkout.stripe.com)
     const session = await stripe.checkout.sessions.create({

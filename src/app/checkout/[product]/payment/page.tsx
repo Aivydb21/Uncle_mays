@@ -220,7 +220,7 @@ export default function PaymentPage() {
   const createIntent = useCallback(
     async (data: StoredCheckout) => {
       try {
-        // Read any captured UTM params from localStorage
+        // Read any captured UTM params and gclid from localStorage
         let utms: Record<string, string> = {};
         try {
           const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
@@ -228,6 +228,8 @@ export default function PaymentPage() {
             const val = localStorage.getItem(`unc-${k}`);
             if (val) utms[k] = val;
           });
+          const gclid = localStorage.getItem("unc-gclid");
+          if (gclid) utms["gclid"] = gclid;
         } catch { /* ignore */ }
 
         const res = await fetch("/api/checkout/intent", {

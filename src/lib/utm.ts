@@ -9,6 +9,7 @@ export interface UTMParams {
   utm_campaign?: string;
   utm_content?: string;
   utm_term?: string;
+  gclid?: string;
 }
 
 const UTM_STORAGE_KEY = "unclemays_utm";
@@ -36,6 +37,11 @@ export function getUTMFromURL(): UTMParams {
       utm[key] = value;
     }
   });
+
+  const gclid = params.get("gclid");
+  if (gclid) {
+    utm.gclid = gclid;
+  }
 
   return utm;
 }
@@ -74,12 +80,21 @@ export function getSavedUTMParams(): UTMParams {
 
 /**
  * Captures UTM parameters from URL and saves them to sessionStorage.
+ * Also persists gclid to localStorage for cross-session Google Ads attribution.
  * Call this on initial page load.
  */
 export function captureUTMParams(): UTMParams {
   const utm = getUTMFromURL();
   if (Object.keys(utm).length > 0) {
     saveUTMParams(utm);
+  }
+  // Persist gclid to localStorage separately so it survives Stripe redirect
+  if (utm.gclid) {
+    try {
+      localStorage.setItem("unc-gclid", utm.gclid);
+    } catch {
+      // Ignore storage errors
+    }
   }
   return utm;
 }

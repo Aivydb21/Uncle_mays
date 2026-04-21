@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, utm_source, utm_medium, utm_campaign, utm_content, utm_term } = await req.json();
+    const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid } = await req.json();
 
     // Apply first-order discount for eligible products (e.g. starter box)
     const isFirstOrder = product in FIRST_ORDER_AMOUNT_MAP;
@@ -125,6 +125,7 @@ export async function POST(req: NextRequest) {
         ...(utm_campaign ? { utm_campaign } : {}),
         ...(utm_content ? { utm_content } : {}),
         ...(utm_term ? { utm_term } : {}),
+        ...(gclid ? { gclid } : {}),
       },
       automatic_payment_methods: { enabled: true },
     });
