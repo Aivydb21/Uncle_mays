@@ -72,9 +72,9 @@ export default function SubscribeSummaryPage() {
   const [email, setEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
 
-  // Fire Meta Pixel ViewContent + InitiateCheckout on page load (client-side).
-  // Also fire server-side CAPI events to bypass ITP/ad blockers for better attribution.
-  // Retry browser pixel once after 2s in case the Pixel script loads asynchronously.
+  // Fire Meta Pixel ViewContent on page load (client-side).
+  // Also fire server-side CAPI ViewContent to bypass ITP/ad blockers for better attribution.
+  // InitiateCheckout fires on the "Continue" button click, not on page load (UNC-559).
   useEffect(() => {
     fetch("/api/capi/view", {
       method: "POST",
@@ -84,7 +84,7 @@ export default function SubscribeSummaryPage() {
       // Never block checkout for CAPI failures
     });
 
-    function firePixelEvents() {
+    function fireViewContent() {
       const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
       if (!fbq) return false;
       fbq("track", "ViewContent", {
@@ -94,19 +94,11 @@ export default function SubscribeSummaryPage() {
         value: product.subPrice,
         currency: "USD",
       });
-      fbq("track", "InitiateCheckout", {
-        content_name: product.name,
-        content_ids: [slug],
-        content_type: "product",
-        value: product.subPrice,
-        currency: "USD",
-        num_items: 1,
-      });
       return true;
     }
 
-    if (!firePixelEvents()) {
-      const timer = setTimeout(firePixelEvents, 2000);
+    if (!fireViewContent()) {
+      const timer = setTimeout(fireViewContent, 2000);
       return () => clearTimeout(timer);
     }
   }, [slug, product.name, product.subPrice]);
@@ -329,6 +321,29 @@ export default function SubscribeSummaryPage() {
 
             <button
               onClick={() => {
+                // Fire InitiateCheckout on user action, not page load (UNC-559)
+                try {
+                  const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
+                  if (fbq) {
+                    fbq("track", "InitiateCheckout", {
+                      content_name: product.name,
+                      content_ids: [slug],
+                      content_type: "product",
+                      value: product.subPrice,
+                      currency: "USD",
+                      num_items: 1,
+                    });
+                  }
+                } catch {
+                  // Never block checkout for tracking failures
+                }
+                // Server-side CAPI InitiateCheckout — non-blocking
+                fetch("/api/capi/initiate-checkout", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ slug, contentName: product.name, value: product.subPrice }),
+                }).catch(() => {});
+
                 // Persist email if valid
                 const trimmed = email.trim();
                 if (trimmed && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {

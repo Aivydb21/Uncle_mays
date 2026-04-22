@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendCapiEvent } from "@/lib/meta-capi";
 
-// Server-side CAPI endpoint called by the checkout summary client page.
-// Fires ViewContent only. InitiateCheckout is fired separately on user action (UNC-559).
+// Server-side CAPI endpoint for InitiateCheckout events.
+// Called when the user clicks "Continue" on checkout/subscribe summary pages (UNC-559).
 export async function POST(req: NextRequest) {
   try {
     const { slug, contentName, value } = await req.json() as {
@@ -25,10 +25,10 @@ export async function POST(req: NextRequest) {
       client_user_agent: userAgent,
     };
 
-    const viewEventId = `view-${slug}-${Date.now()}`;
+    const eventId = `initiate-${slug}-${Date.now()}`;
 
     await sendCapiEvent({
-      eventName: "ViewContent",
+      eventName: "InitiateCheckout",
       eventSourceUrl,
       userData,
       customData: {
@@ -37,14 +37,15 @@ export async function POST(req: NextRequest) {
         content_type: "product",
         value,
         currency: "USD",
+        num_items: 1,
       },
-      eventId: viewEventId,
+      eventId,
     });
 
     return NextResponse.json({ ok: true });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
-    console.error("[CAPI] /api/capi/view error:", message);
+    console.error("[CAPI] /api/capi/initiate-checkout error:", message);
     // Always return 200 so client errors never interrupt checkout flow
     return NextResponse.json({ ok: false });
   }

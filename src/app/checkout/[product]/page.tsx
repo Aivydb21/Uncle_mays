@@ -78,9 +78,9 @@ export default function CheckoutSummaryPage() {
   const [email, setEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
 
-  // Fire Meta Pixel ViewContent + InitiateCheckout on page load (client-side).
-  // Also fire server-side CAPI events to bypass ITP/ad blockers for better attribution.
-  // Retry browser pixel once after 2s in case the Pixel script loads asynchronously.
+  // Fire Meta Pixel ViewContent on page load (client-side).
+  // Also fire server-side CAPI ViewContent to bypass ITP/ad blockers for better attribution.
+  // InitiateCheckout fires on the "Continue" button click, not on page load (UNC-559).
   useEffect(() => {
     // Server-side CAPI call — fire once, non-blocking
     fetch("/api/capi/view", {
@@ -91,7 +91,7 @@ export default function CheckoutSummaryPage() {
       // Never block checkout for CAPI failures
     });
 
-    function firePixelEvents() {
+    function fireViewContent() {
       const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
       if (!fbq) return false;
       fbq("track", "ViewContent", {
@@ -101,19 +101,11 @@ export default function CheckoutSummaryPage() {
         value: effectivePrice,
         currency: "USD",
       });
-      fbq("track", "InitiateCheckout", {
-        content_name: product.name,
-        content_ids: [slug],
-        content_type: "product",
-        value: effectivePrice,
-        currency: "USD",
-        num_items: 1,
-      });
       return true;
     }
 
-    if (!firePixelEvents()) {
-      const timer = setTimeout(firePixelEvents, 2000);
+    if (!fireViewContent()) {
+      const timer = setTimeout(fireViewContent, 2000);
       return () => clearTimeout(timer);
     }
   }, [slug, product.name, effectivePrice]);
@@ -154,13 +146,18 @@ export default function CheckoutSummaryPage() {
     }
   }
 
-  // Restore any prior selection from sessionStorage
+  // Restore any prior selection from sessionStorage, or auto-select if only one included option
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(`unc-proteins-${slug}`);
       if (saved) {
         const parsed = JSON.parse(saved) as ProteinId[];
         setSelectedProteins(parsed);
+      } else if (proteinIncluded && availableProteins.length === 1) {
+        // Auto-select the only included protein (e.g. Family box = chicken)
+        const autoSelected = [availableProteins[0].id];
+        setSelectedProteins(autoSelected);
+        sessionStorage.setItem(`unc-proteins-${slug}`, JSON.stringify(autoSelected));
       }
       const savedAdditional = sessionStorage.getItem(`unc-additional-proteins-${slug}`);
       if (savedAdditional) {
@@ -170,7 +167,7 @@ export default function CheckoutSummaryPage() {
     } catch {
       // ignore
     }
-  }, [slug]);
+  }, [slug, proteinIncluded, availableProteins]);
 
   // Always single-select (radio): selecting a new protein replaces the previous one
   function toggleProtein(id: ProteinId) {
@@ -441,6 +438,29 @@ export default function CheckoutSummaryPage() {
             {/* CTA */}
             <button
               onClick={() => {
+                // Fire InitiateCheckout on user action, not page load (UNC-559)
+                try {
+                  const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
+                  if (fbq) {
+                    fbq("track", "InitiateCheckout", {
+                      content_name: product.name,
+                      content_ids: [slug],
+                      content_type: "product",
+                      value: totalPrice,
+                      currency: "USD",
+                      num_items: 1,
+                    });
+                  }
+                } catch {
+                  // Never block checkout for tracking failures
+                }
+                // Server-side CAPI InitiateCheckout — non-blocking
+                fetch("/api/capi/initiate-checkout", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ slug, contentName: product.name, value: totalPrice }),
+                }).catch(() => {});
+
                 // Persist total price (base + additional proteins) for downstream checkout steps
                 try {
                   sessionStorage.setItem(`unc-price-${slug}`, String(totalPrice));
