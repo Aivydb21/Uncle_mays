@@ -110,14 +110,50 @@
 
 ## Setup instructions for the Mailchimp UI
 
-1. Go to **Automations → Create → Customer Journey** in Mailchimp.
-2. Starting point: **Tag added** → tag is `new_signup`.
-3. Add three email steps:
-   - Email 1: send immediately (delay 0)
-   - Email 2: send after 2 days (skip if customer has `purchased` tag)
-   - Email 3: send after 5 days (skip if customer has `purchased` tag)
-4. Copy the subject, preview, and body from each section above into the email editor.
-5. Test once with your own email address.
-6. Turn on the journey.
+**The 3 templates are already created in your Mailchimp account.** HTML is styled with Uncle May's green (#2d7a2d), correct footer, merge tags, and UTM-tagged CTAs. Content is pre-filled — you can edit text directly inside the template editor if you want to tweak.
 
-**Important:** The `new_signup` tag is added by the homepage email-capture form automatically. The `purchased` tag is added by the Stripe webhook when an order completes. Both are already wired up as of this commit.
+### Template IDs (saved in Mailchimp)
+
+| # | Template ID | Purpose |
+|---|---|---|
+| 1 | **10000806** | Welcome 1 - Introduction (send immediately) |
+| 2 | **10000807** | Welcome 2 - Proof (send day 2, skip if purchased) |
+| 3 | **10000808** | Welcome 3 - Nudge (send day 5, skip if purchased) |
+
+You'll also see them in the UI under **Content → Email templates → Saved templates**.
+
+### Wire them into a Customer Journey
+
+1. **Mailchimp → Automations → Create → Customer Journey** (start from scratch).
+2. **Starting point:** "Tag is added" → tag name: `new_signup`
+3. **Step 1:** "Send email"
+   - Select template: **Welcome 1 - Introduction**
+   - Subject: `Welcome to Uncle May's. Here's what's waiting.`
+   - Preview: `Black-farmed seasonal produce, delivered to your Chicago door every Wednesday.`
+   - From: `Uncle May's Produce <info@unclemays.com>`
+   - Delay: **immediately**
+4. **Step 2:** "Rule" → "If/Else" → check if contact has tag `purchased`
+   - If yes → End journey
+   - If no → continue
+5. **Step 3:** "Wait" → **2 days**
+6. **Step 4:** "Send email"
+   - Template: **Welcome 2 - Proof**
+   - Subject: `Where your produce actually comes from`
+   - Preview: `The farms. The farmers. The reason this tastes different.`
+7. **Step 5:** Repeat the `purchased` check (same as step 2)
+8. **Step 6:** "Wait" → **3 days** (5 days total from signup)
+9. **Step 7:** "Send email"
+   - Template: **Welcome 3 - Nudge**
+   - Subject: `Your first Wednesday is waiting`
+   - Preview: `Order by Sunday 11:59 PM CT for this week's delivery.`
+10. **Test** by adding the `new_signup` tag manually to your own email in the audience, then verify Step 1 fires.
+11. **Turn on the journey.**
+
+### Tags already wired up
+
+- **`new_signup`** — Added automatically by the homepage email capture form (`/api/email-capture`). Every new email entered on unclemays.com gets this tag.
+- **`order_completed`** — Added by the Stripe webhook after a successful purchase (see `src/lib/mailchimp.ts::tagOrderCompleted`). **For the journey, use this tag name instead of `purchased`** when setting up the If/Else check in steps 2 and 5 — that's the tag the code actually sets.
+
+### Rotating copy later
+
+To change email content without re-wiring the journey: edit the saved template in Mailchimp (**Content → Email templates → Saved templates**). All future journey sends pick up the new content. No code change needed.
