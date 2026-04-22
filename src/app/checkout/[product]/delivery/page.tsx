@@ -168,7 +168,7 @@ export default function DeliveryPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value } = e.target;
     setFields((prev) => ({ ...prev, [name]: value }));
     // Clear field error on change
@@ -484,15 +484,18 @@ export default function DeliveryPage() {
                     <Label htmlFor="state">
                       State <span className="text-destructive">*</span>
                     </Label>
-                    <Input
+                    <select
                       id="state"
                       name="state"
                       value={fields.state}
                       onChange={handleChange}
                       autoComplete="address-level1"
-                      placeholder="IL"
-                      maxLength={2}
-                    />
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    >
+                      {["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"].map((s) => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
                     {errors.state && (
                       <p className="text-destructive text-xs">{errors.state}</p>
                     )}
