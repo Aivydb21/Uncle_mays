@@ -1,43 +1,60 @@
 import { schedules, task } from "@trigger.dev/sdk/v3";
 import { createHash } from "crypto";
-import { readFileSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
-
-// Track which emails we've sent per session (persistent file-based store)
-const SENT_EMAILS_FILE = join(process.cwd(), ".stripe-abandoned-emails.json");
 
 function md5(s: string) {
   return createHash("md5").update(s).digest("hex");
 }
 
-interface EmailTracker {
-  [sessionId: string]: {
-    email1SentAt?: string;
-    email2SentAt?: string;
-    email3SentAt?: string;
-  };
+/**
+ * Per-session send-state tracking.
+ *
+ * We used to keep a JSON file on disk (".stripe-abandoned-emails.json") but
+ * trigger.dev runs in ephemeral containers — the file gets wiped between every
+ * run, so the "already-sent" gate could never fire and nothing ever got sent
+ * past the first email. We persist the state as Mailchimp tags on the contact
+ * instead: tags survive runs and are read/written via the audience API.
+ *
+ * Tag format: `abc_<sessionIdSuffix>_e<N>` (abc = abandoned-cart)
+ *   - sessionIdSuffix = last 8 chars of the Stripe session id (unique per cart)
+ *   - N = 1, 2, or 3 (which recovery email)
+ * Example: `abc_9XpT2aKq_e2`
+ */
+function sessionEmailTag(sessionId: string, emailNumber: 1 | 2 | 3): string {
+  return `abc_${sessionId.slice(-8)}_e${emailNumber}`;
 }
 
-function loadEmailTracker(): EmailTracker {
-  if (!existsSync(SENT_EMAILS_FILE)) {
-    return {};
-  }
+async function getContactTags(apiKey: string, email: string): Promise<Set<string>> {
+  const emailHash = md5(email.toLowerCase());
+  const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
   try {
-    const data = JSON.parse(readFileSync(SENT_EMAILS_FILE, "utf-8"));
-    return data.emails || {};
+    const res = await fetch(
+      `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/lists/${MAILCHIMP_LIST_ID}/members/${emailHash}/tags?count=250`,
+      { headers: { Authorization: authHeader } }
+    );
+    if (!res.ok) return new Set();
+    const data = (await res.json()) as { tags?: Array<{ name: string }> };
+    return new Set((data.tags || []).map((t) => t.name));
   } catch {
-    return {};
+    return new Set();
   }
 }
 
-function saveEmailTracker(tracker: EmailTracker) {
-  writeFileSync(
-    SENT_EMAILS_FILE,
-    JSON.stringify({ emails: tracker, updatedAt: new Date().toISOString() }, null, 2)
-  );
+async function addContactTag(apiKey: string, email: string, tag: string): Promise<void> {
+  const emailHash = md5(email.toLowerCase());
+  const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
+  await fetch(
+    `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/lists/${MAILCHIMP_LIST_ID}/members/${emailHash}/tags`,
+    {
+      method: "POST",
+      headers: { Authorization: authHeader, "Content-Type": "application/json" },
+      body: JSON.stringify({ tags: [{ name: tag, status: "active" }] }),
+    }
+  ).catch(() => {
+    // Non-fatal: worst case we send a duplicate email next run, not silent skip forever
+  });
 }
 
 interface StripeCheckoutSession {
@@ -372,179 +389,82 @@ export const stripeAbandonedCheckoutProcessor = schedules.task({
     const fortyEightHoursAgo = now - 48 * 3600;
     const seventyTwoHoursAgo = now - 72 * 3600;
 
-    const emailTracker = loadEmailTracker();
     const results: any[] = [];
 
-    // Email 1: Sessions expired 1-24 hours ago (no Email 1 sent yet)
-    const email1Sessions = await fetchStripeExpiredSessions(
-      stripeKey,
-      twentyFourHoursAgo,
-      oneHourAgo
-    );
+    /**
+     * Process a single time window. Each window is INDEPENDENT of the others —
+     * we don't require that an earlier email was sent before sending a later one,
+     * because the old "chain" logic combined with ephemeral state silently skipped
+     * carts that aged past the first window without ever getting any email.
+     *
+     * Gate is a Mailchimp tag on the customer: `abc_<session8>_e<N>`. If the
+     * contact already has that tag, we've already sent them this specific email
+     * for this specific session — skip. Otherwise send, then add the tag.
+     */
+    async function processWindow(
+      emailNumber: 1 | 2 | 3,
+      windowStart: number,
+      windowEnd: number,
+      windowLabel: string
+    ) {
+      const sessions = await fetchStripeExpiredSessions(stripeKey, windowStart, windowEnd);
+      console.log(`Found ${sessions.length} sessions for Email ${emailNumber} (${windowLabel})`);
 
-    console.log(`Found ${email1Sessions.length} sessions for Email 1 (1-24h window)`);
+      for (const session of sessions) {
+        const email = session.customer_details?.email;
+        if (!email) {
+          console.warn(`Session ${session.id} has no customer email, skipping`);
+          continue;
+        }
 
-    for (const session of email1Sessions) {
-      if (emailTracker[session.id]?.email1SentAt) {
-        continue; // Already sent Email 1
+        const tag = sessionEmailTag(session.id, emailNumber);
+        const existingTags = await getContactTags(mailchimpKey, email);
+        if (existingTags.has(tag)) {
+          // Already sent this email for this session — skip
+          continue;
+        }
+
+        const name = parseNameParts(session.customer_details?.name || "");
+
+        // Upsert first so the tag has a contact to attach to
+        await upsertMailchimpContact(mailchimpKey, email, name).catch((e) =>
+          console.warn(`Mailchimp upsert warning for ${email}:`, e.message)
+        );
+
+        try {
+          const { campaignId } = await sendEmail(mailchimpKey, email, name, session.id, emailNumber);
+          await addContactTag(mailchimpKey, email, tag);
+
+          console.log(
+            `✓ Email ${emailNumber} sent | session=${session.id} email=${email} campaign=${campaignId}`
+          );
+          results.push({ sessionId: session.id, email, emailNumber, sent: true, campaignId });
+        } catch (e: any) {
+          console.error(`✗ Email ${emailNumber} failed for session ${session.id}:`, e.message);
+          results.push({ sessionId: session.id, email, emailNumber, sent: false, error: e.message });
+        }
       }
 
-      const email = session.customer_details?.email;
-      if (!email) {
-        console.warn(`Session ${session.id} has no customer email, skipping`);
-        continue;
-      }
-
-      const name = parseNameParts(session.customer_details?.name || "");
-
-      // Upsert in Mailchimp
-      await upsertMailchimpContact(mailchimpKey, email, name).catch((e) =>
-        console.warn(`Mailchimp upsert warning for ${email}:`, e.message)
-      );
-
-      // Send Email 1
-      try {
-        const { campaignId } = await sendEmail(mailchimpKey, email, name, session.id, 1);
-
-        // Track Email 1 sent
-        if (!emailTracker[session.id]) emailTracker[session.id] = {};
-        emailTracker[session.id].email1SentAt = new Date().toISOString();
-        saveEmailTracker(emailTracker);
-
-        console.log(`✓ Email 1 sent | session=${session.id} email=${email} campaign=${campaignId}`);
-
-        results.push({
-          sessionId: session.id,
-          email,
-          emailNumber: 1,
-          sent: true,
-          campaignId,
-        });
-      } catch (e: any) {
-        console.error(`✗ Email 1 failed for session ${session.id}:`, e.message);
-        results.push({
-          sessionId: session.id,
-          email,
-          emailNumber: 1,
-          sent: false,
-          error: e.message,
-        });
-      }
+      return sessions.length;
     }
 
-    // Email 2: Sessions expired 24-48 hours ago (Email 1 sent, Email 2 not sent)
-    const email2Sessions = await fetchStripeExpiredSessions(
-      stripeKey,
-      fortyEightHoursAgo,
-      twentyFourHoursAgo
-    );
-
-    console.log(`Found ${email2Sessions.length} sessions for Email 2 (24-48h window)`);
-
-    for (const session of email2Sessions) {
-      if (!emailTracker[session.id]?.email1SentAt) {
-        continue; // Email 1 not sent yet
-      }
-      if (emailTracker[session.id]?.email2SentAt) {
-        continue; // Already sent Email 2
-      }
-
-      const email = session.customer_details?.email;
-      if (!email) continue;
-
-      const name = parseNameParts(session.customer_details?.name || "");
-
-      try {
-        const { campaignId } = await sendEmail(mailchimpKey, email, name, session.id, 2);
-
-        // Track Email 2 sent
-        emailTracker[session.id].email2SentAt = new Date().toISOString();
-        saveEmailTracker(emailTracker);
-
-        console.log(`✓ Email 2 sent | session=${session.id} email=${email} campaign=${campaignId}`);
-
-        results.push({
-          sessionId: session.id,
-          email,
-          emailNumber: 2,
-          sent: true,
-          campaignId,
-        });
-      } catch (e: any) {
-        console.error(`✗ Email 2 failed for session ${session.id}:`, e.message);
-        results.push({
-          sessionId: session.id,
-          email,
-          emailNumber: 2,
-          sent: false,
-          error: e.message,
-        });
-      }
-    }
-
-    // Email 3: Sessions expired 48-72 hours ago (Email 2 sent, Email 3 not sent)
-    const email3Sessions = await fetchStripeExpiredSessions(
-      stripeKey,
-      seventyTwoHoursAgo,
-      fortyEightHoursAgo
-    );
-
-    console.log(`Found ${email3Sessions.length} sessions for Email 3 (48-72h window)`);
-
-    for (const session of email3Sessions) {
-      if (!emailTracker[session.id]?.email2SentAt) {
-        continue; // Email 2 not sent yet
-      }
-      if (emailTracker[session.id]?.email3SentAt) {
-        continue; // Already sent Email 3
-      }
-
-      const email = session.customer_details?.email;
-      if (!email) continue;
-
-      const name = parseNameParts(session.customer_details?.name || "");
-
-      try {
-        const { campaignId } = await sendEmail(mailchimpKey, email, name, session.id, 3);
-
-        // Track Email 3 sent
-        emailTracker[session.id].email3SentAt = new Date().toISOString();
-        saveEmailTracker(emailTracker);
-
-        console.log(`✓ Email 3 sent | session=${session.id} email=${email} campaign=${campaignId}`);
-
-        results.push({
-          sessionId: session.id,
-          email,
-          emailNumber: 3,
-          sent: true,
-          campaignId,
-        });
-      } catch (e: any) {
-        console.error(`✗ Email 3 failed for session ${session.id}:`, e.message);
-        results.push({
-          sessionId: session.id,
-          email,
-          emailNumber: 3,
-          sent: false,
-          error: e.message,
-        });
-      }
-    }
+    const email1Count = await processWindow(1, twentyFourHoursAgo, oneHourAgo, "1-24h window");
+    const email2Count = await processWindow(2, fortyEightHoursAgo, twentyFourHoursAgo, "24-48h window");
+    const email3Count = await processWindow(3, seventyTwoHoursAgo, fortyEightHoursAgo, "48-72h window");
 
     return {
       email1: {
-        totalSessions: email1Sessions.length,
+        totalSessions: email1Count,
         sent: results.filter((r) => r.emailNumber === 1 && r.sent).length,
         failed: results.filter((r) => r.emailNumber === 1 && !r.sent).length,
       },
       email2: {
-        totalSessions: email2Sessions.length,
+        totalSessions: email2Count,
         sent: results.filter((r) => r.emailNumber === 2 && r.sent).length,
         failed: results.filter((r) => r.emailNumber === 2 && !r.sent).length,
       },
       email3: {
-        totalSessions: email3Sessions.length,
+        totalSessions: email3Count,
         sent: results.filter((r) => r.emailNumber === 3 && r.sent).length,
         failed: results.filter((r) => r.emailNumber === 3 && !r.sent).length,
       },
