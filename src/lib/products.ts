@@ -58,7 +58,7 @@ export const PRODUCTS = {
       "Pasture-raised whole chicken — included",
     ],
     valueCallout: "Your $65 Family Box delivers ~14-18 servings -- produce, a dozen farm eggs, and a pasture-raised whole chicken, all included. About $4 per meal for a family of 4. No extra grocery run required.",
-    servingNote: "~14-18 servings including produce, eggs, and whole chicken",
+    servingNote: "~14-18 servings: produce, eggs, and a whole chicken",
     servingBadge: "~14-18 servings | feeds a family of 4",
   },
   community: {
@@ -90,7 +90,7 @@ export const PRODUCTS = {
       "Farm eggs — 1 dozen",
     ],
     valueCallout: "Your $95 Community Box delivers ~20-24 servings of specialty and heirloom produce plus your choice of protein and farm eggs. Split between two or three households: about $32-48 each.",
-    servingNote: "~20-24 servings of specialty and heirloom produce plus protein",
+    servingNote: "~20-24 servings: heirloom produce + your choice of protein",
     servingBadge: "~20-24 servings | great for sharing",
   },
 } as const;

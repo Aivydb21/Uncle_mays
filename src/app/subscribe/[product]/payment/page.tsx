@@ -22,30 +22,18 @@ declare global {
 // Load Stripe once outside component to avoid recreating on renders
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-const VALUE_ANCHORS: Record<string, { headline: string; bullets: string[] }> = {
+const VALUE_ANCHORS: Record<string, { serving: string; guarantee: string }> = {
   starter: {
-    headline: "Cleaner than Whole Foods. For less than dinner out.",
-    bullets: [
-      "No chemical washes on your produce",
-      "No chemical bath on your meat",
-      "First order $30 — less than dinner out in Chicago",
-    ],
+    serving: "~8 servings of fresh, seasonal produce",
+    guarantee: "100% freshness guarantee. Not happy? Full refund.",
   },
   family: {
-    headline: "Better quality than Whole Foods. $30 less, delivered.",
-    bullets: [
-      "No chemical washes on your produce",
-      "No chemical bath on your meat",
-      "Whole chicken, dozen eggs, full week of produce — $65 delivered",
-    ],
+    serving: "~14-18 servings: produce, eggs, and a whole chicken",
+    guarantee: "100% freshness guarantee. Not happy? Full refund.",
   },
   community: {
-    headline: "Cleaner than Whole Foods. Specialty produce you won't find at Aldi.",
-    bullets: [
-      "No chemical washes on your produce",
-      "No chemical bath on your meat",
-      "20-24 servings of heirloom and specialty produce + your choice of protein",
-    ],
+    serving: "~20-24 servings: heirloom produce + your choice of protein",
+    guarantee: "100% freshness guarantee. Not happy? Full refund.",
   },
 };
 
@@ -173,21 +161,13 @@ function SubscriptionPaymentForm({
       {/* Value anchor */}
       {(() => {
         const anchor = VALUE_ANCHORS[checkout.product] ?? {
-          headline: "Cleaner than Whole Foods. Cheaper than Aldi.",
-          bullets: [
-            "No chemical washes on your produce",
-            "No chemical bath on your meat",
-            "Priced below Aldi per serving",
-          ],
+          serving: "~8 servings of fresh, seasonal produce",
+          guarantee: "100% freshness guarantee. Not happy? Full refund.",
         };
         return (
           <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 px-3 py-3">
-            <p className="text-sm font-bold text-primary mb-1.5">{anchor.headline}</p>
-            <ul className="space-y-0.5">
-              {anchor.bullets.map((b) => (
-                <li key={b} className="text-xs text-foreground/80">{b}</li>
-              ))}
-            </ul>
+            <p className="text-sm font-medium text-primary/80 mb-1">{anchor.serving}</p>
+            <p className="text-sm font-bold text-primary">{anchor.guarantee}</p>
           </div>
         );
       })()}

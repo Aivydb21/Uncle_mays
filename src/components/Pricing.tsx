@@ -214,15 +214,11 @@ export const Pricing = () => {
                       {plan.oneTimePrice} one-time
                     </p>
                   )}
-                  <p className="text-xs font-medium text-primary/80 mt-1">{plan.priceAnchor}</p>
                   <p className="text-sm text-primary/80 font-medium mt-2">
                     {PRODUCTS[plan.checkoutSlug as keyof typeof PRODUCTS].servingNote}
                   </p>
-                  <p className="text-sm font-semibold mt-3">
-                    Order by Tuesday 11:59pm. Delivered this Wednesday.
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    100% freshness guarantee. Not happy? Full refund, no questions.
+                  <p className="text-sm font-bold text-primary mt-2">
+                    100% freshness guarantee. Not happy? Full refund.
                   </p>
                 </div>
                 <ul className="space-y-3 mb-8 flex-grow">

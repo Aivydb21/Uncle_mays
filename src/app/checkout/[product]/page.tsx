@@ -211,39 +211,23 @@ export default function CheckoutSummaryPage() {
   const totalPrice = effectivePrice + additionalProteinCost;
 
   // Product-specific value anchor copy (board-approved, UNC-500)
-  const VALUE_ANCHORS: Record<string, { headline: string; bullets: string[] }> = {
+  const VALUE_ANCHORS: Record<string, { serving: string; guarantee: string }> = {
     starter: {
-      headline: "Cleaner than Whole Foods. For less than dinner out.",
-      bullets: [
-        "No chemical washes on your produce",
-        "No chemical bath on your meat",
-        "First order $30 — less than dinner out in Chicago",
-      ],
+      serving: "~8 servings of fresh, seasonal produce",
+      guarantee: "100% freshness guarantee. Not happy? Full refund.",
     },
     family: {
-      headline: "Better quality than Whole Foods. $30 less, delivered.",
-      bullets: [
-        "No chemical washes on your produce",
-        "No chemical bath on your meat",
-        "Whole chicken, dozen eggs, full week of produce — $65 delivered",
-      ],
+      serving: "~14-18 servings: produce, eggs, and a whole chicken",
+      guarantee: "100% freshness guarantee. Not happy? Full refund.",
     },
     community: {
-      headline: "Cleaner than Whole Foods. Specialty produce you won't find at Aldi.",
-      bullets: [
-        "No chemical washes on your produce",
-        "No chemical bath on your meat",
-        "20-24 servings of heirloom and specialty produce + your choice of protein",
-      ],
+      serving: "~20-24 servings: heirloom produce + your choice of protein",
+      guarantee: "100% freshness guarantee. Not happy? Full refund.",
     },
   };
   const valueAnchor = VALUE_ANCHORS[slug] ?? {
-    headline: "Cleaner than Whole Foods. Cheaper than Aldi.",
-    bullets: [
-      "No chemical washes on your produce",
-      "No chemical bath on your meat",
-      "Priced below Aldi per serving",
-    ],
+    serving: "~8 servings of fresh, seasonal produce",
+    guarantee: "100% freshness guarantee. Not happy? Full refund.",
   };
 
   return (
@@ -301,16 +285,14 @@ export default function CheckoutSummaryPage() {
               </div>
             </div>
 
-            {/* Value anchor — product-specific copy (UNC-500) */}
+            {/* Value anchor — product-specific copy (UNC-535) */}
             <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
-              <p className="text-sm font-bold text-primary mb-2">
-                {valueAnchor.headline}
+              <p className="text-sm font-medium text-primary/80 mb-1">
+                {valueAnchor.serving}
               </p>
-              <ul className="space-y-1">
-                {valueAnchor.bullets.map((bullet) => (
-                  <li key={bullet} className="text-xs text-foreground/80">{bullet}</li>
-                ))}
-              </ul>
+              <p className="text-sm font-bold text-primary">
+                {valueAnchor.guarantee}
+              </p>
             </div>
 
             {/* First-order discount callout */}
