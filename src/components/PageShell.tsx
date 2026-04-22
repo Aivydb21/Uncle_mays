@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { MobileCTA } from "@/components/MobileCTA";
 
 // Routes that suppress global navigation and footer (dedicated ad landing pages)
-const LANDING_PAGE_PATHS = ["/starter-box"];
+const LANDING_PAGE_PATHS = ["/starter-box", "/shop"];
 
 export function PageShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
