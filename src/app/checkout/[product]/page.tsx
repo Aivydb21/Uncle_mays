@@ -227,7 +227,7 @@ export default function CheckoutSummaryPage() {
   };
   const valueAnchor = VALUE_ANCHORS[slug] ?? {
     serving: "~8 servings of fresh, seasonal produce",
-    guarantee: "100% freshness guarantee. Not happy? Full refund.",
+    guarantee: "Sourced to our standard. If it ever falls short, we make it right.",
   };
 
   return (
