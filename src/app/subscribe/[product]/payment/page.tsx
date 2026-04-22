@@ -186,6 +186,14 @@ function SubscriptionPaymentForm({
         <span className="text-sm text-green-800 font-medium">Cancel anytime, no questions asked</span>
       </div>
 
+      {/* FTC / Illinois ILCS 601 auto-renewal disclosure */}
+      <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+        By completing this purchase, you subscribe to weekly deliveries. You will be charged ${checkout.subPrice}/week on a recurring basis until you cancel. To avoid being charged for the next delivery, you must cancel at least 48 hours in advance. To cancel, email{" "}
+        <a href="mailto:info@unclemays.com" className="underline underline-offset-2">info@unclemays.com</a>{" "}
+        or manage your subscription at{" "}
+        <a href="https://unclemays.com/manage-subscription" className="underline underline-offset-2">unclemays.com/manage-subscription</a>.
+      </p>
+
       <button
         type="submit"
         disabled={!stripe || !elements || submitting}
