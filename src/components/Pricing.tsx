@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { PRODUCTS } from "@/lib/products";
 
 declare global {
@@ -84,11 +84,18 @@ const plans = [
 ];
 
 export const Pricing = () => {
-  const searchParams = useSearchParams();
-  const [isSubscription, setIsSubscription] = useState(
-    searchParams.get("mode") === "subscription"
-  );
+  const [isSubscription, setIsSubscription] = useState(false);
   const router = useRouter();
+
+  // Read `?mode=subscription` from the URL on mount.
+  // Doing this in useEffect (not via useSearchParams) keeps this component
+  // fully server-renderable so the box CTAs appear in the initial HTML
+  // instead of bailing out to client-only rendering.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "subscription") setIsSubscription(true);
+  }, []);
 
   const handleOrder = (plan: typeof plans[0]) => {
     // Extract price value from string (e.g., "$35" -> 35)

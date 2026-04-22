@@ -1,53 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHash } from "crypto";
+import { addSignupLead } from "@/lib/mailchimp";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Called from the checkout page (step 1) when the customer types their email.
+// Adds them to the Mailchimp audience with the `new_signup` tag so the welcome
+// series fires, plus a source marker (`source:checkout-<product>`) for segmentation.
+// The Stripe webhook later adds the `order_completed` tag on successful purchase,
+// which the welcome journey checks to end early.
 export async function POST(req: NextRequest) {
-  const { email, product } = await req.json();
-
-  if (!email || typeof email !== "string") {
-    return NextResponse.json({ error: "Email required" }, { status: 400 });
-  }
-
-  const apiKey = process.env.MAILCHIMP_API_KEY;
-  const listId = process.env.MAILCHIMP_AUDIENCE_ID;
-
-  if (!apiKey || !listId) {
-    // Not configured yet — silently succeed so checkout is never blocked
-    console.warn("Mailchimp not configured (MAILCHIMP_API_KEY / MAILCHIMP_AUDIENCE_ID missing)");
-    return NextResponse.json({ ok: true });
-  }
-
-  const serverPrefix = apiKey.split("-").pop();
-  const emailHash = createHash("md5").update(email.trim().toLowerCase()).digest("hex");
-  const url = `https://${serverPrefix}.api.mailchimp.com/3.0/lists/${listId}/members/${emailHash}`;
-
-  const body = {
-    email_address: email.trim().toLowerCase(),
-    status_if_new: "subscribed",
-    merge_fields: {
-      PRODUCT: product || "",
-    },
-  };
-
   try {
-    const res = await fetch(url, {
-      method: "PUT",
-      headers: {
-        Authorization: `Basic ${Buffer.from(`anystring:${apiKey}`).toString("base64")}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    const { email, product } = await req.json();
 
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("Mailchimp error:", res.status, text);
+    if (typeof email !== "string" || !EMAIL_RE.test(email.trim())) {
+      return NextResponse.json({ ok: false, error: "Invalid email" }, { status: 400 });
     }
 
+    const source = typeof product === "string" && product
+      ? `checkout-${product}`
+      : "checkout";
+
+    const result = await addSignupLead(email.trim(), source);
+    if (!result.ok) {
+      // Don't block checkout on Mailchimp errors — always succeed to the client.
+      console.warn("capture-email: Mailchimp signup failed:", result.error);
+    }
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("Mailchimp fetch error:", err);
-    // Non-fatal — never block checkout
+    console.error("capture-email error:", err);
+    // Never block checkout for capture failures.
     return NextResponse.json({ ok: true });
   }
 }
