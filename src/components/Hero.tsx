@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Truck, Star } from "lucide-react";
+import { Truck } from "lucide-react";
 import Link from "next/link";
 const heroImage = "/images/hero-produce.jpg";
 
@@ -73,9 +73,8 @@ export const Hero = () => {
             <span aria-hidden="true">•</span>
             <span className="font-semibold text-foreground/90">One-time or subscribe &amp; save</span>
             <span aria-hidden="true">•</span>
-            <span className="inline-flex items-center gap-1 font-semibold text-foreground/90">
-              <Star className="h-3.5 w-3.5 fill-primary text-primary" />
-              100% freshness guarantee
+            <span className="font-semibold text-foreground/90">
+              Give this a try, we would love your support
             </span>
           </motion.div>
         </div>

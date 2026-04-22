@@ -155,21 +155,11 @@ export const Pricing = () => {
           </p>
         </motion.div>
 
-        {/* Subscription / One-Time toggle */}
-        <div className="flex justify-center mb-12">
+        {/* One-Time / Subscribe toggle — one-time default, subscribe highlighted as the save option */}
+        <div className="flex flex-col items-center mb-8">
           <div className="inline-flex items-center rounded-xl bg-card border border-border shadow-soft p-1 gap-1">
             <button
-              onClick={() => setIsSubscription(true)}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                isSubscription
-                  ? "bg-primary text-primary-foreground shadow-soft"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Subscribe &amp; Save
-              <span className="ml-1.5 text-xs font-normal opacity-80">10% off</span>
-            </button>
-            <button
+              type="button"
               onClick={() => setIsSubscription(false)}
               className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 !isSubscription
@@ -179,14 +169,46 @@ export const Pricing = () => {
             >
               One-Time Box
             </button>
+            <button
+              type="button"
+              onClick={() => setIsSubscription(true)}
+              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                isSubscription
+                  ? "bg-primary text-primary-foreground shadow-soft"
+                  : "text-primary/90 hover:text-primary"
+              }`}
+            >
+              Subscribe &amp; Save
+              <span className={`ml-1.5 text-xs font-bold px-1.5 py-0.5 rounded ${
+                isSubscription
+                  ? "bg-primary-foreground/20 text-primary-foreground"
+                  : "bg-primary/15 text-primary"
+              }`}>
+                10% off
+              </span>
+            </button>
           </div>
+
+          {/* Prominent nudge to the subscribe toggle when still on one-time */}
+          {!isSubscription ? (
+            <p className="mt-3 text-sm text-center text-muted-foreground max-w-md">
+              Ordering weekly?{" "}
+              <button
+                type="button"
+                onClick={() => setIsSubscription(true)}
+                className="font-semibold text-primary hover:underline"
+              >
+                Toggle to Subscribe &amp; Save
+              </button>{" "}
+              — <span className="font-semibold text-foreground">10% off every box</span>, free delivery, cancel anytime.
+            </p>
+          ) : (
+            <p className="mt-3 text-center text-sm text-muted-foreground">
+              Free delivery. Cancel anytime — no fees, no commitment.
+            </p>
+          )}
         </div>
 
-        {isSubscription && (
-          <p className="text-center text-sm text-muted-foreground mb-8 -mt-6">
-            Free delivery. Cancel anytime.
-          </p>
-        )}
 
         <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto mb-10">
           {plans.map((plan, index) => (
