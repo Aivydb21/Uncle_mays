@@ -238,7 +238,7 @@ export const sendOrderConfirmationEmail = task({
     }
 
     const nameParts = (payload.customerName || "").trim().split(/\s+/);
-    const firstName = nameParts[0] || "there";
+    const firstName = nameParts[0] || "friend";
     const lastName = nameParts.slice(1).join(" ") || "";
     const amountDollars = payload.amountTotal / 100;
 

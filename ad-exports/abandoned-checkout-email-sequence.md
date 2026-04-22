@@ -24,7 +24,7 @@ Hi there,
 
 You started an order for premium produce from Uncle May's but didn't finish. Your items are still in your cart, ready to go. We curate every box with care for Black families who want quality they can count on.
 
-Complete your order now and get Sunday delivery. Questions? Call us anytime at (312) 972-2595.
+Complete your order now and get Wednesday delivery. Questions? Call us anytime at (312) 972-2595.
 
 **[Complete Your Order →]**
 
@@ -33,7 +33,7 @@ Complete your order now and get Sunday delivery. Questions? Call us anytime at (
 ## Email 2: Urgency Reminder (Send 24 hours after abandonment)
 
 ### Subject Line Variants (A/B Test)
-1. **Order by Thursday for Sunday delivery** *(deadline-driven, clear)*
+1. **Order by Tuesday for Wednesday delivery** *(deadline-driven, clear)*
 2. **Your cart expires soon** *(scarcity + urgency)*
 3. **Don't miss this week's delivery** *(FOMO, community-focused)*
 
@@ -42,9 +42,9 @@ Complete your order now and get Sunday delivery. Questions? Call us anytime at (
 
 ### Email Body (HTML-ready)
 
-**Subject:** Order by Thursday for Sunday delivery
+**Subject:** Order by Tuesday for Wednesday delivery
 
-We saved your cart, but time is running out. To get your fresh produce delivered this Sunday, you need to complete your order by Thursday.
+We saved your cart, but time is running out. To get your fresh produce delivered this Wednesday, you need to complete your order by Tuesday.
 
 Uncle May's isn't your average grocery box. We curate premium produce for Black communities that deserve the best. 89% of our customers refer friends and family because they trust what we deliver.
 
@@ -62,13 +62,13 @@ Questions? We're here: (312) 972-2595
 3. **This is your final reminder** *(clear, no-nonsense)*
 
 ### Preview Text
-"We only have a few boxes left for Sunday delivery. Order now or miss out."
+"We only have a few boxes left for Wednesday delivery. Order now or miss out."
 
 ### Email Body (HTML-ready)
 
 **Subject:** Last chance: Limited boxes left this week
 
-This is your final reminder. We have limited boxes available for Sunday delivery, and your cart is still sitting there. Once they're gone, you'll have to wait until next week.
+This is your final reminder. We have limited boxes available for Wednesday delivery, and your cart is still sitting there. Once they're gone, you'll have to wait until next week.
 
 Our customers love Uncle May's because we bring quality produce to neighborhoods that have been overlooked for too long. Don't miss your chance to join them this week.
 

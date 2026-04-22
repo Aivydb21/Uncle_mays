@@ -1,0 +1,35 @@
+{
+  "url": "https://www.cct.org/apply-for-a-grant/",
+  "data": {
+    "success": true,
+    "data": {
+      "markdown": "[Skip to content](https://www.cct.org/apply-for-a-grant/#main) [Skip to footer](https://www.cct.org/apply-for-a-grant/#footer)\n\n# Not Found\n\nSorry, the page you requested has moved or is no longer available.\n\n[Go back home](https://www.cct.org/)\n\nreCAPTCHA",
+      "metadata": {
+        "language": "en-US",
+        "ogTitle": "Page not found - The Chicago Community Trust",
+        "msapplication-TileImage": "/wp-content/uploads/2024/04/cropped-CCT_logo_icon_blue_r-1-270x270.png",
+        "og:site_name": "The Chicago Community Trust",
+        "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
+        "title": "Page not found - The Chicago Community Trust",
+        "ogLocale": "en_US",
+        "ogSiteName": "The Chicago Community Trust",
+        "robots": "noindex, follow",
+        "og:title": "Page not found - The Chicago Community Trust",
+        "og:locale": "en_US",
+        "favicon": "https://www.cct.org/wp-content/uploads/2024/04/cropped-CCT_logo_icon_blue_r-1-32x32.png",
+        "scrapeId": "019da645-c081-76b1-8c5e-7b65125affc9",
+        "sourceURL": "https://www.cct.org/apply-for-a-grant/",
+        "url": "https://www.cct.org/apply-for-a-grant/",
+        "statusCode": 404,
+        "error": "Not Found",
+        "contentType": "text/html; charset=UTF-8",
+        "timezone": "America/New_York",
+        "proxyUsed": "basic",
+        "cacheState": "miss",
+        "indexId": "569b9e35-caf4-4293-8af0-e5ceed2b9893",
+        "creditsUsed": 1,
+        "concurrencyLimited": false
+      }
+    }
+  }
+}

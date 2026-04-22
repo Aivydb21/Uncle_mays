@@ -524,6 +524,74 @@ if isinstance(remaining, int) and remaining < 50:
 fi
 
 # ——————————————————————————————————————
+# SECTION 7: META ADS — Campaign Performance
+# ——————————————————————————————————————
+echo ""
+echo "--- META ADS: SUBSCRIPTION LAUNCH ---"
+META_STATS=$(python3 investor-outreach/scripts/fetch-meta-campaign-stats.py 2>/dev/null)
+if [ -z "$META_STATS" ]; then
+  echo "[Meta API error — could not fetch campaign stats]"
+else
+  echo "$META_STATS" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+
+if 'error' in data:
+    print(f'Error: {data[\"error\"]}')
+    sys.exit(0)
+
+# Campaign info
+campaign = data.get('campaign', {})
+metrics_24h = data.get('metrics_24h', {})
+metrics_7d = data.get('metrics_7d_avg', {})
+alerts = data.get('alerts', [])
+links = data.get('links', {})
+
+print(f'Campaign: {campaign.get(\"name\", \"N/A\")}')
+print(f'Status: {campaign.get(\"status\", \"UNKNOWN\")} | Daily Budget: \${campaign.get(\"daily_budget\", 0):.2f}')
+print()
+
+# 24h metrics
+spend_24h = metrics_24h.get('spend', 0)
+impressions_24h = metrics_24h.get('impressions', 0)
+reach_24h = metrics_24h.get('reach', 0)
+clicks_24h = metrics_24h.get('clicks', 0)
+checkouts_24h = metrics_24h.get('initiated_checkouts', 0)
+cpa_24h = metrics_24h.get('cpa', 0)
+roas_24h = metrics_24h.get('roas', 0)
+
+print(f'Last 24 Hours:')
+print(f'  Spend:      \${spend_24h:>8.2f}')
+print(f'  Impressions: {impressions_24h:>7,}  |  Reach: {reach_24h:>7,}')
+print(f'  Clicks:      {clicks_24h:>7,}  |  Initiated Checkouts: {checkouts_24h:>3}')
+print(f'  CPA:        \${cpa_24h:>8.2f}  |  ROAS: {roas_24h:>5.2f}x')
+print()
+
+# 7d rolling averages
+spend_7d = metrics_7d.get('spend_per_day', 0)
+checkouts_7d = metrics_7d.get('initiated_checkouts_per_day', 0)
+cpa_7d = metrics_7d.get('cpa', 0)
+roas_7d = metrics_7d.get('roas', 0)
+
+print(f'7-Day Rolling Average (per day):')
+print(f'  Spend:       \${spend_7d:>7.2f}')
+print(f'  Checkouts:   {checkouts_7d:>7.1f}')
+print(f'  CPA:        \${cpa_7d:>8.2f}  |  ROAS: {roas_7d:>5.2f}x')
+print()
+
+# Alerts
+if alerts:
+    print('ALERTS:')
+    for alert in alerts:
+        print(f'  *** {alert}')
+    print()
+
+# Link to Ads Manager
+print(f'Ads Manager: {links.get(\"ads_manager\", \"N/A\")}')
+"
+fi
+
+# ——————————————————————————————————————
 # ACTION ITEMS
 # ——————————————————————————————————————
 echo ""
@@ -533,4 +601,5 @@ echo "2. Check for bounces — remove bounced contacts from active sequence"
 echo "3. Monitor open rate — if below 30% after 20+ sends, review subject lines"
 echo "4. Attach teaser PDF to Email 1 if not already done"
 echo "5. Use 'research [fund name]' to enrich any new high-priority contacts before drafting personalized outreach"
+echo "6. Monitor Meta campaign performance — review Ads Manager if CPA >$20 or no spend"
 echo "========================================"

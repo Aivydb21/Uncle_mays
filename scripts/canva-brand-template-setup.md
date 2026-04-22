@@ -81,7 +81,7 @@ The template will now appear in the Brand Templates section and be accessible vi
 After publishing all 3 templates, run the validation script:
 
 ```bash
-cd ~/Desktop/business
+cd ~/Desktop/um_website
 python scripts/canva-validate-autofill.py           # verify templates + datasets
 python scripts/canva-validate-autofill.py --generate # generate 5 test variants per template
 ```

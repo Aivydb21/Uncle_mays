@@ -28,15 +28,15 @@ HEADERS = {
 }
 
 # Output directory
-OUTPUT_DIR = Path("C:/Users/Anthony/Desktop/business/ad-exports/subscription-launch-apr17/static-images")
+OUTPUT_DIR = Path("C:/Users/Anthony/Desktop/um_website/ad-exports/subscription-launch-apr17/static-images")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Source images
 SOURCE_IMAGES = {
-    "heritage": "C:/Users/Anthony/Desktop/business/public/images/heritage.jpg",
-    "hero_produce": "C:/Users/Anthony/Desktop/business/public/images/hero-produce.jpg",
-    "produce_box": "C:/Users/Anthony/Desktop/business/public/images/produce-box.jpg",
-    "logo": "C:/Users/Anthony/Desktop/business/public/uncle-mays-logo.png"
+    "heritage": "C:/Users/Anthony/Desktop/um_website/public/images/heritage.jpg",
+    "hero_produce": "C:/Users/Anthony/Desktop/um_website/public/images/hero-produce.jpg",
+    "produce_box": "C:/Users/Anthony/Desktop/um_website/public/images/produce-box.jpg",
+    "logo": "C:/Users/Anthony/Desktop/um_website/public/uncle-mays-logo.png"
 }
 
 

@@ -17,7 +17,7 @@ ACCESS_TOKEN = config["access_token"]
 AD_ACCOUNT_ID = config["ad_account_id"]
 
 # Test video
-VIDEO_PATH = Path("C:/Users/Anthony/Desktop/business/ad-exports/subscription-launch-apr17/video-ads/final-renders/meta/smaller a.mp4")
+VIDEO_PATH = Path("C:/Users/Anthony/Desktop/um_website/ad-exports/subscription-launch-apr17/video-ads/final-renders/meta/smaller a.mp4")
 
 # Check file size
 size_mb = VIDEO_PATH.stat().st_size / (1024 * 1024)

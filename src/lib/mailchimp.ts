@@ -137,6 +137,42 @@ export async function deleteCart(sessionId: string): Promise<void> {
   }
 }
 
+// Add a new homepage-capture lead to the list with the new_signup tag.
+// This is the entry point for the welcome series (see
+// campaigns/email-sequences/welcome-series.md).
+// Idempotent: existing members get the tag added; existing subscribers stay subscribed.
+export async function addSignupLead(email: string, source?: string): Promise<{ ok: boolean; error?: string }> {
+  const config = getConfig();
+  if (!config) {
+    return { ok: false, error: "Mailchimp not configured" };
+  }
+  const hash = hashEmail(email);
+  const url = `https://${config.serverPrefix}.api.mailchimp.com/3.0/lists/${config.listId}/members/${hash}`;
+  try {
+    const res = await fetch(url, {
+      method: "PUT",
+      headers: {
+        Authorization: authHeader(config.apiKey),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email_address: email,
+        status_if_new: "subscribed",
+        tags: ["new_signup", ...(source ? [`source:${source}`] : [])],
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text();
+      console.error("Mailchimp addSignupLead error:", res.status, body);
+      return { ok: false, error: `Mailchimp returned ${res.status}` };
+    }
+    return { ok: true };
+  } catch (err) {
+    console.error("Mailchimp addSignupLead error:", err);
+    return { ok: false, error: err instanceof Error ? err.message : "Unknown error" };
+  }
+}
+
 // Called after Stripe payment success. Adds order_completed and deactivates
 // checkout_started in one call so the recovery sequence stops immediately.
 export async function tagOrderCompleted(email: string): Promise<void> {

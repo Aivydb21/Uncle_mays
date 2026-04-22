@@ -19,7 +19,7 @@
 ## Post 2: Scarcity (scarcity.png)
 
 **Caption:**
-Only 12 boxes left for Thursday delivery. Fresh, seasonal, handpicked. Hyde Park's favorite produce box. Order before they're gone. Link in bio. ⏰🍓
+Only 12 boxes left for Wednesday delivery. Fresh, seasonal, handpicked. Hyde Park's favorite produce box. Order before they're gone. Link in bio. ⏰🍓
 
 **Platform Notes:**
 - Instagram: Post to feed + stories

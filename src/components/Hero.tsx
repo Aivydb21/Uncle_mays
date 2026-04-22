@@ -46,7 +46,7 @@ export const Hero = () => {
             {/* Offer subhead */}
             <p className="text-xl md:text-2xl mb-6 text-foreground/80 font-light">
               Black-farmed seasonal produce, delivered to your Chicago door every Wednesday.
-              First box from <span className="font-semibold text-foreground">$30</span>.
+              Boxes from <span className="font-semibold text-foreground">$35</span>. No subscription required.
             </p>
 
             {/* Dominant above-fold CTA */}

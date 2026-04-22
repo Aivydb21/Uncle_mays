@@ -31,3 +31,10 @@ out
 # Business ops
 .claude/scheduled_tasks.lock
 google-ads-customer-match.csv
+
+# Local archive of the former business/ folder (on-disk safety copy, not tracked).
+# Crisis-docs archive IS tracked (git mv preserved history).
+_archive/business-2026-04-22/
+
+# Contains API secrets — keep local-only
+ecosystem.config.cjs

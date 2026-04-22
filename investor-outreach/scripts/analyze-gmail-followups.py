@@ -188,7 +188,7 @@ def main():
         print(f"  Snippet: {t['last_snippet'][:100]}...")
 
     # Save full report
-    report_path = Path('C:/Users/Anthony/Desktop/business/investor-outreach/reports/gmail-followup-analysis.json')
+    report_path = Path('C:/Users/Anthony/Desktop/um_website/investor-outreach/reports/gmail-followup-analysis.json')
     report_path.parent.mkdir(parents=True, exist_ok=True)
 
     with open(report_path, 'w') as f:
@@ -204,5 +204,176 @@ def main():
     print(f"\n\nFull report saved to: {report_path}")
     print(f"{len(needs_followup)} threads need follow-up")
 
+
+# ---------------------------------------------------------------------------
+# Thin CLI wrapper — adds --mode dormant-json for Trigger.dev dormant revival
+# and exposes extract_thread_for_contact() for build-contact-file.py.
+# Do not modify existing logic above; only add below.
+# ---------------------------------------------------------------------------
+
+import argparse as _argparse
+import sys as _sys
+
+
+def _get_all_threads(service):
+    """Shared helper: fetch + parse investor threads. Returns (parsed_msgs, thread_analyses)."""
+    results = service.users().messages().list(userId='me', maxResults=500).execute()
+    messages = results.get('messages', [])
+    parsed_messages = []
+    for msg in messages:
+        msg_data = get_message_details(service, msg['id'])
+        if msg_data:
+            parsed = parse_message(msg_data)
+            parsed_messages.append(parsed)
+
+    investor_msgs = [m for m in parsed_messages if is_investor_related(m)]
+    threads = defaultdict(list)
+    for msg in investor_msgs:
+        threads[msg['thread_id']].append(msg)
+
+    thread_analyses = []
+    for thread_id in threads:
+        analysis = analyze_thread(service, thread_id, investor_msgs)
+        if analysis:
+            thread_analyses.append(analysis)
+    return investor_msgs, thread_analyses
+
+
+def _enrich_dormant_thread(service, thread_id: str, investor_msgs: list, thread_summary: dict) -> dict:
+    """Add inbound/outbound quote fields required by DormantCandidate schema."""
+    thread_msgs = sorted(
+        [m for m in investor_msgs if m['thread_id'] == thread_id],
+        key=lambda x: x['timestamp']
+    )
+    last_inbound = None
+    last_outbound = None
+    for m in thread_msgs:
+        if 'SENT' in m['labels']:
+            last_outbound = m
+        else:
+            last_inbound = m
+
+    def fmt_date(ts):
+        if not ts:
+            return ""
+        return datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+
+    return {
+        "email": thread_summary['contact_email'],
+        "name": thread_summary['contact_name'],
+        "firm": None,
+        "thread_id": thread_id,
+        "subject": thread_summary['subject'],
+        "last_inbound_quote": (last_inbound['body'][:300] if last_inbound else ""),
+        "last_inbound_date": fmt_date(last_inbound['timestamp'] if last_inbound else None),
+        "last_outbound_date": fmt_date(last_outbound['timestamp'] if last_outbound else None),
+        "days_dormant": thread_summary['days_since_last'],
+        "pending_ask": None,
+        "prior_objections": [],
+    }
+
+
+def dormant_json_mode(min_days: int = 120, max_days: int = 210, require_inbound: bool = True):
+    """
+    --mode dormant-json entry point.
+    Prints a JSON array of DormantCandidate objects to stdout.
+    """
+    service = load_gmail_service()
+    if not service:
+        print("[]")
+        return
+
+    investor_msgs, thread_analyses = _get_all_threads(service)
+
+    candidates = []
+    for t in thread_analyses:
+        days = t['days_since_last']
+        if not (min_days <= days <= max_days):
+            continue
+        # require_inbound: thread must have at least one non-SENT message
+        if require_inbound:
+            has_inbound = any(
+                m['thread_id'] == t['thread_id'] and 'SENT' not in m['labels']
+                for m in investor_msgs
+            )
+            if not has_inbound:
+                continue
+        enriched = _enrich_dormant_thread(service, t['thread_id'], investor_msgs, t)
+        candidates.append(enriched)
+
+    print(json.dumps(candidates, indent=2))
+
+
+def extract_thread_for_contact(email: str, thread_id: str | None = None) -> dict:
+    """
+    Called by build-contact-file.py to pull Gmail thread data for a specific contact.
+    Returns a dict matching the ThreadExtract field names.
+    """
+    service = load_gmail_service()
+    if not service:
+        return {}
+
+    investor_msgs, thread_analyses = _get_all_threads(service)
+
+    # Find threads involving this email
+    matching = [
+        t for t in thread_analyses
+        if t['contact_email'].lower() == email.lower()
+    ]
+    if not matching:
+        return {}
+
+    t = matching[0]  # most recent or first match
+    enriched = _enrich_dormant_thread(service, t['thread_id'], investor_msgs, t)
+
+    # Build all touch log rows
+    thread_msgs = sorted(
+        [m for m in investor_msgs if m['thread_id'] == t['thread_id']],
+        key=lambda x: x['timestamp']
+    )
+    touch_log = []
+    for m in thread_msgs:
+        direction = "out" if 'SENT' in m['labels'] else "in"
+        touch_log.append({
+            "date": datetime.fromtimestamp(m['timestamp']).strftime('%Y-%m-%d'),
+            "channel": "email",
+            "direction": direction,
+            "summary": m['snippet'][:80] if m.get('snippet') else "",
+            "next_step": "",
+        })
+
+    return {
+        "subject": t['subject'],
+        "first_touch": touch_log[0]['date'] if touch_log else "",
+        "last_touch": touch_log[-1]['date'] if touch_log else "",
+        "last_inbound_quote": enriched['last_inbound_quote'],
+        "last_inbound_date": enriched['last_inbound_date'],
+        "last_outbound_quote": touch_log[-1]['summary'] if touch_log and touch_log[-1]['direction'] == 'out' else "",
+        "last_outbound_date": enriched['last_outbound_date'],
+        "pending_ask": None,
+        "objections": [],
+        "touch_log": touch_log,
+        "summary_seed": f"Contact email: {email}. {t['message_count']} messages. Last activity: {t['last_message_date']}.",
+    }
+
+
+def _cli_main():
+    ap = _argparse.ArgumentParser(description="Gmail Follow-up Analyzer")
+    ap.add_argument("--mode", choices=["followup", "dormant-json"], default="followup")
+    ap.add_argument("--min-days", type=int, default=120)
+    ap.add_argument("--max-days", type=int, default=210)
+    ap.add_argument("--require-inbound", action="store_true")
+    args = ap.parse_args()
+
+    if args.mode == "dormant-json":
+        dormant_json_mode(
+            min_days=args.min_days,
+            max_days=args.max_days,
+            require_inbound=args.require_inbound,
+        )
+    else:
+        main()
+
+
 if __name__ == '__main__':
-    main()
+    _cli_main()

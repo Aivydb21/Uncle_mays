@@ -1,0 +1,50 @@
+{
+  "new_ads": [
+    {
+      "ad_id": "120243375265750762",
+      "ad_name": "Sub Launch - IG Feed - Video A (NEW)",
+      "video": "Video A",
+      "placement": "IG Feed",
+      "adset_id": "120243236057640762"
+    },
+    {
+      "ad_id": "120243375279930762",
+      "ad_name": "Sub Launch - IG Stories - Video A (NEW)",
+      "video": "Video A",
+      "placement": "IG Stories",
+      "adset_id": "120243236049950762"
+    },
+    {
+      "ad_id": "120243375283790762",
+      "ad_name": "Sub Launch - FB Feed - Video A (NEW)",
+      "video": "Video A",
+      "placement": "FB Feed",
+      "adset_id": "120243236041950762"
+    },
+    {
+      "ad_id": "120243375285390762",
+      "ad_name": "Sub Launch - IG Feed - Video B (NEW)",
+      "video": "Video B",
+      "placement": "IG Feed",
+      "adset_id": "120243236057640762"
+    },
+    {
+      "ad_id": "120243375285940762",
+      "ad_name": "Sub Launch - IG Stories - Video B (NEW)",
+      "video": "Video B",
+      "placement": "IG Stories",
+      "adset_id": "120243236049950762"
+    },
+    {
+      "ad_id": "120243375287740762",
+      "ad_name": "Sub Launch - FB Feed - Video B (NEW)",
+      "video": "Video B",
+      "placement": "FB Feed",
+      "adset_id": "120243236041950762"
+    }
+  ],
+  "video_ids": {
+    "Video A": "1641572303751167",
+    "Video B": "925554640355263"
+  }
+}

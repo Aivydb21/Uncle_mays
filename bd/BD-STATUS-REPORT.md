@@ -170,7 +170,7 @@ bd/
 
 **Business Development Agent**  
 **Email:** (via Anthony: anthony@unclemays.com)  
-**Working Directory:** `~/Desktop/business/bd/`  
+**Working Directory:** `~/Desktop/um_website/bd/`  
 **Strategy Doc:** `bd/STRATEGY.md`  
 **Target List:** `bd/targets/hyde-park-institutional-targets.md`  
 **RFP Research:** `bd/rfps/government-procurement-research.md`  

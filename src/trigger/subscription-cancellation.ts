@@ -86,7 +86,7 @@ export const sendSubscriptionCancellationEmail = task({
     }
 
     const nameParts = (customerName || "").trim().split(/\s+/);
-    const firstName = nameParts[0] || "there";
+    const firstName = nameParts[0] || "friend";
     const lastName = nameParts.slice(1).join(" ") || "";
     const productName = payload.productName || "Produce Box subscription";
     const subTag = payload.subscriptionId.substring(0, 8);
@@ -175,7 +175,7 @@ export const sendSubscriptionCancellationEmail = task({
     // Wait 2s after upsert so Mailchimp indexes the contact before the
     // segment-targeted campaign send (avoids "recipients not ready" error).
     await upsertMailchimpContact(mailchimpKey, email, {
-      first: firstName !== "there" ? firstName : undefined,
+      first: firstName !== "friend" ? firstName : undefined,
       last: lastName || undefined,
     }).catch((e: Error) => console.warn("[CancellationEmail] Mailchimp upsert warning:", e.message));
 

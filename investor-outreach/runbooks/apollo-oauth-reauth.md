@@ -26,7 +26,7 @@ Before starting, verify current status:
 
 ```bash
 # Check all account statuses
-cd ~/Desktop/business/investor-outreach/scripts
+cd ~/Desktop/um_website/investor-outreach/scripts
 python3 apollo-health-check.py --detailed
 ```
 
@@ -63,7 +63,7 @@ For each account, follow these steps:
 Wait 5 minutes for Apollo to process, then verify:
 
 ```bash
-cd ~/Desktop/business/investor-outreach/scripts
+cd ~/Desktop/um_website/investor-outreach/scripts
 python3 -c "
 import json, urllib.request, os
 
@@ -113,7 +113,7 @@ Set a calendar reminder for the next account. During the wait:
 After each account, log the result:
 
 ```bash
-echo "$(date): anthony@unclemays.com re-authed, daily_limit=50" >> ~/Desktop/business/investor-outreach/runbooks/oauth-reauth-log.txt
+echo "$(date): anthony@unclemays.com re-authed, daily_limit=50" >> ~/Desktop/um_website/investor-outreach/runbooks/oauth-reauth-log.txt
 ```
 
 ## Campaign Relinking (After All Accounts Re-authed)
@@ -138,7 +138,7 @@ Once ALL 6 accounts are successfully re-authed and stable for 24 hours:
 ### Verify Campaign Linking (API):
 
 ```bash
-cd ~/Desktop/business/investor-outreach/scripts
+cd ~/Desktop/um_website/investor-outreach/scripts
 python3 apollo-health-check.py --campaigns
 ```
 
@@ -150,7 +150,7 @@ After rebuild, run daily health checks:
 
 ```bash
 # Add to cron or manual daily check
-cd ~/Desktop/business/investor-outreach/scripts
+cd ~/Desktop/um_website/investor-outreach/scripts
 python3 apollo-health-check.py --daily-report
 ```
 

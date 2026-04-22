@@ -208,7 +208,7 @@
 
 **Total Assets:** 9-15 images (3-5 per format x 3 formats)
 
-**Delivery Path:** `~/Desktop/business/ad-exports/performance-max-2026-04-14/images/`
+**Delivery Path:** `~/Desktop/um_website/ad-exports/performance-max-2026-04-14/images/`
 
 ---
 

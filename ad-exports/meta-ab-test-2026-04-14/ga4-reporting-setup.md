@@ -126,7 +126,7 @@ Cross-reference with GA4 conversion data to calculate:
 
 ## Python Script for Daily Report
 
-Location: `~/Desktop/business/scripts/meta-ab-test-report.py`
+Location: `~/Desktop/um_website/scripts/meta-ab-test-report.py`
 
 Script will:
 1. Pull GA4 data via Analytics Data API

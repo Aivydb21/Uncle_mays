@@ -21,7 +21,7 @@ AD_ACCOUNT_ID = config["ad_account_id"]
 BASE_URL = "https://graph.facebook.com/v21.0"
 
 # Video files
-VIDEO_DIR = Path("C:/Users/Anthony/Desktop/business/ad-exports/subscription-launch-apr17/video-ads/final-renders/meta")
+VIDEO_DIR = Path("C:/Users/Anthony/Desktop/um_website/ad-exports/subscription-launch-apr17/video-ads/final-renders/meta")
 VIDEOS = [
     VIDEO_DIR / "smaller a.mp4",
     VIDEO_DIR / "smaller b video.mp4"

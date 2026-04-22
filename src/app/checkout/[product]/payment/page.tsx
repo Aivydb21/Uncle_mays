@@ -80,15 +80,15 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
 
 const VALUE_ANCHORS: Record<string, { headline: string; bullets: string[] }> = {
   starter: {
-    headline: "Cleaner than Whole Foods. For less than dinner out.",
+    headline: "Cleaner than Whole Foods. Cheaper than Aldi.",
     bullets: [
       "No chemical washes on your produce",
       "No chemical bath on your meat",
-      "First order $30 — less than dinner out in Chicago",
+      "~8 servings of fresh, seasonal produce — $35 delivered",
     ],
   },
   family: {
-    headline: "Better quality than Whole Foods. $30 less, delivered.",
+    headline: "Cleaner than Whole Foods. Cheaper than Aldi.",
     bullets: [
       "No chemical washes on your produce",
       "No chemical bath on your meat",

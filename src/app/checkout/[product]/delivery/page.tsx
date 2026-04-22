@@ -117,7 +117,7 @@ export default function DeliveryPage() {
 
   const product = PRODUCTS[slug];
 
-  // Effective price (may include first-order discount set by order summary page)
+  // Effective price (may include protein add-ons stored by the summary page)
   const [displayPrice, setDisplayPrice] = useState<number>(product.price);
   useEffect(() => {
     try {
@@ -235,7 +235,7 @@ export default function DeliveryPage() {
       }
     }
 
-    // Read effective price (may include first-order discount set by order summary page)
+    // Read effective price (may include protein add-ons stored by the summary page)
     let effectivePrice: number = product.price;
     try {
       const storedPrice = sessionStorage.getItem(`unc-price-${slug}`);

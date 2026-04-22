@@ -55,7 +55,7 @@
 
 **[10-20sec] SOLUTION:**  
 *[Show Uncle May's box, pick up greens]*  
-"Now I get Uncle May's. $55 a week. Delivered every Thursday. And the produce? Actually fresh. Like, my-grandma's-garden fresh."
+"Now I get Uncle May's. $55 a week. Delivered every Wednesday. And the produce? Actually fresh. Like, my-grandma's-garden fresh."
 
 **[20-25sec] CTA:**  
 *[Direct to camera, confident]*  
@@ -122,7 +122,7 @@
 
 **[3-10sec] SOLUTION:**  
 *[Show box on doorstep or unpacking]*  
-"Uncle May's delivers every Thursday. I get the Community Box. $55. Same day, same time, every week."
+"Uncle May's delivers every Wednesday. I get the Community Box. $55. Same day, same time, every week."
 
 **[10-15sec] BENEFIT:**  
 *[Show produce or preparing meal]*  

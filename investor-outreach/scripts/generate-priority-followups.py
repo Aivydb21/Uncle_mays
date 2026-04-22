@@ -8,8 +8,8 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-REPORT_PATH = Path('C:/Users/Anthony/Desktop/business/investor-outreach/reports/gmail-followup-analysis.json')
-OUTPUT_PATH = Path('C:/Users/Anthony/Desktop/business/investor-outreach/drafts/PRIORITY-FOLLOWUPS-2026-04-17.md')
+REPORT_PATH = Path('C:/Users/Anthony/Desktop/um_website/investor-outreach/reports/gmail-followup-analysis.json')
+OUTPUT_PATH = Path('C:/Users/Anthony/Desktop/um_website/investor-outreach/drafts/PRIORITY-FOLLOWUPS-2026-04-17.md')
 
 def main():
     with open(REPORT_PATH) as f:

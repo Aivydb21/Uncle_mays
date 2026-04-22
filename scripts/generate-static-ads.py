@@ -16,7 +16,7 @@ if sys.platform == "win32":
     sys.stderr.reconfigure(encoding='utf-8')
 
 # Paths
-BASE_DIR = Path("C:/Users/Anthony/Desktop/business")
+BASE_DIR = Path("C:/Users/Anthony/Desktop/um_website")
 OUTPUT_DIR = BASE_DIR / "ad-exports/subscription-launch-apr17/static-images"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 

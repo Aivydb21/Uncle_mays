@@ -11,7 +11,7 @@
 ## Quick Links
 
 - **Ads Manager:** https://business.facebook.com/adsmanager/manage/campaigns?act=814877604473301
-- **Creatives folder:** `C:\Users\Anthony\Desktop\business\data\meta-ads\exports\`
+- **Creatives folder:** `C:\Users\Anthony\Desktop\um_website\data\meta-ads\exports\`
 - **Campaign spec:** `campaign-spec-april-17.md`
 
 ---

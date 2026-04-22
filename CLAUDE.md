@@ -1,5 +1,8 @@
 # Uncle May's Produce — Investor Outreach Workspace
 
+> ### 🟢 Customer-facing single source of truth: [`customer-facts.md`](./customer-facts.md)
+> Delivery day, pricing, active promo codes, cutoff times, and brand positioning that customers can see live on the site live in `customer-facts.md`. **Any agent writing ads, emails, social posts, or landing-page copy MUST read `customer-facts.md` first.** Do not use older planning docs (`emergency-promotion-*`, `promo-launch-offer-*`, `AD-COPY-TEMPLATES.md`, etc.) as authoritative — they contain retired promo codes (WELCOME20, LAUNCH20, FREESHIP, first-order $30) that are no longer live.
+
 ## Business
 Uncle May's Produce is the first data and distribution platform for Black food consumption. The company operates neighborhood-format grocery stores (7,500–12,000 sq ft) targeting historically Black American and culturally thriving urban communities with higher willingness to pay.
 

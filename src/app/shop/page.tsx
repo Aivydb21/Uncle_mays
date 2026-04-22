@@ -132,12 +132,6 @@ export default function ShopLandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
             >
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-bold shadow mb-4">
-                <span>Starter Box: $30 first order</span>
-                <span className="opacity-60">.</span>
-                <span className="line-through opacity-60 font-normal">$35</span>
-              </div>
-
               <div className="flex items-center gap-2 text-sm font-medium text-primary mb-5">
                 <Truck className="h-4 w-4 shrink-0" />
                 <span>
@@ -201,11 +195,6 @@ export default function ShopLandingPage() {
             {boxes.map((box, idx) => {
               const product = PRODUCTS[box.slug];
               const price = product.price;
-              const displayPrice =
-                "firstOrderPrice" in product && product.firstOrderPrice
-                  ? product.firstOrderPrice
-                  : price;
-              const hasDiscount = displayPrice < price;
 
               return (
                 <motion.div
@@ -252,18 +241,8 @@ export default function ShopLandingPage() {
                       {/* Price */}
                       <div className="flex items-baseline gap-2 mb-4">
                         <span className="text-3xl font-bold text-primary">
-                          ${displayPrice}
+                          ${price}
                         </span>
-                        {hasDiscount && (
-                          <>
-                            <span className="text-sm line-through text-muted-foreground">
-                              ${price}
-                            </span>
-                            <span className="text-xs font-semibold text-primary/70">
-                              first order
-                            </span>
-                          </>
-                        )}
                       </div>
 
                       {/* Items list */}
@@ -292,7 +271,7 @@ export default function ShopLandingPage() {
                       <Link
                         href={`/checkout/${box.slug}`}
                         onClick={() =>
-                          fireTrackingEvent(box.slug, product.name, displayPrice)
+                          fireTrackingEvent(box.slug, product.name, price)
                         }
                         className={`w-full inline-flex items-center justify-center gap-2 rounded-xl font-semibold h-12 px-6 transition-all duration-200 active:scale-[0.98] ${
                           box.popular
@@ -300,7 +279,7 @@ export default function ShopLandingPage() {
                             : "border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                         }`}
                       >
-                        Order Now - ${displayPrice}
+                        Order Now - ${price}
                         <ArrowRight className="h-4 w-4" />
                       </Link>
                     </div>
@@ -413,7 +392,7 @@ export default function ShopLandingPage() {
             transition={{ duration: 0.6 }}
           >
             <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-xs font-bold mb-4">
-              Starter Box: $30 first order
+              Now delivering Chicago-wide every Wednesday
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-3">
               Ready for fresh produce?

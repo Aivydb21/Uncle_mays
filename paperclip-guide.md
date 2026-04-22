@@ -2,7 +2,14 @@
 
 > Your 5-agent AI executive team: CEO, CMO, COO, Investor Relations, CTO
 > Dashboard: http://localhost:3100
-> Last updated: 2026-04-07
+> Last updated: 2026-04-22
+
+> **Project root is now `C:\Users\Anthony\Desktop\um_website\`.**
+> The former `C:\Users\Anthony\Desktop\business\` folder was consolidated
+> into this repo on 2026-04-22 and archived to `C:\Users\Anthony\Desktop\_archive\business-2026-04-22\`.
+> Paperclip agents and the website both run from `um_website/` going forward.
+> Paperclip's DB lives in `C:\Users\Anthony\.paperclip\` and is unaffected
+> by this move; all existing tasks, agents, and history are preserved.
 
 ---
 
@@ -10,7 +17,7 @@
 
 ### Starting Paperclip
 ```bash
-node C:\Users\Anthony\Desktop\business\start-paperclip.cjs
+node C:\Users\Anthony\Desktop\um_website\start-paperclip.cjs
 ```
 Then open http://localhost:3100
 

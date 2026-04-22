@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
                       payload: {
                         sessionId: checkoutSessionId,
                         phone: phone,
-                        firstName: checkoutSession.firstName || session.customer_details?.name?.split(" ")[0] || "there",
+                        firstName: checkoutSession.firstName || session.customer_details?.name?.split(" ")[0] || "friend",
                         deliveryDate: checkoutSession.deliveryDate,
                         deliveryWindow: checkoutSession.deliveryWindow,
                         productName: checkoutSession.productName || "produce box",

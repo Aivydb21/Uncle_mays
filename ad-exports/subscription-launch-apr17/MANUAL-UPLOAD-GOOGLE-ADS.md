@@ -92,7 +92,7 @@ Copy/paste these 5 long headlines exactly:
 1. `Subscribe to Chicago's #1 Produce Box for Black Families`
 2. `Fresh Greens, Okra, Yams Delivered Every Week`
 3. `Black-Owned, Chicago-Based, Culturally Specific Produce`
-4. `From $30/Week, Cancel Anytime, First Box This Thursday`
+4. `From $30/Week, Cancel Anytime, First Box This Wednesday`
 5. `Premium Produce Subscription for Hyde Park Families`
 
 ---
@@ -102,7 +102,7 @@ Copy/paste these 5 long headlines exactly:
 Copy/paste these 5 descriptions exactly:
 
 1. `Premium produce boxes for Black families. Greens, okra, yams, and more.`
-2. `Subscription grocery from Black farmers. Delivered every Thursday.`
+2. `Subscription grocery from Black farmers. Delivered every Wednesday.`
 3. `Skip the store. Get restaurant-quality produce at home.`
 4. `Started by a Chicago Booth grad, trusted by Hyde Park.`
 5. `The produce box you've been looking for. Subscribe in 2 minutes.`
@@ -158,7 +158,7 @@ Select: **Subscribe**
 **Ad Headline 1:** `Uncle May's Produce Box`  
 **Ad Headline 2:** `Black-Owned Grocery Chicago`  
 **Ad Headline 3:** `Subscribe From $30/Week`  
-**Description 1:** `Premium produce boxes for Black families. Delivered every Thursday.`  
+**Description 1:** `Premium produce boxes for Black families. Delivered every Wednesday.`  
 **Description 2:** `Chicago Booth founded. Trusted by 500+ Hyde Park families.`  
 **Final URL:**
 ```

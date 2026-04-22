@@ -47,7 +47,7 @@ For phone orders taken during the campaign:
 
 **Run daily during campaign (April 18-28):**
 ```bash
-cd ~/Desktop/business/scripts
+cd ~/Desktop/um_website/scripts
 ./daily-campaign-report.sh
 ```
 

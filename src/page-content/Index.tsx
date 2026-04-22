@@ -2,10 +2,10 @@
 
 import { Suspense } from "react";
 import { motion } from "framer-motion";
-import { Users, Instagram, ShoppingBag, Bell, Package, Mail } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Users, ShoppingBag, Bell, Package } from "lucide-react";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
+import { HomeEmailCapture } from "@/components/HomeEmailCapture";
 
 const testimonials = [
   {
@@ -142,34 +142,7 @@ const Index = () => {
       {/* EMAIL CAPTURE */}
       <section className="py-20 bg-background">
         <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="max-w-2xl mx-auto text-center"
-          >
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
-              <Mail className="h-4 w-4" />
-              Stay in the loop
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Stay connected to what's growing
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-              Get first access to seasonal box drops, farmer spotlights, and what's coming out of the ground this week. Good food news from Chicago, nothing else.
-            </p>
-            <a
-              href={process.env.NEXT_PUBLIC_EMAIL_FORM_URL!}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button size="lg" className="text-base font-semibold px-8 py-5 rounded-xl">
-                Join the Mailing List
-              </Button>
-            </a>
-            <p className="text-xs text-muted-foreground mt-3">Free to join. Unsubscribe anytime.</p>
-          </motion.div>
+          <HomeEmailCapture source="home_newsletter" />
         </div>
       </section>
     </>

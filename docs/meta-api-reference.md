@@ -85,7 +85,7 @@ All Meta API operations use the config at: `~/.claude/meta-config.json`
 
 ## Working Scripts
 
-All scripts in: `C:/Users/Anthony/Desktop/business/scripts/`
+All scripts in: `C:/Users/Anthony/Desktop/um_website/scripts/`
 
 ### Campaign Creation
 - `launch-meta-campaign.py` - Creates campaign + ad sets

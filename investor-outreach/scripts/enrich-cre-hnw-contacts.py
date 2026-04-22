@@ -15,7 +15,7 @@ API_KEY = config["api_key"]
 BASE_URL = config["base_url"]
 EXECUTE = "--execute" in sys.argv
 
-OUTPUT_DIR = os.path.join(os.path.expanduser("~/Desktop/business/investor-outreach/pipeline/cre-hnw"))
+OUTPUT_DIR = os.path.join(os.path.expanduser("~/Desktop/um_website/investor-outreach/pipeline/cre-hnw"))
 
 def apollo_match(first_name, last_name, org_name=None, domain=None):
     """Look up a person via Apollo people/match endpoint."""

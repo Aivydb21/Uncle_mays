@@ -255,14 +255,14 @@ curl https://api.stripe.com/v1/charges?limit=10 \
 
 **Manual Run (Daily, 9am CT):**
 ```bash
-cd ~/Desktop/business
+cd ~/Desktop/um_website
 python scripts/week1-performance-dashboard.py $(date -d "yesterday" +%Y-%m-%d)
 ```
 
 **Cron Setup (Optional):**
 ```bash
 # Add to crontab: Run daily at 9am CT (3pm UTC)
-0 15 * * * cd ~/Desktop/business && python scripts/week1-performance-dashboard.py $(date -d "yesterday" +\%Y-\%m-\%d) >> logs/dashboard-cron.log 2>&1
+0 15 * * * cd ~/Desktop/um_website && python scripts/week1-performance-dashboard.py $(date -d "yesterday" +\%Y-\%m-\%d) >> logs/dashboard-cron.log 2>&1
 ```
 
 **Output Location:**

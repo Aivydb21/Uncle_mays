@@ -8,11 +8,6 @@ const AMOUNT_MAP: Record<string, number> = {
   community: 9500,
 };
 
-// First-order discounted prices in cents — applied automatically for eligible products
-const FIRST_ORDER_AMOUNT_MAP: Record<string, number> = {
-  starter: 3000, // $30 first-order price (regular $35)
-};
-
 // Additional protein pricing in cents (10-13% markup over base protein costs)
 const ADDITIONAL_PROTEIN_PRICING: Record<string, number> = {
   chicken: 2000,
@@ -30,9 +25,7 @@ export async function POST(req: NextRequest) {
 
     const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid } = await req.json();
 
-    // Apply first-order discount for eligible products (e.g. starter box)
-    const isFirstOrder = product in FIRST_ORDER_AMOUNT_MAP;
-    let amount = isFirstOrder ? FIRST_ORDER_AMOUNT_MAP[product] : AMOUNT_MAP[product];
+    let amount = AMOUNT_MAP[product];
 
     if (!amount) {
       return NextResponse.json({ error: "Unknown product" }, { status: 400 });
@@ -113,7 +106,6 @@ export async function POST(req: NextRequest) {
               shipping_zip: address.zip,
             }
           : {}),
-        ...(isFirstOrder ? { first_order_discount: "true" } : {}),
         ...(Array.isArray(proteins) && proteins.length > 0
           ? { protein_selections: proteins.join(", ") }
           : {}),

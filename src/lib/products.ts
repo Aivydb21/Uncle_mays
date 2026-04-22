@@ -18,7 +18,6 @@ export const PRODUCTS = {
   starter: {
     name: "Starter Box",
     price: 35,
-    firstOrderPrice: 30,
     subPrice: 31.50,
     // Produce only — no protein section
     proteinCount: 0,
@@ -31,7 +30,7 @@ export const PRODUCTS = {
       "Persian cucumbers — 4 ct",
       "Snap peas — 1/2 lb",
     ],
-    valueCallout: "Your $35 box (or $30 first order) delivers ~8 servings of fresh, seasonally sourced produce -- about $4-5 per serving. Less than a salad at Whole Foods, with produce that actually tastes like something.",
+    valueCallout: "Your $35 Starter Box delivers ~8 servings of fresh, seasonally sourced produce — about $4–5 per serving. Less than a salad at Whole Foods, with produce that actually tastes like something.",
     servingNote: "~8 servings of fresh, seasonal produce",
     servingBadge: "~8 servings | perfect for 1-2 people",
   },

@@ -35,7 +35,7 @@ All variants meet Meta specs (headline ≤40 chars, primary text ≤125 chars):
 |---------|---------------|----------|--------------|-----|
 | **V1** | Social Proof | "89% Would Tell a Friend. Now 20% Off" | Premium produce curated for Black families. Fresh, quality, delivered. First box $24 (reg $30). Hyde Park's choice. | Shop Now |
 | **V2** | Cultural | "For Us, By Us. First Box 20% Off." | Produce you actually want, picked by people who know. No substitutions, no compromises. $24 your first box. Hyde Park. | Get 20% Off |
-| **V3** | Direct Offer | "Fresh Produce Box: $24 (Save $6 Today)" | Quality produce delivered to your door. First-time customers get 20% off. No commitment. Order by Sunday. Hyde Park. | Claim Discount |
+| **V3** | Direct Offer | "Fresh Produce Box: $24 (Save $6 Today)" | Quality produce delivered to your door. First-time customers get 20% off. No commitment. Order by Tuesday. Hyde Park. | Claim Discount |
 | **V4** | Problem/Solution | "Tired of Grocery Runs? We Got You. 20%" | Fresh produce picked for Black families, delivered Hyde Park. Skip the lines, get quality. First box $24. Try it this week. | Save 20% Now |
 | **V5** | Curiosity | "What's in the Box? (97% Love It)" | Curated produce for Black families who know quality. See what's inside this week. First box 20% off ($24). Try us. | See This Week's Box |
 | **V6** | Testimonial | "Finally, Produce That Gets It." -20%" | Hyde Park families trust us for fresh, quality produce picked with us in mind. Join them. First box 20% off. Order today. | Try It Now |

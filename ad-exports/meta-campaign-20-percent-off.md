@@ -33,7 +33,7 @@
 ### Variant 3: Direct Offer + Urgency
 **Hook Strategy:** Clear value proposition with FOMO  
 **Headline (39 chars):** `Fresh Produce Box: $24 (Save $6 Today)`  
-**Primary Text (122 chars):** `Quality produce delivered to your door. First-time customers get 20% off. No commitment. Order by Sunday. Hyde Park.`  
+**Primary Text (122 chars):** `Quality produce delivered to your door. First-time customers get 20% off. No commitment. Order by Tuesday. Hyde Park.`  
 **CTA:** `Claim Discount`  
 **Format:** Feed post, Story  
 **Visual Pairing:** Existing "Direct Offer" variant (DAHGqkraRcc) updated with $24 price point
@@ -86,7 +86,7 @@
 - **Hook type:** Social proof (V1, V5) vs Cultural (V2) vs Direct offer (V3, V7) vs Problem/solution (V4)
 - **CTA:** "Shop Now" vs "Get 20% Off" vs "Claim Discount" vs "Save 20% Now" vs "Try It Now"
 - **Price framing:** "$24" vs "$24 (reg $30)" vs "Save $6" vs "20% off"
-- **Urgency:** "Today" vs "This week" vs "Sunday" vs none
+- **Urgency:** "Today" vs "This week" vs "Tuesday" vs none
 
 **Recommended First Test:**
 - Run V1 (social proof), V2 (cultural), and V3 (direct offer) against each other

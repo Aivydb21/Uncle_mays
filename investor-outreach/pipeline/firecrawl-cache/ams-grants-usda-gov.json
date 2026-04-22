@@ -1,0 +1,30 @@
+{
+  "url": "https://www.ams.usda.gov/selling-your-farm-products/local-food-purchase-assistance",
+  "data": {
+    "success": true,
+    "data": {
+      "markdown": "[Skip to main content](https://www.ams.usda.gov/selling-your-farm-products/local-food-purchase-assistance#main-content)\n\n# 404 - Not Found\n\nThe content was not found.",
+      "metadata": {
+        "title": "404 - Not Found | Agricultural Marketing Service",
+        "MobileOptimized": "width",
+        "language": "en",
+        "HandheldFriendly": "true",
+        "Generator": "Drupal 11 (https://www.drupal.org)",
+        "viewport": "width=device-width, initial-scale=1.0",
+        "favicon": "https://www.ams.usda.gov/sites/default/files/favicon_0.ico",
+        "scrapeId": "019da644-74a5-767e-8dc9-fc6a0fa2eccc",
+        "sourceURL": "https://www.ams.usda.gov/selling-your-farm-products/local-food-purchase-assistance",
+        "url": "https://www.ams.usda.gov/selling-your-farm-products/local-food-purchase-assistance",
+        "statusCode": 404,
+        "error": "Not Found",
+        "contentType": "text/html; charset=UTF-8",
+        "timezone": "America/New_York",
+        "proxyUsed": "basic",
+        "cacheState": "miss",
+        "indexId": "ebf95df2-90e6-40c4-a5c8-42d744af10a6",
+        "creditsUsed": 1,
+        "concurrencyLimited": false
+      }
+    }
+  }
+}

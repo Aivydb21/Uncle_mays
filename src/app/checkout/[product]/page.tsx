@@ -69,9 +69,7 @@ export default function CheckoutSummaryPage() {
   const proteinIncluded = product.proteinIncluded;
   const availableProteins = getAvailableProteins(product);
 
-  // First-order pricing: starter box gets $30 instead of $35
-  const effectivePrice = "firstOrderPrice" in product ? product.firstOrderPrice : product.price;
-  const isFirstOrderDiscount: boolean = "firstOrderPrice" in product && (product as { firstOrderPrice: number; price: number }).firstOrderPrice < product.price;
+  const effectivePrice = product.price;
 
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
   const [additionalProteins, setAdditionalProteins] = useState<ProteinId[]>([]);
@@ -271,9 +269,6 @@ export default function CheckoutSummaryPage() {
               </div>
               <div className="text-right shrink-0">
                 <span className="text-3xl font-bold text-primary">${totalPrice}</span>
-                {isFirstOrderDiscount ? (
-                  <div className="text-xs text-muted-foreground line-through">${product.price + additionalProteinCost}</div>
-                ) : null}
                 {additionalProteinCost > 0 ? (
                   <div className="text-xs text-muted-foreground mt-1">
                     Box: ${effectivePrice} + Proteins: ${additionalProteinCost}
@@ -291,13 +286,6 @@ export default function CheckoutSummaryPage() {
                 {valueAnchor.guarantee}
               </p>
             </div>
-
-            {/* First-order discount callout */}
-            {isFirstOrderDiscount ? (
-              <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2.5 text-sm text-primary font-medium">
-                <span>First-order discount applied — you save ${product.price - effectivePrice}!</span>
-              </div>
-            ) : null}
 
             {/* What's in the box */}
             <div className="mb-6">

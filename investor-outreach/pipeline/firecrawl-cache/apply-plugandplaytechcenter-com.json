@@ -1,0 +1,39 @@
+{
+  "url": "https://www.plugandplaytechcenter.com/food-agriculture/",
+  "data": {
+    "success": true,
+    "data": {
+      "markdown": "404\n\nSomething went wrong\n\nSomething went wrong\n\nThe page you are looking for doesn\u2019t exist or has been removed. Please go back to the homepage.\n\nThe page you are looking for doesn\u2019t exist or has been removed. Please go back to the homepage.\n\nGo to homepageGo to homepage\n\n404\n\n![Demo avatar](<Base64-Image-Removed>)\n\nAccelerate your innovation\n\nFind out how leading corporations innovate with Plug and Play",
+      "metadata": {
+        "name": "Plug and Play",
+        "image": [
+          "https://www.plugandplaytechcenter.com/assets/pnp-logo.svg",
+          "https://www.plugandplaytechcenter.com/assets/pnp-logo.svg"
+        ],
+        "twitter:description": "Plug and Play",
+        "twitter:image:src": "https://www.plugandplaytechcenter.com/assets/pnp-logo.svg",
+        "og:description": "Plug and Play",
+        "og:image": "https://www.plugandplaytechcenter.com/assets/pnp-logo.svg",
+        "viewport": "width=device-width, initial-scale=1",
+        "title": "Plug and Play",
+        "language": "en",
+        "description": "Plug and Play, Plug and Play",
+        "og:title": "Plug and Play",
+        "twitter:title": "Plug and Play",
+        "og:type": "website",
+        "favicon": "https://www.plugandplaytechcenter.com/assets/favicon-192x192.png",
+        "scrapeId": "019da646-4275-770d-a2fb-52476356f44c",
+        "sourceURL": "https://www.plugandplaytechcenter.com/food-agriculture/",
+        "url": "https://www.plugandplaytechcenter.com/food-agriculture",
+        "statusCode": 200,
+        "contentType": "text/html",
+        "timezone": "America/New_York",
+        "proxyUsed": "basic",
+        "cacheState": "miss",
+        "indexId": "5b3a8cd5-e262-4a25-b5bc-6399d36ec24d",
+        "creditsUsed": 1,
+        "concurrencyLimited": false
+      }
+    }
+  }
+}

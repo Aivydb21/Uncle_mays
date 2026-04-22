@@ -83,7 +83,7 @@
 - **Base Image:** `hero-produce.jpg` (centered, full bleed)
 - **Text Overlay:**
   - **Headline:** "Your Grandma's Greens" (top third, 56pt bold, white)
-  - **Subhead:** "Delivered Every Thursday" (below, 36pt)
+  - **Subhead:** "Delivered Every Wednesday" (below, 36pt)
   - **Price:** "From $30/week" (bottom third, 48pt, highlighted badge)
 - **Logo:** Bottom right, 100px height
 - **File Name:** `pmax_square_product_hero_1080x1080.png`
@@ -186,7 +186,7 @@
 - **Base Image:** `hero-produce.jpg` (vertical crop, centered on greens)
 - **Text Overlay:**
   - **Headline (top):** "Set It & Forget It" (56pt bold)
-  - **Subhead:** "Fresh produce. Every Thursday. Cancel anytime." (32pt, multi-line)
+  - **Subhead:** "Fresh produce. Every Wednesday. Cancel anytime." (32pt, multi-line)
   - **Price:** "$55/week" (middle, 72pt, badge)
   - **CTA:** "Start Subscription" (bottom, 48pt, button)
 - **Logo:** Bottom right, 80px
@@ -237,7 +237,7 @@
 - **Text Overlay:**
   - **Headline:** "Your Grandmother's Greens" (top, 56pt bold, script/serif font for warmth)
   - **Subhead:** "Delivered to Your Door" (below, 36pt)
-  - **Details:** "Every Thursday. From $30/week." (center, 28pt)
+  - **Details:** "Every Wednesday. From $30/week." (center, 28pt)
   - **CTA Badge:** "$10 Off First Box" (bottom, green badge, 32pt)
 - **Logo:** Top right, 80px
 - **File Name:** `meta_feed_grandmas_greens_1080x1080.png`
@@ -278,7 +278,7 @@
 - **Base Image:** `hero-produce.jpg` (vertical crop, centered on produce)
 - **Text Overlay:**
   - **Headline (top third):** "Fresh Produce" (64pt bold, white)
-  - **Subhead:** "Delivered Every Thursday" (48pt)
+  - **Subhead:** "Delivered Every Wednesday" (48pt)
   - **Price (center):** "$30 - $75/week" (80pt, badge)
   - **CTA (bottom third):** "Swipe Up to Subscribe" (52pt, with upward arrow)
   - **Promo Badge:** "Use FREESHIP for $10 Off" (very bottom, 32pt, green banner)
@@ -323,7 +323,7 @@
 - **Base Image:** `produce-box.jpg` (vertical crop)
 - **Text Overlay:**
   - **Headline (top third):** "Set It & Forget It" (64pt bold)
-  - **Description (center):** "Fresh produce delivered every Thursday. Cancel anytime." (40pt, multi-line)
+  - **Description (center):** "Fresh produce delivered every Wednesday. Cancel anytime." (40pt, multi-line)
   - **Price Range:** "$30 - $75/week" (72pt, badge)
   - **CTA (bottom):** "Subscribe Now" (60pt, button style)
   - **Promo:** "Use FREESHIP: $10 Off" (very bottom, 32pt)

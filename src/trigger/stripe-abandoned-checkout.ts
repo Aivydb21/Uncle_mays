@@ -115,7 +115,7 @@ async function sendEmail(
   emailNumber: 1 | 2 | 3
 ): Promise<{ campaignId: string }> {
   const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
-  const firstName = name.first || "there";
+  const firstName = name.first || "friend";
   const sessionTag = sessionId.substring(0, 8);
   const checkoutUrl =
     `https://unclemays.com/boxes` +
@@ -154,7 +154,7 @@ async function sendEmail(
     </p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
-      Uncle May's Produce | Chicago, IL<br>
+      Uncle May's Produce | Hyde Park, Chicago, IL<br>
       <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> |
       <a href="mailto:info@unclemays.com" style="color:#999;">info@unclemays.com</a>
     </p>
@@ -170,22 +170,22 @@ Complete your order now and get Wednesday delivery. Questions? Call us anytime a
 ${checkoutUrl}
 
 ---
-Uncle May's Produce | Chicago, IL
+Uncle May's Produce | Hyde Park, Chicago, IL
 unclemays.com | info@unclemays.com`;
   } else if (emailNumber === 2) {
     // Email 2: Urgency Reminder (24 hours after abandonment)
-    subjectLine = "Order by Tuesday for Wednesday delivery";
+    subjectLine = "Order by Sunday for Wednesday delivery";
     previewText = "89% of our customers refer friends. Your box is almost ready.";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Arial,sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
   <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
-    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Order by Tuesday for Wednesday delivery</h2>
+    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Order by Sunday for Wednesday delivery</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
       We saved your cart, but time is running out. To get your fresh produce delivered this Wednesday,
-      you need to complete your order by Thursday.
+      complete your order by Sunday at 11:59 PM CT. Orders after that ship next Wednesday.
     </p>
     <p style="font-size:16px;line-height:1.6;">
       Uncle May's isn't your average grocery box. We curate premium produce for Black communities
@@ -203,7 +203,7 @@ unclemays.com | info@unclemays.com`;
     </p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
-      Uncle May's Produce | Chicago, IL<br>
+      Uncle May's Produce | Hyde Park, Chicago, IL<br>
       <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> |
       <a href="mailto:info@unclemays.com" style="color:#999;">info@unclemays.com</a>
     </p>
@@ -212,7 +212,7 @@ unclemays.com | info@unclemays.com`;
 </html>`;
     plainText = `Hi ${firstName},
 
-We saved your cart, but time is running out. To get your fresh produce delivered this Wednesday, you need to complete your order by Thursday.
+We saved your cart, but time is running out. To get your fresh produce delivered this Wednesday, complete your order by Sunday at 11:59 PM CT. Orders after that ship next Wednesday.
 
 Uncle May's isn't your average grocery box. We curate premium produce for Black communities that deserve the best. 89% of our customers refer friends and family because they trust what we deliver.
 
@@ -221,7 +221,7 @@ ${checkoutUrl}
 Questions? We're here: (312) 972-2595
 
 ---
-Uncle May's Produce | Chicago, IL
+Uncle May's Produce | Hyde Park, Chicago, IL
 unclemays.com | info@unclemays.com`;
   } else {
     // Email 3: Final Urgency (48 hours after abandonment)
@@ -253,7 +253,7 @@ unclemays.com | info@unclemays.com`;
     </p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
-      Uncle May's Produce | Chicago, IL<br>
+      Uncle May's Produce | Hyde Park, Chicago, IL<br>
       <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> |
       <a href="mailto:info@unclemays.com" style="color:#999;">info@unclemays.com</a>
     </p>
@@ -271,7 +271,7 @@ ${checkoutUrl}
 Need help? Call (312) 972-2595 before it's too late.
 
 ---
-Uncle May's Produce | Chicago, IL
+Uncle May's Produce | Hyde Park, Chicago, IL
 unclemays.com | info@unclemays.com`;
   }
 

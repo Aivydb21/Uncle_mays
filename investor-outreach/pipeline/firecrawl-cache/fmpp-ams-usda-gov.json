@@ -1,0 +1,30 @@
+{
+  "url": "https://www.ams.usda.gov/grants-and-loans/farmers-market-promotion-program",
+  "data": {
+    "success": true,
+    "data": {
+      "markdown": "[Skip to main content](https://www.ams.usda.gov/grants-and-loans/farmers-market-promotion-program#main-content)\n\n# 404 - Not Found\n\nThe content was not found.",
+      "metadata": {
+        "Generator": "Drupal 11 (https://www.drupal.org)",
+        "MobileOptimized": "width",
+        "HandheldFriendly": "true",
+        "viewport": "width=device-width, initial-scale=1.0",
+        "title": "404 - Not Found | Agricultural Marketing Service",
+        "language": "en",
+        "favicon": "https://www.ams.usda.gov/sites/default/files/favicon_0.ico",
+        "scrapeId": "019da645-75a8-72cf-acba-8bd4054fa424",
+        "sourceURL": "https://www.ams.usda.gov/grants-and-loans/farmers-market-promotion-program",
+        "url": "https://www.ams.usda.gov/grants-and-loans/farmers-market-promotion-program",
+        "statusCode": 404,
+        "error": "Not Found",
+        "contentType": "text/html; charset=UTF-8",
+        "timezone": "America/New_York",
+        "proxyUsed": "basic",
+        "cacheState": "miss",
+        "indexId": "c4d6ee75-5add-4cc9-b9f3-2e0723b77d64",
+        "creditsUsed": 1,
+        "concurrencyLimited": false
+      }
+    }
+  }
+}

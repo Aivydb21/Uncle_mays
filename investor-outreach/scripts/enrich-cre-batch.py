@@ -12,7 +12,7 @@ config = json.load(open(os.path.expanduser("~/.claude/apollo-config.json")))
 API_KEY = config["api_key"]
 BASE_URL = config["base_url"]
 
-OUTPUT_DIR = os.path.expanduser("~/Desktop/business/investor-outreach/pipeline/cre-hnw")
+OUTPUT_DIR = os.path.expanduser("~/Desktop/um_website/investor-outreach/pipeline/cre-hnw")
 
 CONTACTS = [
     ("Quintin", "Primo", "Capri Investment Group", "capri.global"),

@@ -15,7 +15,7 @@
 5. **Join 500+ Chicago Families** (27 chars)
 
 ### Alternative Headlines (Under 30 chars)
-4. **Greens Delivered Every Thursday** (32 chars) ⚠️ OVER LIMIT
+4. **Greens Delivered Every Wednesday** (35 chars) ⚠️ OVER LIMIT
 4. **Cultural Produce Boxes** (23 chars) ✅
 4. **Premium Greens, Weekly** (22 chars) ✅
 
@@ -33,7 +33,7 @@
 1. **Subscribe to Chicago's #1 Produce Box for Black Families** (60 chars)
 2. **Fresh Greens, Okra, Yams Delivered Every Week** (48 chars)
 3. **Black-Owned, Chicago-Based, Culturally Specific Produce** (58 chars)
-4. **From $30/Week, Cancel Anytime, First Box This Thursday** (57 chars)
+4. **From $30/Week, Cancel Anytime, First Box This Wednesday** (59 chars)
 5. **Premium Produce Subscription for Hyde Park Families** (54 chars)
 
 ---
@@ -41,7 +41,7 @@
 ## Descriptions (Max 90 characters each)
 
 1. **Premium produce boxes for Black families. Greens, okra, yams, and more.** (75 chars)
-2. **Subscription grocery from Black farmers. Delivered every Thursday.** (68 chars)
+2. **Subscription grocery from Black farmers. Delivered every Wednesday.** (70 chars)
 3. **Skip the store. Get restaurant-quality produce at home.** (57 chars)
 4. **Started by a Chicago Booth grad, trusted by Hyde Park.** (56 chars)
 5. **The produce box you've been looking for. Subscribe in 2 minutes.** (66 chars)

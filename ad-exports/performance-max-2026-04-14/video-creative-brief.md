@@ -244,7 +244,7 @@
 
 **Total Assets:** 6 videos (3 concepts x 2 formats)
 
-**Delivery Path:** `~/Desktop/business/ad-exports/performance-max-2026-04-14/videos/`
+**Delivery Path:** `~/Desktop/um_website/ad-exports/performance-max-2026-04-14/videos/`
 
 ---
 

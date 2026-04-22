@@ -6,8 +6,7 @@ import { Truck, ShieldCheck, Star, Check, ArrowRight, Leaf } from "lucide-react"
 import { PRODUCTS } from "@/lib/products";
 
 const starterBox = PRODUCTS.starter;
-const FIRST_ORDER_PRICE = starterBox.firstOrderPrice; // $30
-const REGULAR_PRICE = starterBox.price; // $35
+const PRICE = starterBox.price; // $35
 
 const testimonial = {
   quote:
@@ -19,22 +18,21 @@ const testimonial = {
 function CTAButton({ className = "" }: { className?: string }) {
   return (
     <Link
-      href="/subscribe/starter"
+      href="/checkout/starter"
       className={`inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold text-lg rounded-xl px-8 py-4 shadow-lg hover:bg-primary/90 transition-all duration-200 active:scale-95 ${className}`}
       onClick={() => {
-        // Fire Meta pixel ViewContent + InitiateCheckout for conversion tracking
         if (typeof window !== "undefined" && typeof (window as Window & { fbq?: (...a: unknown[]) => void }).fbq === "function") {
           (window as Window & { fbq: (...a: unknown[]) => void }).fbq("track", "InitiateCheckout", {
             content_name: "Starter Box",
             content_ids: ["starter"],
             content_type: "product",
-            value: FIRST_ORDER_PRICE,
+            value: PRICE,
             currency: "USD",
           });
         }
       }}
     >
-      Claim Your $30 Box
+      Order Your Starter Box
       <ArrowRight className="h-5 w-5" />
     </Link>
   );
@@ -71,34 +69,32 @@ export default function StarterBoxLandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7 }}
             >
-              {/* Offer badge */}
+              {/* Offer badge — no commitment */}
               <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-bold shadow mb-4">
-                <span>$30 first order</span>
-                <span className="opacity-60">·</span>
-                <span className="line-through opacity-60 font-normal">${REGULAR_PRICE}</span>
+                <span>Our smallest box · No subscription</span>
               </div>
 
               {/* Delivery badge */}
               <div className="flex items-center gap-2 text-sm font-medium text-primary mb-5">
                 <Truck className="h-4 w-4 shrink-0" />
-                <span>Hyde Park &amp; Chicago-wide delivery · every Wednesday</span>
+                <span>Chicago-wide delivery · every Wednesday</span>
               </div>
 
               <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-4">
-                Your first produce box:{" "}
-                <span className="text-primary">$30.</span>
+                The Starter Box.{" "}
+                <span className="text-primary">${PRICE}.</span>
               </h1>
 
               <p className="text-xl text-foreground/75 mb-8 leading-relaxed">
-                Seasonal produce from Black farmers, delivered to your door in
-                Hyde Park and across Chicago. Starter Box — normally $
-                {REGULAR_PRICE}. First-order pricing.
+                Black-farmed seasonal produce, hand-picked for 1–2 people.
+                Delivered fresh to your Chicago door every Wednesday. No
+                subscription, no commitment — just one box.
               </p>
 
               <CTAButton />
 
               <p className="mt-3 text-xs text-muted-foreground">
-                No subscription · Delivered this Wednesday · 100% freshness guarantee
+                Order by Sunday 11:59 PM for this Wednesday · 100% freshness guarantee
               </p>
             </motion.div>
           </div>
@@ -121,7 +117,7 @@ export default function StarterBoxLandingPage() {
               </span>
             </div>
             <h2 className="text-2xl md:text-3xl font-bold mb-6">
-              What&apos;s inside your $30 box
+              What&apos;s inside
             </h2>
 
             <div className="rounded-2xl bg-background shadow-sm border border-border overflow-hidden">
@@ -156,12 +152,14 @@ export default function StarterBoxLandingPage() {
 
               <div className="px-6 pb-6">
                 <div className="flex items-center justify-between rounded-xl bg-muted/50 px-5 py-3 text-sm">
-                  <span className="text-muted-foreground">First order price</span>
+                  <span className="text-muted-foreground">One-time price</span>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-primary">${FIRST_ORDER_PRICE}</span>
-                    <span className="line-through text-muted-foreground text-sm">${REGULAR_PRICE}</span>
+                    <span className="text-2xl font-bold text-primary">${PRICE}</span>
                   </div>
                 </div>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  Prefer weekly? Subscribe &amp; save 10% (${starterBox.subPrice}/wk).
+                </p>
               </div>
             </div>
           </motion.div>
@@ -176,7 +174,7 @@ export default function StarterBoxLandingPage() {
               {
                 icon: <Truck className="h-6 w-6 text-primary mx-auto mb-2" />,
                 title: "Wednesday delivery",
-                body: "Order any day — arrives fresh every Wednesday, right to your door.",
+                body: "Order any day by Sunday 11:59 PM — arrives fresh every Wednesday, right to your door.",
               },
               {
                 icon: <ShieldCheck className="h-6 w-6 text-primary mx-auto mb-2" />,
@@ -233,17 +231,17 @@ export default function StarterBoxLandingPage() {
             transition={{ duration: 0.6 }}
           >
             <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-xs font-bold mb-4">
-              $30 first order · normally ${REGULAR_PRICE}
+              Starter Box · ${PRICE} · No subscription
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-3">
               Ready for fresh produce?
             </h2>
             <p className="text-muted-foreground mb-7">
-              Hyde Park delivery · order today, delivered this Wednesday.
+              Order by Sunday 11:59 PM · delivered this Wednesday to your Chicago door.
             </p>
             <CTAButton className="w-full sm:w-auto" />
             <p className="mt-4 text-xs text-muted-foreground">
-              No subscription · No commitment · Cancel anytime by not reordering
+              No subscription · No commitment · 100% freshness guarantee
             </p>
           </motion.div>
         </div>
@@ -256,7 +254,7 @@ export default function StarterBoxLandingPage() {
           <a href="mailto:info@unclemays.com" className="hover:text-primary transition-colors">
             info@unclemays.com
           </a>{" "}
-          &middot; Chicago, IL
+          &middot; Hyde Park, Chicago, IL
         </p>
       </footer>
     </div>

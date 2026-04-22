@@ -5,7 +5,7 @@
 ### Step 1: Run the Script
 
 ```bash
-cd ~/Desktop/business
+cd ~/Desktop/um_website
 python scripts/week1-performance-dashboard.py
 ```
 

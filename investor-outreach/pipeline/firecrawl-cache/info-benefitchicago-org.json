@@ -1,0 +1,24 @@
+{
+  "url": "https://www.benefitchicago.org/about/",
+  "data": {
+    "success": true,
+    "data": {
+      "markdown": "# 404\n\n**File not found**\n\nThe site configured at this address does not\ncontain the requested file.\n\n\nIf this is your site, make sure that the filename case matches the URL\nas well as any file permissions.\n\nFor root URLs (like `http://example.com/`) you must provide an\n`index.html` file.\n\n\n[Read the full documentation](https://help.github.com/pages/)\nfor more information about using **GitHub Pages**.\n\n\n[GitHub Status](https://githubstatus.com/) \u2014\n[@githubstatus](https://twitter.com/githubstatus)\n\n[![](<Base64-Image-Removed>)](https://benefitchicago.org/)[![](<Base64-Image-Removed>)](https://benefitchicago.org/)",
+      "metadata": {
+        "title": "Page not found \u00b7 GitHub Pages",
+        "scrapeId": "019da643-996a-756d-83c0-fb94d3e307a4",
+        "sourceURL": "https://www.benefitchicago.org/about/",
+        "url": "https://benefitchicago.org/about/",
+        "statusCode": 404,
+        "error": "Not Found",
+        "contentType": "text/html; charset=utf-8",
+        "timezone": "America/New_York",
+        "proxyUsed": "basic",
+        "cacheState": "miss",
+        "indexId": "629f2b96-7e7e-44be-91f2-1d77be1694d3",
+        "creditsUsed": 1,
+        "concurrencyLimited": false
+      }
+    }
+  }
+}

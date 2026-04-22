@@ -113,7 +113,7 @@ Subscription Launch - Apr 2026 - Image Variants
 - **Description:** "From $30/week. Subscribe today."
 
 **Image 2:** `meta_feed_farm_to_table_1080x1080.png`
-- **Primary Text:** "We source from Black farmers. You get restaurant-quality greens, okra, yams, and more. Delivered every Thursday to your Hyde Park door."
+- **Primary Text:** "We source from Black farmers. You get restaurant-quality greens, okra, yams, and more. Delivered every Wednesday to your Hyde Park door."
 - **Headline:** "Farm-to-Table, Culture-Forward"
 - **Description:** "Black-owned. Chicago-based."
 
@@ -123,7 +123,7 @@ Subscription Launch - Apr 2026 - Image Variants
 - **Description:** "Subscribe from $30/week."
 
 **Image 4:** `meta_feed_whats_in_box_1080x1080.png`
-- **Primary Text:** "This week's Community Box ($55): Collard greens, okra, heirloom tomatoes, sweet potatoes, fresh herbs. Delivered Thursday. Cancel anytime."
+- **Primary Text:** "This week's Community Box ($55): Collard greens, okra, heirloom tomatoes, sweet potatoes, fresh herbs. Delivered Wednesday. Cancel anytime."
 - **Headline:** "What's in This Week's Box"
 - **Description:** "See all subscription tiers."
 
@@ -152,7 +152,7 @@ Subscription Launch - Apr 2026 - Image Variants
 - **Description:** "From $30/week."
 
 **Image 9:** `meta_story_offer_1080x1920.png`
-- **Primary Text:** "Free delivery on your first box with code FREESHIP. Subscribe today, get your first delivery this Thursday."
+- **Primary Text:** "Free delivery on your first box with code FREESHIP. Subscribe today, get your first delivery this Wednesday."
 - **Headline:** "Free Delivery This Week"
 - **Description:** "Use code FREESHIP."
 

@@ -64,7 +64,7 @@ export const sendPaymentFailedEmail = task({
         const customer = await fetchCustomer(stripeKey, payload.customerId);
         if (customer.name) {
           const parts = (customer.name as string).trim().split(/\s+/);
-          firstName = parts[0] || "there";
+          firstName = parts[0] || "friend";
           lastName = parts.slice(1).join(" ") || "";
         }
       } catch {
@@ -102,7 +102,7 @@ export const sendPaymentFailedEmail = task({
     <p style="font-size:14px;color:#666;">— The Uncle May's Team</p>
     <hr style="border:none;border-top:1px solid #eee;margin:32px 0;" />
     <p style="font-size:12px;color:#999;">
-      Uncle May's Produce &nbsp;|&nbsp; Chicago, IL &nbsp;|&nbsp;
+      Uncle May's Produce &nbsp;|&nbsp; Hyde Park, Chicago, IL &nbsp;|&nbsp;
       <a href="https://unclemays.com" style="color:#999;">unclemays.com</a>
     </p>
   </div>
@@ -123,7 +123,7 @@ export const sendPaymentFailedEmail = task({
 
     // Ensure contact is in Mailchimp before sending
     await upsertMailchimpContact(mailchimpKey, payload.email, {
-      first: firstName !== "there" ? firstName : undefined,
+      first: firstName !== "friend" ? firstName : undefined,
       last: lastName || undefined,
     }).catch((e: Error) => console.warn("Mailchimp upsert warning:", e.message));
 
