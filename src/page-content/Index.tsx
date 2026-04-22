@@ -10,7 +10,7 @@ import { Pricing } from "@/components/Pricing";
 const testimonials = [
   {
     quote: "The Family Box lasted us almost two weeks. The collard greens were better than anything I've found at Jewel-Osco, and the tomatoes from the farm actually tasted like tomatoes. Already ordered again.",
-    name: "Kiesha Watkins",
+    name: "Tiffany Watkins",
     location: "South Shore, Chicago",
     box: "Family Box",
   },
