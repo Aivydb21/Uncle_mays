@@ -106,11 +106,15 @@ export const EmailCaptureModal = ({
           >
             Get My Box →
           </button>
+
+          <p className="mt-3 text-xs text-muted-foreground text-center leading-relaxed">
+            By continuing, you agree to receive order updates and occasional product news from Uncle May&apos;s Produce. You can unsubscribe at any time.
+          </p>
         </form>
 
         <button
           onClick={onDismiss}
-          className="mt-3 w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
+          className="mt-2 w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
         >
           Skip — go straight to checkout
         </button>
