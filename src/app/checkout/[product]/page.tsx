@@ -214,15 +214,15 @@ export default function CheckoutSummaryPage() {
   const VALUE_ANCHORS: Record<string, { serving: string; guarantee: string }> = {
     starter: {
       serving: "~8 servings of fresh, seasonal produce",
-      guarantee: "100% freshness guarantee. Not happy? Full refund.",
+      guarantee: "Sourced to our standard. If it ever falls short, we make it right.",
     },
     family: {
       serving: "~14-18 servings: produce, eggs, and a whole chicken",
-      guarantee: "100% freshness guarantee. Not happy? Full refund.",
+      guarantee: "Sourced to our standard. If it ever falls short, we make it right.",
     },
     community: {
       serving: "~20-24 servings: heirloom produce + your choice of protein",
-      guarantee: "100% freshness guarantee. Not happy? Full refund.",
+      guarantee: "Sourced to our standard. If it ever falls short, we make it right.",
     },
   };
   const valueAnchor = VALUE_ANCHORS[slug] ?? {

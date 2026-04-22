@@ -162,7 +162,7 @@ function SubscriptionPaymentForm({
       {(() => {
         const anchor = VALUE_ANCHORS[checkout.product] ?? {
           serving: "~8 servings of fresh, seasonal produce",
-          guarantee: "100% freshness guarantee. Not happy? Full refund.",
+          guarantee: "Sourced to our standard. If it ever falls short, we make it right.",
         };
         return (
           <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 px-3 py-3">
@@ -183,7 +183,7 @@ function SubscriptionPaymentForm({
         <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
         </svg>
-        <span className="text-sm text-green-800 font-medium">Cancel anytime, no questions asked</span>
+        <span className="text-sm text-green-800 font-medium">Flexible — pause or cancel before your next delivery</span>
       </div>
 
       {/* FTC / Illinois ILCS 601 auto-renewal disclosure */}
