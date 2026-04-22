@@ -23,7 +23,7 @@
 
 **Body:**
 
-> Hi *|FNAME|default:friend*,
+> *|IF:FNAME|*Hi *|FNAME|*,*|ELSE:|*Hi friend,*|END:IF|*
 >
 > Welcome to Uncle May's Produce.
 >
@@ -56,7 +56,7 @@
 
 **Body:**
 
-> Hi *|FNAME|default:friend*,
+> *|IF:FNAME|*Hi *|FNAME|*,*|ELSE:|*Hi friend,*|END:IF|*
 >
 > Most grocery produce gets picked green, shipped 1,500 miles, gassed to ripen, and sits on a shelf under fluorescent lights for two weeks before you take it home.
 >
@@ -85,7 +85,7 @@
 
 **Body:**
 
-> Hi *|FNAME|default:friend*,
+> *|IF:FNAME|*Hi *|FNAME|*,*|ELSE:|*Hi friend,*|END:IF|*
 >
 > Quick one.
 >
