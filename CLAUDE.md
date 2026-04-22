@@ -3,6 +3,13 @@
 > ### 🟢 Customer-facing single source of truth: [`customer-facts.md`](./customer-facts.md)
 > Delivery day, pricing, active promo codes, cutoff times, and brand positioning that customers can see live on the site live in `customer-facts.md`. **Any agent writing ads, emails, social posts, or landing-page copy MUST read `customer-facts.md` first.** Do not use older planning docs (`emergency-promotion-*`, `promo-launch-offer-*`, `AD-COPY-TEMPLATES.md`, etc.) as authoritative — they contain retired promo codes (WELCOME20, LAUNCH20, FREESHIP, first-order $30) that are no longer live.
 
+> ### 🚢 Deploy target: `uncle-mays` Vercel project (ONLY)
+> - Production domain: **unclemays.com** → aliased to the `uncle-mays` Vercel project (`prj_jwMT8iMOmaEdETzwnsKYBrg2lPoI`).
+> - Local folder `um_website/` is linked to this project via `.vercel/project.json`. Every `git push` to `Aivydb21/Uncle_mays` main auto-deploys to production here.
+> - **Do NOT create another Vercel project under any circumstance without explicit CEO approval.** A stale `business` Vercel project was auto-created earlier and silently double-deployed every push; it has since been deleted. Keeping a single project prevents wasted build minutes, prevents confusion, and keeps logs/analytics in one place.
+> - If an agent or workflow appears to be trying to `vercel link` to a new project, `vercel project add`, or `vercel deploy` against a fresh name, **stop and escalate** to the CEO before proceeding.
+> - Paperclip, pm2 (`ecosystem.config.cjs`), and all scripts must point at `C:\Users\Anthony\Desktop\um_website\` — never `business/`, which has been archived to `_archive/business-2026-04-22/`.
+
 ## Business
 Uncle May's Produce is the first data and distribution platform for Black food consumption. The company operates neighborhood-format grocery stores (7,500–12,000 sq ft) targeting historically Black American and culturally thriving urban communities with higher willingness to pay.
 
