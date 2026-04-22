@@ -10,19 +10,19 @@ import { Pricing } from "@/components/Pricing";
 const testimonials = [
   {
     quote: "The Family Box lasted us almost two weeks. The collard greens were better than anything I've found at Jewel-Osco, and the tomatoes from the farm actually tasted like tomatoes. Already ordered again.",
-    name: "Kiesha",
+    name: "Kiesha Watkins",
     location: "South Shore, Chicago",
     box: "Family Box",
   },
   {
     quote: "I ordered the Starter Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The asparagus and greens were gone in two days.",
-    name: "Rob",
+    name: "Damon Carter",
     location: "Bronzeville, Chicago",
     box: "Starter Box",
   },
   {
     quote: "We split a Community Box between three families on our block. Came out to about $32 each for produce that would've cost us double at the store. Already planning our next order.",
-    name: "Shonda",
+    name: "Shonda Williams",
     location: "Hyde Park, Chicago",
     box: "Community Box",
   },
