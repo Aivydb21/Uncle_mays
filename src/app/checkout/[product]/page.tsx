@@ -2,7 +2,7 @@
 
 import { useParams, notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
@@ -67,7 +67,15 @@ export default function CheckoutSummaryPage() {
 
   const product = PRODUCTS[slug];
   const proteinIncluded = product.proteinIncluded;
-  const availableProteins = getAvailableProteins(product);
+  // Memoize so the reference is stable for a given product slug.
+  // Without useMemo this was a new array on every render, which — when
+  // placed in a useEffect dep list that also calls setState — caused an
+  // infinite re-render loop on Family Box (auto-select triggers setState,
+  // which creates a new availableProteins ref, which re-runs the effect,
+  // which calls setState again, etc.). React then throws "Maximum update
+  // depth exceeded" which breaks hydration for the entire page and leaves
+  // every button inert — the symptom CEO reported.
+  const availableProteins = useMemo(() => getAvailableProteins(product), [slug]);
 
   const effectivePrice = product.price;
 

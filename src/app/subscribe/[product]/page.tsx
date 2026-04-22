@@ -2,7 +2,7 @@
 
 import { useParams, notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
@@ -66,7 +66,8 @@ export default function SubscribeSummaryPage() {
 
   const product = PRODUCTS[slug];
   const proteinIncluded = product.proteinIncluded;
-  const availableProteins = getAvailableProteins(product);
+  // Stable reference for a given slug (see matching note in checkout/[product]/page.tsx)
+  const availableProteins = useMemo(() => getAvailableProteins(product), [slug]);
 
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
   const [email, setEmail] = useState("");
@@ -143,11 +144,18 @@ export default function SubscribeSummaryPage() {
       if (saved) {
         const parsed = JSON.parse(saved) as ProteinId[];
         setSelectedProteins(parsed);
+      } else if (proteinIncluded && availableProteins.length === 1) {
+        // Auto-select the only included protein (Family box = chicken) so the
+        // Continue button isn't trapped disabled on first visit. Matches
+        // checkout/[product]/page.tsx behavior.
+        const autoSelected = [availableProteins[0].id];
+        setSelectedProteins(autoSelected);
+        sessionStorage.setItem(`unc-sub-proteins-${slug}`, JSON.stringify(autoSelected));
       }
     } catch {
       // ignore
     }
-  }, [slug]);
+  }, [slug, proteinIncluded, availableProteins]);
 
   // Always single-select (radio): selecting a new protein replaces the previous one
   function toggleProtein(id: ProteinId) {
