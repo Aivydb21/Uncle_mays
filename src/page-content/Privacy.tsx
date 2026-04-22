@@ -17,7 +17,7 @@ const Privacy = () => {
                 Privacy Policy
               </h1>
               <p className="text-xl text-primary-foreground/80">
-                Last updated: {new Date().toLocaleDateString()}
+                Last updated: April 22, 2026
               </p>
             </motion.div>
           </div>
