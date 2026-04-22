@@ -221,7 +221,7 @@ export default function CheckoutSummaryPage() {
       ],
     },
     family: {
-      headline: "Same groceries. $30 less than Whole Foods delivered.",
+      headline: "Better quality than Whole Foods. $30 less, delivered.",
       bullets: [
         "No chemical washes on your produce",
         "No chemical bath on your meat",
@@ -316,7 +316,6 @@ export default function CheckoutSummaryPage() {
             {/* First-order discount callout */}
             {isFirstOrderDiscount ? (
               <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2.5 text-sm text-primary font-medium">
-                <span>🎉</span>
                 <span>First-order discount applied — you save ${product.price - effectivePrice}!</span>
               </div>
             ) : null}

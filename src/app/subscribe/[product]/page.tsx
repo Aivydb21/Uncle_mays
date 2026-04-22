@@ -7,6 +7,7 @@ import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ShieldCheck, Truck, Leaf } from "lucide-react";
 
 function getAvailableProteins(product: typeof PRODUCTS[ProductSlug]) {
   const allowed = "proteinOptions" in product ? (product.proteinOptions as ProteinId[]) : null;
@@ -293,16 +294,18 @@ export default function SubscribeSummaryPage() {
 
             {/* Trust signals */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
-              {[
-                { icon: "🔄", text: "Cancel anytime, no fees" },
-                { icon: "🚚", text: "Free delivery, every Wednesday" },
-                { icon: "🌱", text: "Locally sourced, Black-owned farms" },
-              ].map(({ icon, text }) => (
-                <div key={text} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span>{icon}</span>
-                  <span>{text}</span>
-                </div>
-              ))}
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
+                <span>Cancel anytime, no fees</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Truck className="h-4 w-4 text-primary shrink-0" />
+                <span>Free delivery, every Wednesday</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Leaf className="h-4 w-4 text-primary shrink-0" />
+                <span>Locally sourced, Black-owned farms</span>
+              </div>
             </div>
 
             {/* Email capture — earliest possible point for abandoned cart recovery */}
