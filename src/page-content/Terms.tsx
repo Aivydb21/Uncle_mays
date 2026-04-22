@@ -105,8 +105,7 @@ const Terms = () => {
                     <div>
                       <h3 className="text-xl font-semibold mb-2">Refunds</h3>
                       <p>
-                        Refunds are handled on a case-by-case basis. If you are unsatisfied with your order, please contact us 
-                        within 48 hours of delivery for assistance.
+                        If you are not satisfied with your order for any reason, contact us at info@unclemays.com within 48 hours of delivery and we will provide a full refund, no questions asked. Refunds are processed within 5-7 business days.
                       </p>
                     </div>
                   </div>
