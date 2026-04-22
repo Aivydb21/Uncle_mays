@@ -34,9 +34,9 @@ const features = [
   },
   {
     icon: ShieldCheck,
-    title: "No Subscription",
+    title: "Flexible Ordering",
     description:
-      "Order when you want. No lock-in, no commitment. Boxes start at $35. Pay only when you order.",
+      "Order one-time whenever you want, or subscribe weekly and save 10%. No long-term commitment on either option.",
   },
 ];
 
@@ -46,7 +46,7 @@ const steps = [
     step: "01",
     title: "Choose Your Box",
     description:
-      "Pick the box size that works for your household: Starter, Family, or Community. All boxes are one-time purchases. No subscription required.",
+      "Pick the box size that works for your household: Starter, Family, or Community. Order one-time or subscribe weekly and save 10%.",
   },
   {
     icon: Package,
@@ -67,7 +67,7 @@ const steps = [
 const faqs = [
   {
     q: "Do I need a subscription?",
-    a: "No. Every box is a one-time purchase. Order when it works for you. If you'd like regular deliveries, reach out to info@unclemays.com and we can set up a recurring schedule.",
+    a: "No subscription required. You can order any box as a one-time purchase whenever you want. If you'd like regular weekly deliveries, we also offer a Subscribe & Save option that takes 10% off every box. You can cancel anytime.",
   },
   {
     q: "What if I have an issue with my order?",
@@ -83,11 +83,11 @@ const faqs = [
   },
   {
     q: "How much does a box cost?",
-    a: "The Starter Box is $35 (~12-15 lbs of produce). The Family Box is $65 and includes 10 seasonal produce items, a dozen farm eggs, and pasture-raised whole chicken. The Community Box is $95 and includes 10 specialty and heirloom produce items, a dozen farm eggs, and your choice of one protein (chicken, pork chops, beef short ribs, or salmon). No subscription required. Order when you want.",
+    a: "The Starter Box is $35 one-time ($31.50/wk with a subscription). The Family Box is $65 one-time ($58.50/wk with a subscription) and includes 10 seasonal produce items, a dozen farm eggs, and pasture-raised whole chicken. The Community Box is $95 one-time ($85.50/wk with a subscription) and includes 10 specialty and heirloom produce items, a dozen farm eggs, and your choice of one protein (chicken, pork chops, beef short ribs, or salmon). Subscribe & Save takes 10% off every box. Cancel anytime.",
   },
   {
-    q: "How do I cancel my order?",
-    a: "There's nothing to cancel. Every box is a one-time purchase with no recurring charges. If you need to modify or cancel an order you've already placed, email info@unclemays.com as soon as possible and we'll take care of it.",
+    q: "How do I cancel my subscription or order?",
+    a: "If you have a weekly subscription, you can cancel anytime by emailing info@unclemays.com and we'll stop future deliveries immediately. If you need to modify or cancel a one-time order you've already placed, email us as soon as possible and we'll take care of it.",
   },
 ];
 

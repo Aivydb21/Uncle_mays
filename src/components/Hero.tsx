@@ -4,8 +4,6 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Truck, Star } from "lucide-react";
 import Link from "next/link";
-import { DeadlineCountdown } from "@/components/DeadlineCountdown";
-
 const heroImage = "/images/hero-produce.jpg";
 
 export const Hero = () => {
@@ -51,11 +49,6 @@ export const Hero = () => {
               First box from <span className="font-semibold text-foreground">$30</span>.
             </p>
 
-            {/* Cutoff countdown */}
-            <div className="mb-8">
-              <DeadlineCountdown variant="inline" />
-            </div>
-
             {/* Dominant above-fold CTA */}
             <Button
               size="lg"
@@ -78,7 +71,7 @@ export const Hero = () => {
             <span aria-hidden="true">•</span>
             <span className="font-semibold text-foreground/90">Chicago-wide delivery</span>
             <span aria-hidden="true">•</span>
-            <span className="font-semibold text-foreground/90">No subscription required</span>
+            <span className="font-semibold text-foreground/90">One-time or subscribe &amp; save</span>
             <span aria-hidden="true">•</span>
             <span className="inline-flex items-center gap-1 font-semibold text-foreground/90">
               <Star className="h-3.5 w-3.5 fill-primary text-primary" />

@@ -4,7 +4,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { DeadlineCountdown } from "@/components/DeadlineCountdown";
 import { PRODUCTS } from "@/lib/products";
 
 declare global {
@@ -147,9 +146,6 @@ export const Pricing = () => {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Seasonal, rotating produce sourced directly from Black farmers and delivered to your Chicago door every Wednesday.
           </p>
-          <div className="flex justify-center mt-4">
-            <DeadlineCountdown variant="inline" />
-          </div>
         </motion.div>
 
         {/* Subscription / One-Time toggle */}
@@ -263,12 +259,6 @@ export const Pricing = () => {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Tier recommendation bar */}
-        <div className="max-w-6xl mx-auto mt-4 rounded-xl bg-muted/50 px-6 py-3 text-sm text-muted-foreground text-center">
-          <span className="font-semibold text-foreground">Not sure which box?</span>{" "}
-          1-2 people: Starter. &middot; Family of 4: Family (chicken included, best value). &middot; Large household or splitting with neighbors: Community.
         </div>
 
         {/* Produce box image */}
