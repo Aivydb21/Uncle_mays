@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DeadlineCountdown } from "@/components/DeadlineCountdown";
+import { PRODUCTS } from "@/lib/products";
 
 declare global {
   interface Window {
@@ -18,42 +19,67 @@ const produceBoxImage = "/images/produce-box.jpg";
 const plans = [
   {
     name: "Starter Box",
-    description: "1-2 people",
+    description: "A focused weekly haul for 1–2 people",
     oneTimePrice: "$35",
     subPrice: "$31.50",
     subFrequency: "/wk",
-    bullets: [
-      "6 seasonal vegetables, ~8 servings",
-      "No chemicals, no wax coatings",
-      "Delivered fresh every Wednesday",
+    priceAnchor: "Updated weekly · Spring/Summer mix",
+    features: [
+      "Collard greens — 1 bunch",
+      "Asparagus — 1 lb",
+      "Spring onions — 1 bunch",
+      "Heirloom cherry tomatoes — 1 pint",
+      "Persian cucumbers — 4 ct",
+      "Snap peas — 1/2 lb",
     ],
     checkoutSlug: "starter",
   },
   {
     name: "Family Box",
-    description: "Family of 4",
+    description: "Feeds a family of 4. Enough variety to fill out the week",
     oneTimePrice: "$65",
     subPrice: "$58.50",
     subFrequency: "/wk",
-    bullets: [
-      "12 items — whole chicken + dozen eggs included",
-      "Best value per serving",
-      "Delivered fresh every Wednesday",
+    priceAnchor: "Updated weekly · Spring/Summer mix",
+    features: [
+      "Collard greens — 2 bunches",
+      "Asparagus — 1.5 lb",
+      "Spring onions — 2 bunches",
+      "Heirloom cherry tomatoes — 1 pint",
+      "Persian cucumbers — 6 ct",
+      "Snap peas — 1 lb",
+      "Rainbow chard — 1 bunch",
+      "Strawberries — 1 quart",
+      "Early beets with tops — 1 bunch",
+      "Zucchini — 2 ct",
+      "Farm eggs — 1 dozen",
+      "Pasture-raised whole chicken — included",
     ],
     popular: true,
+    proteinAddon: "included-chicken" as const,
     checkoutSlug: "family",
   },
   {
     name: "Community Box",
-    description: "Specialty & heirloom",
+    description: "Specialty and heirloom varieties for the adventurous cook",
     oneTimePrice: "$95",
     subPrice: "$85.50",
     subFrequency: "/wk",
-    bullets: [
-      "Specialty and heirloom varieties",
-      "Choice of protein included",
-      "Delivered fresh every Wednesday",
+    priceAnchor: "Updated weekly · Spring/Summer mix",
+    features: [
+      "Watermelon radishes — 1 bunch",
+      "Fairy tale eggplant — 1/2 lb",
+      "Shishito peppers — 1/2 lb",
+      "Hakurei turnips with greens — 1 bunch",
+      "Sunburst cherry tomatoes — 1 pint",
+      "Pattypan squash — 1/2 lb",
+      "Dragon tongue beans — 1/2 lb",
+      "Rainbow chard — 1 bunch",
+      "Heirloom cucumber — 2 ct",
+      "Ramps — 1/2 lb",
+      "Farm eggs — 1 dozen",
     ],
+    proteinAddon: "included-choice" as const,
     checkoutSlug: "community",
   },
 ];
@@ -159,7 +185,7 @@ export const Pricing = () => {
           </p>
         )}
 
-        <div className="grid lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-10">
+        <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto mb-10">
           {plans.map((plan, index) => (
             <div key={index} className="relative z-10">
               {plan.popular && (
@@ -168,37 +194,58 @@ export const Pricing = () => {
                 </div>
               )}
               <div
-                className={`bg-card rounded-2xl p-6 shadow-soft h-full flex flex-col relative z-10 ${
-                  plan.popular ? "border-2 border-secondary shadow-medium" : "border border-border"
+                className={`bg-card rounded-2xl p-8 shadow-soft h-full flex flex-col relative z-10 ${
+                  plan.popular ? "border-2 border-secondary shadow-medium" : ""
                 }`}
               >
-                <div className="mb-1">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{plan.description}</span>
-                </div>
-                <h3 className="text-xl font-bold mb-4">{plan.name}</h3>
-                <div className="mb-5">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-bold text-primary">
+                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                <p className="text-muted-foreground mb-6">{plan.description}</p>
+                <div className="mb-6">
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className="text-5xl font-bold text-primary">
                       {isSubscription ? plan.subPrice : plan.oneTimePrice}
                     </span>
                     {isSubscription && (
-                      <span className="text-muted-foreground text-sm">{plan.subFrequency}</span>
+                      <span className="text-muted-foreground text-base">{plan.subFrequency}</span>
                     )}
                   </div>
                   {isSubscription && (
-                    <p className="text-xs text-muted-foreground mt-0.5">
+                    <p className="text-xs text-muted-foreground line-through">
                       {plan.oneTimePrice} one-time
                     </p>
                   )}
+                  <p className="text-xs font-medium text-primary/80 mt-1">{plan.priceAnchor}</p>
+                  <p className="text-sm text-primary/80 font-medium mt-2">
+                    {PRODUCTS[plan.checkoutSlug as keyof typeof PRODUCTS].servingNote}
+                  </p>
+                  <p className="text-sm font-semibold mt-3">
+                    Order by Tuesday 11:59pm. Delivered this Wednesday.
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    100% freshness guarantee. Not happy? Full refund, no questions.
+                  </p>
                 </div>
-                <ul className="space-y-2 mb-6 flex-grow">
-                  {plan.bullets.map((bullet, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-foreground/80">{bullet}</span>
+                <ul className="space-y-3 mb-8 flex-grow">
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground/80">{feature}</span>
                     </li>
                   ))}
                 </ul>
+                {plan.proteinAddon === "included-chicken" && (
+                  <p className="text-xs text-primary/70 font-medium text-center mb-2">
+                    Whole chicken included — no extra charge
+                  </p>
+                )}
+                {plan.proteinAddon === "included-choice" && (
+                  <p className="text-xs text-primary/70 font-medium text-center mb-2">
+                    Your choice of protein included — chicken, pork, beef, or salmon
+                  </p>
+                )}
+                <p className="text-xs text-muted-foreground text-center mb-4">
+                  Checkout is handled securely through Stripe. Takes under 60 seconds.
+                </p>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();

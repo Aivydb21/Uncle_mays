@@ -3,6 +3,47 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
+
+const plans = [
+  {
+    name: "Starter Box",
+    description: "1-2 people",
+    subPrice: "$31.50",
+    subFrequency: "/wk",
+    bullets: [
+      "6 seasonal vegetables, ~8 servings",
+      "No chemicals, no wax coatings",
+      "Delivered fresh every Wednesday",
+    ],
+    slug: "starter",
+  },
+  {
+    name: "Family Box",
+    description: "Family of 4",
+    subPrice: "$58.50",
+    subFrequency: "/wk",
+    bullets: [
+      "12 items — whole chicken + dozen eggs included",
+      "Best value per serving",
+      "Delivered fresh every Wednesday",
+    ],
+    popular: true,
+    slug: "family",
+  },
+  {
+    name: "Community Box",
+    description: "Specialty & heirloom",
+    subPrice: "$85.50",
+    subFrequency: "/wk",
+    bullets: [
+      "Specialty and heirloom varieties",
+      "Choice of protein included",
+      "Delivered fresh every Wednesday",
+    ],
+    slug: "community",
+  },
+];
 
 export default function ManageSubscriptionContent() {
   const [email, setEmail] = useState("");
@@ -61,39 +102,86 @@ export default function ManageSubscriptionContent() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-16">
-      <div className="max-w-md w-full text-center space-y-6">
-        <h1 className="text-3xl font-bold">Manage Your Subscription</h1>
-        <p className="text-muted-foreground leading-relaxed">
-          Enter the email address you used at checkout. You&apos;ll be taken directly to the Stripe portal where you can cancel, pause, or update your billing.
-        </p>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <Button
-            type="submit"
-            size="lg"
-            className="rounded-xl w-full"
-            disabled={loading}
-          >
-            {loading ? "Looking up…" : "Go to Subscription Portal"}
+    <div className="min-h-screen px-6 py-16">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold mb-3">Manage Your Subscription</h1>
+          <p className="text-muted-foreground leading-relaxed max-w-md mx-auto">
+            Upgrade, downgrade, pause, or cancel — all from the Stripe portal. Enter your email to get started.
+          </p>
+        </div>
+
+        {/* Plan overview */}
+        <div className="grid sm:grid-cols-3 gap-4 mb-10">
+          {plans.map((plan) => (
+            <div
+              key={plan.slug}
+              className={`bg-card rounded-2xl p-5 flex flex-col relative ${
+                plan.popular ? "border-2 border-secondary shadow-medium" : "border border-border"
+              }`}
+            >
+              {plan.popular && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-white px-4 py-1 rounded-full text-xs font-semibold">
+                  Most Popular
+                </div>
+              )}
+              <div className="mb-1">
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{plan.description}</span>
+              </div>
+              <h3 className="text-lg font-bold mb-3">{plan.name}</h3>
+              <div className="flex items-baseline gap-1 mb-4">
+                <span className="text-3xl font-bold text-primary">{plan.subPrice}</span>
+                <span className="text-muted-foreground text-sm">{plan.subFrequency}</span>
+              </div>
+              <ul className="space-y-2 flex-grow">
+                {plan.bullets.map((bullet, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-foreground/80">{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Email form */}
+        <div className="max-w-md mx-auto text-center space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Enter the email you used at checkout to access your subscription portal.
+          </p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <Button
+              type="submit"
+              size="lg"
+              className="rounded-xl w-full"
+              disabled={loading}
+            >
+              {loading ? "Looking up…" : "Go to Subscription Portal"}
+            </Button>
+          </form>
+          {error && !sent && (
+            <p className="text-sm text-destructive">{error}</p>
+          )}
+          <p className="text-xs text-muted-foreground">
+            Questions? Email{" "}
+            <a href="mailto:info@unclemays.com" className="underline">
+              info@unclemays.com
+            </a>
+          </p>
+          <Button asChild variant="ghost" className="rounded-xl">
+            <Link href="/">Back to home</Link>
           </Button>
-        </form>
-        <p className="text-xs text-muted-foreground">
-          Questions? Email{" "}
-          <a href="mailto:info@unclemays.com" className="underline">
-            info@unclemays.com
-          </a>
-        </p>
-        <Button asChild variant="ghost" className="rounded-xl">
-          <Link href="/">Back to home</Link>
-        </Button>
+        </div>
       </div>
     </div>
   );
