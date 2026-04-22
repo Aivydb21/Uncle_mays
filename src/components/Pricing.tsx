@@ -145,7 +145,7 @@ export const Pricing = () => {
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose Your Box</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Seasonal, rotating produce sourced directly from Black farmers and delivered to your Chicago door every Sunday.
+            Seasonal, rotating produce sourced directly from Black farmers and delivered to your Chicago door every Wednesday.
           </p>
           <div className="flex justify-center mt-4">
             <DeadlineCountdown variant="inline" />
@@ -219,7 +219,7 @@ export const Pricing = () => {
                     {PRODUCTS[plan.checkoutSlug as keyof typeof PRODUCTS].servingNote}
                   </p>
                   <p className="text-sm font-semibold mt-3">
-                    Order by Thursday 11:59pm. Delivered this Sunday.
+                    Order by Tuesday 11:59pm. Delivered this Wednesday.
                   </p>
                   <p className="text-xs text-muted-foreground mt-2">
                     100% freshness guarantee. Not happy? Full refund, no questions.

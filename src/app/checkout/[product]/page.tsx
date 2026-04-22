@@ -285,7 +285,7 @@ export default function CheckoutSummaryPage() {
                   {product.name}
                 </h1>
                 <p className="text-muted-foreground text-sm mt-1">
-                  Delivered fresh every Sunday
+                  Delivered fresh every Wednesday
                 </p>
               </div>
               <div className="text-right shrink-0">

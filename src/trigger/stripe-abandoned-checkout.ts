@@ -143,7 +143,7 @@ async function sendEmail(
       for Black families who want quality they can count on.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      Complete your order now and get Sunday delivery. Questions? Call us anytime at
+      Complete your order now and get Wednesday delivery. Questions? Call us anytime at
       <strong>(312) 972-2595</strong>.
     </p>
     <p style="margin:32px 0;">
@@ -165,7 +165,7 @@ async function sendEmail(
 
 You started an order for premium produce from Uncle May's but didn't finish. Your items are still in your cart, ready to go. We curate every box with care for Black families who want quality they can count on.
 
-Complete your order now and get Sunday delivery. Questions? Call us anytime at (312) 972-2595.
+Complete your order now and get Wednesday delivery. Questions? Call us anytime at (312) 972-2595.
 
 ${checkoutUrl}
 
@@ -174,17 +174,17 @@ Uncle May's Produce | Chicago, IL
 unclemays.com | info@unclemays.com`;
   } else if (emailNumber === 2) {
     // Email 2: Urgency Reminder (24 hours after abandonment)
-    subjectLine = "Order by Thursday for Sunday delivery";
+    subjectLine = "Order by Tuesday for Wednesday delivery";
     previewText = "89% of our customers refer friends. Your box is almost ready.";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Arial,sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
   <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
-    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Order by Thursday for Sunday delivery</h2>
+    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Order by Tuesday for Wednesday delivery</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
-      We saved your cart, but time is running out. To get your fresh produce delivered this Sunday,
+      We saved your cart, but time is running out. To get your fresh produce delivered this Wednesday,
       you need to complete your order by Thursday.
     </p>
     <p style="font-size:16px;line-height:1.6;">
@@ -212,7 +212,7 @@ unclemays.com | info@unclemays.com`;
 </html>`;
     plainText = `Hi ${firstName},
 
-We saved your cart, but time is running out. To get your fresh produce delivered this Sunday, you need to complete your order by Thursday.
+We saved your cart, but time is running out. To get your fresh produce delivered this Wednesday, you need to complete your order by Thursday.
 
 Uncle May's isn't your average grocery box. We curate premium produce for Black communities that deserve the best. 89% of our customers refer friends and family because they trust what we deliver.
 
@@ -226,7 +226,7 @@ unclemays.com | info@unclemays.com`;
   } else {
     // Email 3: Final Urgency (48 hours after abandonment)
     subjectLine = "Last chance: Limited boxes left this week";
-    previewText = "We only have a few boxes left for Sunday delivery. Order now or miss out.";
+    previewText = "We only have a few boxes left for Wednesday delivery. Order now or miss out.";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -235,7 +235,7 @@ unclemays.com | info@unclemays.com`;
     <h2 style="font-size:22px;margin-bottom:16px;color:#d9534f;">Last chance: Limited boxes left this week</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
-      This is your final reminder. We have limited boxes available for Sunday delivery, and your cart
+      This is your final reminder. We have limited boxes available for Wednesday delivery, and your cart
       is still sitting there. Once they're gone, you'll have to wait until next week.
     </p>
     <p style="font-size:16px;line-height:1.6;">
@@ -262,7 +262,7 @@ unclemays.com | info@unclemays.com`;
 </html>`;
     plainText = `Hi ${firstName},
 
-This is your final reminder. We have limited boxes available for Sunday delivery, and your cart is still sitting there. Once they're gone, you'll have to wait until next week.
+This is your final reminder. We have limited boxes available for Wednesday delivery, and your cart is still sitting there. Once they're gone, you'll have to wait until next week.
 
 Our customers love Uncle May's because we bring quality produce to neighborhoods that have been overlooked for too long. Don't miss your chance to join them this week.
 

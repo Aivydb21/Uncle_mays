@@ -3,18 +3,18 @@
 import { useState, useEffect } from "react";
 
 /**
- * Returns the next Thursday 11:59pm (Chicago time as a local JS Date).
- * If today is Thursday before 11:59pm, returns this Thursday.
- * Otherwise returns next Thursday.
+ * Returns the next Tuesday 11:59pm (Chicago time as a local JS Date).
+ * If today is Tuesday before 11:59pm, returns this Tuesday.
+ * Otherwise returns next Tuesday.
  */
 function getNextCutoff(): Date {
   const now = new Date();
-  const day = now.getDay(); // 0=Sun, 4=Thu
-  const daysUntilThursday = (4 - day + 7) % 7;
+  const day = now.getDay(); // 0=Sun, 2=Tue
+  const daysUntilTuesday = (2 - day + 7) % 7;
   const cutoff = new Date(now);
-  cutoff.setDate(now.getDate() + daysUntilThursday);
+  cutoff.setDate(now.getDate() + daysUntilTuesday);
   cutoff.setHours(23, 59, 0, 0);
-  // If we're past this Thursday's cutoff, use next Thursday
+  // If we're past this Tuesday's cutoff, use next Tuesday
   if (cutoff <= now) {
     cutoff.setDate(cutoff.getDate() + 7);
   }
@@ -22,12 +22,12 @@ function getNextCutoff(): Date {
 }
 
 /**
- * Returns the Sunday following the next cutoff Thursday.
+ * Returns the Wednesday following the next cutoff Tuesday.
  */
 function getNextDeliveryDate(): Date {
   const cutoff = getNextCutoff();
   const delivery = new Date(cutoff);
-  delivery.setDate(cutoff.getDate() + 3); // Thu -> Sun
+  delivery.setDate(cutoff.getDate() + 1); // Tue -> Wed
   delivery.setHours(0, 0, 0, 0);
   return delivery;
 }
@@ -104,7 +104,7 @@ export function DeadlineCountdown({ variant = "box" }: Props) {
             · Delivers {deliveryLabel}
           </span>
         ) : (
-          <span>Order by Thursday 11:59pm · Delivers {deliveryLabel}</span>
+          <span>Order by Tuesday 11:59pm · Delivers {deliveryLabel}</span>
         )}
       </div>
     );
@@ -117,7 +117,7 @@ export function DeadlineCountdown({ variant = "box" }: Props) {
         <span className="text-2xl">⏰</span>
         <div className="flex-1">
           <p className={`text-sm font-semibold mb-1 ${urgencyColor}`}>
-            Order by Thursday 11:59pm for delivery this Sunday
+            Order by Tuesday 11:59pm for delivery this Wednesday
           </p>
           {timeLeft && timeLeft.total > 0 ? (
             <div className="flex gap-3 mt-2">

@@ -126,7 +126,7 @@ async function sendRecoveryEmail(
       for Black families who want quality they can count on.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      Complete your order now and get Sunday delivery. Questions? Call us anytime at
+      Complete your order now and get Wednesday delivery. Questions? Call us anytime at
       <strong>(312) 972-2595</strong>.
     </p>
     <p style="margin:32px 0;">
@@ -149,7 +149,7 @@ async function sendRecoveryEmail(
 
 You started an order for premium produce from Uncle May's but didn't finish. Your items are still in your cart, ready to go. We curate every box with care for Black families who want quality they can count on.
 
-Complete your order now and get Sunday delivery. Questions? Call us anytime at (312) 972-2595.
+Complete your order now and get Wednesday delivery. Questions? Call us anytime at (312) 972-2595.
 
 ${checkoutUrl}
 
