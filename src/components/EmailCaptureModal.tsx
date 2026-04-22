@@ -95,6 +95,9 @@ export const EmailCaptureModal = ({
               autoComplete="tel"
               className="w-full border border-border rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
+            <p className="text-muted-foreground text-xs mt-2">
+              By providing your phone number, you consent to receive automated order and delivery text messages from Uncle May&apos;s Produce. Standard message and data rates may apply. Reply STOP to opt out.
+            </p>
           </div>
 
           <button
