@@ -319,10 +319,12 @@ export default function CheckoutSummaryPage() {
               {proteinIncluded ? (
                 <>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                    Choose Your Protein: Included
+                    {availableProteins.length === 1 ? "Your Included Protein" : "Choose Your Protein: Included"}
                   </h2>
                   <p className="text-xs text-muted-foreground mb-3">
-                    Protein is included with your box at no extra charge. Select one.
+                    {availableProteins.length === 1
+                      ? "Tap to confirm your included protein — no extra charge."
+                      : "Protein is included with your box at no extra charge. Select one."}
                   </p>
                 </>
               ) : (
@@ -435,9 +437,20 @@ export default function CheckoutSummaryPage() {
               />
             </div>
 
+            {/* Protein required but not selected — show inline error (UNC-560) */}
+            {proteinIncluded && selectedProteins.length === 0 ? (
+              <p className="text-sm text-destructive font-medium text-center mb-2">
+                Please select your included protein above to continue.
+              </p>
+            ) : null}
+
             {/* CTA */}
             <button
+              disabled={proteinIncluded && selectedProteins.length === 0}
               onClick={() => {
+                // Guard: don't proceed without required protein
+                if (proteinIncluded && selectedProteins.length === 0) return;
+
                 // Fire InitiateCheckout on user action, not page load (UNC-559)
                 try {
                   const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
@@ -478,15 +491,10 @@ export default function CheckoutSummaryPage() {
                 }
                 router.push(`/checkout/${slug}/delivery`);
               }}
-              className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft"
+              className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Continue to Delivery →
             </button>
-            {proteinIncluded && selectedProteins.length === 0 ? (
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                Don&apos;t forget to select your protein above before continuing.
-              </p>
-            ) : null}
           </div>
         </div>
       </div>
