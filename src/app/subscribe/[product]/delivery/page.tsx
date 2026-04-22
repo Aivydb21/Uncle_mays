@@ -131,6 +131,12 @@ export default function SubscribeDeliveryPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [leadFired, setLeadFired] = useState(false);
+  const [deliveryDateLabel, setDeliveryDateLabel] = useState("Wednesday");
+
+  useEffect(() => {
+    const d = getEarliestDeliveryDate();
+    setDeliveryDateLabel(d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }));
+  }, []);
 
   // Pre-fill email from Step 1 capture (sessionStorage)
   useEffect(() => {
@@ -155,20 +161,27 @@ export default function SubscribeDeliveryPage() {
   }
 
   function handleEmailBlur() {
-    if (
-      !leadFired &&
-      fields.email.trim() &&
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())
-    ) {
-      setLeadFired(true);
-      try {
-        if (typeof window !== "undefined") {
-          if (window.fbq) window.fbq("track", "Lead");
-          if (window.gtag) window.gtag("event", "generate_lead");
+    const email = fields.email.trim();
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (!leadFired) {
+        setLeadFired(true);
+        try {
+          if (typeof window !== "undefined") {
+            if (window.fbq) window.fbq("track", "Lead");
+            if (window.gtag) window.gtag("event", "generate_lead");
+          }
+        } catch {
+          // Never block checkout for tracking failures
         }
-      } catch {
-        // Never block checkout for tracking failures
       }
+      // Capture email to Mailchimp for abandoned cart recovery — fire-and-forget.
+      fetch("/api/capture-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, product: slug }),
+      }).catch(() => {
+        // Intentionally swallowed — email capture must never interrupt checkout
+      });
     }
   }
 
@@ -418,7 +431,7 @@ export default function SubscribeDeliveryPage() {
                 {/* Delivery info — Wednesday, auto-assigned */}
                 <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary/5 px-4 py-2.5 text-sm text-primary border border-primary/20">
                   <span>🚚</span>
-                  <span>We deliver every <strong>Wednesday</strong>. Your first delivery will be scheduled automatically after subscribing.</span>
+                  <span>Your first delivery: <strong>{deliveryDateLabel}</strong></span>
                 </div>
 
                 <div className="space-y-1.5 mb-6">

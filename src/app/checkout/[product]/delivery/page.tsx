@@ -147,6 +147,12 @@ export default function DeliveryPage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [leadFired, setLeadFired] = useState(false);
+  const [deliveryDateLabel, setDeliveryDateLabel] = useState("Wednesday");
+
+  useEffect(() => {
+    const d = getEarliestDeliveryDate();
+    setDeliveryDateLabel(d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }));
+  }, []);
 
   // Pre-fill email from Step 1 capture (sessionStorage)
   useEffect(() => {
@@ -513,7 +519,7 @@ export default function DeliveryPage() {
                 {/* Delivery info — Wednesday, auto-assigned */}
                 <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary/5 px-4 py-2.5 text-sm text-primary border border-primary/20">
                   <span>🚚</span>
-                  <span>We deliver every <strong>Wednesday</strong>. Your next delivery will be scheduled automatically after checkout.</span>
+                  <span>Your next delivery: <strong>{deliveryDateLabel}</strong></span>
                 </div>
 
                 {/* Delivery notes */}
