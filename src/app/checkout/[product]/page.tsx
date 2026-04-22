@@ -434,6 +434,7 @@ export default function CheckoutSummaryPage() {
 
             {/* CTA */}
             <button
+              type="button"
               disabled={proteinIncluded && selectedProteins.length === 0}
               onClick={() => {
                 // Guard: don't proceed without required protein

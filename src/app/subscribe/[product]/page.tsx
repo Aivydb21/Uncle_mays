@@ -319,8 +319,20 @@ export default function SubscribeSummaryPage() {
               />
             </div>
 
+            {/* Protein required but not selected — show inline error (mirrors checkout) */}
+            {proteinIncluded && selectedProteins.length === 0 ? (
+              <p className="text-sm text-destructive font-medium text-center mb-2">
+                Please select your included protein above to continue.
+              </p>
+            ) : null}
+
             <button
+              type="button"
+              disabled={proteinIncluded && selectedProteins.length === 0}
               onClick={() => {
+                // Guard: don't proceed without required protein
+                if (proteinIncluded && selectedProteins.length === 0) return;
+
                 // Fire InitiateCheckout on user action, not page load (UNC-559)
                 try {
                   const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
@@ -355,15 +367,10 @@ export default function SubscribeSummaryPage() {
                 }
                 router.push(`/subscribe/${slug}/delivery`);
               }}
-              className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft"
+              className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Continue to Your Details →
             </button>
-            {proteinIncluded && selectedProteins.length === 0 && (
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                Don&apos;t forget to select your protein above before continuing.
-              </p>
-            )}
           </div>
         </div>
       </div>
