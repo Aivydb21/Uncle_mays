@@ -360,6 +360,22 @@ export async function POST(req: NextRequest) {
           },
           eventId: `purchase-sub-${intent.id}`,
         }).catch((err) => console.error("[CAPI] Purchase (payment_intent.succeeded) error:", err));
+
+        // Fire server-side GA4 purchase event (subscription first payment).
+        // Client-side gtag on /order-success is unreliable (3DS redirects,
+        // ad blockers, script load race) — this ensures every completed
+        // subscription is counted in GA4.
+        trackGA4Purchase({
+          transactionId: intent.id,
+          value: intent.amount / 100,
+          currency: "USD",
+          items: [{
+            item_id: intentProduct,
+            item_name: intent.metadata?.productName || intentProduct,
+            price: intent.amount / 100,
+            quantity: 1,
+          }],
+        }).catch((err) => console.error("[GA4] Purchase (subscription) error:", err));
       }
 
       // Send order confirmation email for one-time purchases via the embedded
@@ -392,6 +408,22 @@ export async function POST(req: NextRequest) {
           },
           eventId: `purchase-ot-${intent.id}`,
         }).catch((err) => console.error("[CAPI] Purchase (payment_intent.succeeded one-time) error:", err));
+
+        // Fire server-side GA4 purchase event (one-time embedded checkout).
+        // Covers the primary flow that previously only relied on client-side
+        // gtag on /order-success, which loses ~80% of conversions to 3DS
+        // redirects, ad blockers, and script load races.
+        trackGA4Purchase({
+          transactionId: intent.id,
+          value: intent.amount / 100,
+          currency: "USD",
+          items: [{
+            item_id: otProduct,
+            item_name: intent.metadata?.productName || otProduct,
+            price: intent.amount / 100,
+            quantity: 1,
+          }],
+        }).catch((err) => console.error("[GA4] Purchase (one-time) error:", err));
       }
 
       if (confirmEmail && !intentInvoice) {

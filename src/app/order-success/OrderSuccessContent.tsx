@@ -21,7 +21,9 @@ interface TrackingItem {
 }
 
 /**
- * Fire GA4/dataLayer purchase events. These don't depend on fbq loading order.
+ * Fire GA4/dataLayer purchase events. dataLayer.push always succeeds (GTM
+ * drains the queue once loaded). gtag direct-call retries for up to 8s to
+ * survive slow gtag boot after 3DS redirects and mobile networks.
  */
 function trackGA(transactionId: string, value: number, items: TrackingItem[]) {
   if (typeof window === "undefined") return;
@@ -32,20 +34,29 @@ function trackGA(transactionId: string, value: number, items: TrackingItem[]) {
     ecommerce: { transaction_id: transactionId, value, currency: "USD", items },
   });
 
-  if (typeof window.gtag === "function") {
-    window.gtag("event", "purchase", { transaction_id: transactionId, value, currency: "USD", items });
+  const gAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
+  const gAdsLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
 
-    const gAdsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
-    const gAdsLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL;
-    if (gAdsId && gAdsLabel) {
-      window.gtag("event", "conversion", {
-        send_to: `${gAdsId}/${gAdsLabel}`,
-        value,
-        currency: "USD",
-        transaction_id: transactionId,
-      });
+  let attempts = 0;
+  const maxAttempts = 8; // 8 retries * 1s = 8s total, covers slow mobile gtag boot
+  const tryFire = () => {
+    if (typeof window.gtag === "function") {
+      window.gtag("event", "purchase", { transaction_id: transactionId, value, currency: "USD", items });
+      if (gAdsId && gAdsLabel) {
+        window.gtag("event", "conversion", {
+          send_to: `${gAdsId}/${gAdsLabel}`,
+          value,
+          currency: "USD",
+          transaction_id: transactionId,
+        });
+      }
+      return;
     }
-  }
+    if (++attempts < maxAttempts) {
+      setTimeout(tryFire, 1000);
+    }
+  };
+  tryFire();
 }
 
 /**
@@ -73,12 +84,15 @@ function trackPurchase(transactionId: string, value: number, product?: string, i
 
   trackGA(transactionId, value, resolvedItems);
 
-  // Fire Meta Pixel — retry after 2s if fbq script hasn't loaded yet.
-  // This mirrors the pattern used in checkout pages. The order-success page
-  // may be reached via a full browser redirect (3DS auth) where fbq loads async.
-  if (!fireMetaPurchase(value, resolvedProduct)) {
-    setTimeout(() => fireMetaPurchase(value, resolvedProduct), 2000);
-  }
+  // Fire Meta Pixel with retry — order-success is often reached via 3DS
+  // redirect where fbq loads async. Try up to 8 times at 1s intervals.
+  let attempts = 0;
+  const maxAttempts = 8;
+  const tryMeta = () => {
+    if (fireMetaPurchase(value, resolvedProduct)) return;
+    if (++attempts < maxAttempts) setTimeout(tryMeta, 1000);
+  };
+  tryMeta();
 }
 
 export default function OrderSuccessContent() {

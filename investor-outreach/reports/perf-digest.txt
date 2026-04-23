@@ -1,0 +1,173 @@
+======================================================================
+  UNCLE MAY'S PRODUCE — PERFORMANCE AUDIT
+======================================================================
+
+[GA4] Last 30 days site-wide
+  sessions:               3762
+  users:                  3094
+  pageviews:              6004
+  bounce rate:           68.1%
+  engagement rate:       31.9%
+  avg session (s):      154.5
+
+[GA4] 30d current vs prior 30d
+  current   : sessions=  3762  users=  3094  conversions=   5
+  previous  : sessions=   354  users=   319  conversions=   0
+
+[GA4] Device breakdown
+  mobile   sessions=  3057  engaged= 32.1%  convs=   0  avg sess   152s
+  desktop  sessions=   498  engaged= 34.5%  convs=   5  avg sess   163s
+  tablet   sessions=   119  engaged= 42.0%  convs=   0  avg sess   307s
+  smart tv sessions=     1  engaged=  0.0%  convs=   0  avg sess     2s
+
+[GA4] Top traffic sources
+  facebook            /video           sess= 2194  engaged=  747  conv=  4
+  (direct)            /(none)          sess=  337  engaged=   83  conv=  1
+  facebook            /image           sess=  291  engaged=   83  conv=  0
+  fb                  /paid            sess=  245  engaged=   76  conv=  0
+  m.facebook.com      /referral        sess=  124  engaged=   14  conv=  0
+  ig                  /paid            sess=  122  engaged=   28  conv=  0
+  google              /organic         sess=   74  engaged=   36  conv=  0
+  facebook.com        /referral        sess=   51  engaged=   24  conv=  0
+  th                  /paid            sess=   43  engaged=    6  conv=  0
+  google              /cpc             sess=   29  engaged=   12  conv=  0
+
+[GA4] Top campaigns
+  subscription_launch_apr2026                   sess= 2517  conv=  4
+  (direct)                                      sess=  337  conv=  1
+  120241511524320442                            sess=  248  conv=  0
+  (referral)                                    sess=  240  conv=  0
+  (organic)                                     sess=   76  conv=  0
+  120242783613250762                            sess=   41  conv=  0
+  120243219649250762                            sess=   36  conv=  0
+  120241453113590442                            sess=   35  conv=  0
+  120242736455880762                            sess=   28  conv=  0
+  120241227293740442                            sess=   27  conv=  0
+
+[GA4] Landing pages (entry points)
+  /checkout/family                                   sess= 1483  engaged=  489  conv=  0  bounce= 67.0%
+  /                                                  sess= 1359  engaged=  426  conv=  5  bounce= 68.7%
+  /checkout/starter                                  sess=  559  engaged=  199  conv=  0  bounce= 64.4%
+  /subscribe/starter                                 sess=  119  engaged=   42  conv=  0  bounce= 64.7%
+  /products/weekly-produce-box                       sess=   50  engaged=    8  conv=  0  bounce= 84.0%
+  /subscribe/family                                  sess=   49  engaged=   18  conv=  0  bounce= 63.3%
+  (not set)                                          sess=   23  engaged=    0  conv=  0  bounce=100.0%
+  /faq                                               sess=   11  engaged=    1  conv=  0  bounce= 90.9%
+  /about                                             sess=    7  engaged=    3  conv=  0  bounce= 57.1%
+  /checkout/community/delivery                       sess=    5  engaged=    1  conv=  0  bounce= 80.0%
+
+[GA4] Top pages by sessions
+  /checkout/family                                   sess= 1536  pv= 2416  bounce= 65.0%  engaged= 35.0%
+  /                                                  sess= 1456  pv= 1825  bounce= 65.7%  engaged= 34.3%
+  /checkout/starter                                  sess=  639  pv=  848  bounce= 56.7%  engaged= 43.3%
+  /subscribe/starter                                 sess=  208  pv=  240  bounce= 38.0%  engaged= 62.0%
+  /subscribe/family                                  sess=  100  pv=  134  bounce= 32.0%  engaged= 68.0%
+  /subscribe/community                               sess=   59  pv=   74  bounce=  1.7%  engaged= 98.3%
+  /faq                                               sess=   51  pv=   58  bounce= 21.6%  engaged= 78.4%
+  /products/weekly-produce-box                       sess=   50  pv=   50  bounce= 84.0%  engaged= 16.0%
+  /about                                             sess=   48  pv=   57  bounce= 12.5%  engaged= 87.5%
+  /checkout/community                                sess=   23  pv=   45  bounce=  8.7%  engaged= 91.3%
+
+[GA4] Event counts (last 30d)
+  page_view                           count=  6004  users= 3091
+  session_start                       count=  3687  users= 3090
+  first_visit                         count=  3084  users= 3081
+  scroll                              count=   526  users=  369
+  user_engagement                     count=   480  users=  272
+  begin_checkout                      count=   147  users=   16
+  click                               count=   128  users=   92
+  form_start                          count=    35  users=    9
+  purchase                            count=     5  users=    2
+  select_item                         count=     2  users=    2
+  generate_lead                       count=     1  users=    1
+
+[GA4] Daily trend — most recent 14 days
+  20260410  sess=  63  conv=  0  rev=$   0.00
+  20260411  sess=  43  conv=  0  rev=$   0.00
+  20260412  sess=  11  conv=  0  rev=$   0.00
+  20260413  sess=  14  conv=  0  rev=$   0.00
+  20260414  sess=  18  conv=  0  rev=$   0.00
+  20260415  sess=  21  conv=  0  rev=$   0.00
+  20260416  sess=  12  conv=  0  rev=$   0.00
+  20260417  sess=  64  conv=  0  rev=$   0.00
+  20260418  sess=   7  conv=  0  rev=$   0.00
+  20260419  sess=  68  conv=  0  rev=$   0.00
+  20260420  sess= 354  conv= 65  rev=$   0.00
+  20260421  sess= 733  conv= 30  rev=$   0.00
+  20260422  sess=1536  conv=174  rev=$   0.00
+  20260423  sess=  33  conv=  0  rev=$   0.00
+
+[Stripe] Balance  available=$-58.02  pending=$199.45
+
+[Stripe] Last 90 days
+  total charges:      25
+  revenue:            $2715.00
+  refunded:           $390.00
+  status breakdown:   {'succeeded': 24, 'failed': 1}
+  first charge day:   2026-01-29   last charge day: 2026-04-22
+  days with charges:  8 distinct days in window
+
+[Stripe] Subscriptions
+  total:              56
+  by_status:          {'incomplete_expired': 43, 'active': 2, 'canceled': 11}
+  by_product:         {'starter': 24, 'community': 8, 'family': 20, '?': 4}
+  est MRR:            $563.33
+
+[Meta] Account 30d
+  spend:              $571.67
+  impressions:        32178
+  clicks:             3133
+  CTR:                9.736466
+  CPC:                0.182467
+  CPM:                17.765865
+  reach:              21873
+  actions:
+     link_click                               3071
+     omni_initiated_checkout                  1488
+     page_engagement                          12022
+     landing_page_view                        1792
+     add_to_cart                              2
+     omni_landing_page_view                   1792
+     onsite_conversion.post_unlike            6
+     post_engagement                          11989
+     like                                     33
+     post_interaction_gross                   235
+     comment                                  4
+     onsite_web_view_content                  3159
+     onsite_web_add_to_cart                   2
+     post_interaction_net                     241
+     onsite_web_app_view_content              3159
+
+[Meta] Campaigns (last 30d)
+  Uncle May's Sales Campaign                    spend=$  37.55 impr=   1143 clicks=   62 CTR=5.424322
+  Uncle May's - Website Retargeting             spend=$  25.51 impr=   6298 clicks=  143 CTR=2.270562
+  Subscription Launch Apr 2026                  spend=$ 479.37 impr=  22969 clicks= 2882 CTR=12.547346
+  Retargeting - Website Visitors Apr 2026       spend=$  29.24 impr=   1768 clicks=   46 CTR=2.60181
+
+[Meta] Top ads by spend (last 30d)
+  Sub Launch - IG Stories - Don Video spend=$ 80.00  clicks= 737  ATC=2  Purch=-
+  IG Stories Static 1 (Checkout)      spend=$ 72.87  clicks=  97  ATC=-  Purch=-
+  Sub Launch - FB Feed - Don Jhonsan  spend=$ 59.31  clicks= 365  ATC=-  Purch=-
+  IG Stories Video 1 (Checkout)       spend=$ 42.75  clicks= 162  ATC=-  Purch=-
+  Fresh From Black Farmers - Main Ad  spend=$ 37.55  clicks=  62  ATC=-  Purch=-
+  Sub Launch - IG Stories - Don Jhons spend=$ 37.47  clicks= 586  ATC=-  Purch=-
+  Retargeting - Don Video (Social Pro spend=$ 28.32  clicks=  43  ATC=-  Purch=-
+  FB Feed Video 1 (Checkout)          spend=$ 26.41  clicks=  85  ATC=-  Purch=-
+  Sub Launch - FB Feed - Don Video 5  spend=$ 23.03  clicks= 198  ATC=-  Purch=-
+  FB Feed Static 4 (Checkout)         spend=$ 19.33  clicks=   8  ATC=-  Purch=-
+
+[Mailchimp] List 'Uncle May's Produce'
+  members:            9
+  unsubscribes:       0
+  list open rate:     64.88395560040362
+  list click rate:    9.182643794147326
+
+[Mailchimp] Recent campaigns
+  2026-04-23  Last chance: Limited boxes left this week      sent=1  open=1  click=0
+  2026-04-23  Order by Thursday for Sunday delivery          sent=1  open=1  click=0
+  2026-04-23  Order by Thursday for Sunday delivery          sent=1  open=1  click=0
+  2026-04-23  Order by Thursday for Sunday delivery          sent=1  open=1  click=0
+  2026-04-23  Order by Thursday for Sunday delivery          sent=1  open=1  click=0
+  2026-04-23  Order by Thursday for Sunday delivery          sent=1  open=1  click=0
+  2026-04-23  Order by Thursday for Sunday delivery          sent=1  open=1  click=0
+  2026-04-23  Order by Thursday for Sunday delivery          sent=1  open=1  click=0

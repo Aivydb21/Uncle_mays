@@ -1,0 +1,6093 @@
+{
+  "ga4": {
+    "last30_summary": {
+      "metricHeaders": [
+        {
+          "name": "sessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "totalUsers",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "screenPageViews",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "bounceRate",
+          "type": "TYPE_FLOAT"
+        },
+        {
+          "name": "engagementRate",
+          "type": "TYPE_FLOAT"
+        },
+        {
+          "name": "averageSessionDuration",
+          "type": "TYPE_SECONDS"
+        }
+      ],
+      "rows": [
+        {
+          "metricValues": [
+            {
+              "value": "3762"
+            },
+            {
+              "value": "3094"
+            },
+            {
+              "value": "6004"
+            },
+            {
+              "value": "0.68075491759702289"
+            },
+            {
+              "value": "0.31924508240297716"
+            },
+            {
+              "value": "154.53722138330676"
+            }
+          ]
+        }
+      ],
+      "rowCount": 1,
+      "metadata": {
+        "currencyCode": "USD",
+        "timeZone": "America/Chicago"
+      },
+      "kind": "analyticsData#runReport"
+    },
+    "last30_vs_prev": {
+      "dimensionHeaders": [
+        {
+          "name": "dateRange"
+        }
+      ],
+      "metricHeaders": [
+        {
+          "name": "sessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "totalUsers",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "conversions",
+          "type": "TYPE_FLOAT"
+        }
+      ],
+      "rows": [
+        {
+          "dimensionValues": [
+            {
+              "value": "current"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "3762"
+            },
+            {
+              "value": "3094"
+            },
+            {
+              "value": "5"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "previous"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "354"
+            },
+            {
+              "value": "319"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      "rowCount": 2,
+      "metadata": {
+        "currencyCode": "USD",
+        "timeZone": "America/Chicago"
+      },
+      "kind": "analyticsData#runReport"
+    },
+    "top_pages": {
+      "dimensionHeaders": [
+        {
+          "name": "pagePath"
+        }
+      ],
+      "metricHeaders": [
+        {
+          "name": "sessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "screenPageViews",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "bounceRate",
+          "type": "TYPE_FLOAT"
+        },
+        {
+          "name": "engagementRate",
+          "type": "TYPE_FLOAT"
+        }
+      ],
+      "rows": [
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/family"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "1536"
+            },
+            {
+              "value": "2416"
+            },
+            {
+              "value": "0.64973958333333337"
+            },
+            {
+              "value": "0.35026041666666669"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "1456"
+            },
+            {
+              "value": "1825"
+            },
+            {
+              "value": "0.65659340659340659"
+            },
+            {
+              "value": "0.34340659340659341"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/starter"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "639"
+            },
+            {
+              "value": "848"
+            },
+            {
+              "value": "0.56651017214397492"
+            },
+            {
+              "value": "0.433489827856025"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/subscribe/starter"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "208"
+            },
+            {
+              "value": "240"
+            },
+            {
+              "value": "0.37980769230769229"
+            },
+            {
+              "value": "0.62019230769230771"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/subscribe/family"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "100"
+            },
+            {
+              "value": "134"
+            },
+            {
+              "value": "0.32"
+            },
+            {
+              "value": "0.68"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/subscribe/community"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "59"
+            },
+            {
+              "value": "74"
+            },
+            {
+              "value": "0.016949152542372881"
+            },
+            {
+              "value": "0.98305084745762716"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/faq"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "51"
+            },
+            {
+              "value": "58"
+            },
+            {
+              "value": "0.21568627450980393"
+            },
+            {
+              "value": "0.78431372549019607"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/products/weekly-produce-box"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "50"
+            },
+            {
+              "value": "50"
+            },
+            {
+              "value": "0.84"
+            },
+            {
+              "value": "0.16"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/about"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "48"
+            },
+            {
+              "value": "57"
+            },
+            {
+              "value": "0.125"
+            },
+            {
+              "value": "0.875"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/community"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "23"
+            },
+            {
+              "value": "45"
+            },
+            {
+              "value": "0.086956521739130432"
+            },
+            {
+              "value": "0.91304347826086951"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/starter/delivery"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "19"
+            },
+            {
+              "value": "38"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/subscribe/starter/delivery"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "16"
+            },
+            {
+              "value": "34"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/community/delivery"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "11"
+            },
+            {
+              "value": "14"
+            },
+            {
+              "value": "0.36363636363636365"
+            },
+            {
+              "value": "0.63636363636363635"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/family/delivery"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "10"
+            },
+            {
+              "value": "13"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/subscribe/community/delivery"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "9"
+            },
+            {
+              "value": "13"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/investors"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "8"
+            },
+            {
+              "value": "9"
+            },
+            {
+              "value": "0.125"
+            },
+            {
+              "value": "0.875"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/subscribe/family/delivery"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "8"
+            },
+            {
+              "value": "21"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/subscribe/starter/payment"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "8"
+            },
+            {
+              "value": "17"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/starter/payment"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "7"
+            },
+            {
+              "value": "16"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/manage-subscription"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "7"
+            },
+            {
+              "value": "9"
+            },
+            {
+              "value": "0.14285714285714285"
+            },
+            {
+              "value": "0.8571428571428571"
+            }
+          ]
+        }
+      ],
+      "rowCount": 34,
+      "metadata": {
+        "currencyCode": "USD",
+        "timeZone": "America/Chicago"
+      },
+      "kind": "analyticsData#runReport"
+    },
+    "sources": {
+      "dimensionHeaders": [
+        {
+          "name": "sessionSource"
+        },
+        {
+          "name": "sessionMedium"
+        }
+      ],
+      "metricHeaders": [
+        {
+          "name": "sessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "engagedSessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "conversions",
+          "type": "TYPE_FLOAT"
+        }
+      ],
+      "rows": [
+        {
+          "dimensionValues": [
+            {
+              "value": "facebook"
+            },
+            {
+              "value": "video"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "2194"
+            },
+            {
+              "value": "747"
+            },
+            {
+              "value": "4"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "(direct)"
+            },
+            {
+              "value": "(none)"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "337"
+            },
+            {
+              "value": "83"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "facebook"
+            },
+            {
+              "value": "image"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "291"
+            },
+            {
+              "value": "83"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "fb"
+            },
+            {
+              "value": "paid"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "245"
+            },
+            {
+              "value": "76"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "m.facebook.com"
+            },
+            {
+              "value": "referral"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "124"
+            },
+            {
+              "value": "14"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "ig"
+            },
+            {
+              "value": "paid"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "122"
+            },
+            {
+              "value": "28"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "google"
+            },
+            {
+              "value": "organic"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "74"
+            },
+            {
+              "value": "36"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "facebook.com"
+            },
+            {
+              "value": "referral"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "51"
+            },
+            {
+              "value": "24"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "th"
+            },
+            {
+              "value": "paid"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "43"
+            },
+            {
+              "value": "6"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "google"
+            },
+            {
+              "value": "cpc"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "29"
+            },
+            {
+              "value": "12"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "instagram"
+            },
+            {
+              "value": "social"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "26"
+            },
+            {
+              "value": "18"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "instagram.com"
+            },
+            {
+              "value": "referral"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "19"
+            },
+            {
+              "value": "2"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "instagram"
+            },
+            {
+              "value": "story"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "18"
+            },
+            {
+              "value": "10"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "instagram"
+            },
+            {
+              "value": "video"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "16"
+            },
+            {
+              "value": "6"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "email"
+            },
+            {
+              "value": "abandoned_cart"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "14"
+            },
+            {
+              "value": "11"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      "rowCount": 35,
+      "metadata": {
+        "currencyCode": "USD",
+        "timeZone": "America/Chicago"
+      },
+      "kind": "analyticsData#runReport"
+    },
+    "campaigns": {
+      "dimensionHeaders": [
+        {
+          "name": "sessionCampaignName"
+        }
+      ],
+      "metricHeaders": [
+        {
+          "name": "sessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "engagedSessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "conversions",
+          "type": "TYPE_FLOAT"
+        }
+      ],
+      "rows": [
+        {
+          "dimensionValues": [
+            {
+              "value": "subscription_launch_apr2026"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "2517"
+            },
+            {
+              "value": "847"
+            },
+            {
+              "value": "4"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "(direct)"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "337"
+            },
+            {
+              "value": "83"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "120241511524320442"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "248"
+            },
+            {
+              "value": "72"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "(referral)"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "240"
+            },
+            {
+              "value": "65"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "(organic)"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "76"
+            },
+            {
+              "value": "38"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "120242783613250762"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "41"
+            },
+            {
+              "value": "6"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "120243219649250762"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "36"
+            },
+            {
+              "value": "14"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "120241453113590442"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "35"
+            },
+            {
+              "value": "5"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "120242736455880762"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "28"
+            },
+            {
+              "value": "9"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "120241227293740442"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "27"
+            },
+            {
+              "value": "5"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "(not set)"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "19"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "Produce Box - Search Campaign"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "18"
+            },
+            {
+              "value": "10"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "profile_link"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "18"
+            },
+            {
+              "value": "11"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "subscription_launch_april2026"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "12"
+            },
+            {
+              "value": "7"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "recovery"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "11"
+            },
+            {
+              "value": "9"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      "rowCount": 22,
+      "metadata": {
+        "currencyCode": "USD",
+        "timeZone": "America/Chicago"
+      },
+      "kind": "analyticsData#runReport"
+    },
+    "devices": {
+      "dimensionHeaders": [
+        {
+          "name": "deviceCategory"
+        }
+      ],
+      "metricHeaders": [
+        {
+          "name": "sessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "engagementRate",
+          "type": "TYPE_FLOAT"
+        },
+        {
+          "name": "conversions",
+          "type": "TYPE_FLOAT"
+        },
+        {
+          "name": "averageSessionDuration",
+          "type": "TYPE_SECONDS"
+        }
+      ],
+      "rows": [
+        {
+          "dimensionValues": [
+            {
+              "value": "mobile"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "3057"
+            },
+            {
+              "value": "0.3205757278377494"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "151.66561058096173"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "desktop"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "498"
+            },
+            {
+              "value": "0.34538152610441769"
+            },
+            {
+              "value": "5"
+            },
+            {
+              "value": "163.11104483132533"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "tablet"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "119"
+            },
+            {
+              "value": "0.42016806722689076"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "306.69012487394957"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "smart tv"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "1"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "1.830112"
+            }
+          ]
+        }
+      ],
+      "rowCount": 4,
+      "metadata": {
+        "currencyCode": "USD",
+        "timeZone": "America/Chicago"
+      },
+      "kind": "analyticsData#runReport"
+    },
+    "events": {
+      "dimensionHeaders": [
+        {
+          "name": "eventName"
+        }
+      ],
+      "metricHeaders": [
+        {
+          "name": "eventCount",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "totalUsers",
+          "type": "TYPE_INTEGER"
+        }
+      ],
+      "rows": [
+        {
+          "dimensionValues": [
+            {
+              "value": "page_view"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "6004"
+            },
+            {
+              "value": "3091"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "session_start"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "3687"
+            },
+            {
+              "value": "3090"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "first_visit"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "3084"
+            },
+            {
+              "value": "3081"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "scroll"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "526"
+            },
+            {
+              "value": "369"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "user_engagement"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "480"
+            },
+            {
+              "value": "272"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "begin_checkout"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "147"
+            },
+            {
+              "value": "16"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "click"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "128"
+            },
+            {
+              "value": "92"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "form_start"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "35"
+            },
+            {
+              "value": "9"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "purchase"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "5"
+            },
+            {
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "select_item"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "2"
+            },
+            {
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "generate_lead"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "1"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        }
+      ],
+      "rowCount": 11,
+      "metadata": {
+        "currencyCode": "USD",
+        "timeZone": "America/Chicago"
+      },
+      "kind": "analyticsData#runReport"
+    },
+    "daily_trend": {
+      "dimensionHeaders": [
+        {
+          "name": "date"
+        }
+      ],
+      "metricHeaders": [
+        {
+          "name": "sessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "conversions",
+          "type": "TYPE_FLOAT"
+        },
+        {
+          "name": "totalRevenue",
+          "type": "TYPE_CURRENCY"
+        }
+      ],
+      "rows": [
+        {
+          "dimensionValues": [
+            {
+              "value": "20260324"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "23"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260325"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "32"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260326"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "12"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260327"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "15"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260328"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "8"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260329"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "38"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260330"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "49"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260331"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "51"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260401"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "57"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260402"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "102"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260403"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "32"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260404"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "75"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260405"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "56"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260406"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "53"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260407"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "10"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260408"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "47"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260409"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "49"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260410"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "63"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260411"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "43"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260412"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "11"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260413"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "14"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260414"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "18"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260415"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "21"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260416"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "12"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260417"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "64"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260418"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "7"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260419"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "68"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260420"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "354"
+            },
+            {
+              "value": "1"
+            },
+            {
+              "value": "65"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260421"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "733"
+            },
+            {
+              "value": "1"
+            },
+            {
+              "value": "30"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260422"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "1536"
+            },
+            {
+              "value": "3"
+            },
+            {
+              "value": "174"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "20260423"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "33"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            }
+          ]
+        }
+      ],
+      "rowCount": 31,
+      "metadata": {
+        "schemaRestrictionResponse": {},
+        "currencyCode": "USD",
+        "timeZone": "America/Chicago"
+      },
+      "kind": "analyticsData#runReport"
+    },
+    "landing_pages": {
+      "dimensionHeaders": [
+        {
+          "name": "landingPage"
+        }
+      ],
+      "metricHeaders": [
+        {
+          "name": "sessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "engagedSessions",
+          "type": "TYPE_INTEGER"
+        },
+        {
+          "name": "conversions",
+          "type": "TYPE_FLOAT"
+        },
+        {
+          "name": "bounceRate",
+          "type": "TYPE_FLOAT"
+        }
+      ],
+      "rows": [
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/family"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "1483"
+            },
+            {
+              "value": "489"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.67026298044504384"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "1359"
+            },
+            {
+              "value": "426"
+            },
+            {
+              "value": "5"
+            },
+            {
+              "value": "0.68653421633554079"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/starter"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "559"
+            },
+            {
+              "value": "199"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.64400715563506261"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/subscribe/starter"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "119"
+            },
+            {
+              "value": "42"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.6470588235294118"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/products/weekly-produce-box"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "50"
+            },
+            {
+              "value": "8"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.84"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/subscribe/family"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "49"
+            },
+            {
+              "value": "18"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.63265306122448983"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "(not set)"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "23"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/faq"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "11"
+            },
+            {
+              "value": "1"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.90909090909090906"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/about"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "7"
+            },
+            {
+              "value": "3"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.5714285714285714"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/community/delivery"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "5"
+            },
+            {
+              "value": "1"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.8"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": ""
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "4"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/checkout/community"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "4"
+            },
+            {
+              "value": "3"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.25"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/investors"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "3"
+            },
+            {
+              "value": "2"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.33333333333333331"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/test-facebook"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "3"
+            },
+            {
+              "value": "1"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.66666666666666663"
+            }
+          ]
+        },
+        {
+          "dimensionValues": [
+            {
+              "value": "/boxes"
+            }
+          ],
+          "metricValues": [
+            {
+              "value": "2"
+            },
+            {
+              "value": "1"
+            },
+            {
+              "value": "0"
+            },
+            {
+              "value": "0.5"
+            }
+          ]
+        }
+      ],
+      "rowCount": 23,
+      "metadata": {
+        "currencyCode": "USD",
+        "timeZone": "America/Chicago"
+      },
+      "kind": "analyticsData#runReport"
+    }
+  },
+  "stripe": {
+    "balance": {
+      "object": "balance",
+      "available": [
+        {
+          "amount": -5802,
+          "currency": "usd",
+          "source_types": {
+            "card": -5802
+          }
+        }
+      ],
+      "instant_available": [
+        {
+          "amount": 6643,
+          "currency": "usd",
+          "source_types": {
+            "card": 6643
+          }
+        }
+      ],
+      "livemode": true,
+      "pending": [
+        {
+          "amount": 19945,
+          "currency": "usd",
+          "source_types": {
+            "card": 19945
+          }
+        }
+      ],
+      "refund_and_dispute_prefunding": {
+        "available": [
+          {
+            "amount": 0,
+            "currency": "usd"
+          }
+        ],
+        "pending": [
+          {
+            "amount": 0,
+            "currency": "usd"
+          }
+        ]
+      }
+    },
+    "charges_summary": {
+      "count": 25,
+      "by_day": {
+        "2026-04-22": 3,
+        "2026-04-21": 1,
+        "2026-04-20": 7,
+        "2026-04-15": 1,
+        "2026-04-06": 1,
+        "2026-04-04": 2,
+        "2026-01-30": 5,
+        "2026-01-29": 5
+      },
+      "by_status": {
+        "succeeded": 24,
+        "failed": 1
+      },
+      "revenue_cents": 271500,
+      "refunded_cents": 39000,
+      "recent_sample": [
+        {
+          "id": "ch_3TOuomG67LsNxpTo1kBFw54u",
+          "amount": 7500,
+          "currency": "usd",
+          "status": "succeeded",
+          "created": 1776841420,
+          "description": "Subscription creation",
+          "metadata": {
+            "customer_email": "anthonypivy@gmail.com",
+            "deliveryAddress": "5140 South Woodlawn Avenue, 111, Chicago, IL, 60615",
+            "firstName": "Anthony",
+            "firstPayment": "true",
+            "lastName": "Ivy",
+            "phone": "13129722595",
+            "product": "community",
+            "proteinChoices": "chicken",
+            "subscriptionId": "sub_1TOuomG67LsNxpToQqo5upQw",
+            "utm_campaign": "subscription_launch_apr2026",
+            "utm_content": "woman_unboxing",
+            "utm_medium": "video",
+            "utm_source": "facebook"
+          }
+        },
+        {
+          "id": "ch_3TOuKiG67LsNxpTo134sOQOG",
+          "amount": 5500,
+          "currency": "usd",
+          "status": "succeeded",
+          "created": 1776839562,
+          "description": "Subscription creation",
+          "metadata": {
+            "customer_email": "anthonypivy@gmail.com",
+            "deliveryAddress": "5140 South Woodlawn Avenue, 111, Chicago, IL, 60615",
+            "firstName": "Anthony",
+            "firstPayment": "true",
+            "lastName": "Ivy",
+            "phone": "13129722595",
+            "product": "family",
+            "proteinChoices": "chicken",
+            "subscriptionId": "sub_1TOuKiG67LsNxpToqvacTTKm",
+            "utm_campaign": "subscription_launch_apr2026",
+            "utm_content": "woman_unboxing",
+            "utm_medium": "video",
+            "utm_source": "facebook"
+          }
+        },
+        {
+          "id": "ch_3TOuJFG67LsNxpTo1Kn5dhQI",
+          "amount": 3000,
+          "currency": "usd",
+          "status": "succeeded",
+          "created": 1776839466,
+          "description": null,
+          "metadata": {
+            "customer_email": "anthonypivy@gmail.com",
+            "customer_name": "Anthony Ivy",
+            "customer_phone": "13129722595",
+            "first_order_discount": "true",
+            "product": "starter",
+            "shipping_apt": "111",
+            "shipping_city": "Chicago",
+            "shipping_state": "IL",
+            "shipping_street": "5140 South Woodlawn Avenue",
+            "shipping_zip": "60615",
+            "utm_campaign": "subscription_launch_apr2026",
+            "utm_content": "woman_unboxing",
+            "utm_medium": "video",
+            "utm_source": "facebook"
+          }
+        },
+        {
+          "id": "ch_3TOfjXG67LsNxpTo1auRfK77",
+          "amount": 3000,
+          "currency": "usd",
+          "status": "succeeded",
+          "created": 1776783442,
+          "description": null,
+          "metadata": {
+            "customer_email": "anthony@unclemays.com",
+            "customer_name": "Anthony Ivy",
+            "first_order_discount": "true",
+            "product": "starter",
+            "shipping_city": "Chicago",
+            "shipping_state": "IL",
+            "shipping_street": "5140 s woodlawn ave",
+            "shipping_zip": "60615"
+          }
+        },
+        {
+          "id": "ch_3TOPvsG67LsNxpTo1QGI63iE",
+          "amount": 7500,
+          "currency": "usd",
+          "status": "succeeded",
+          "created": 1776722693,
+          "description": "Subscription creation",
+          "metadata": {}
+        },
+        {
+          "id": "ch_3TOPudG67LsNxpTo0gc3cGkv",
+          "amount": 3000,
+          "currency": "usd",
+          "status": "succeeded",
+          "created": 1776722616,
+          "description": "Subscription creation",
+          "metadata": {}
+        },
+        {
+          "id": "ch_3TOPeOG67LsNxpTo1cQQymAZ",
+          "amount": 3000,
+          "currency": "usd",
+          "status": "succeeded",
+          "created": 1776721611,
+          "description": "Subscription creation",
+          "metadata": {}
+        },
+        {
+          "id": "ch_3TOPdjG67LsNxpTo0HbuAec1",
+          "amount": 6500,
+          "currency": "usd",
+          "status": "succeeded",
+          "created": 1776721568,
+          "description": null,
+          "metadata": {
+            "customer_email": "anthonypivy@gmail.com",
+            "customer_name": "Anthony Ivy",
+            "customer_phone": "13129722595",
+            "product": "family",
+            "protein_selections": "chicken",
+            "shipping_apt": "111",
+            "shipping_city": "Chicago",
+            "shipping_state": "IL",
+            "shipping_street": "5140 South Woodlawn Avenue",
+            "shipping_zip": "60615",
+            "utm_campaign": "subscription_launch_apr2026",
+            "utm_content": "woman_unboxing",
+            "utm_medium": "image",
+            "utm_source": "facebook"
+          }
+        },
+        {
+          "id": "ch_3TOPUkG67LsNxpTo0Dq1nJrD",
+          "amount": 5500,
+          "currency": "usd",
+          "status": "succeeded",
+          "created": 1776721012,
+          "description": "Subscription creation",
+          "metadata": {}
+        },
+        {
+          "id": "ch_3TOP1nG67LsNxpTo0cP12gCA",
+          "amount": 3000,
+          "currency": "usd",
+          "status": "succeeded",
+          "created": 1776719259,
+          "description": "Subscription creation",
+          "metadata": {}
+        }
+      ]
+    },
+    "subs_summary": {
+      "count": 56,
+      "by_status": {
+        "incomplete_expired": 43,
+        "active": 2,
+        "canceled": 11
+      },
+      "by_product": {
+        "starter": 24,
+        "community": 8,
+        "family": 20,
+        "?": 4
+      },
+      "mrr_cents": 56333
+    }
+  },
+  "meta": {
+    "acct_last30": {
+      "data": [
+        {
+          "spend": "571.67",
+          "impressions": "32178",
+          "clicks": "3133",
+          "reach": "21873",
+          "cpc": "0.182467",
+          "ctr": "9.736466",
+          "cpm": "17.765865",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "3071"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "1488"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "12022"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "1792"
+            },
+            {
+              "action_type": "add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "1792"
+            },
+            {
+              "action_type": "onsite_conversion.post_unlike",
+              "value": "6"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "11989"
+            },
+            {
+              "action_type": "like",
+              "value": "33"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "235"
+            },
+            {
+              "action_type": "comment",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "3159"
+            },
+            {
+              "action_type": "onsite_web_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "241"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "3159"
+            },
+            {
+              "action_type": "post",
+              "value": "25"
+            },
+            {
+              "action_type": "view_content",
+              "value": "3159"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "31"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_comment",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_web_app_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "31"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "169"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "1488"
+            },
+            {
+              "action_type": "omni_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "3159"
+            },
+            {
+              "action_type": "video_view",
+              "value": "8683"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "3159"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "3159"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "175"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "1488"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "1488"
+            }
+          ],
+          "action_values": [
+            {
+              "action_type": "onsite_web_app_add_to_cart",
+              "value": "96.5"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "75955"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "75955"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "180019.5"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "180019.5"
+            },
+            {
+              "action_type": "add_to_cart",
+              "value": "96.5"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_add_to_cart",
+              "value": "96.5"
+            },
+            {
+              "action_type": "view_content",
+              "value": "180019.5"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "75955"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "180019.5"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "180019.5"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "75955"
+            },
+            {
+              "action_type": "omni_add_to_cart",
+              "value": "96.5"
+            },
+            {
+              "action_type": "onsite_web_add_to_cart",
+              "value": "96.5"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        }
+      ],
+      "paging": {
+        "cursors": {
+          "before": "MAZDZD",
+          "after": "MAZDZD"
+        }
+      }
+    },
+    "campaigns_last30": {
+      "data": [
+        {
+          "campaign_name": "Uncle May's Sales Campaign",
+          "spend": "37.55",
+          "impressions": "1143",
+          "clicks": "62",
+          "ctr": "5.424322",
+          "cpc": "0.605645",
+          "cpm": "32.852143",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "23"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "2"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "45"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "14"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "14"
+            },
+            {
+              "action_type": "onsite_conversion.post_unlike",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "42"
+            },
+            {
+              "action_type": "like",
+              "value": "3"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "19"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "20"
+            },
+            {
+              "action_type": "post",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "5"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "5"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "9"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "2"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "10"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "2"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "2"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "campaign_name": "Uncle May's - Website Retargeting",
+          "spend": "25.51",
+          "impressions": "6298",
+          "clicks": "143",
+          "ctr": "2.270562",
+          "cpc": "0.178392",
+          "cpm": "4.050492",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "74"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "3"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "108"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "42"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "42"
+            },
+            {
+              "action_type": "onsite_conversion.post_unlike",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "108"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "34"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "35"
+            },
+            {
+              "action_type": "post",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "27"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "3"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "28"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "3"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "3"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "479.37",
+          "impressions": "22969",
+          "clicks": "2882",
+          "ctr": "12.547346",
+          "cpc": "0.166332",
+          "cpm": "20.870303",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "2947"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "1483"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "11507"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "1716"
+            },
+            {
+              "action_type": "add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "1716"
+            },
+            {
+              "action_type": "onsite_conversion.post_unlike",
+              "value": "4"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "11477"
+            },
+            {
+              "action_type": "like",
+              "value": "30"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "175"
+            },
+            {
+              "action_type": "comment",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "3132"
+            },
+            {
+              "action_type": "onsite_web_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "179"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "3132"
+            },
+            {
+              "action_type": "post",
+              "value": "17"
+            },
+            {
+              "action_type": "view_content",
+              "value": "3132"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "22"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_comment",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_web_app_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "22"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "129"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "1483"
+            },
+            {
+              "action_type": "omni_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "3132"
+            },
+            {
+              "action_type": "video_view",
+              "value": "8355"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "3132"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "3132"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "133"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "1483"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "1483"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "campaign_name": "Retargeting - Website Visitors Apr 2026",
+          "spend": "29.24",
+          "impressions": "1768",
+          "clicks": "46",
+          "ctr": "2.60181",
+          "cpc": "0.635652",
+          "cpm": "16.538462",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "27"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "362"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "20"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "20"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "362"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "7"
+            },
+            {
+              "action_type": "comment",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "27"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "7"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "27"
+            },
+            {
+              "action_type": "post",
+              "value": "1"
+            },
+            {
+              "action_type": "view_content",
+              "value": "27"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_comment",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "4"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "27"
+            },
+            {
+              "action_type": "video_view",
+              "value": "328"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "27"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "27"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "4"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        }
+      ],
+      "paging": {
+        "cursors": {
+          "before": "MAZDZD",
+          "after": "MwZDZD"
+        }
+      }
+    },
+    "ads_last30": {
+      "data": [
+        {
+          "ad_name": "Fresh From Black Farmers - Main Ad",
+          "campaign_name": "Uncle May's Sales Campaign",
+          "spend": "37.55",
+          "impressions": "1143",
+          "clicks": "62",
+          "ctr": "5.424322",
+          "cpc": "0.605645",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "23"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "2"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "45"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "14"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "14"
+            },
+            {
+              "action_type": "onsite_conversion.post_unlike",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "42"
+            },
+            {
+              "action_type": "like",
+              "value": "3"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "19"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "20"
+            },
+            {
+              "action_type": "post",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "5"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "5"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "9"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "2"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "10"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "2"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "2"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Uncle May's - Pixel Optimized Ad",
+          "campaign_name": "Uncle May's - Website Retargeting",
+          "spend": "18.43",
+          "impressions": "396",
+          "clicks": "37",
+          "ctr": "9.343434",
+          "cpc": "0.498108",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "24"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "3"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "34"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "23"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "23"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "34"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "10"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "10"
+            },
+            {
+              "action_type": "post",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "5"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "3"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "5"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "3"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "3"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Retargeting - You Were Close - Checkout Abandoners",
+          "campaign_name": "Uncle May's - Website Retargeting",
+          "spend": "7.08",
+          "impressions": "5902",
+          "clicks": "106",
+          "ctr": "1.796001",
+          "cpc": "0.066792",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "50"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "74"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "19"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "19"
+            },
+            {
+              "action_type": "onsite_conversion.post_unlike",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "74"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "24"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "25"
+            },
+            {
+              "action_type": "post",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "22"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "23"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "FB Feed Static 5 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.69",
+          "impressions": "46",
+          "clicks": "1",
+          "ctr": "2.173913",
+          "cpc": "0.69",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "1"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "1"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "FB Feed Static 4 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "19.33",
+          "impressions": "870",
+          "clicks": "8",
+          "ctr": "0.91954",
+          "cpc": "2.41625",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "6"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "7"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "5"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "5"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "7"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "1"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "1"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "1"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "FB Feed Static 3 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.33",
+          "impressions": "18",
+          "clicks": "0",
+          "ctr": "0",
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "FB Feed Static 2 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "2.17",
+          "impressions": "85",
+          "clicks": "5",
+          "ctr": "5.882353",
+          "cpc": "0.434",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "2"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "2"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "2"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "FB Feed Static 1 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.1",
+          "impressions": "13",
+          "clicks": "0",
+          "ctr": "0",
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "FB Feed Video 1 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "26.41",
+          "impressions": "1102",
+          "clicks": "85",
+          "ctr": "7.713249",
+          "cpc": "0.310706",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "55"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "6"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "518"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "47"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "47"
+            },
+            {
+              "action_type": "onsite_conversion.post_unlike",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "513"
+            },
+            {
+              "action_type": "like",
+              "value": "5"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "16"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "7"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "17"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "7"
+            },
+            {
+              "action_type": "view_content",
+              "value": "7"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "13"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "6"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "7"
+            },
+            {
+              "action_type": "video_view",
+              "value": "442"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "7"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "7"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "14"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "6"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "6"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "FB Feed Video 2 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "9.37",
+          "impressions": "485",
+          "clicks": "13",
+          "ctr": "2.680412",
+          "cpc": "0.720769",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "9"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "8"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "150"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "10"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "10"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "150"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "8"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "8"
+            },
+            {
+              "action_type": "view_content",
+              "value": "8"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "8"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "8"
+            },
+            {
+              "action_type": "video_view",
+              "value": "141"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "8"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "8"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "8"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "8"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Stories Static 3 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.29",
+          "impressions": "16",
+          "clicks": "0",
+          "ctr": "0",
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Stories Static 1 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "72.87",
+          "impressions": "4253",
+          "clicks": "97",
+          "ctr": "2.280743",
+          "cpc": "0.751237",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "56"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "66"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "51"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "51"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "65"
+            },
+            {
+              "action_type": "like",
+              "value": "1"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "9"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "9"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "post",
+              "value": "3"
+            },
+            {
+              "action_type": "view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "6"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "1"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "6"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Stories Static 2 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.03",
+          "impressions": "5",
+          "clicks": "0",
+          "ctr": "0",
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Stories Static 5 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.89",
+          "impressions": "49",
+          "clicks": "0",
+          "ctr": "0",
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Stories Static 4 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "2.32",
+          "impressions": "90",
+          "clicks": "4",
+          "ctr": "4.444444",
+          "cpc": "0.58",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "4"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "4"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "3"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "3"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "4"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Stories Video 1 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "42.75",
+          "impressions": "1884",
+          "clicks": "162",
+          "ctr": "8.598726",
+          "cpc": "0.263889",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "85"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "6"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "841"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "76"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "76"
+            },
+            {
+              "action_type": "onsite_conversion.post_unlike",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "836"
+            },
+            {
+              "action_type": "like",
+              "value": "5"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "30"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "6"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "31"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "6"
+            },
+            {
+              "action_type": "post",
+              "value": "2"
+            },
+            {
+              "action_type": "view_content",
+              "value": "6"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "23"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "6"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "6"
+            },
+            {
+              "action_type": "video_view",
+              "value": "721"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "6"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "6"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "24"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "6"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "6"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Stories Video 2 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "14.14",
+          "impressions": "490",
+          "clicks": "53",
+          "ctr": "10.816327",
+          "cpc": "0.266792",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "29"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "262"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "27"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "27"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "262"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "18"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "18"
+            },
+            {
+              "action_type": "post",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "14"
+            },
+            {
+              "action_type": "video_view",
+              "value": "215"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "14"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Feed Static 4 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "9.59",
+          "impressions": "547",
+          "clicks": "7",
+          "ctr": "1.279708",
+          "cpc": "1.37",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "3"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "1"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "4"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "4"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "4"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "4"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "1"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "1"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "1"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "1"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "1"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Feed Static 3 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.46",
+          "impressions": "26",
+          "clicks": "1",
+          "ctr": "3.846154",
+          "cpc": "0.46",
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Feed Static 1 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0",
+          "impressions": "1",
+          "clicks": "0",
+          "ctr": "0",
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Feed Static 2 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.08",
+          "impressions": "8",
+          "clicks": "0",
+          "ctr": "0",
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Feed Static 5 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "5.41",
+          "impressions": "318",
+          "clicks": "13",
+          "ctr": "4.08805",
+          "cpc": "0.416154",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "6"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "8"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "7"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "7"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "8"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "2"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "2"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "2"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Feed Video 1 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "4.05",
+          "impressions": "194",
+          "clicks": "20",
+          "ctr": "10.309278",
+          "cpc": "0.2025",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "11"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "1"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "99"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "12"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "12"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "98"
+            },
+            {
+              "action_type": "like",
+              "value": "1"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "1"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "1"
+            },
+            {
+              "action_type": "video_view",
+              "value": "84"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "2"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "1"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "1"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Feed Video 2 (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "2.53",
+          "impressions": "88",
+          "clicks": "9",
+          "ctr": "10.227273",
+          "cpc": "0.281111",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "7"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "54"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "4"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "4"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "53"
+            },
+            {
+              "action_type": "like",
+              "value": "1"
+            },
+            {
+              "action_type": "video_view",
+              "value": "46"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "FB Feed Farmer Image (Checkout) - A/B Test",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "14.28",
+          "impressions": "631",
+          "clicks": "32",
+          "ctr": "5.071315",
+          "cpc": "0.44625",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "17"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "5"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "24"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "15"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "15"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "22"
+            },
+            {
+              "action_type": "like",
+              "value": "2"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "5"
+            },
+            {
+              "action_type": "comment",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "5"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "post",
+              "value": "1"
+            },
+            {
+              "action_type": "view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_comment",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "5"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "4"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "3"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "5"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "5"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Feed Farmer Image (Checkout) - A/B Test",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "2.76",
+          "impressions": "142",
+          "clicks": "3",
+          "ctr": "2.112676",
+          "cpc": "0.92",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "2"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "4"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "2"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "4"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "4"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "4"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "4"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "4"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "4"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "FB Feed Woman Unboxing Crate V1 (Checkout) - A/B Test",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "4.06",
+          "impressions": "238",
+          "clicks": "4",
+          "ctr": "1.680672",
+          "cpc": "1.015",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "5"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "4"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "5"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "5"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "5"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "5"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "4"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "4"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "4"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "4"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "4"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "FB Feed Woman Unboxing Box V2 (Checkout) - A/B Test",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "5.54",
+          "impressions": "371",
+          "clicks": "9",
+          "ctr": "2.425876",
+          "cpc": "0.615556",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "7"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "7"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "8"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "7"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "7"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "8"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "7"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "7"
+            },
+            {
+              "action_type": "view_content",
+              "value": "7"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "7"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "7"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "7"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "7"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "1"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "7"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "7"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "IG Feed Woman Unboxing Box V2 (Checkout) - A/B Test",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "2.41",
+          "impressions": "175",
+          "clicks": "4",
+          "ctr": "2.285714",
+          "cpc": "0.6025",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "3"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "3"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "3"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Var A Price Anchor \u2014 IG Feed (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.2",
+          "impressions": "1",
+          "clicks": "2",
+          "ctr": "200",
+          "cpc": "0.1",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "1"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "1"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "1"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Var A Price Anchor \u2014 IG Stories (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "6.97",
+          "impressions": "370",
+          "clicks": "32",
+          "ctr": "8.648649",
+          "cpc": "0.217813",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "16"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "1"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "20"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "12"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "12"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "19"
+            },
+            {
+              "action_type": "like",
+              "value": "1"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "post",
+              "value": "1"
+            },
+            {
+              "action_type": "view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "1"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "1"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "1"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "2"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "1"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "1"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Var A Price Anchor \u2014 FB Feed (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.07",
+          "impressions": "2",
+          "clicks": "1",
+          "ctr": "50",
+          "cpc": "0.07",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "1"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "1"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "1"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Var C Community Identity \u2014 IG Feed (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0",
+          "impressions": "3",
+          "clicks": "0",
+          "ctr": "0",
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Var C Community Identity \u2014 IG Stories (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "0.02",
+          "impressions": "3",
+          "clicks": "1",
+          "ctr": "33.333333",
+          "cpc": "0.02",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "1"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "1"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "1"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Var C Community Identity \u2014 FB Feed (Checkout)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "1.6",
+          "impressions": "55",
+          "clicks": "5",
+          "ctr": "9.090909",
+          "cpc": "0.32",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "5"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "5"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "3"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "3"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "5"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Sub Launch - IG Feed - Don Jhonsan 4 (NEW)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "19.04",
+          "impressions": "820",
+          "clicks": "244",
+          "ctr": "29.756098",
+          "cpc": "0.078033",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "293"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "197"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "917"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "153"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "153"
+            },
+            {
+              "action_type": "onsite_conversion.post_unlike",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "917"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "10"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "340"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "11"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "340"
+            },
+            {
+              "action_type": "view_content",
+              "value": "340"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "7"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "197"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "340"
+            },
+            {
+              "action_type": "video_view",
+              "value": "614"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "340"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "340"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "8"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "197"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "197"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Sub Launch - IG Stories - Don Jhonsan 4 (NEW)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "37.47",
+          "impressions": "1791",
+          "clicks": "586",
+          "ctr": "32.719151",
+          "cpc": "0.063942",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "733"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "77"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "2120"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "415"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "415"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "2120"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "843"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "4"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "843"
+            },
+            {
+              "action_type": "view_content",
+              "value": "843"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "77"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "843"
+            },
+            {
+              "action_type": "video_view",
+              "value": "1383"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "843"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "843"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "3"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "77"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "77"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Sub Launch - FB Feed - Don Jhonsan 4 (NEW)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "59.31",
+          "impressions": "2932",
+          "clicks": "365",
+          "ctr": "12.44884",
+          "cpc": "0.162493",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "308"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "279"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "1875"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "176"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "176"
+            },
+            {
+              "action_type": "onsite_conversion.post_unlike",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "1864"
+            },
+            {
+              "action_type": "like",
+              "value": "11"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "62"
+            },
+            {
+              "action_type": "comment",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "399"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "63"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "399"
+            },
+            {
+              "action_type": "post",
+              "value": "8"
+            },
+            {
+              "action_type": "view_content",
+              "value": "399"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "9"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_comment",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "9"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "43"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "279"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "399"
+            },
+            {
+              "action_type": "video_view",
+              "value": "1494"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "399"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "399"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "44"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "279"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "279"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Sub Launch - IG Feed - Don Video 5 (NEW)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "8.8",
+          "impressions": "504",
+          "clicks": "181",
+          "ctr": "35.912698",
+          "cpc": "0.048619",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "215"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "66"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "611"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "134"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "134"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "611"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "245"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "245"
+            },
+            {
+              "action_type": "view_content",
+              "value": "245"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "66"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "245"
+            },
+            {
+              "action_type": "video_view",
+              "value": "396"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "245"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "245"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "66"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "66"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Sub Launch - IG Stories - Don Video 5 (NEW)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "80",
+          "impressions": "3531",
+          "clicks": "737",
+          "ctr": "20.872274",
+          "cpc": "0.108548",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "832"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "574"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "3112"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "425"
+            },
+            {
+              "action_type": "add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "425"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "3109"
+            },
+            {
+              "action_type": "like",
+              "value": "3"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "7"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "959"
+            },
+            {
+              "action_type": "onsite_web_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "7"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "959"
+            },
+            {
+              "action_type": "view_content",
+              "value": "959"
+            },
+            {
+              "action_type": "onsite_web_app_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "7"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "574"
+            },
+            {
+              "action_type": "omni_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "959"
+            },
+            {
+              "action_type": "video_view",
+              "value": "2270"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "959"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "959"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_add_to_cart",
+              "value": "2"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "7"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "574"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "574"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Sub Launch - FB Feed - Don Video 5 (NEW)",
+          "campaign_name": "Subscription Launch Apr 2026",
+          "spend": "23.03",
+          "impressions": "812",
+          "clicks": "198",
+          "ctr": "24.384236",
+          "cpc": "0.116313",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "234"
+            },
+            {
+              "action_type": "omni_initiated_checkout",
+              "value": "247"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "786"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "116"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "116"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "786"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "3"
+            },
+            {
+              "action_type": "comment",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "302"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "3"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "302"
+            },
+            {
+              "action_type": "post",
+              "value": "1"
+            },
+            {
+              "action_type": "view_content",
+              "value": "302"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_comment",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_initiate_checkout",
+              "value": "247"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "302"
+            },
+            {
+              "action_type": "video_view",
+              "value": "549"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "302"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "302"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "1"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_initiate_checkout",
+              "value": "247"
+            },
+            {
+              "action_type": "initiate_checkout",
+              "value": "247"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Retargeting - Community 0 Off",
+          "campaign_name": "Retargeting - Website Visitors Apr 2026",
+          "spend": "0.92",
+          "impressions": "63",
+          "clicks": "3",
+          "ctr": "4.761905",
+          "cpc": "0.306667",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "1"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "1"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "1"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "1"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        },
+        {
+          "ad_name": "Retargeting - Don Video (Social Proof)",
+          "campaign_name": "Retargeting - Website Visitors Apr 2026",
+          "spend": "28.32",
+          "impressions": "1705",
+          "clicks": "43",
+          "ctr": "2.521994",
+          "cpc": "0.658605",
+          "actions": [
+            {
+              "action_type": "link_click",
+              "value": "26"
+            },
+            {
+              "action_type": "page_engagement",
+              "value": "361"
+            },
+            {
+              "action_type": "landing_page_view",
+              "value": "19"
+            },
+            {
+              "action_type": "omni_landing_page_view",
+              "value": "19"
+            },
+            {
+              "action_type": "post_engagement",
+              "value": "361"
+            },
+            {
+              "action_type": "post_interaction_gross",
+              "value": "7"
+            },
+            {
+              "action_type": "comment",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_web_view_content",
+              "value": "27"
+            },
+            {
+              "action_type": "post_interaction_net",
+              "value": "7"
+            },
+            {
+              "action_type": "onsite_web_app_view_content",
+              "value": "27"
+            },
+            {
+              "action_type": "post",
+              "value": "1"
+            },
+            {
+              "action_type": "view_content",
+              "value": "27"
+            },
+            {
+              "action_type": "onsite_conversion.post_save",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_comment",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_save",
+              "value": "1"
+            },
+            {
+              "action_type": "onsite_conversion.post_net_like",
+              "value": "4"
+            },
+            {
+              "action_type": "offsite_content_view_add_meta_leads",
+              "value": "27"
+            },
+            {
+              "action_type": "video_view",
+              "value": "328"
+            },
+            {
+              "action_type": "omni_view_content",
+              "value": "27"
+            },
+            {
+              "action_type": "offsite_conversion.fb_pixel_view_content",
+              "value": "27"
+            },
+            {
+              "action_type": "post_reaction",
+              "value": "4"
+            }
+          ],
+          "date_start": "2026-03-24",
+          "date_stop": "2026-04-22"
+        }
+      ],
+      "paging": {
+        "cursors": {
+          "before": "MAZDZD",
+          "after": "NDIZD"
+        }
+      }
+    }
+  },
+  "mailchimp": {
+    "campaigns": [
+      {
+        "id": "2f1a17fdfb",
+        "title": "Abandoned Cart Email 3 - e1cb588c",
+        "subject_line": "Last chance: Limited boxes left this week",
+        "send_time": "2026-04-23T14:58:24+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "fbdf6ce329",
+        "title": "Abandoned Cart Email 2 - beec217a",
+        "subject_line": "Order by Thursday for Sunday delivery",
+        "send_time": "2026-04-23T07:37:55+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "8de41e32a5",
+        "title": "Abandoned Cart Email 2 - 825bfbdc",
+        "subject_line": "Order by Thursday for Sunday delivery",
+        "send_time": "2026-04-23T07:37:55+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "b8fb7c5152",
+        "title": "Abandoned Cart Email 2 - f6522218",
+        "subject_line": "Order by Thursday for Sunday delivery",
+        "send_time": "2026-04-23T07:18:14+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "c8f6289130",
+        "title": "Abandoned Cart Email 2 - 201e38e3",
+        "subject_line": "Order by Thursday for Sunday delivery",
+        "send_time": "2026-04-23T07:03:29+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "7a3fb6c0ce",
+        "title": "Abandoned Cart Email 2 - 1d0df119",
+        "subject_line": "Order by Thursday for Sunday delivery",
+        "send_time": "2026-04-23T07:02:45+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "70f0210800",
+        "title": "Abandoned Cart Email 2 - 4e0c63e9",
+        "subject_line": "Order by Thursday for Sunday delivery",
+        "send_time": "2026-04-23T06:32:15+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "3976cd86a5",
+        "title": "Abandoned Cart Email 2 - ff6aab90",
+        "subject_line": "Order by Thursday for Sunday delivery",
+        "send_time": "2026-04-23T06:31:29+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "b731c308b1",
+        "title": "Email contacts from your automation flow",
+        "subject_line": "Welcome to Uncle May's. Here's what's waiting.",
+        "send_time": "2026-04-22T21:42:09+00:00",
+        "emails_sent": 4,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "46f0285793",
+        "title": "Email contacts from your automation flow",
+        "subject_line": "Your first Wednesday is waiting",
+        "send_time": "",
+        "emails_sent": 0,
+        "open_rate": 0,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "9a4d1f3b15",
+        "title": "Email contacts from your automation flow",
+        "subject_line": "Where your produce actually comes from",
+        "send_time": "",
+        "emails_sent": 0,
+        "open_rate": 0,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "49b1dc4caa",
+        "title": "Abandoned Cart Email 2 - e1cb588c",
+        "subject_line": "Order by Thursday for Sunday delivery",
+        "send_time": "2026-04-22T14:58:10+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "5cac9ca99d",
+        "title": "Abandoned Cart Email 1 - 825bfbdc",
+        "subject_line": "Your Uncle May's box is waiting",
+        "send_time": "2026-04-22T08:37:40+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "7648247b78",
+        "title": "Abandoned Cart Email 1 - beec217a",
+        "subject_line": "Your Uncle May's box is waiting",
+        "send_time": "2026-04-22T08:37:40+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "01dc6ab681",
+        "title": "Abandoned Cart Email 1 - f6522218",
+        "subject_line": "Your Uncle May's box is waiting",
+        "send_time": "2026-04-22T08:17:58+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "ec0592e1c0",
+        "title": "Abandoned Cart Email 1 - 201e38e3",
+        "subject_line": "Your Uncle May's box is waiting",
+        "send_time": "2026-04-22T08:03:11+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "3f811cfbb0",
+        "title": "Abandoned Cart Email 1 - 1d0df119",
+        "subject_line": "Your Uncle May's box is waiting",
+        "send_time": "2026-04-22T08:02:19+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "12c3d24783",
+        "title": "Abandoned Cart Email 1 - 4e0c63e9",
+        "subject_line": "Your Uncle May's box is waiting",
+        "send_time": "2026-04-22T07:32:00+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "ed01c6121f",
+        "title": "Abandoned Cart Email 1 - ff6aab90",
+        "subject_line": "Your Uncle May's box is waiting",
+        "send_time": "2026-04-22T07:31:09+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      },
+      {
+        "id": "7e92283dfe",
+        "title": "Order Confirmation - pi_3TOuo",
+        "subject_line": "Order confirmed: Community Box",
+        "send_time": "2026-04-22T07:03:57+00:00",
+        "emails_sent": 1,
+        "open_rate": 1,
+        "click_rate": 0,
+        "bounces": null
+      }
+    ],
+    "list": {
+      "name": "Uncle May's Produce",
+      "member_count": 9,
+      "unsubscribe_count": 0,
+      "cleaned_count": 3,
+      "open_rate": 64.88395560040362,
+      "click_rate": 9.182643794147326
+    }
+  }
+}

@@ -251,7 +251,7 @@ export default function CheckoutSummaryPage() {
 
           <div className="p-6 md:p-8">
             {/* Product name + price */}
-            <div className="flex items-start justify-between gap-4 mb-5">
+            <div className="flex items-start justify-between gap-4 mb-4">
               <div>
                 <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
                   {product.name}
@@ -275,6 +275,21 @@ export default function CheckoutSummaryPage() {
                   </div>
                 ) : null}
               </div>
+            </div>
+
+            {/* Compact trust strip — one line. Most checkout traffic is
+                deep-linked from Meta ads and never sees the homepage, so
+                provide just enough signal ("others bought this; you won't
+                lose your money") without re-bloating Step 1. */}
+            <div className="mb-5 flex items-center gap-3 text-xs text-muted-foreground border-y border-border py-2.5">
+              <span className="flex items-center gap-1 text-amber-600 font-semibold">
+                <span aria-hidden>★★★★★</span>
+                <span className="sr-only">5 out of 5 stars</span>
+              </span>
+              <span className="flex-1 truncate">
+                &ldquo;Best produce I&apos;ve had in Chicago.&rdquo; — Keisha, Hyde Park
+              </span>
+              <span className="text-primary font-semibold whitespace-nowrap">100% fresh or refunded</span>
             </div>
 
             {/* What's in the box */}
