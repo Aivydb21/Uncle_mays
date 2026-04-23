@@ -5,10 +5,11 @@ import { sendCapiEvent } from "@/lib/meta-capi";
 // Fires ViewContent only. InitiateCheckout is fired separately on user action (UNC-559).
 export async function POST(req: NextRequest) {
   try {
-    const { slug, contentName, value } = await req.json() as {
+    const { slug, contentName, value, eventId: clientEventId } = await req.json() as {
       slug: string;
       contentName: string;
       value: number;
+      eventId?: string;
     };
 
     const clientIp =
@@ -25,7 +26,10 @@ export async function POST(req: NextRequest) {
       client_user_agent: userAgent,
     };
 
-    const viewEventId = `view-${slug}-${Date.now()}`;
+    // Use client-supplied eventId when available so the browser pixel event and
+    // this server CAPI event dedupe at Meta's side. Fall back to a server-generated
+    // id only when the client omitted one (e.g. direct-to-API callers, legacy builds).
+    const viewEventId = clientEventId || `view-${slug}-${Date.now()}`;
 
     await sendCapiEvent({
       eventName: "ViewContent",

@@ -5,10 +5,11 @@ import { sendCapiEvent } from "@/lib/meta-capi";
 // Called when the user clicks "Continue" on checkout/subscribe summary pages (UNC-559).
 export async function POST(req: NextRequest) {
   try {
-    const { slug, contentName, value } = await req.json() as {
+    const { slug, contentName, value, eventId: clientEventId } = await req.json() as {
       slug: string;
       contentName: string;
       value: number;
+      eventId?: string;
     };
 
     const clientIp =
@@ -25,7 +26,9 @@ export async function POST(req: NextRequest) {
       client_user_agent: userAgent,
     };
 
-    const eventId = `initiate-${slug}-${Date.now()}`;
+    // Use client-supplied eventId when available so the browser pixel event and
+    // this server CAPI event dedupe at Meta's side.
+    const eventId = clientEventId || `initiate-${slug}-${Date.now()}`;
 
     await sendCapiEvent({
       eventName: "InitiateCheckout",

@@ -84,15 +84,19 @@ export default function CheckoutSummaryPage() {
   const [email, setEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
 
-  // Fire Meta Pixel ViewContent on page load (client-side).
-  // Also fire server-side CAPI ViewContent to bypass ITP/ad blockers for better attribution.
-  // InitiateCheckout fires on the "Continue" button click, not on page load (UNC-559).
+  // Fire Meta Pixel ViewContent on page load (client-side) AND server-side CAPI,
+  // both carrying the same eventID so Meta deduplicates the pair to a single event.
+  // AddToCart fires on the "Continue" button click; InitiateCheckout only at payment.
   useEffect(() => {
-    // Server-side CAPI call — fire once, non-blocking
+    const eventId =
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `view-${slug}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
     fetch("/api/capi/view", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug, contentName: product.name, value: effectivePrice }),
+      body: JSON.stringify({ slug, contentName: product.name, value: effectivePrice, eventId }),
     }).catch(() => {
       // Never block checkout for CAPI failures
     });
@@ -100,13 +104,18 @@ export default function CheckoutSummaryPage() {
     function fireViewContent() {
       const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
       if (!fbq) return false;
-      fbq("track", "ViewContent", {
-        content_name: product.name,
-        content_ids: [slug],
-        content_type: "product",
-        value: effectivePrice,
-        currency: "USD",
-      });
+      fbq(
+        "track",
+        "ViewContent",
+        {
+          content_name: product.name,
+          content_ids: [slug],
+          content_type: "product",
+          value: effectivePrice,
+          currency: "USD",
+        },
+        { eventID: eventId }
+      );
       return true;
     }
 
@@ -448,11 +457,12 @@ export default function CheckoutSummaryPage() {
                 // Guard: don't proceed without required protein
                 if (proteinIncluded && selectedProteins.length === 0) return;
 
-                // Fire InitiateCheckout on user action, not page load (UNC-559)
+                // Fire AddToCart, not InitiateCheckout: the user has only selected a
+                // box. InitiateCheckout is reserved for the payment step. Client-only.
                 try {
                   const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
                   if (fbq) {
-                    fbq("track", "InitiateCheckout", {
+                    fbq("track", "AddToCart", {
                       content_name: product.name,
                       content_ids: [slug],
                       content_type: "product",
@@ -464,12 +474,6 @@ export default function CheckoutSummaryPage() {
                 } catch {
                   // Never block checkout for tracking failures
                 }
-                // Server-side CAPI InitiateCheckout — non-blocking
-                fetch("/api/capi/initiate-checkout", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ slug, contentName: product.name, value: totalPrice }),
-                }).catch(() => {});
 
                 // Persist total price (base + additional proteins) for downstream checkout steps
                 try {

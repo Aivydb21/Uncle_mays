@@ -271,6 +271,14 @@ export default function SubscribePaymentPage() {
           });
         } catch { /* ignore */ }
 
+        // Generate one eventId shared by the browser pixel fire and the server
+        // CAPI fire inside /api/checkout/subscribe-intent, so Meta deduplicates
+        // the pair and only counts a single InitiateCheckout.
+        const icEventId =
+          typeof crypto !== "undefined" && "randomUUID" in crypto
+            ? crypto.randomUUID()
+            : `ic-sub-${data.product}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
         const res = await fetch("/api/checkout/subscribe-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -283,6 +291,7 @@ export default function SubscribePaymentPage() {
             address: data.address,
             deliveryNotes: data.deliveryNotes,
             proteinChoices: data.proteinChoices,
+            eventId: icEventId,
             ...utms,
           }),
         });
@@ -294,19 +303,25 @@ export default function SubscribePaymentPage() {
         setClientSecret(json.clientSecret);
         setSubscriptionId(json.subscriptionId);
 
-        // Fire Meta Pixel InitiateCheckout — subscription intent created, payment form loading
+        // Fire Meta Pixel InitiateCheckout — subscription intent created, payment form loading.
+        // The eventID here matches the one sent to subscribe-intent above so Meta dedupes.
         try {
           if (typeof window !== "undefined") {
             const product = data.product;
             const value = data.subPrice;
             if (window.fbq) {
-              window.fbq("track", "InitiateCheckout", {
-                content_ids: [product],
-                content_type: "product",
-                value,
-                currency: "USD",
-                num_items: 1,
-              });
+              window.fbq(
+                "track",
+                "InitiateCheckout",
+                {
+                  content_ids: [product],
+                  content_type: "product",
+                  value,
+                  currency: "USD",
+                  num_items: 1,
+                },
+                { eventID: icEventId }
+              );
             }
             if (window.gtag) {
               window.gtag("event", "begin_checkout", {

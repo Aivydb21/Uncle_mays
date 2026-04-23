@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
       utm_campaign,
       utm_content,
       utm_term,
+      eventId: clientEventId,
     } = await req.json();
 
     const priceId = SUB_PRICE_MAP[product];
@@ -215,7 +216,10 @@ export async function POST(req: NextRequest) {
         currency: "USD",
         num_items: 1,
       },
-      eventId: `initiate-sub-${subscription.id}`,
+      // Prefer the client-supplied eventId so the browser pixel and this server
+      // CAPI event dedupe at Meta. Fall back to a subscription-based id only if
+      // the client didn't send one.
+      eventId: clientEventId || `initiate-sub-${subscription.id}`,
     }).catch((err) => console.error("[CAPI] InitiateCheckout (subscribe-intent) error:", err));
 
     return NextResponse.json({

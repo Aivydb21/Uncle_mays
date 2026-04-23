@@ -371,7 +371,8 @@ curl "https://graph.facebook.com/v21.0/act_{ad-account-id}/insights?access_token
 - **Auth:** OAuth 2.0 (developer token header + refresh-token flow for access token)
 - **Use cases:** Creating and managing search/display/YouTube campaigns, ad group and keyword management, ad creative upload, budget management, performance reporting, audience management, conversion tracking
 - **Docs:** https://developers.google.com/google-ads/api/docs/start
-- **Status (as of 2026-04-14):** FULLY LIVE. Basic access. OAuth complete. API version v22. MCC/manager: `6758950400` (`login_customer_id`). Operating ad account: `6015592923` (`customer_id`). All campaigns target `6015592923`. Always include `login-customer-id: 6758950400` header.
+- **Status (as of 2026-04-22):** FULLY LIVE. Basic access. OAuth complete. API version v22. Operating ad account: `6015592923` (`customer_id`). All campaigns target `6015592923`.
+- **Auth quirk (verified 2026-04-22):** MCC `6758950400` is listed in `customers:listAccessibleCustomers` alongside `6015592923`, but it does NOT actually manage `6015592923`. Sending `login-customer-id: 6758950400` in the header causes `PERMISSION_DENIED` (USER_PERMISSION_DENIED). **Query `6015592923` directly with NO `login-customer-id` header** (or set it to `6015592923`). The config still has `login_customer_id: 6758950400` — ignore it, do not send it.
 
 ### Required headers
 

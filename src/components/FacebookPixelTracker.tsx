@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 declare global {
@@ -29,7 +29,15 @@ export const FacebookPixelTracker = () => {
     }
   }, [searchParams]);
 
+  // Skip the first mount: the inline Meta Pixel init script in layout.tsx
+  // already fires PageView on initial load. Firing here too would double-count.
+  // Fire on subsequent client-side route changes only.
+  const isFirstMount = useRef(true);
   useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
     if (typeof window !== "undefined" && window.fbq) {
       window.fbq("track", "PageView");
     }
