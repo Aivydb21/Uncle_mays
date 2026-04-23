@@ -6,6 +6,7 @@ import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
 
 declare global {
   interface Window {
@@ -153,6 +154,21 @@ export default function DeliveryPage() {
     const d = getEarliestDeliveryDate();
     setDeliveryDateLabel(d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }));
   }, []);
+
+  // Promo code persisted from the summary page; shown here so the user sees
+  // the discount they were promised by the ad through every step.
+  const [promoCode, setPromoCode] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = normalizePromo(sessionStorage.getItem("unc-promo"));
+      if (saved && ACTIVE_PROMOS[saved]) setPromoCode(saved);
+    } catch { /* ignore */ }
+  }, []);
+  const activePromo = promoCode ? ACTIVE_PROMOS[promoCode] : null;
+  const promoDiscount = activePromo?.appliesTo.includes("one-time")
+    ? activePromo.amountOffCents / 100
+    : 0;
 
   // Pre-fill email from Step 1 capture (sessionStorage)
   useEffect(() => {
@@ -345,6 +361,34 @@ export default function DeliveryPage() {
 
         <StepIndicator current={2} />
 
+        {/* Mobile-only compact order + promo header. Desktop users already
+            see the sticky sidebar with the same info. Without this, mobile
+            users fill the form with no visible reminder of what they're
+            buying or how much it costs — a silent trust leak. */}
+        <div className="md:hidden mb-4 rounded-xl bg-background shadow-soft p-4 flex items-center justify-between gap-3">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+              {product.name}
+            </p>
+            <p className="text-sm text-muted-foreground">Delivered Wednesdays</p>
+          </div>
+          <div className="text-right">
+            {promoDiscount > 0 ? (
+              <>
+                <div className="text-xs line-through text-muted-foreground">${displayPrice}</div>
+                <div className="text-xl font-bold text-primary">${Math.max(0, displayPrice - promoDiscount)}</div>
+              </>
+            ) : (
+              <div className="text-xl font-bold text-primary">${displayPrice}</div>
+            )}
+          </div>
+        </div>
+        {activePromo && promoDiscount > 0 ? (
+          <div className="md:hidden mb-4 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm text-primary">
+            <strong>Promo {promoCode}</strong> applied — {activePromo.label}
+          </div>
+        ) : null}
+
         <div className="grid md:grid-cols-3 gap-6">
           {/* Form */}
           <div className="md:col-span-2">
@@ -416,10 +460,15 @@ export default function DeliveryPage() {
                   )}
                 </div>
 
-                {/* Phone */}
+                {/* Phone — marked optional explicitly. Previously this
+                    rendered as "Phone" with no optional marker, and users
+                    mistook it for required next to the other labeled
+                    required fields. */}
                 <div className="space-y-1.5 mb-4">
-                  <Label htmlFor="phone">Phone</Label>
-                  <p className="text-xs text-muted-foreground -mt-1">Helps with delivery coordination</p>
+                  <Label htmlFor="phone">
+                    Phone <span className="text-muted-foreground font-normal">(optional)</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground -mt-1">Helps with delivery coordination.</p>
                   <Input
                     id="phone"
                     name="phone"
@@ -545,31 +594,53 @@ export default function DeliveryPage() {
                   </div>
                 )}
 
+                {/* Trust signals — counteract the "am I safe to give this info"
+                    pause that users take on address/phone fields. Cheap lift
+                    on mobile where social proof from the summary page scrolls
+                    off-screen. */}
+                <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">🔒 Secure checkout</span>
+                  <span className="flex items-center gap-1">✓ No subscription lock-in</span>
+                  <span className="flex items-center gap-1">📦 Fresh-guaranteed</span>
+                </div>
+
                 <button
                   type="submit"
                   disabled={submitting}
                   className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {submitting ? "Saving…" : "Continue to Payment →"}
+                  {submitting ? "Saving…" : `Continue to Payment · $${promoDiscount > 0 ? Math.max(0, displayPrice - promoDiscount) : displayPrice} →`}
                 </button>
               </form>
             </div>
           </div>
 
-          {/* Order summary sidebar */}
-          <div className="md:col-span-1">
+          {/* Order summary sidebar — hidden on mobile where the compact
+              header above serves the same purpose. */}
+          <div className="hidden md:block md:col-span-1">
             <div className="rounded-2xl bg-background shadow-soft p-5 sticky top-6">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
                 Order Summary
               </h2>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <span className="font-medium text-sm">{product.name}</span>
-                <span className="font-bold text-primary">${displayPrice}</span>
+                <span className={`font-bold ${promoDiscount > 0 ? "text-muted-foreground line-through text-sm" : "text-primary"}`}>
+                  ${displayPrice}
+                </span>
               </div>
+              {promoDiscount > 0 && activePromo ? (
+                <>
+                  <div className="flex items-center justify-between mb-2 text-sm">
+                    <span className="text-primary font-medium">{promoCode} discount</span>
+                    <span className="text-primary font-medium">−${promoDiscount}</span>
+                  </div>
+                  <p className="text-xs text-primary mb-2">{activePromo.label}</p>
+                </>
+              ) : null}
               <div className="border-t border-border pt-3">
                 <div className="flex items-center justify-between text-sm font-semibold">
                   <span>Total</span>
-                  <span className="text-primary">${displayPrice}.00</span>
+                  <span className="text-primary">${Math.max(0, displayPrice - promoDiscount)}.00</span>
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-3">

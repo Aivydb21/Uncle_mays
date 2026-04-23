@@ -32,21 +32,28 @@ Lowest-friction entry point for cold traffic ($31.50/wk with FRESH10 discount on
 | `120243236117510762` | FB Feed Static 1 | `https://unclemays.com/subscribe/starter?utm_source=facebook&utm_medium=image&utm_campaign=subscription_launch_apr2026&utm_content=fb_static1&promo=FRESH10` |
 | `120243236112320762` | FB Feed Static 3 | `https://unclemays.com/subscribe/starter?utm_source=facebook&utm_medium=image&utm_campaign=subscription_launch_apr2026&utm_content=fb_static3&promo=FRESH10` |
 
-## Video-only ads (no link to update)
+## Video ads (no link set currently — add one during edit)
 
-These eight have no Website URL set (video-only with CTA button). They need a link added to the CTA during the same edit pass — use `/subscribe/starter?promo=FRESH10` with a matching `utm_content`.
+These 11 are video ads with a CTA button but no Website URL attached. Paste the URL into the ad's **Website URL** field (or under the CTA config if using Instant Experiences).
 
-- `120243457464920762` — Retargeting - Don Video (Social Proof)
-- `120243399452240762` — Sub Launch - IG Feed - Don Jhonsan 4
-- `120243399457950762` — Sub Launch - IG Feed - Don Video 5
-- `120243399453720762` — Sub Launch - IG Stories - Don Jhonsan 4
-- `120243399459760762` — Sub Launch - IG Stories - Don Video 5
-- `120243399461780762` — Sub Launch - FB Feed - Don Video 5
-- `120243399455400762` — Sub Launch - FB Feed - Don Jhonsan 4
-- `120243236140440762` — IG Stories Video 1
-- `120243236125020762` — FB Feed Video 2
-- `120243236121200762` — FB Feed Video 1
-- `120243236165060762` — IG Feed Video 1
+| Ad ID | Ad Name | Category | URL |
+|---|---|---|---|
+| `120243457464920762` | Retargeting - Don Video (Social Proof) | retargeting | `https://unclemays.com/checkout/starter?utm_source=facebook&utm_medium=video&utm_campaign=subscription_launch_apr2026&utm_content=retargeting_don_video&promo=FRESH10` |
+| `120243399452240762` | Sub Launch - IG Feed - Don Jhonsan 4 | cold | `https://unclemays.com/subscribe/starter?utm_source=instagram&utm_medium=video&utm_campaign=subscription_launch_apr2026&utm_content=ig_feed_don_jhonsan&promo=FRESH10` |
+| `120243399457950762` | Sub Launch - IG Feed - Don Video 5 | cold | `https://unclemays.com/subscribe/starter?utm_source=instagram&utm_medium=video&utm_campaign=subscription_launch_apr2026&utm_content=ig_feed_don_v5&promo=FRESH10` |
+| `120243399453720762` | Sub Launch - IG Stories - Don Jhonsan 4 | cold | `https://unclemays.com/subscribe/starter?utm_source=instagram&utm_medium=story&utm_campaign=subscription_launch_apr2026&utm_content=ig_stories_don_jhonsan&promo=FRESH10` |
+| `120243399459760762` | Sub Launch - IG Stories - Don Video 5 | cold | `https://unclemays.com/subscribe/starter?utm_source=instagram&utm_medium=story&utm_campaign=subscription_launch_apr2026&utm_content=ig_stories_don_v5&promo=FRESH10` |
+| `120243399461780762` | Sub Launch - FB Feed - Don Video 5 | cold | `https://unclemays.com/subscribe/starter?utm_source=facebook&utm_medium=video&utm_campaign=subscription_launch_apr2026&utm_content=fb_feed_don_v5&promo=FRESH10` |
+| `120243399455400762` | Sub Launch - FB Feed - Don Jhonsan 4 | cold | `https://unclemays.com/subscribe/starter?utm_source=facebook&utm_medium=video&utm_campaign=subscription_launch_apr2026&utm_content=fb_feed_don_jhonsan&promo=FRESH10` |
+| `120243236140440762` | IG Stories Video 1 (Checkout) | cold | `https://unclemays.com/subscribe/starter?utm_source=instagram&utm_medium=story&utm_campaign=subscription_launch_apr2026&utm_content=ig_stories_video1&promo=FRESH10` |
+| `120243236125020762` | FB Feed Video 2 (Checkout) | cold | `https://unclemays.com/subscribe/starter?utm_source=facebook&utm_medium=video&utm_campaign=subscription_launch_apr2026&utm_content=fb_feed_video2&promo=FRESH10` |
+| `120243236121200762` | FB Feed Video 1 (Checkout) | cold | `https://unclemays.com/subscribe/starter?utm_source=facebook&utm_medium=video&utm_campaign=subscription_launch_apr2026&utm_content=fb_feed_video1&promo=FRESH10` |
+| `120243236165060762` | IG Feed Video 1 (Checkout) | cold | `https://unclemays.com/subscribe/starter?utm_source=instagram&utm_medium=video&utm_campaign=subscription_launch_apr2026&utm_content=ig_feed_video1&promo=FRESH10` |
+
+**Notes:**
+- All URLs carry `promo=FRESH10` so the landing page reinforces the "$10 off your first box" promise via the banner we just shipped.
+- The single retargeting video (`120243457464920762`) points at `/checkout/starter` (one-time); the rest are cold traffic → `/subscribe/starter` (lower-friction subscription entry).
+- `utm_medium` = `video` for feed placements, `story` for stories — this lets GA4 segment feed-vs-story performance in the Source/Medium report.
 
 ## Already done via API
 
