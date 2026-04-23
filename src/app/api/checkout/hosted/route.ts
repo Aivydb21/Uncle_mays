@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-// Map product slugs to Stripe Price IDs (one-time prices)
+// Map product slugs to Stripe Price IDs (one-time prices).
+// Community Box is retired. Stripe Price IDs are immutable — these still
+// carry the legacy $35/$65 amounts. Replace with new Price IDs when ready
+// to charge the updated $40/$70 retail prices via the hosted flow.
 const PRICE_MAP: Record<string, string> = {
-  starter: "price_1Sb4yrG67LsNxpTo2r1aphVI",   // Essentials Box — $35
-  family: "price_1Sb5PUG67LsNxpToKdpQkWDg",     // Family Box — $65
-  community: "price_1Sb5LiG67LsNxpToKmA6QPgg",  // Premium Box — $95
+  starter: "price_1Sb4yrG67LsNxpTo2r1aphVI",
+  family: "price_1Sb5PUG67LsNxpToKdpQkWDg",
 };
 
 export async function POST(req: NextRequest) {

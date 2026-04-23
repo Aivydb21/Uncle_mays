@@ -7,41 +7,29 @@ import { Check } from "lucide-react";
 
 const plans = [
   {
-    name: "Starter Box",
-    description: "1-2 people",
-    subPrice: "$31.50",
+    name: "Small Box",
+    description: "For 1–2 people",
+    subPrice: "$36",
     subFrequency: "/wk",
     bullets: [
-      "6 seasonal vegetables, ~8 servings",
-      "No chemicals, no wax coatings",
+      "6 seasonal items from our farmer partners",
+      "Greens, roots, and pantry staples",
       "Delivered fresh every Wednesday",
     ],
     slug: "starter",
   },
   {
     name: "Family Box",
-    description: "Family of 4",
-    subPrice: "$58.50",
+    description: "For 3–4 people",
+    subPrice: "$63",
     subFrequency: "/wk",
     bullets: [
-      "12 items — whole chicken + dozen eggs included",
-      "Best value per serving",
+      "9 seasonal items, rotating with the harvest",
+      "Add a protein at checkout if you want one",
       "Delivered fresh every Wednesday",
     ],
     popular: true,
     slug: "family",
-  },
-  {
-    name: "Community Box",
-    description: "Specialty & heirloom",
-    subPrice: "$85.50",
-    subFrequency: "/wk",
-    bullets: [
-      "Specialty and heirloom varieties",
-      "Choice of protein included",
-      "Delivered fresh every Wednesday",
-    ],
-    slug: "community",
   },
 ];
 

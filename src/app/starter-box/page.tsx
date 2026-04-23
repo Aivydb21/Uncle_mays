@@ -6,11 +6,11 @@ import { Truck, ShieldCheck, Star, Check, ArrowRight, Leaf } from "lucide-react"
 import { PRODUCTS } from "@/lib/products";
 
 const starterBox = PRODUCTS.starter;
-const PRICE = starterBox.price; // $35
+const PRICE = starterBox.price;
 
 const testimonial = {
   quote:
-    "I ordered the Starter Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The asparagus and greens were gone in two days.",
+    "I ordered the Small Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The kale and salad mix were gone in two days.",
   name: "Rob",
   location: "Bronzeville, Chicago",
 };
@@ -23,7 +23,7 @@ function CTAButton({ className = "" }: { className?: string }) {
       onClick={() => {
         if (typeof window !== "undefined" && typeof (window as Window & { fbq?: (...a: unknown[]) => void }).fbq === "function") {
           (window as Window & { fbq: (...a: unknown[]) => void }).fbq("track", "InitiateCheckout", {
-            content_name: "Starter Box",
+            content_name: "Small Box",
             content_ids: ["starter"],
             content_type: "product",
             value: PRICE,
@@ -32,7 +32,7 @@ function CTAButton({ className = "" }: { className?: string }) {
         }
       }}
     >
-      Order Your Starter Box
+      Order Your Small Box
       <ArrowRight className="h-5 w-5" />
     </Link>
   );
@@ -81,7 +81,7 @@ export default function StarterBoxLandingPage() {
               </div>
 
               <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-4">
-                The Starter Box.{" "}
+                The Small Box.{" "}
                 <span className="text-primary">${PRICE}.</span>
               </h1>
 
@@ -113,7 +113,7 @@ export default function StarterBoxLandingPage() {
             <div className="flex items-center gap-3 mb-2">
               <Leaf className="h-5 w-5 text-primary" />
               <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                This week&apos;s Starter Box
+                This week&apos;s Small Box
               </span>
             </div>
             <h2 className="text-2xl md:text-3xl font-bold mb-6">
@@ -124,13 +124,13 @@ export default function StarterBoxLandingPage() {
               <div className="relative">
                 <img
                   src="/images/produce-box.jpg"
-                  alt="Starter Box — fresh seasonal produce"
+                  alt="Small Box — fresh seasonal produce"
                   className="w-full h-52 object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                 <div className="absolute bottom-4 left-5">
                   <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
-                    ~12–15 lbs · perfect for 1–2 people
+                    {starterBox.servingBadge}
                   </span>
                 </div>
               </div>
@@ -231,7 +231,7 @@ export default function StarterBoxLandingPage() {
             transition={{ duration: 0.6 }}
           >
             <div className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-4 py-1.5 text-xs font-bold mb-4">
-              Starter Box · ${PRICE} · No subscription
+              Small Box · ${PRICE} · No subscription
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-3">
               Ready for fresh produce?

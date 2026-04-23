@@ -2,19 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { validatePromo } from "@/lib/promo";
 
-// Map product slugs to amounts in cents (regular price)
+// Map product slugs to amounts in cents (one-time price).
+// MUST match src/lib/products.ts PRODUCTS[slug].price * 100.
 const AMOUNT_MAP: Record<string, number> = {
-  starter: 3500,
-  family: 6500,
-  community: 9500,
+  starter: 4000,
+  family: 7000,
 };
 
-// Additional protein pricing in cents (10-13% markup over base protein costs)
-const ADDITIONAL_PROTEIN_PRICING: Record<string, number> = {
-  chicken: 2000,
-  "pork-chops": 1800,
-  "beef-short-ribs": 2400,
-  salmon: 2200,
+// Optional protein add-on prices in cents.
+// MUST match src/lib/products.ts PROTEIN_OPTIONS[].price * 100.
+const PROTEIN_ADD_ON_PRICING: Record<string, number> = {
+  chicken: 4500,
+  "beef-short-ribs": 3800,
+  "lamb-chops": 4200,
 };
 
 export async function POST(req: NextRequest) {
@@ -32,13 +32,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unknown product" }, { status: 400 });
     }
 
-    // Add additional protein costs to the total amount
-    if (Array.isArray(additionalProteins) && additionalProteins.length > 0) {
-      for (const proteinId of additionalProteins) {
-        const proteinCost = ADDITIONAL_PROTEIN_PRICING[proteinId];
-        if (proteinCost) {
-          amount += proteinCost;
-        }
+    // Proteins are optional paid add-ons (no protein is ever "included").
+    // Charge for every entry in either `proteins` or `additionalProteins` —
+    // both arrays are treated identically and may come from legacy callers.
+    const allProteins: unknown[] = [
+      ...(Array.isArray(proteins) ? proteins : []),
+      ...(Array.isArray(additionalProteins) ? additionalProteins : []),
+    ];
+    for (const proteinId of allProteins) {
+      if (typeof proteinId === "string") {
+        const proteinCost = PROTEIN_ADD_ON_PRICING[proteinId];
+        if (proteinCost) amount += proteinCost;
       }
     }
 

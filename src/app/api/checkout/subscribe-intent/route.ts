@@ -4,11 +4,11 @@ import { upsertContact, createCart } from "@/lib/mailchimp";
 import { sendCapiEvent } from "@/lib/meta-capi";
 import { validatePromo } from "@/lib/promo";
 
-// Subscription Price IDs (weekly, 10% discount vs one-time)
+// Subscription Price IDs (weekly, 10% discount vs one-time).
+// Community Box is retired — do not add it back.
 const SUB_PRICE_MAP: Record<string, string> = {
   starter: process.env.STRIPE_STARTER_SUB_PRICE_ID || "",
   family: process.env.STRIPE_FAMILY_SUB_PRICE_ID || "",
-  community: process.env.STRIPE_COMMUNITY_SUB_PRICE_ID || "",
 };
 
 export async function POST(req: NextRequest) {

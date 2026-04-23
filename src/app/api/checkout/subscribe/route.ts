@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { upsertContact, createCart } from "@/lib/mailchimp";
 
-// Subscription Price IDs (weekly, 10% discount vs one-time)
-// Set these in .env: STRIPE_STARTER_SUB_PRICE_ID, STRIPE_FAMILY_SUB_PRICE_ID, STRIPE_COMMUNITY_SUB_PRICE_ID
+// Subscription Price IDs (weekly, 10% discount vs one-time).
+// Community Box is retired — do not add it back.
 const SUB_PRICE_MAP: Record<string, string> = {
-  starter: process.env.STRIPE_STARTER_SUB_PRICE_ID || "",   // Essentials — $31.50/wk
-  family: process.env.STRIPE_FAMILY_SUB_PRICE_ID || "",     // Family — $58.50/wk
-  community: process.env.STRIPE_COMMUNITY_SUB_PRICE_ID || "", // Community — $85.50/wk
+  starter: process.env.STRIPE_STARTER_SUB_PRICE_ID || "",
+  family: process.env.STRIPE_FAMILY_SUB_PRICE_ID || "",
 };
 
 export async function POST(req: NextRequest) {

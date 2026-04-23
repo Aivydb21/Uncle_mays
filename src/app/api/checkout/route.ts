@@ -3,11 +3,16 @@ import Stripe from "stripe";
 import { sendCapiEvent } from "@/lib/meta-capi";
 
 
-// Map product slugs to Stripe Price IDs (one-time prices)
+// Map product slugs to Stripe Price IDs (one-time prices).
+// Community Box is retired. The underlying Stripe Price IDs still carry the
+// legacy $35/$65 amounts — Stripe prices are immutable, so new Price IDs
+// must be created and swapped in when Small/Family retail prices change
+// ($40/$70 in the new model). Until then, the embedded-page hosted flow
+// (this route) will still charge the old amount. All primary traffic uses
+// the custom PaymentIntent flow in /api/checkout/intent, which was updated.
 const PRICE_MAP: Record<string, string> = {
-  starter: "price_1Sb4yrG67LsNxpTo2r1aphVI",   // Essentials Box — $35
-  family: "price_1Sb5PUG67LsNxpToKdpQkWDg",     // Family Box — $65
-  community: "price_1Sb5LiG67LsNxpToKmA6QPgg",  // Premium Box — $95
+  starter: "price_1Sb4yrG67LsNxpTo2r1aphVI",
+  family: "price_1Sb5PUG67LsNxpToKdpQkWDg",
 };
 
 export async function POST(req: NextRequest) {
@@ -64,7 +69,7 @@ export async function POST(req: NextRequest) {
       "";
     const userAgent = req.headers.get("user-agent") || "";
     const referer = req.headers.get("referer") || "";
-    const ONE_TIME_PRICES: Record<string, number> = { starter: 35, family: 65, community: 95 };
+    const ONE_TIME_PRICES: Record<string, number> = { starter: 40, family: 70 };
     const priceInDollars = ONE_TIME_PRICES[product] ?? 0;
     sendCapiEvent({
       eventName: "InitiateCheckout",

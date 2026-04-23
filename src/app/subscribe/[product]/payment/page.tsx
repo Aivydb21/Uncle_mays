@@ -22,21 +22,6 @@ declare global {
 // Load Stripe once outside component to avoid recreating on renders
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-const VALUE_ANCHORS: Record<string, { serving: string; guarantee: string }> = {
-  starter: {
-    serving: "~8 servings of fresh, seasonal produce",
-    guarantee: "Sourced to our standard. If it ever falls short, we make it right.",
-  },
-  family: {
-    serving: "~14-18 servings: produce, eggs, and a whole chicken",
-    guarantee: "Sourced to our standard. If it ever falls short, we make it right.",
-  },
-  community: {
-    serving: "~20-24 servings: heirloom produce + your choice of protein",
-    guarantee: "Sourced to our standard. If it ever falls short, we make it right.",
-  },
-};
-
 function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
   const steps = ["Subscription Summary", "Your Details", "Payment"];
   return (
@@ -156,21 +141,7 @@ function SubscriptionPaymentForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <PaymentElement className="mb-4" />
-
-      {/* Value anchor */}
-      {(() => {
-        const anchor = VALUE_ANCHORS[checkout.product] ?? {
-          serving: "~8 servings of fresh, seasonal produce",
-          guarantee: "Sourced to our standard. If it ever falls short, we make it right.",
-        };
-        return (
-          <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 px-3 py-3">
-            <p className="text-sm font-medium text-primary/80 mb-1">{anchor.serving}</p>
-            <p className="text-sm font-bold text-primary">{anchor.guarantee}</p>
-          </div>
-        );
-      })()}
+      <PaymentElement className="mb-6" />
 
       {paymentError && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">

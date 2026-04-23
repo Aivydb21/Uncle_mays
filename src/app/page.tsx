@@ -40,7 +40,7 @@ const organizationSchema = {
   url: "https://unclemays.com",
   logo: "https://www.unclemays.com/uncle-mays-logo.png",
   description:
-    "Uncle May's Produce connects Black farmers directly to Chicago through curated seasonal produce boxes. Delivering every Wednesday. Boxes from $35, no subscription required.",
+    "Uncle May's Produce connects Black farmers directly to Chicago through curated seasonal produce boxes. Delivering every Wednesday. Boxes from $40, no subscription required.",
   contactPoint: {
     "@type": "ContactPoint",
     telephone: "+1-312-972-2595",
@@ -70,17 +70,17 @@ const productListSchema = {
       position: 1,
       item: {
         "@type": "Product",
-        name: "Starter Box",
+        name: "Small Box",
         description:
-          "6 seasonal produce items (~12–15 lbs): collard greens, asparagus, spring onions, heirloom cherry tomatoes, Persian cucumbers, and snap peas. Perfect for individuals or couples.",
+          "6 seasonal items from our Black farmer partners: salad mix, kale, candy orange carrots, sweet potatoes, organic pinto beans, and microgreens. Built for 1–2 people.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
           "@type": "Offer",
-          price: "35.00",
+          price: "40.00",
           priceCurrency: "USD",
           availability: "https://schema.org/InStock",
-          url: "https://buy.stripe.com/6oUbJ1bfpdeY2JpfZG9Zm0g",
+          url: "https://unclemays.com/checkout/starter",
         },
       },
     },
@@ -91,34 +91,15 @@ const productListSchema = {
         "@type": "Product",
         name: "Family Box",
         description:
-          "10 seasonal produce items (~22–26 lbs) plus farm eggs (1 dozen) and pasture-raised whole chicken included. Collard greens, asparagus, spring onions, cherry tomatoes, cucumbers, snap peas, rainbow chard, strawberries, beets, and zucchini. Ideal for families of 3–5.",
+          "9 seasonal items from our Black farmer partners: asparagus (spring; rotates seasonally), kale, rainbow chard, salad mix, candy orange carrots, sweet potatoes, organic pinto beans, organic kidney beans, and microgreens. Built for 3–4 people.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
           "@type": "Offer",
-          price: "65.00",
+          price: "70.00",
           priceCurrency: "USD",
           availability: "https://schema.org/InStock",
-          url: "https://buy.stripe.com/28EfZh3MXej2bfV5l29Zm0h",
-        },
-      },
-    },
-    {
-      "@type": "ListItem",
-      position: 3,
-      item: {
-        "@type": "Product",
-        name: "Community Box",
-        description:
-          "10 specialty and heirloom produce items (~30–35 lbs) plus farm eggs (1 dozen) and your choice of one protein (chicken, pork chops, beef short ribs, or salmon). Watermelon radishes, fairy tale eggplant, shishito peppers, turnips, cherry tomatoes, pattypan squash, dragon tongue beans, chard, cucumber, and ramps. For large families or splitting across households.",
-        url: "https://unclemays.com/#boxes",
-        brand: { "@type": "Brand", name: "Uncle Mays Produce" },
-        offers: {
-          "@type": "Offer",
-          price: "95.00",
-          priceCurrency: "USD",
-          availability: "https://schema.org/InStock",
-          url: "https://buy.stripe.com/bJe8wPfvF2Ak4Rx4gY9Zm0i",
+          url: "https://unclemays.com/checkout/family",
         },
       },
     },
@@ -142,7 +123,7 @@ const faqSchema = {
       name: "What's actually in the box?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. A Starter Box currently includes items like collard greens, asparagus, spring onions, heirloom cherry tomatoes, Persian cucumbers, and snap peas. The contents vary each delivery based on what's in season.",
+        text: "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. A Small Box currently includes items like salad mix, kale, candy orange carrots, sweet potatoes, organic pinto beans, and microgreens. Contents vary each delivery based on what our farmer partners are harvesting.",
       },
     },
     {
@@ -150,7 +131,7 @@ const faqSchema = {
       name: "How much does a box cost?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Boxes start at $35 for a Starter Box (6 seasonal items, 12-15 lbs), $65 for a Family Box (10 produce items, eggs, and chicken, 22-26 lbs), and $95 for a Community Box (10 specialty items, eggs, and choice of protein, 30-35 lbs). No subscription required. Order when you want.",
+        text: "Two tiers: $40 for a Small Box (6 items, built for 1–2 people) or $70 for a Family Box (9 items, built for 3–4 people). Proteins (pasture-raised chicken, beef short ribs, or lamb chops) are optional paid add-ons at checkout. No subscription required — but Subscribe & Save takes 10% off every box.",
       },
     },
     {

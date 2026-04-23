@@ -46,7 +46,7 @@ const steps = [
     step: "01",
     title: "Choose Your Box",
     description:
-      "Pick the box size that works for your household: Starter, Family, or Community. Order one-time or subscribe weekly and save 10%.",
+      "Pick the box size that works for your household: Small or Family. Order one-time or subscribe weekly and save 10%.",
   },
   {
     icon: Package,
@@ -79,11 +79,11 @@ const faqs = [
   },
   {
     q: "What's actually in the box?",
-    a: "Every box is sourced from a Black-owned farm and packed with what's freshest. The Starter Box currently includes collard greens, asparagus, spring onions, heirloom cherry tomatoes, Persian cucumbers, and snap peas (~12-15 lbs). The Family Box includes 10 seasonal produce items, a dozen farm eggs, and pasture-raised whole chicken. The Community Box includes 10 specialty and heirloom varieties, a dozen farm eggs, and your choice of one protein: chicken, pork chops, beef short ribs, or salmon. Contents rotate each delivery based on what's in season.",
+    a: "Every box is sourced from our Black-owned farm partners and packed with what's freshest that week. The Small Box currently includes a salad-mix clamshell, a bunch of kale, candy orange carrots, sweet potatoes, organic pinto beans, and a clamshell of microgreens — built for 1–2 people. The Family Box adds asparagus (spring only), rainbow chard, extra carrots and sweet potatoes, and a second variety of organic beans — built for 3–4 people. Contents rotate each delivery based on what's in season.",
   },
   {
     q: "How much does a box cost?",
-    a: "The Starter Box is $35 one-time ($31.50/wk with a subscription). The Family Box is $65 one-time ($58.50/wk with a subscription) and includes 10 seasonal produce items, a dozen farm eggs, and pasture-raised whole chicken. The Community Box is $95 one-time ($85.50/wk with a subscription) and includes 10 specialty and heirloom produce items, a dozen farm eggs, and your choice of one protein (chicken, pork chops, beef short ribs, or salmon). Subscribe & Save takes 10% off every box. Cancel anytime.",
+    a: "The Small Box is $40 one-time ($36/wk with a subscription). The Family Box is $70 one-time ($63/wk with a subscription). Subscribe & Save takes 10% off every box and you can cancel anytime. Proteins (pasture-raised whole chicken, grass-fed beef short ribs, or lamb chops) are optional paid add-ons at checkout.",
   },
   {
     q: "How do I cancel my subscription or order?",
@@ -92,12 +92,12 @@ const faqs = [
 ];
 
 const sampleStarterBox = [
-  "Collard greens (1 bunch)",
-  "Asparagus (1 lb)",
-  "Spring onions (1 bunch)",
-  "Heirloom cherry tomatoes (1 pint)",
-  "Persian cucumbers (4 ct)",
-  "Snap peas (1/2 lb)",
+  "Salad mix (5 oz)",
+  "Kale (1 bunch)",
+  "Candy orange carrots (1 lb)",
+  "Sweet potatoes (1.5 lb)",
+  "Organic pinto beans (1 lb)",
+  "Microgreens (chef's pick)",
 ];
 
 const FaqContent = () => {
@@ -172,7 +172,7 @@ const FaqContent = () => {
             className="bg-card rounded-2xl p-8 shadow-soft border border-border/50 max-w-3xl mx-auto"
           >
             <h3 className="text-2xl font-bold mb-2 text-center">
-              Sample Starter Box
+              Sample Small Box
             </h3>
             <p className="text-muted-foreground text-center mb-6">
               Contents rotate each delivery based on what's freshest. Here's a

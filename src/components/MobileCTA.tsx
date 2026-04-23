@@ -8,7 +8,7 @@ import Link from "next/link";
  * MobileCTA — sticky bottom bar shown on mobile only.
  * Appears after the user scrolls past the hero (~300px).
  * Keeps the shop CTA thumb-reachable at all times on mobile.
- * Shows all 3 box prices with direct checkout links — no intermediate scroll step.
+ * Two-tier layout with direct checkout links — no intermediate scroll step.
  */
 export const MobileCTA = () => {
   const [visible, setVisible] = useState(false);
@@ -36,22 +36,15 @@ export const MobileCTA = () => {
               href="/subscribe/starter"
               className="flex-1 flex flex-col items-center justify-center rounded-xl border border-border bg-muted/50 py-2.5 text-center"
             >
-              <span className="text-xs text-muted-foreground">Starter</span>
-              <span className="text-base font-bold text-primary">$35</span>
+              <span className="text-xs text-muted-foreground">Small</span>
+              <span className="text-base font-bold text-primary">$40</span>
             </Link>
             <Link
               href="/subscribe/family"
               className="flex-[2] flex flex-col items-center justify-center rounded-xl bg-primary text-primary-foreground py-2.5 text-center shadow-soft"
             >
               <span className="text-xs opacity-80">Family Box</span>
-              <span className="text-base font-bold">Order — $65</span>
-            </Link>
-            <Link
-              href="/subscribe/community"
-              className="flex-1 flex flex-col items-center justify-center rounded-xl border border-border bg-muted/50 py-2.5 text-center"
-            >
-              <span className="text-xs text-muted-foreground">Community</span>
-              <span className="text-base font-bold text-primary">$95</span>
+              <span className="text-base font-bold">Order — $70</span>
             </Link>
           </div>
         </motion.div>

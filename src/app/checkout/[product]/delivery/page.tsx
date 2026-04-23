@@ -233,18 +233,20 @@ export default function DeliveryPage() {
     setSubmitting(true);
     setSubmitError(null);
 
-    // Read protein choices for family/community boxes
+    // Protein add-ons are optional on every box.
     let proteinChoices: ProteinId[] | undefined;
     let additionalProteinChoices: ProteinId[] | undefined;
-    if (product.proteinCount > 0 && typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       try {
         const saved = sessionStorage.getItem(`unc-proteins-${slug}`);
         if (saved) {
-          proteinChoices = JSON.parse(saved) as ProteinId[];
+          const parsed = JSON.parse(saved) as ProteinId[];
+          if (parsed.length > 0) proteinChoices = parsed;
         }
         const savedAdditional = sessionStorage.getItem(`unc-additional-proteins-${slug}`);
         if (savedAdditional) {
-          additionalProteinChoices = JSON.parse(savedAdditional) as ProteinId[];
+          const parsed = JSON.parse(savedAdditional) as ProteinId[];
+          if (parsed.length > 0) additionalProteinChoices = parsed;
         }
       } catch {
         // ignore

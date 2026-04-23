@@ -78,33 +78,6 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
   );
 }
 
-const VALUE_ANCHORS: Record<string, { headline: string; bullets: string[] }> = {
-  starter: {
-    headline: "Cleaner than Whole Foods. Cheaper than Aldi.",
-    bullets: [
-      "No chemical washes on your produce",
-      "No chemical bath on your meat",
-      "~8 servings of fresh, seasonal produce — $35 delivered",
-    ],
-  },
-  family: {
-    headline: "Cleaner than Whole Foods. Cheaper than Aldi.",
-    bullets: [
-      "No chemical washes on your produce",
-      "No chemical bath on your meat",
-      "Whole chicken, dozen eggs, full week of produce — $65 delivered",
-    ],
-  },
-  community: {
-    headline: "Cleaner than Whole Foods. Specialty produce you won't find at Aldi.",
-    bullets: [
-      "No chemical washes on your produce",
-      "No chemical bath on your meat",
-      "20-24 servings of heirloom and specialty produce + your choice of protein",
-    ],
-  },
-};
-
 // Inner form — must live inside <Elements>
 function PaymentForm({
   checkout,
@@ -172,29 +145,7 @@ function PaymentForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <PaymentElement className="mb-4" />
-
-      {/* Value anchor */}
-      {(() => {
-        const anchor = VALUE_ANCHORS[checkout.product] ?? {
-          headline: "Cleaner than Whole Foods. Cheaper than Aldi.",
-          bullets: [
-            "No chemical washes on your produce",
-            "No chemical bath on your meat",
-            "Priced below Aldi per serving",
-          ],
-        };
-        return (
-          <div className="mb-6 rounded-lg border border-primary/20 bg-primary/5 px-3 py-3">
-            <p className="text-sm font-bold text-primary mb-1.5">{anchor.headline}</p>
-            <ul className="space-y-0.5">
-              {anchor.bullets.map((b) => (
-                <li key={b} className="text-xs text-foreground/80">{b}</li>
-              ))}
-            </ul>
-          </div>
-        );
-      })()}
+      <PaymentElement className="mb-6" />
 
       {paymentError && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
@@ -432,31 +383,25 @@ export default function PaymentPage() {
                 <span className="font-bold text-primary">${checkout.price}</span>
               </div>
 
-              {checkout.proteinChoices && checkout.proteinChoices.length > 0 && (
-                <div className="mb-2">
-                  <p className="text-xs text-muted-foreground font-medium mb-1">
-                    Included Protein:
-                  </p>
-                  <ul className="space-y-0.5">
-                    {checkout.proteinChoices.map((p) => (
-                      <li key={p} className="text-xs text-foreground/80">• {p.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {checkout.additionalProteinChoices && checkout.additionalProteinChoices.length > 0 && (
-                <div className="mb-2">
-                  <p className="text-xs text-muted-foreground font-medium mb-1">
-                    Additional Protein{checkout.additionalProteinChoices.length > 1 ? "s" : ""}:
-                  </p>
-                  <ul className="space-y-0.5">
-                    {checkout.additionalProteinChoices.map((p) => (
-                      <li key={p} className="text-xs text-foreground/80">• {p.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              {(() => {
+                const allProteins = [
+                  ...(checkout.proteinChoices ?? []),
+                  ...(checkout.additionalProteinChoices ?? []),
+                ];
+                if (allProteins.length === 0) return null;
+                return (
+                  <div className="mb-2">
+                    <p className="text-xs text-muted-foreground font-medium mb-1">
+                      Protein{allProteins.length > 1 ? "s" : ""} added:
+                    </p>
+                    <ul className="space-y-0.5">
+                      {allProteins.map((p) => (
+                        <li key={p} className="text-xs text-foreground/80">• {p.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
 
               <div className="border-t border-border pt-3 mb-3">
                 <div className="flex items-center justify-between text-sm font-semibold">
@@ -477,27 +422,10 @@ export default function PaymentPage() {
                 )}
               </div>
 
-              {/* Trust signals in sidebar */}
-              <div className="pt-4 border-t border-border space-y-2 mb-3">
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span>Delivered this Wednesday</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span>Less than Aldi per serving</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span>Cleaner than Whole Foods, better priced than Aldi</span>
-                </div>
-              </div>
+              {/* One quiet delivery reminder — no selling copy on the payment step. */}
+              <p className="pt-4 border-t border-border text-xs text-muted-foreground mb-3">
+                Delivered this Wednesday.
+              </p>
             </div>
           </div>
         </div>

@@ -54,10 +54,10 @@ export async function upsertContact(
 }
 
 // Maps checkout product slugs to the IDs registered in the Mailchimp store.
+// Community Box is retired — do not add it back.
 const MC_PRODUCT_IDS: Record<string, { productId: string; variantId: string }> = {
-  starter:   { productId: "starter_box",   variantId: "starter_box_v1" },
-  family:    { productId: "family_box",     variantId: "family_box_v1" },
-  community: { productId: "community_box",  variantId: "community_box_v1" },
+  starter: { productId: "starter_box", variantId: "starter_box_v1" },
+  family:  { productId: "family_box",  variantId: "family_box_v1" },
 };
 
 // Create a Mailchimp e-commerce cart so the abandoned cart Journey fires if

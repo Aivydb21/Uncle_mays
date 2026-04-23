@@ -95,11 +95,10 @@ export default function OrderSuccessContent() {
   const [isSubscription, setIsSubscription] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
 
-  // Weekly subscription amounts by product (cents → dollars)
+  // Weekly subscription amounts by product — must match PRODUCTS[slug].subPrice.
   const SUB_AMOUNT: Record<string, number> = {
-    starter: 31.5,
-    family: 58.5,
-    community: 85.5,
+    starter: 36,
+    family: 63,
   };
 
   useEffect(() => {

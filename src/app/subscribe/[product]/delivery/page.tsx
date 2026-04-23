@@ -212,13 +212,14 @@ export default function SubscribeDeliveryPage() {
 
     setSubmitting(true);
 
-    // Read protein choices from sessionStorage
+    // Protein add-ons are optional on every box.
     let proteinChoices: ProteinId[] | undefined;
-    if (product.proteinCount > 0 && typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       try {
         const saved = sessionStorage.getItem(`unc-sub-proteins-${slug}`);
         if (saved) {
-          proteinChoices = JSON.parse(saved) as ProteinId[];
+          const parsed = JSON.parse(saved) as ProteinId[];
+          if (parsed.length > 0) proteinChoices = parsed;
         }
       } catch {
         // ignore

@@ -9,22 +9,16 @@ import { HomeEmailCapture } from "@/components/HomeEmailCapture";
 
 const testimonials = [
   {
-    quote: "The Family Box lasted us almost two weeks. The collard greens were better than anything I've found at Jewel-Osco, and the tomatoes from the farm actually tasted like tomatoes. Already ordered again.",
+    quote: "The Family Box gets us through most of the week. The greens and sweet potatoes have been better than anything I've found at Jewel-Osco. Already ordered again.",
     name: "Tiffany Watkins",
     location: "South Shore, Chicago",
     box: "Family Box",
   },
   {
-    quote: "I ordered the Starter Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The asparagus and greens were gone in two days.",
+    quote: "I ordered the Small Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The kale and salad mix were gone in two days.",
     name: "Damon Carter",
     location: "Bronzeville, Chicago",
-    box: "Starter Box",
-  },
-  {
-    quote: "We split a Community Box between three families on our block. Came out to about $32 each for produce that would've cost us double at the store. Already planning our next order.",
-    name: "Shonda Williams",
-    location: "Hyde Park, Chicago",
-    box: "Community Box",
+    box: "Small Box",
   },
 ];
 
@@ -61,7 +55,7 @@ const Index = () => {
                 step: "01",
                 title: "Choose Your Box",
                 description:
-                  "Pick the box size that works for your household: Starter, Family, or Community. All boxes are one-time purchases. No subscription required.",
+                  "Pick the box size that works for your household: Small or Family. Order one-time or subscribe weekly and save 10%.",
               },
               {
                 icon: Package,

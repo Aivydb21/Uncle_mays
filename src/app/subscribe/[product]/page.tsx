@@ -2,18 +2,13 @@
 
 import { useParams, notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShieldCheck, Truck, Leaf } from "lucide-react";
 import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
-
-function getAvailableProteins(product: typeof PRODUCTS[ProductSlug]) {
-  const allowed = "proteinOptions" in product ? (product.proteinOptions as ProteinId[]) : null;
-  return allowed ? PROTEIN_OPTIONS.filter((o) => allowed.includes(o.id)) : [...PROTEIN_OPTIONS];
-}
 
 function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
   const steps = ["Subscription Summary", "Your Details", "Payment"];
@@ -66,17 +61,10 @@ export default function SubscribeSummaryPage() {
   }
 
   const product = PRODUCTS[slug];
-  const proteinIncluded = product.proteinIncluded;
-  // Stable reference for a given slug (see matching note in checkout/[product]/page.tsx)
-  const availableProteins = useMemo(() => getAvailableProteins(product), [slug]);
 
-  // Auto-select the single included protein in the initial state (not useEffect)
-  // so the Continue button is never briefly disabled on mount.
-  const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>(() =>
-    product.proteinIncluded && getAvailableProteins(product).length === 1
-      ? [getAvailableProteins(product)[0].id]
-      : []
-  );
+  // Proteins are optional paid add-ons, available on every box.
+  const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
+  const [showProteinAddOns, setShowProteinAddOns] = useState(false);
   const [email, setEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
 
@@ -181,27 +169,26 @@ export default function SubscribeSummaryPage() {
     }
   }
 
-  // Restore a prior protein selection from sessionStorage if the user came
-  // back via browser back button. The initial state above already handles
-  // auto-select for single-option boxes; this only overrides when needed.
+  // Restore a prior protein selection if the user came back via browser-back.
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(`unc-sub-proteins-${slug}`);
       if (saved) {
         const parsed = JSON.parse(saved) as ProteinId[];
-        if (parsed.length > 0) setSelectedProteins(parsed);
-      } else if (proteinIncluded && availableProteins.length === 1) {
-        sessionStorage.setItem(`unc-sub-proteins-${slug}`, JSON.stringify([availableProteins[0].id]));
+        if (parsed.length > 0) {
+          setSelectedProteins(parsed);
+          setShowProteinAddOns(true);
+        }
       }
     } catch {
       // ignore
     }
-  }, [slug, proteinIncluded, availableProteins]);
+  }, [slug]);
 
-  // Always single-select (radio): selecting a new protein replaces the previous one
+  // Multi-select: checkbox behavior for optional add-ons.
   function toggleProtein(id: ProteinId) {
     setSelectedProteins((prev) => {
-      const next = prev.includes(id) ? [] : [id];
+      const next = prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id];
       try {
         sessionStorage.setItem(`unc-sub-proteins-${slug}`, JSON.stringify(next));
       } catch {
@@ -210,6 +197,11 @@ export default function SubscribeSummaryPage() {
       return next;
     });
   }
+
+  const proteinCost = selectedProteins.reduce((sum, id) => {
+    const opt = PROTEIN_OPTIONS.find((o) => o.id === id);
+    return sum + (opt?.price ?? 0);
+  }, 0);
 
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
@@ -304,58 +296,60 @@ export default function SubscribeSummaryPage() {
               </ul>
             </div>
 
-            {/* Protein section — only for boxes that include/offer protein */}
-            {product.proteinCount > 0 && <div className="mb-6 p-4 rounded-xl border border-border bg-muted/30">
-              {proteinIncluded ? (
-                <>
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                    Choose Your Protein — Included
+            {/* Optional protein add-on — single collapsed accordion. */}
+            <div className="mb-6 rounded-xl border border-border bg-muted/30 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setShowProteinAddOns((v) => !v)}
+                className="w-full flex items-center justify-between gap-3 p-4 text-left"
+                aria-expanded={showProteinAddOns}
+              >
+                <div>
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                    Add a protein <span className="text-muted-foreground/70 normal-case font-normal">(optional)</span>
                   </h2>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Protein is included with your box at no extra charge. Select one.
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {selectedProteins.length > 0
+                      ? `${selectedProteins.length} added (+$${proteinCost}/wk)`
+                      : "Whole chicken, short ribs, or lamb chops, each week."}
                   </p>
-                </>
-              ) : (
-                <>
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-1">
-                    Add a Protein — Optional
-                  </h2>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    Add one locally sourced protein to your box (+$16–$22). Skip if you prefer.
-                  </p>
-                </>
-              )}
-              <div className="space-y-2">
-                {availableProteins.map((opt) => {
-                  const selected = selectedProteins.includes(opt.id);
-                  return (
-                    <button
-                      key={opt.id}
-                      type="button"
-                      onClick={() => toggleProtein(opt.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium text-left transition-all ${
-                        selected
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
-                      }`}
-                    >
-                      {/* Radio indicator */}
-                      <span
-                        className={`w-5 h-5 rounded-full flex-shrink-0 border-2 flex items-center justify-center ${
-                          selected ? "border-primary bg-primary" : "border-muted-foreground/40"
+                </div>
+                <span className={`text-xl text-muted-foreground transition-transform ${showProteinAddOns ? "rotate-45" : ""}`}>+</span>
+              </button>
+              {showProteinAddOns ? (
+                <div className="px-4 pb-4 space-y-2">
+                  {PROTEIN_OPTIONS.map((opt) => {
+                    const selected = selectedProteins.includes(opt.id);
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => toggleProtein(opt.id)}
+                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium text-left transition-all ${
+                          selected
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
                         }`}
                       >
-                        {selected && <span className="w-2 h-2 rounded-full bg-white" />}
-                      </span>
-                      <span className="flex-1">{opt.label}</span>
-                      {!proteinIncluded && (
-                        <span className="text-muted-foreground font-normal">+${opt.price}</span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>}
+                        <span
+                          className={`w-5 h-5 rounded flex-shrink-0 border-2 flex items-center justify-center ${
+                            selected ? "border-primary bg-primary" : "border-muted-foreground/40"
+                          }`}
+                        >
+                          {selected && (
+                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </span>
+                        <span className="flex-1">{opt.label}</span>
+                        <span className="text-muted-foreground font-normal">+${opt.price}/wk</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </div>
 
             {/* Trust signals */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
@@ -392,20 +386,9 @@ export default function SubscribeSummaryPage() {
               />
             </div>
 
-            {/* Protein required but not selected — show inline error (mirrors checkout) */}
-            {proteinIncluded && selectedProteins.length === 0 ? (
-              <p className="text-sm text-destructive font-medium text-center mb-2">
-                Please select your included protein above to continue.
-              </p>
-            ) : null}
-
             <button
               type="button"
-              disabled={proteinIncluded && selectedProteins.length === 0}
               onClick={() => {
-                // Guard: don't proceed without required protein
-                if (proteinIncluded && selectedProteins.length === 0) return;
-
                 // Fire AddToCart, not InitiateCheckout: the user has only selected a
                 // box here, they haven't entered any checkout info. InitiateCheckout
                 // is reserved for the payment step. Client-only (no CAPI pair).
@@ -452,9 +435,7 @@ export default function SubscribeSummaryPage() {
       <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border px-4 py-3 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)]">
         <button
           type="button"
-          disabled={proteinIncluded && selectedProteins.length === 0}
           onClick={() => {
-            if (proteinIncluded && selectedProteins.length === 0) return;
             try {
               const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
               if (fbq) {

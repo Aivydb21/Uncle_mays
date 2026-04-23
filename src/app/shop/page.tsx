@@ -23,46 +23,35 @@ declare global {
 const boxes: {
   slug: ProductSlug;
   description: string;
-  servings: string;
   popular?: boolean;
-  proteinNote?: string;
 }[] = [
   {
     slug: "starter",
-    description: "A focused weekly haul for 1-2 people",
-    servings: "~12-15 lbs",
+    description: "A focused weekly haul for 1–2 people",
   },
   {
     slug: "family",
-    description: "Feeds a family of 4. Enough variety to fill out the week",
-    servings: "~22-26 lbs",
+    description: "A full week of produce for a household of 3–4",
     popular: true,
-    proteinNote: "Whole chicken included",
-  },
-  {
-    slug: "community",
-    description: "Specialty and heirloom varieties for the adventurous cook",
-    servings: "~30-35 lbs",
-    proteinNote: "Your choice of protein included",
   },
 ];
 
 const testimonials = [
   {
     quote:
-      "I ordered the Starter Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The asparagus and greens were gone in two days.",
+      "I ordered the Small Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The kale and salad mix were gone in two days.",
     name: "Rob",
     location: "Bronzeville",
   },
   {
     quote:
-      "The Family Box feeds my household for most of the week. The chicken is restaurant quality. We cancelled our other grocery delivery.",
+      "The Family Box gets us through most of the week. Produce that actually tastes like something, and I feel good knowing where it comes from.",
     name: "Keisha",
     location: "Hyde Park",
   },
   {
     quote:
-      "Ramps, fairy tale eggplant, dragon tongue beans. Produce I never see at the store. Worth every penny.",
+      "Sweet potatoes, microgreens, rainbow chard. Produce I never see at the store. Worth every penny.",
     name: "Marcus",
     location: "South Shore",
   },
@@ -145,9 +134,9 @@ export default function ShopLandingPage() {
               </h1>
 
               <p className="text-lg sm:text-xl text-foreground/75 mb-8 leading-relaxed">
-                Three curated boxes, seasonal and rotating, sourced directly from
-                Black farmers and delivered to your Chicago door. Pick your size
-                below.
+                Two curated boxes, seasonal and rotating, sourced directly from
+                our Black farmer partners and delivered to your Chicago door.
+                Pick your size below.
               </p>
 
               <a
@@ -191,7 +180,7 @@ export default function ShopLandingPage() {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {boxes.map((box, idx) => {
               const product = PRODUCTS[box.slug];
               const price = product.price;
@@ -227,7 +216,7 @@ export default function ShopLandingPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                       <div className="absolute bottom-3 left-4">
                         <span className="bg-background/90 text-foreground text-xs font-semibold px-3 py-1 rounded-full">
-                          {box.servings}
+                          {product.servingBadge}
                         </span>
                       </div>
                     </div>
@@ -260,13 +249,6 @@ export default function ShopLandingPage() {
                         ))}
                       </ul>
 
-                      {/* Protein note */}
-                      {box.proteinNote && (
-                        <p className="text-xs text-primary/70 font-medium text-center mb-3">
-                          {box.proteinNote}
-                        </p>
-                      )}
-
                       {/* CTA */}
                       <Link
                         href={`/checkout/${box.slug}`}
@@ -288,6 +270,10 @@ export default function ShopLandingPage() {
               );
             })}
           </div>
+
+          <p className="text-center text-sm text-muted-foreground mt-6 max-w-xl mx-auto">
+            Add a pasture-raised chicken, short ribs, or lamb chops at checkout.
+          </p>
 
           <p className="text-center text-sm text-muted-foreground mt-8">
             Want to subscribe and save 10%?{" "}
@@ -403,10 +389,10 @@ export default function ShopLandingPage() {
             </p>
             <Link
               href="/checkout/family"
-              onClick={() => fireTrackingEvent("family", "Family Box", 65)}
+              onClick={() => fireTrackingEvent("family", "Family Box", PRODUCTS.family.price)}
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold text-lg rounded-xl px-8 py-4 shadow-lg hover:bg-primary/90 transition-all duration-200 active:scale-95"
             >
-              Order the Family Box - $65
+              Order the Family Box - ${PRODUCTS.family.price}
               <ArrowRight className="h-5 w-5" />
             </Link>
             <p className="mt-4 text-xs text-muted-foreground">
