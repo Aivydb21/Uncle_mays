@@ -279,6 +279,14 @@ export default function SubscribePaymentPage() {
             ? crypto.randomUUID()
             : `ic-sub-${data.product}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+        // Pull the validated promo code out of sessionStorage (set on the
+        // summary page when ?promo= is in the URL). Server re-validates.
+        let promo: string | undefined;
+        try {
+          const saved = sessionStorage.getItem("unc-promo");
+          if (saved) promo = saved;
+        } catch { /* ignore */ }
+
         const res = await fetch("/api/checkout/subscribe-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -292,6 +300,7 @@ export default function SubscribePaymentPage() {
             deliveryNotes: data.deliveryNotes,
             proteinChoices: data.proteinChoices,
             eventId: icEventId,
+            ...(promo ? { promo } : {}),
             ...utms,
           }),
         });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { validatePromo } from "@/lib/promo";
 
 // Map product slugs to amounts in cents (regular price)
 const AMOUNT_MAP: Record<string, number> = {
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid } = await req.json();
+    const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid, promo } = await req.json();
 
     let amount = AMOUNT_MAP[product];
 
@@ -86,6 +87,20 @@ export async function POST(req: NextRequest) {
 
     const isTestKey = process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ?? false;
 
+    // Apply promo discount to the amount. PaymentIntents do not support Stripe
+    // coupons directly, so we subtract the amount_off server-side and record
+    // the promo code in metadata so the webhook + CAPI Purchase events reflect
+    // the discounted value. Only codes in ACTIVE_PROMOS apply; unknown codes
+    // are silently ignored (client already validated & displayed the banner).
+    let appliedPromoCode: string | null = null;
+    let appliedPromoDiscount = 0;
+    const validPromo = validatePromo(promo, "one-time");
+    if (validPromo) {
+      appliedPromoCode = validPromo.code;
+      appliedPromoDiscount = Math.min(validPromo.entry.amountOffCents, Math.max(0, amount - 100));
+      amount -= appliedPromoDiscount;
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency: "usd",
@@ -118,11 +133,17 @@ export async function POST(req: NextRequest) {
         ...(utm_content ? { utm_content } : {}),
         ...(utm_term ? { utm_term } : {}),
         ...(gclid ? { gclid } : {}),
+        ...(appliedPromoCode ? { promo_code: appliedPromoCode, promo_discount_cents: String(appliedPromoDiscount) } : {}),
       },
       automatic_payment_methods: { enabled: true },
     });
 
-    return NextResponse.json({ clientSecret: paymentIntent.client_secret });
+    return NextResponse.json({
+      clientSecret: paymentIntent.client_secret,
+      appliedAmount: amount,
+      appliedPromoCode,
+      appliedPromoDiscount,
+    });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error("checkout/intent error:", message);

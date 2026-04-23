@@ -8,6 +8,7 @@ import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/l
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShieldCheck, Truck, Leaf } from "lucide-react";
+import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
 
 function getAvailableProteins(product: typeof PRODUCTS[ProductSlug]) {
   const allowed = "proteinOptions" in product ? (product.proteinOptions as ProteinId[]) : null;
@@ -69,9 +70,40 @@ export default function SubscribeSummaryPage() {
   // Stable reference for a given slug (see matching note in checkout/[product]/page.tsx)
   const availableProteins = useMemo(() => getAvailableProteins(product), [slug]);
 
-  const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
+  // Auto-select the single included protein in the initial state (not useEffect)
+  // so the Continue button is never briefly disabled on mount.
+  const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>(() =>
+    product.proteinIncluded && getAvailableProteins(product).length === 1
+      ? [getAvailableProteins(product)[0].id]
+      : []
+  );
   const [email, setEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
+
+  // Promo code: captured from ?promo= on mount (set by Meta ad URLs), persisted
+  // to sessionStorage so it survives through delivery + payment steps.
+  const [promoCode, setPromoCode] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const fromUrl = new URLSearchParams(window.location.search).get("promo");
+      const normalized = normalizePromo(fromUrl);
+      if (normalized && ACTIVE_PROMOS[normalized]) {
+        sessionStorage.setItem("unc-promo", normalized);
+        setPromoCode(normalized);
+        return;
+      }
+      const saved = sessionStorage.getItem("unc-promo");
+      const savedNorm = normalizePromo(saved);
+      if (savedNorm && ACTIVE_PROMOS[savedNorm]) setPromoCode(savedNorm);
+    } catch {
+      // ignore
+    }
+  }, []);
+  const activePromo = promoCode ? ACTIVE_PROMOS[promoCode] : null;
+  const promoDiscount = activePromo?.appliesTo.includes("subscription")
+    ? activePromo.amountOffCents / 100
+    : 0;
 
   // Fire Meta Pixel ViewContent on page load (client-side) AND server-side CAPI,
   // both carrying the same eventID so Meta deduplicates the pair to a single event.
@@ -149,19 +181,17 @@ export default function SubscribeSummaryPage() {
     }
   }
 
+  // Restore a prior protein selection from sessionStorage if the user came
+  // back via browser back button. The initial state above already handles
+  // auto-select for single-option boxes; this only overrides when needed.
   useEffect(() => {
     try {
       const saved = sessionStorage.getItem(`unc-sub-proteins-${slug}`);
       if (saved) {
         const parsed = JSON.parse(saved) as ProteinId[];
-        setSelectedProteins(parsed);
+        if (parsed.length > 0) setSelectedProteins(parsed);
       } else if (proteinIncluded && availableProteins.length === 1) {
-        // Auto-select the only included protein (Family box = chicken) so the
-        // Continue button isn't trapped disabled on first visit. Matches
-        // checkout/[product]/page.tsx behavior.
-        const autoSelected = [availableProteins[0].id];
-        setSelectedProteins(autoSelected);
-        sessionStorage.setItem(`unc-sub-proteins-${slug}`, JSON.stringify(autoSelected));
+        sessionStorage.setItem(`unc-sub-proteins-${slug}`, JSON.stringify([availableProteins[0].id]));
       }
     } catch {
       // ignore
@@ -195,12 +225,26 @@ export default function SubscribeSummaryPage() {
 
         <StepIndicator current={1} />
 
+        {/* Promo banner — reinforces the ad-to-landing-page promise
+            immediately, so users see the discount they were promised without
+            scrolling. */}
+        {activePromo && promoDiscount > 0 ? (
+          <div className="mb-4 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+              Promo {promoCode} applied
+            </p>
+            <p className="text-sm font-bold text-primary mt-0.5">
+              {activePromo.label}: first box ${Math.max(0, product.subPrice - promoDiscount).toFixed(2)} (then ${product.subPrice}/wk)
+            </p>
+          </div>
+        ) : null}
+
         <div className="rounded-2xl overflow-hidden shadow-soft bg-background">
           <div className="relative">
             <img
               src="/images/produce-box.jpg"
               alt={`${product.name} — fresh seasonal produce`}
-              className="w-full h-56 object-cover"
+              className="w-full h-36 md:h-56 object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute bottom-4 left-5 flex items-center gap-2">
@@ -224,8 +268,18 @@ export default function SubscribeSummaryPage() {
                 </p>
               </div>
               <div className="text-right shrink-0">
-                <span className="text-3xl font-bold text-primary">${product.subPrice}</span>
-                <span className="text-muted-foreground text-sm">/wk</span>
+                {promoDiscount > 0 ? (
+                  <>
+                    <div className="text-sm line-through text-muted-foreground">${product.subPrice}</div>
+                    <span className="text-3xl font-bold text-primary">${Math.max(0, product.subPrice - promoDiscount).toFixed(2)}</span>
+                    <div className="text-xs text-primary font-medium">first box</div>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-3xl font-bold text-primary">${product.subPrice}</span>
+                    <span className="text-muted-foreground text-sm">/wk</span>
+                  </>
+                )}
               </div>
             </div>
 
@@ -388,6 +442,48 @@ export default function SubscribeSummaryPage() {
             </button>
           </div>
         </div>
+
+        {/* Bottom spacer so the sticky mobile CTA doesn't cover content. */}
+        <div className="h-20 md:hidden" />
+      </div>
+
+      {/* Sticky mobile CTA — always within thumb reach. 76% of traffic is
+          mobile, and the inline CTA is ~4 scrolls down on iPhone viewports. */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border px-4 py-3 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)]">
+        <button
+          type="button"
+          disabled={proteinIncluded && selectedProteins.length === 0}
+          onClick={() => {
+            if (proteinIncluded && selectedProteins.length === 0) return;
+            try {
+              const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
+              if (fbq) {
+                fbq("track", "AddToCart", {
+                  content_name: product.name,
+                  content_ids: [slug],
+                  content_type: "product",
+                  value: product.subPrice,
+                  currency: "USD",
+                  num_items: 1,
+                });
+              }
+            } catch { /* ignore */ }
+            try {
+              const trimmed = email.trim();
+              if (trimmed && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+                sessionStorage.setItem(`unc-email-${slug}`, trimmed);
+              }
+            } catch { /* ignore */ }
+            router.push(`/subscribe/${slug}/delivery`);
+          }}
+          className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          <span>Continue</span>
+          <span className="font-normal opacity-80">
+            · ${promoDiscount > 0 ? Math.max(0, product.subPrice - promoDiscount).toFixed(2) : product.subPrice}
+            {promoDiscount > 0 ? " first box" : "/wk"}
+          </span>
+        </button>
       </div>
     </section>
   );

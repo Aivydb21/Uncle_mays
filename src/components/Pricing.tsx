@@ -101,17 +101,27 @@ export const Pricing = () => {
     // Extract price value from string (e.g., "$35" -> 35)
     const price = parseFloat(isSubscription ? plan.subPrice.replace('$', '') : plan.oneTimePrice.replace('$', ''));
 
-    // Fire tracking events
+    // Fire a box-selection signal only — the user hasn't begun checkout yet,
+    // they've just clicked a pricing tile on the home page. Using `select_item`
+    // (GA4) and `AddToCart` (Meta) keeps the true `begin_checkout` /
+    // `InitiateCheckout` events reserved for the payment step where they
+    // actually belong. Previously this fired `begin_checkout` + `InitiateCheckout`
+    // on the home page, which inflated top-of-funnel counts and made
+    // checkout conversion look artificially bad.
     try {
       if (typeof window !== "undefined") {
-        // Meta Pixel
-        if (window.fbq) window.fbq("track", "InitiateCheckout");
-
-        // GA4 begin_checkout event with enhanced e-commerce parameters
-        if (window.gtag) {
-          window.gtag("event", "begin_checkout", {
-            currency: "USD",
+        if (window.fbq) {
+          window.fbq("track", "AddToCart", {
+            content_name: plan.name,
+            content_ids: [plan.checkoutSlug],
+            content_type: "product",
             value: price,
+            currency: "USD",
+          });
+        }
+        if (window.gtag) {
+          window.gtag("event", "select_item", {
+            item_list_name: "Home - Pricing",
             items: [{
               item_id: plan.checkoutSlug,
               item_name: plan.name,
@@ -119,7 +129,7 @@ export const Pricing = () => {
               price: price,
               quantity: 1,
               item_category: "Produce Box",
-            }]
+            }],
           });
         }
       }

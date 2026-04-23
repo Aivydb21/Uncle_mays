@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { upsertContact, createCart } from "@/lib/mailchimp";
 import { sendCapiEvent } from "@/lib/meta-capi";
+import { validatePromo } from "@/lib/promo";
 
 // Subscription Price IDs (weekly, 10% discount vs one-time)
 const SUB_PRICE_MAP: Record<string, string> = {
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
       utm_content,
       utm_term,
       eventId: clientEventId,
+      promo,
     } = await req.json();
 
     const priceId = SUB_PRICE_MAP[product];
@@ -123,6 +125,16 @@ export async function POST(req: NextRequest) {
     if (utm_content) metadata.utm_content = utm_content;
     if (utm_term) metadata.utm_term = utm_term;
 
+    // Validate promo. For subscriptions we attach the Stripe coupon directly
+    // so Stripe handles the first-invoice discount — duration=once means the
+    // coupon only applies to the first billing cycle. Unknown codes are
+    // silently ignored (client already validated & displayed the banner).
+    const validPromo = validatePromo(promo, "subscription");
+    if (validPromo) {
+      metadata.promo_code = validPromo.code;
+      metadata.promo_discount_cents = String(validPromo.entry.amountOffCents);
+    }
+
     // Create subscription and expand latest_invoice.payments.
     //
     // CRITICAL: In Stripe API 2025-11-17+, invoice.payment_intent is no longer
@@ -139,6 +151,7 @@ export async function POST(req: NextRequest) {
       payment_settings: { save_default_payment_method: "on_subscription" },
       expand: ["latest_invoice.payments"],
       metadata,
+      ...(validPromo ? { discounts: [{ coupon: validPromo.entry.couponId }] } : {}),
     });
 
     // In Stripe API 2025-11-17, the PaymentIntent is nested under payments list.
