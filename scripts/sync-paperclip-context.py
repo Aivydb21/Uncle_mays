@@ -162,14 +162,23 @@ CTO_EXTRA = """
 ### Website Technical Stack (CTO-specific)
 - **Repo:** `https://github.com/Aivydb21/Uncle_mays.git` (local: `~/Desktop/um_website`)
 - **Framework:** Next.js 15.1.0 (TypeScript, Tailwind CSS, Radix UI)
-- **Checkout flow:** "Order Now" buttons redirect to Stripe Payment Links (not embedded checkout)
-- **Payment Links:**
-  - Starter ($35): `https://buy.stripe.com/14AfZh2IT0sces75l29Zm03`
-  - Family ($65): `https://buy.stripe.com/4gM7sL2ITej2gAf3cU9Zm07`
-  - Community ($95): `https://buy.stripe.com/5kQ28r0AL6QA83J4gY9Zm06`
+- **Checkout flow:** Custom embedded Stripe Elements via `/api/checkout/intent`
+  (one-time) and `/api/checkout/subscribe-intent` (weekly subscription).
+  "Order Now" buttons route to `/checkout/{slug}` or `/subscribe/{slug}`.
+- **Product tiers (source of truth: `src/lib/products.ts` + `customer-facts.md`):**
+  - Small Box: $40 one-time / $36/wk subscription (slug: `starter`)
+  - Family Box: $70 one-time / $63/wk subscription (slug: `family`)
+  - No Community Box (retired 2026-04-23).
+- **Protein add-ons (optional, all tiers):** chicken +$45, beef short ribs +$38,
+  lamb chops +$42. Sourced from Run A Way Buckers Club (Pembroke, IL).
+- **Legacy Stripe Payment Links** (`buy.stripe.com/*`) still point at the
+  old $35/$65/$95 prices and are NOT referenced by live app code. Any
+  external ad still linking to them would charge the legacy price —
+  audit Stripe Dashboard → Payment Links before resuming paid media.
 - **Meta Pixel:** `2276705169443313` (hardcoded in layout.tsx)
 - **GA4:** `G-QWY5HRLX12`
-- **API Routes (require SSR):** `/api/checkout`, `/api/webhook`, `/api/capture-email`, `/api/order-details`
+- **API Routes (require SSR):** `/api/checkout/intent`, `/api/checkout/subscribe-intent`,
+  `/api/webhook`, `/api/capture-email`, `/api/order-details`
 """
 
 CTO_INSERT_MARKER = "- **Note:** Requires SSR deployment (Vercel, not static export) for the API route to be reachable"
