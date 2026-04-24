@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { useAddressAutocomplete, type ParsedAddress } from "@/hooks/use-address-autocomplete";
+import { WaitlistCapture } from "@/components/WaitlistCapture";
 
 declare global {
   interface Window {
@@ -206,6 +208,24 @@ export default function DeliveryPage() {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
     }
   }
+
+  const streetInputRef = useAddressAutocomplete((address: ParsedAddress) => {
+    setFields((prev) => ({
+      ...prev,
+      street: address.street,
+      city: address.city || prev.city,
+      state: address.state || prev.state,
+      zip: address.zip || prev.zip,
+    }));
+    // Clear address-related errors when autocomplete fills fields
+    setErrors((prev) => ({
+      ...prev,
+      street: undefined,
+      city: undefined,
+      state: undefined,
+      zip: undefined,
+    }));
+  });
 
   function handleZipBlur() {
     const zip = fields.zip.trim();
@@ -517,10 +537,11 @@ export default function DeliveryPage() {
                     <Input
                       id="street"
                       name="street"
+                      ref={streetInputRef}
                       value={fields.street}
                       onChange={handleChange}
-                      autoComplete="street-address"
-                      placeholder="123 Main St"
+                      autoComplete="off"
+                      placeholder="Start typing your address..."
                     />
                     {errors.street && (
                       <p className="text-destructive text-xs">{errors.street}</p>
@@ -595,12 +616,7 @@ export default function DeliveryPage() {
                       <p className="text-destructive text-xs">{errors.zip}</p>
                     )}
                     {errors.zip === OUT_OF_AREA_MESSAGE && (
-                      <a
-                        href={`mailto:info@unclemays.com?subject=Waitlist%20-%20${encodeURIComponent(fields.zip || "my area")}&body=${encodeURIComponent("Please add me to the Uncle May's delivery waitlist. ZIP: " + (fields.zip || ""))}`}
-                        className="text-xs text-primary underline inline-block mt-1"
-                      >
-                        Join the waitlist →
-                      </a>
+                      <WaitlistCapture zip={fields.zip} />
                     )}
                   </div>
                 </div>
