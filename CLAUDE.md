@@ -576,6 +576,9 @@ This section exists because Paperclip CRO-style agents that can't read the repo 
 - **Abandoned-cart recovery emails link to `/#boxes`**, which anchors to the pricing grid (section id `boxes` in [src/components/Pricing.tsx](src/components/Pricing.tsx)). There is no standalone `/boxes` route — `/#boxes` is intentional.
 - **FRESH10 promo code is visible on pricing and checkout pages.** [src/components/Pricing.tsx](src/components/Pricing.tsx) shows a "Use code FRESH10" banner. Both [src/app/checkout/[product]/page.tsx](src/app/checkout/[product]/page.tsx) and [src/app/subscribe/[product]/page.tsx](src/app/subscribe/[product]/page.tsx) have a promo code input field with a FRESH10 hint. Promo registry lives in [src/lib/promo.ts](src/lib/promo.ts).
 
+- **Order cutoff deadline is shown on all checkout/subscribe pages.** All four summary and delivery pages ([src/app/checkout/[product]/page.tsx](src/app/checkout/[product]/page.tsx), [src/app/subscribe/[product]/page.tsx](src/app/subscribe/[product]/page.tsx), [src/app/checkout/[product]/delivery/page.tsx](src/app/checkout/[product]/delivery/page.tsx), [src/app/subscribe/[product]/delivery/page.tsx](src/app/subscribe/[product]/delivery/page.tsx)) display "Order by Sunday 11:59 PM CT for Wednesday delivery" in an amber banner, per `customer-facts.md`. Farm sourcing note (Run A Way Buckers Club, Pembroke, IL) is included in the same banner.
+- **FAQ section renders visually on the homepage.** [src/page-content/Index.tsx](src/page-content/Index.tsx) renders an accordion FAQ section between testimonials and email capture. The FAQ data in [src/app/page.tsx](src/app/page.tsx) (lines 109-162) is JSON-LD schema markup for SEO; the visual component is separate.
+
 If you are a CRO/audit agent without filesystem access, flag items at the **file path** level ("please verify X in file Y") rather than asserting specific line numbers you cannot see.
 
 ## Key Positioning Notes
