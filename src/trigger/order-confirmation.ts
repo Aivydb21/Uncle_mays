@@ -1,5 +1,7 @@
-import { task, wait } from "@trigger.dev/sdk/v3";
+import { task } from "@trigger.dev/sdk/v3";
 import { createHash } from "crypto";
+import { isSuppressed } from "./_email-suppression";
+import { sendTransactional } from "../lib/email/resend";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
@@ -8,6 +10,8 @@ function md5(s: string) {
   return createHash("md5").update(s).digest("hex");
 }
 
+// Keeps the contact in the Mailchimp audience for future newsletter
+// segmentation. Transactional send itself has moved to Resend.
 async function upsertMailchimpContact(
   apiKey: string,
   email: string,
@@ -16,9 +20,6 @@ async function upsertMailchimpContact(
   const emailHash = md5(email.toLowerCase());
   const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
 
-  // status_if_new handles truly new contacts; status: "subscribed" also
-  // reactivates archived contacts (e.g. from audience cleanups). Both fields
-  // are required to reliably subscribe customers for transactional emails.
   const body: Record<string, unknown> = {
     email_address: email,
     status_if_new: "subscribed",
@@ -40,32 +41,16 @@ async function upsertMailchimpContact(
   return res.json();
 }
 
-async function sendConfirmationEmail(
-  apiKey: string,
-  params: {
-    email: string;
-    firstName: string;
-    lastName: string;
-    sessionId: string;
-    amountDollars: number;
-    productName: string;
-    isSubscription: boolean;
-    billingInterval?: string | null;
-    subscriptionId?: string | null;
-  }
-): Promise<{ campaignId: string }> {
-  const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
-  const {
-    email,
-    firstName,
-    sessionId,
-    amountDollars,
-    productName,
-    isSubscription,
-    billingInterval,
-    subscriptionId,
-  } = params;
-
+function buildConfirmationEmail(params: {
+  firstName: string;
+  sessionId: string;
+  amountDollars: number;
+  productName: string;
+  isSubscription: boolean;
+  billingInterval?: string | null;
+}): { subject: string; html: string; text: string } {
+  const { firstName, sessionId, amountDollars, productName, isSubscription, billingInterval } =
+    params;
   const sessionTag = sessionId.substring(0, 8);
   const formattedAmount = `$${amountDollars.toFixed(2)}`;
   const billingLine = isSubscription
@@ -78,10 +63,8 @@ async function sendConfirmationEmail(
       </p>`
     : "";
 
-  const subjectLine = `Order confirmed: ${productName}`;
-  const previewText = `Thanks for your order, ${firstName}. Your Uncle May's produce box is on its way.`;
-
-  const htmlContent = `<!DOCTYPE html>
+  const subject = `Order confirmed: ${productName}`;
+  const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Arial,sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
@@ -123,7 +106,7 @@ async function sendConfirmationEmail(
 </body>
 </html>`;
 
-  const plainText = `Hi ${firstName},
+  const text = `Hi ${firstName},
 
 Thank you for your order. We have received your payment and your Uncle May's produce box is confirmed.
 
@@ -143,76 +126,7 @@ ${isSubscription ? `Your subscription renews automatically each ${billingInterva
 Uncle May's Produce | Hyde Park, Chicago, IL
 unclemays.com`;
 
-  // Create a targeted Mailchimp campaign for this subscriber
-  const campaignRes = await fetch(`https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns`, {
-    method: "POST",
-    headers: { Authorization: authHeader, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      type: "regular",
-      settings: {
-        subject_line: subjectLine,
-        preview_text: previewText,
-        title: `Order Confirmation - ${sessionTag}`,
-        from_name: "Uncle May's Produce",
-        reply_to: "info@unclemays.com",
-      },
-      recipients: {
-        list_id: MAILCHIMP_LIST_ID,
-        segment_opts: {
-          match: "all",
-          conditions: [
-            { condition_type: "EmailAddress", field: "EMAIL", op: "is", value: email },
-          ],
-        },
-      },
-      tracking: { opens: true, html_clicks: true, text_clicks: false },
-    }),
-  });
-
-  const campaign = await campaignRes.json();
-  if (!campaign.id) {
-    throw new Error(`Mailchimp campaign creation failed: ${JSON.stringify(campaign)}`);
-  }
-
-  await fetch(`https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}/content`, {
-    method: "PUT",
-    headers: { Authorization: authHeader, "Content-Type": "application/json" },
-    body: JSON.stringify({ html: htmlContent, plain_text: plainText }),
-  });
-
-  // Poll until Mailchimp finishes computing segment recipients.
-  // Sending before recipient_count > 0 causes "recipients not ready" (HTTP 400).
-  // Mailchimp segment calculation is async and typically completes in 5-20s.
-  let recipientCount = 0;
-  for (let attempt = 0; attempt < 12; attempt++) {
-    await wait.for({ seconds: 5 });
-    const statusRes = await fetch(
-      `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}`,
-      { headers: { Authorization: authHeader } }
-    );
-    const status = await statusRes.json() as { recipients?: { recipient_count?: number } };
-    recipientCount = status.recipients?.recipient_count ?? 0;
-    if (recipientCount > 0) break;
-  }
-
-  if (recipientCount === 0) {
-    throw new Error(
-      `Mailchimp campaign ${campaign.id} has 0 recipients after polling. ` +
-      `Contact ${email} may not be subscribed to list ${MAILCHIMP_LIST_ID}.`
-    );
-  }
-
-  const sendRes = await fetch(
-    `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}/actions/send`,
-    { method: "POST", headers: { Authorization: authHeader } }
-  );
-
-  if (sendRes.status !== 204) {
-    const err = await sendRes.json().catch(() => ({}));
-    throw new Error(`Mailchimp send failed for campaign ${campaign.id}: ${JSON.stringify(err)}`);
-  }
-
-  return { campaignId: campaign.id };
+  return { subject, html, text };
 }
 
 /**
@@ -226,15 +140,15 @@ export const sendOrderConfirmationEmail = task({
     sessionId: string;
     email: string;
     customerName?: string | null;
-    amountTotal: number; // in cents
+    amountTotal: number;
     productName: string;
     isSubscription: boolean;
     billingInterval?: string | null;
     subscriptionId?: string | null;
   }) => {
-    const mailchimpKey = process.env.MAILCHIMP_API_KEY;
-    if (!mailchimpKey) {
-      throw new Error("MAILCHIMP_API_KEY not configured");
+    if (isSuppressed(payload.email)) {
+      console.log(`[OrderConfirmation] Suppressed recipient ${payload.email} — skipping send`);
+      return { sent: false, reason: "suppressed_recipient", email: payload.email };
     }
 
     const nameParts = (payload.customerName || "").trim().split(/\s+/);
@@ -242,28 +156,46 @@ export const sendOrderConfirmationEmail = task({
     const lastName = nameParts.slice(1).join(" ") || "";
     const amountDollars = payload.amountTotal / 100;
 
-    // Ensure contact exists in Mailchimp before sending.
-    await upsertMailchimpContact(mailchimpKey, payload.email, {
-      first: firstName,
-      last: lastName,
-    }).catch((e: Error) => console.warn("[OrderConfirmation] Mailchimp upsert warning:", e.message));
+    // Audience upsert (Mailchimp) — kept so customers stay in the newsletter list.
+    const mailchimpKey = process.env.MAILCHIMP_API_KEY;
+    if (mailchimpKey) {
+      await upsertMailchimpContact(mailchimpKey, payload.email, {
+        first: firstName,
+        last: lastName,
+      }).catch((e: Error) =>
+        console.warn("[OrderConfirmation] Mailchimp upsert warning:", e.message)
+      );
+    }
 
-    const { campaignId } = await sendConfirmationEmail(mailchimpKey, {
-      email: payload.email,
+    const { subject, html, text } = buildConfirmationEmail({
       firstName,
-      lastName,
       sessionId: payload.sessionId,
       amountDollars,
       productName: payload.productName,
       isSubscription: payload.isSubscription,
       billingInterval: payload.billingInterval,
-      subscriptionId: payload.subscriptionId,
     });
 
+    const result = await sendTransactional({
+      to: payload.email,
+      subject,
+      html,
+      text,
+      tags: [
+        { name: "type", value: "order_confirmation" },
+        { name: "session", value: payload.sessionId.substring(0, 8) },
+        { name: "subscription", value: payload.isSubscription ? "true" : "false" },
+      ],
+    });
+
+    if (!result.sent) {
+      throw new Error(`Resend send failed: ${result.error || result.reason || "unknown"}`);
+    }
+
     console.log(
-      `[OrderConfirmation] Sent | session=${payload.sessionId} email=${payload.email} campaign=${campaignId} subscription=${payload.isSubscription}`
+      `[OrderConfirmation] Sent | session=${payload.sessionId} email=${payload.email} resend=${result.id} subscription=${payload.isSubscription}`
     );
 
-    return { sent: true, campaignId, email: payload.email };
+    return { sent: true, emailId: result.id, email: payload.email };
   },
 });

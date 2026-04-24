@@ -2,6 +2,29 @@ import { createHash } from "crypto";
 
 const STORE_ID = "unclemays_stripe";
 
+// Blocks internal / test recipients from being added to Mailchimp or tagged.
+// Any tag we add server-side can trigger a Mailchimp Customer Journey, so the
+// cleanest fix is to never insert these addresses at all.
+const SUPPRESSED_DOMAINS = ["unclemays.com"];
+const SUPPRESSED_EMAILS = new Set(
+  [
+    "anthonypivy@gmail.com",
+    ...(process.env.EMAIL_SUPPRESSION_LIST || "")
+      .split(",")
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean),
+  ].map((s) => s.toLowerCase())
+);
+
+function isSuppressed(email: string | null | undefined): boolean {
+  if (!email) return true;
+  const normalized = email.trim().toLowerCase();
+  if (!normalized) return true;
+  if (SUPPRESSED_EMAILS.has(normalized)) return true;
+  const domain = normalized.split("@")[1];
+  return !!domain && SUPPRESSED_DOMAINS.includes(domain);
+}
+
 function getConfig() {
   const apiKey = process.env.MAILCHIMP_API_KEY;
   const listId = process.env.MAILCHIMP_AUDIENCE_ID;
@@ -24,6 +47,7 @@ export async function upsertContact(
   firstName: string,
   lastName?: string
 ): Promise<void> {
+  if (isSuppressed(email)) return;
   const config = getConfig();
   if (!config) {
     console.warn("Mailchimp not configured (MAILCHIMP_API_KEY / MAILCHIMP_AUDIENCE_ID missing)");
@@ -70,6 +94,7 @@ export async function createCart(
   productSlug: string,
   price: number
 ): Promise<void> {
+  if (isSuppressed(email)) return;
   const config = getConfig();
   if (!config) return;
   const mc = MC_PRODUCT_IDS[productSlug];
@@ -142,6 +167,7 @@ export async function deleteCart(sessionId: string): Promise<void> {
 // campaigns/email-sequences/welcome-series.md).
 // Idempotent: existing members get the tag added; existing subscribers stay subscribed.
 export async function addSignupLead(email: string, source?: string): Promise<{ ok: boolean; error?: string }> {
+  if (isSuppressed(email)) return { ok: true };
   const config = getConfig();
   if (!config) {
     return { ok: false, error: "Mailchimp not configured" };
@@ -176,6 +202,7 @@ export async function addSignupLead(email: string, source?: string): Promise<{ o
 // Called after Stripe payment success. Adds order_completed and deactivates
 // checkout_started in one call so the recovery sequence stops immediately.
 export async function tagOrderCompleted(email: string): Promise<void> {
+  if (isSuppressed(email)) return;
   const config = getConfig();
   if (!config) return;
   const url = `https://${config.serverPrefix}.api.mailchimp.com/3.0/lists/${config.listId}/members/${hashEmail(email)}/tags`;

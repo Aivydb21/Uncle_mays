@@ -1,5 +1,7 @@
 import { schedules, task, wait } from "@trigger.dev/sdk/v3";
 import { createHash } from "crypto";
+import { isSuppressed } from "./_email-suppression";
+import { sendTransactional } from "../lib/email/resend";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
@@ -98,14 +100,13 @@ async function upsertMailchimpContact(
 }
 
 async function sendEmail(
-  apiKey: string,
+  _apiKey: string,
   email: string,
   name: { first?: string; last?: string },
   sessionId: string,
   emailNumber: 1 | 2 | 3,
   product?: string | null
 ): Promise<{ campaignId: string }> {
-  const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
   const firstName = name.first || "friend";
   const sessionTag = sessionId.substring(0, 8);
   const productSlug = product || "starter";
@@ -114,14 +115,12 @@ async function sendEmail(
     `?utm_source=email&utm_medium=abandoned_cart&utm_campaign=recovery_email${emailNumber}&utm_content=${sessionTag}`;
 
   let subjectLine: string;
-  let previewText: string;
   let htmlContent: string;
   let plainText: string;
 
   if (emailNumber === 1) {
     // Email 1: Cart Reminder (1 hour after abandonment)
     subjectLine = "Your Uncle May's box is waiting";
-    previewText = "Complete your order in 2 minutes. Fresh, curated produce for your table.";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -167,7 +166,6 @@ unclemays.com | info@unclemays.com`;
   } else if (emailNumber === 2) {
     // Email 2: Urgency Reminder (24 hours after abandonment)
     subjectLine = "Order by Sunday for Wednesday delivery";
-    previewText = "89% of our customers refer friends. Your box is almost ready.";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -218,7 +216,6 @@ unclemays.com | info@unclemays.com`;
   } else {
     // Email 3: Final Urgency (48 hours after abandonment)
     subjectLine = "Last chance: Limited boxes left this week";
-    previewText = "We only have a few boxes left for Wednesday delivery. Order now or miss out.";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -267,67 +264,23 @@ Uncle May's Produce | Hyde Park, Chicago, IL
 unclemays.com | info@unclemays.com`;
   }
 
-  // Create campaign targeted at this specific subscriber
-  const campaignRes = await fetch(
-    `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns`,
-    {
-      method: "POST",
-      headers: { Authorization: authHeader, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "regular",
-        settings: {
-          subject_line: subjectLine,
-          preview_text: previewText,
-          title: `Abandoned Cart Email ${emailNumber} - ${sessionTag}`,
-          from_name: "Uncle May's Produce",
-          reply_to: "info@unclemays.com",
-        },
-        recipients: {
-          list_id: MAILCHIMP_LIST_ID,
-          segment_opts: {
-            match: "all",
-            conditions: [
-              {
-                condition_type: "EmailAddress",
-                field: "EMAIL",
-                op: "is",
-                value: email,
-              },
-            ],
-          },
-        },
-        tracking: { opens: true, html_clicks: true, text_clicks: true },
-      }),
-    }
-  );
+  const result = await sendTransactional({
+    to: email,
+    subject: subjectLine,
+    html: htmlContent,
+    text: plainText,
+    tags: [
+      { name: "type", value: "abandoned_cart" },
+      { name: "step", value: String(emailNumber) },
+      { name: "session", value: sessionTag },
+    ],
+  });
 
-  const campaign = await campaignRes.json();
-  if (!campaign.id) {
-    throw new Error(`Mailchimp campaign creation failed: ${JSON.stringify(campaign)}`);
+  if (!result.sent) {
+    throw new Error(`Resend send failed: ${result.error || result.reason || "unknown"}`);
   }
 
-  // Set email content
-  await fetch(
-    `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}/content`,
-    {
-      method: "PUT",
-      headers: { Authorization: authHeader, "Content-Type": "application/json" },
-      body: JSON.stringify({ html: htmlContent, plain_text: plainText }),
-    }
-  );
-
-  // Send
-  const sendRes = await fetch(
-    `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}/actions/send`,
-    { method: "POST", headers: { Authorization: authHeader } }
-  );
-
-  if (sendRes.status !== 204) {
-    const err = await sendRes.json().catch(() => ({}));
-    throw new Error(`Mailchimp send failed for campaign ${campaign.id}: ${JSON.stringify(err)}`);
-  }
-
-  return { campaignId: campaign.id };
+  return { campaignId: result.id || "" };
 }
 
 // --- Apollo ---
@@ -427,6 +380,11 @@ export const sendAbandonedCheckoutEmail = task({
     const name = payload.firstName
       ? { first: payload.firstName, last: payload.lastName ?? "" }
       : parseNameParts(payload.customerName ?? "");
+
+    if (isSuppressed(email)) {
+      console.log(`[AbandonedCheckout] Suppressed recipient ${email} — skipping sequence`);
+      return { skipped: true, reason: "suppressed_recipient", email };
+    }
 
     const results: any[] = [];
 
@@ -550,6 +508,7 @@ export const abandonedCheckoutProcessor = schedules.task({
 
       const createdMs = new Date(session.createdAt).getTime();
       const email = session.email;
+      if (isSuppressed(email)) continue;
       const name = { first: session.firstName, last: session.lastName ?? "" };
 
       // Tag in Apollo for CRM tracking (once per session)
@@ -688,6 +647,7 @@ export const backfillAbandonedCheckouts = task({
     const results: any[] = [];
     for (const session of notCompleted) {
       const email = session.email;
+      if (isSuppressed(email)) continue;
       const name = { first: session.firstName, last: session.lastName ?? "" };
 
       await upsertMailchimpContact(mailchimpKey, email, name).catch((e) =>

@@ -1,4 +1,6 @@
 import { task, wait } from "@trigger.dev/sdk/v3";
+import { isSuppressed } from "./_email-suppression";
+import { sendTransactional } from "../lib/email/resend";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
@@ -85,6 +87,11 @@ export const sendSubscriptionCancellationEmail = task({
       return { sent: false, reason: "no_email" };
     }
 
+    if (isSuppressed(email)) {
+      console.log(`[CancellationEmail] Suppressed recipient ${email} — skipping send`);
+      return { sent: false, reason: "suppressed_recipient", email };
+    }
+
     const nameParts = (customerName || "").trim().split(/\s+/);
     const firstName = nameParts[0] || "friend";
     const lastName = nameParts.slice(1).join(" ") || "";
@@ -101,8 +108,6 @@ export const sendSubscriptionCancellationEmail = task({
         day: "numeric",
       });
     }
-
-    const authHeader = `Basic ${btoa("anystring:" + mailchimpKey)}`;
 
     const htmlContent = `<!DOCTYPE html>
 <html>
@@ -171,90 +176,35 @@ export const sendSubscriptionCancellationEmail = task({
       `unclemays.com`,
     ].join("\n");
 
-    // Ensure contact exists in Mailchimp before sending.
-    // Wait 2s after upsert so Mailchimp indexes the contact before the
-    // segment-targeted campaign send (avoids "recipients not ready" error).
+    // Keep the contact in the Mailchimp audience for newsletter segmentation.
     await upsertMailchimpContact(mailchimpKey, email, {
       first: firstName !== "friend" ? firstName : undefined,
       last: lastName || undefined,
-    }).catch((e: Error) => console.warn("[CancellationEmail] Mailchimp upsert warning:", e.message));
-
-    // Create and send a targeted Mailchimp campaign
-    const campaignRes = await fetch(`https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns`, {
-      method: "POST",
-      headers: { Authorization: authHeader, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "regular",
-        settings: {
-          subject_line: "Your Uncle May's subscription has been cancelled",
-          preview_text: `Confirmed: your ${productName} has been cancelled. Access ends ${accessEndText}.`,
-          title: `Subscription Cancellation - ${subTag}`,
-          from_name: "Uncle May's Produce",
-          reply_to: "info@unclemays.com",
-        },
-        recipients: {
-          list_id: MAILCHIMP_LIST_ID,
-          segment_opts: {
-            match: "all",
-            conditions: [
-              { condition_type: "EmailAddress", field: "EMAIL", op: "is", value: email },
-            ],
-          },
-        },
-        tracking: { opens: true, html_clicks: true, text_clicks: false },
-      }),
-    });
-
-    const campaign = await campaignRes.json();
-    if (!campaign.id) {
-      throw new Error(
-        `[CancellationEmail] Mailchimp campaign creation failed: ${JSON.stringify(campaign)}`
-      );
-    }
-
-    await fetch(`https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}/content`, {
-      method: "PUT",
-      headers: { Authorization: authHeader, "Content-Type": "application/json" },
-      body: JSON.stringify({ html: htmlContent, plain_text: plainText }),
-    });
-
-    // Poll until Mailchimp finishes computing segment recipients.
-    // Sending before recipient_count > 0 causes "recipients not ready" (HTTP 400).
-    let recipientCount = 0;
-    for (let attempt = 0; attempt < 12; attempt++) {
-      await wait.for({ seconds: 5 });
-      const statusRes = await fetch(
-        `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}`,
-        { headers: { Authorization: authHeader } }
-      );
-      const status = await statusRes.json() as { recipients?: { recipient_count?: number } };
-      recipientCount = status.recipients?.recipient_count ?? 0;
-      if (recipientCount > 0) break;
-    }
-
-    if (recipientCount === 0) {
-      throw new Error(
-        `[CancellationEmail] Campaign ${campaign.id} has 0 recipients after polling. ` +
-        `Contact ${email} may not be subscribed to list ${MAILCHIMP_LIST_ID}.`
-      );
-    }
-
-    const sendRes = await fetch(
-      `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}/actions/send`,
-      { method: "POST", headers: { Authorization: authHeader } }
+    }).catch((e: Error) =>
+      console.warn("[CancellationEmail] Mailchimp upsert warning:", e.message)
     );
 
-    if (sendRes.status !== 204) {
-      const err = await sendRes.json().catch(() => ({}));
+    const result = await sendTransactional({
+      to: email,
+      subject: "Your Uncle May's subscription has been cancelled",
+      html: htmlContent,
+      text: plainText,
+      tags: [
+        { name: "type", value: "subscription_cancellation" },
+        { name: "sub", value: subTag },
+      ],
+    });
+
+    if (!result.sent) {
       throw new Error(
-        `[CancellationEmail] Mailchimp send failed for campaign ${campaign.id}: ${JSON.stringify(err)}`
+        `[CancellationEmail] Resend send failed: ${result.error || result.reason || "unknown"}`
       );
     }
 
     console.log(
-      `[CancellationEmail] Sent | sub=${payload.subscriptionId} email=${email} campaign=${campaign.id}`
+      `[CancellationEmail] Sent | sub=${payload.subscriptionId} email=${email} resend=${result.id}`
     );
 
-    return { sent: true, campaignId: campaign.id, email };
+    return { sent: true, emailId: result.id, email };
   },
 });

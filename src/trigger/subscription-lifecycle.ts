@@ -1,4 +1,6 @@
 import { task } from "@trigger.dev/sdk/v3";
+import { isSuppressed } from "./_email-suppression";
+import { sendTransactional } from "../lib/email/resend";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
@@ -53,8 +55,12 @@ export const sendPaymentFailedEmail = task({
     attemptCount: number;
   }) => {
     const stripeKey = process.env.STRIPE_API_KEY!;
-    const mailchimpKey = process.env.MAILCHIMP_API_KEY!;
-    const authHeader = `Basic ${btoa("anystring:" + mailchimpKey)}`;
+    const mailchimpKey = process.env.MAILCHIMP_API_KEY;
+
+    if (isSuppressed(payload.email)) {
+      console.log(`[PaymentFailed] Suppressed recipient ${payload.email} — skipping send`);
+      return { sent: false, reason: "suppressed_recipient", email: payload.email };
+    }
 
     // Resolve customer name from Stripe if we have a customer ID
     let firstName = "there";
@@ -121,70 +127,34 @@ export const sendPaymentFailedEmail = task({
       `— The Uncle May's Team`,
     ].join("\n");
 
-    // Ensure contact is in Mailchimp before sending
-    await upsertMailchimpContact(mailchimpKey, payload.email, {
-      first: firstName !== "friend" ? firstName : undefined,
-      last: lastName || undefined,
-    }).catch((e: Error) => console.warn("Mailchimp upsert warning:", e.message));
-
-    const { createHash } = await import("crypto");
-    const emailHash = createHash("md5").update(payload.email.toLowerCase()).digest("hex");
-    const invoiceTag = payload.invoiceId.substring(0, 8);
-
-    // Create and send a targeted Mailchimp campaign
-    const campaignRes = await fetch(`https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns`, {
-      method: "POST",
-      headers: { Authorization: authHeader, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "regular",
-        settings: {
-          subject_line: "Action needed: update your payment method",
-          preview_text: "We couldn't process your Uncle May's subscription payment.",
-          title: `Payment Failed - ${invoiceTag}`,
-          from_name: "Uncle May's Produce",
-          reply_to: "info@unclemays.com",
-        },
-        recipients: {
-          list_id: MAILCHIMP_LIST_ID,
-          segment_opts: {
-            match: "all",
-            conditions: [
-              {
-                condition_type: "EmailAddress",
-                field: "EMAIL",
-                op: "is",
-                value: payload.email,
-              },
-            ],
-          },
-        },
-        tracking: { opens: true, html_clicks: true, text_clicks: true },
-      }),
-    });
-
-    const campaign = await campaignRes.json();
-    if (!campaign.id) {
-      throw new Error(`Mailchimp campaign creation failed: ${JSON.stringify(campaign)}`);
+    // Keep the contact in the Mailchimp audience for newsletter segmentation.
+    if (mailchimpKey) {
+      await upsertMailchimpContact(mailchimpKey, payload.email, {
+        first: firstName !== "friend" ? firstName : undefined,
+        last: lastName || undefined,
+      }).catch((e: Error) => console.warn("Mailchimp upsert warning:", e.message));
     }
 
-    await fetch(`https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}/content`, {
-      method: "PUT",
-      headers: { Authorization: authHeader, "Content-Type": "application/json" },
-      body: JSON.stringify({ html: htmlContent, plain_text: plainText }),
+    const invoiceTag = payload.invoiceId.substring(0, 8);
+
+    const result = await sendTransactional({
+      to: payload.email,
+      subject: "Action needed: update your payment method",
+      html: htmlContent,
+      text: plainText,
+      tags: [
+        { name: "type", value: "payment_failed" },
+        { name: "invoice", value: invoiceTag },
+        { name: "attempt", value: String(payload.attemptCount) },
+      ],
     });
 
-    const sendRes = await fetch(
-      `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/campaigns/${campaign.id}/actions/send`,
-      { method: "POST", headers: { Authorization: authHeader } }
-    );
-
-    if (sendRes.status !== 204) {
-      const err = await sendRes.json().catch(() => ({}));
-      throw new Error(`Mailchimp send failed for campaign ${campaign.id}: ${JSON.stringify(err)}`);
+    if (!result.sent) {
+      throw new Error(`Resend send failed: ${result.error || result.reason || "unknown"}`);
     }
 
     console.log(
-      `Payment failure notification sent | invoice=${payload.invoiceId} email=${payload.email} campaign=${campaign.id} attempt=${payload.attemptCount}`
+      `Payment failure notification sent | invoice=${payload.invoiceId} email=${payload.email} resend=${result.id} attempt=${payload.attemptCount}`
     );
 
     // Mark on Stripe subscription metadata so we can track notification history
@@ -205,7 +175,7 @@ export const sendPaymentFailedEmail = task({
     return {
       sent: true,
       email: payload.email,
-      campaignId: campaign.id,
+      emailId: result.id,
       invoiceId: payload.invoiceId,
       attemptCount: payload.attemptCount,
     };
