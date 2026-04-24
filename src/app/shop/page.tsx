@@ -278,10 +278,17 @@ export default function ShopLandingPage() {
           <p className="text-center text-sm text-muted-foreground mt-8">
             Want to subscribe and save 10%?{" "}
             <Link
-              href="/#boxes"
+              href="/subscribe/starter"
               className="text-primary font-semibold hover:underline"
             >
-              View subscription pricing
+              Small Box
+            </Link>
+            {" · "}
+            <Link
+              href="/subscribe/family"
+              className="text-primary font-semibold hover:underline"
+            >
+              Family Box
             </Link>
           </p>
         </div>
@@ -388,7 +395,7 @@ export default function ShopLandingPage() {
               with the most popular:
             </p>
             <Link
-              href="/checkout/family"
+              href="/#boxes"
               onClick={() => fireTrackingEvent("family", "Family Box", PRODUCTS.family.price)}
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold text-lg rounded-xl px-8 py-4 shadow-lg hover:bg-primary/90 transition-all duration-200 active:scale-95"
             >

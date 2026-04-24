@@ -55,7 +55,7 @@ export const Hero = () => {
               asChild
               className="text-xl font-bold px-10 py-7 rounded-xl shadow-lg w-full sm:w-auto"
             >
-              <Link href="/checkout/starter">
+              <Link href="/#boxes">
                 Get Your Box
               </Link>
             </Button>
