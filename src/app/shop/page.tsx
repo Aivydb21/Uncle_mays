@@ -36,27 +36,6 @@ const boxes: {
   },
 ];
 
-const testimonials = [
-  {
-    quote:
-      "I ordered the Small Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The kale and salad mix were gone in two days.",
-    name: "Rob",
-    location: "Bronzeville",
-  },
-  {
-    quote:
-      "The Family Box gets us through most of the week. Produce that actually tastes like something, and I feel good knowing where it comes from.",
-    name: "Keisha",
-    location: "Hyde Park",
-  },
-  {
-    quote:
-      "Sweet potatoes, microgreens, rainbow chard. Produce I never see at the store. Worth every penny.",
-    name: "Marcus",
-    location: "South Shore",
-  },
-];
-
 function fireTrackingEvent(slug: string, name: string, price: number) {
   try {
     if (typeof window === "undefined") return;
@@ -333,45 +312,6 @@ export default function ShopLandingPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-14 bg-muted/20">
-        <div className="container px-6 max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">
-              What Chicago is saying
-            </h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              {testimonials.map((t) => (
-                <div
-                  key={t.name}
-                  className="bg-card rounded-xl border border-border p-6"
-                >
-                  <div className="flex gap-0.5 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="h-3.5 w-3.5 fill-primary text-primary"
-                      />
-                    ))}
-                  </div>
-                  <blockquote className="text-sm leading-relaxed text-foreground/85 mb-4">
-                    &ldquo;{t.quote}&rdquo;
-                  </blockquote>
-                  <p className="text-xs text-muted-foreground font-medium">
-                    {t.name}, {t.location}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
         </div>
       </section>
 

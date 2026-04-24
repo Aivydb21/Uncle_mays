@@ -4,15 +4,9 @@ import { sendCapiEvent } from "@/lib/meta-capi";
 
 
 // Map product slugs to Stripe Price IDs (one-time prices).
-// Community Box is retired. The underlying Stripe Price IDs still carry the
-// legacy $35/$65 amounts — Stripe prices are immutable, so new Price IDs
-// must be created and swapped in when Small/Family retail prices change
-// ($40/$70 in the new model). Until then, the embedded-page hosted flow
-// (this route) will still charge the old amount. All primary traffic uses
-// the custom PaymentIntent flow in /api/checkout/intent, which was updated.
 const PRICE_MAP: Record<string, string> = {
-  starter: "price_1Sb4yrG67LsNxpTo2r1aphVI",
-  family: "price_1Sb5PUG67LsNxpToKdpQkWDg",
+  starter: "price_1TPr9VG67LsNxpToI2JigRB7",
+  family: "price_1TPr9nG67LsNxpToXHPYBuyo",
 };
 
 export async function POST(req: NextRequest) {

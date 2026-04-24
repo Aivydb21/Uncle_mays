@@ -8,13 +8,6 @@ import { PRODUCTS } from "@/lib/products";
 const starterBox = PRODUCTS.starter;
 const PRICE = starterBox.price;
 
-const testimonial = {
-  quote:
-    "I ordered the Small Box on a Monday and it was on my porch by Wednesday afternoon. Everything was fresh, nothing wilted. The kale and salad mix were gone in two days.",
-  name: "Rob",
-  location: "Bronzeville, Chicago",
-};
-
 function CTAButton({ className = "" }: { className?: string }) {
   return (
     <Link
@@ -194,30 +187,6 @@ export default function StarterBoxLandingPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Testimonial */}
-      <section className="py-14 bg-muted/20">
-        <div className="container px-6 max-w-xl mx-auto text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="flex justify-center gap-1 mb-4">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="h-4 w-4 fill-primary text-primary" />
-              ))}
-            </div>
-            <blockquote className="text-lg font-medium leading-relaxed mb-4 text-foreground/90">
-              &ldquo;{testimonial.quote}&rdquo;
-            </blockquote>
-            <p className="text-sm text-muted-foreground font-medium">
-              {testimonial.name} &mdash; {testimonial.location}
-            </p>
-          </motion.div>
         </div>
       </section>
 
