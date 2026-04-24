@@ -1,11 +1,70 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { motion } from "framer-motion";
-import { Users, ShoppingBag, Bell, Package } from "lucide-react";
+import { Users, ShoppingBag, Bell, Package, ChevronDown } from "lucide-react";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
 import { HomeEmailCapture } from "@/components/HomeEmailCapture";
+
+const faqs = [
+  {
+    question: "How does delivery work?",
+    answer:
+      "We deliver directly to your Chicago address every Wednesday. Order by Sunday 11:59 PM CT and your box ships that Wednesday. After placing your order, you'll receive a confirmation email with your estimated delivery window.",
+  },
+  {
+    question: "What's actually in the box?",
+    answer:
+      "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. A Small Box currently includes items like salad mix, kale, candy orange carrots, sweet potatoes, organic pinto beans, and microgreens. Contents vary each delivery based on what our farmer partners are harvesting.",
+  },
+  {
+    question: "How much does a box cost?",
+    answer:
+      "Two tiers: $40 for a Small Box (6 items, built for 1\u20132 people) or $70 for a Family Box (9 items, built for 3\u20134 people). Proteins (pasture-raised chicken, beef short ribs, or lamb chops) are optional paid add-ons at checkout. No subscription required, but Subscribe & Save takes 10% off every box.",
+  },
+  {
+    question: "Do I need a subscription?",
+    answer:
+      "No. Every box is a one-time purchase. Order when it works for you.",
+  },
+  {
+    question: "What if I have an issue with my order?",
+    answer:
+      "We stand behind every box. If anything is wrong with your delivery (missing items, quality issues, anything), email us at info@unclemays.com and we'll make it right, no questions asked.",
+  },
+  {
+    question: "How do I cancel my order?",
+    answer:
+      "There's nothing to cancel. Every box is a one-time purchase with no recurring charges. If you need to modify or cancel an order you've already placed, email info@unclemays.com as soon as possible and we'll take care of it.",
+  },
+];
+
+function FAQItem({ question, answer }: { question: string; answer: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-border last:border-b-0">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between gap-4 py-5 text-left"
+        aria-expanded={open}
+      >
+        <span className="text-base font-semibold">{question}</span>
+        <ChevronDown
+          className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      {open && (
+        <p className="pb-5 text-foreground/70 leading-relaxed -mt-1">
+          {answer}
+        </p>
+      )}
+    </div>
+  );
+}
 
 const testimonials = [
   {
@@ -130,6 +189,38 @@ const Index = () => {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-24 bg-background">
+        <div className="container px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Everything you need to know before your first box.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="max-w-2xl mx-auto bg-card rounded-2xl shadow-soft border border-border/50 px-6 md:px-8"
+          >
+            {faqs.map((faq) => (
+              <FAQItem key={faq.question} question={faq.question} answer={faq.answer} />
+            ))}
+          </motion.div>
         </div>
       </section>
 
