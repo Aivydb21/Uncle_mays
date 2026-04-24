@@ -70,8 +70,11 @@ export default function CheckoutSummaryPage() {
   const [email, setEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
 
-  // Promo code: captured from ?promo= on mount, validated against ACTIVE_PROMOS.
+  // Promo code: captured from ?promo= on mount, validated against ACTIVE_PROMOS,
+  // or entered manually by the user via the promo input field.
   const [promoCode, setPromoCode] = useState<string | null>(null);
+  const [promoInput, setPromoInput] = useState("");
+  const [promoError, setPromoError] = useState("");
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
@@ -89,6 +92,20 @@ export default function CheckoutSummaryPage() {
       // ignore
     }
   }, []);
+
+  function applyPromoCode() {
+    setPromoError("");
+    const normalized = normalizePromo(promoInput);
+    if (!normalized) return;
+    const entry = ACTIVE_PROMOS[normalized];
+    if (!entry || !entry.appliesTo.includes("one-time")) {
+      setPromoError("Invalid promo code");
+      return;
+    }
+    try { sessionStorage.setItem("unc-promo", normalized); } catch { /* ignore */ }
+    setPromoCode(normalized);
+    setPromoInput("");
+  }
   const activePromo = promoCode ? ACTIVE_PROMOS[promoCode] : null;
   const promoDiscount = activePromo?.appliesTo.includes("one-time")
     ? activePromo.amountOffCents / 100
@@ -377,6 +394,37 @@ export default function CheckoutSummaryPage() {
                 placeholder="you@example.com"
               />
             </div>
+
+            {/* Promo code input */}
+            {!promoCode ? (
+              <div className="mb-6">
+                <Label htmlFor="promo" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
+                  Promo Code
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="promo"
+                    type="text"
+                    value={promoInput}
+                    onChange={(e) => { setPromoInput(e.target.value); setPromoError(""); }}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyPromoCode(); } }}
+                    placeholder="e.g. FRESH10"
+                    className="flex-1"
+                  />
+                  <button
+                    type="button"
+                    onClick={applyPromoCode}
+                    className="px-4 py-2 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+                {promoError && <p className="text-xs text-red-500 mt-1">{promoError}</p>}
+                <p className="text-xs text-muted-foreground mt-1">
+                  Try <span className="font-semibold text-primary">FRESH10</span> for $10 off your first box
+                </p>
+              </div>
+            ) : null}
 
             {/* CTA */}
             <button

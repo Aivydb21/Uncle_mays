@@ -102,6 +102,9 @@ export const Pricing = () => {
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Seasonal produce, sourced directly from our Black farmer partners, delivered to your Chicago door every Wednesday.
           </p>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
+            Use code <span className="bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs font-bold tracking-wider">FRESH10</span> for $10 off your first box
+          </div>
         </motion.div>
 
         {/* One-Time / Subscribe toggle */}
