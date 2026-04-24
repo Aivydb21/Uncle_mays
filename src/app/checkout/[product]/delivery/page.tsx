@@ -91,6 +91,18 @@ function getEarliestDeliveryDate(): Date {
 }
 
 
+// Chicago city ZIP prefix. We currently only deliver inside Chicago proper.
+const CHICAGO_ZIP_PREFIX = "606";
+const OUT_OF_AREA_MESSAGE =
+  "We currently only deliver inside Chicago. Join our waitlist and we'll email you when we reach your area.";
+
+function isChicagoDelivery(state: string, zip: string): boolean {
+  const z = zip.trim();
+  if (!/^\d{5}(-\d{4})?$/.test(z)) return false;
+  if (state.trim().toUpperCase() !== "IL") return false;
+  return z.startsWith(CHICAGO_ZIP_PREFIX);
+}
+
 function validate(fields: FormFields): FormErrors {
   const errors: FormErrors = {};
   if (!fields.firstName.trim()) errors.firstName = "First name is required.";
@@ -103,6 +115,8 @@ function validate(fields: FormFields): FormErrors {
   if (!fields.state.trim()) errors.state = "State is required.";
   if (!fields.zip.trim() || !/^\d{5}(-\d{4})?$/.test(fields.zip.trim())) {
     errors.zip = "A valid ZIP code is required.";
+  } else if (!isChicagoDelivery(fields.state, fields.zip)) {
+    errors.zip = OUT_OF_AREA_MESSAGE;
   }
   return errors;
 }
@@ -190,6 +204,18 @@ export default function DeliveryPage() {
     // Clear field error on change
     if (errors[name as keyof FormFields]) {
       setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+  }
+
+  function handleZipBlur() {
+    const zip = fields.zip.trim();
+    if (!zip) return;
+    if (!/^\d{5}(-\d{4})?$/.test(zip)) {
+      setErrors((prev) => ({ ...prev, zip: "A valid ZIP code is required." }));
+      return;
+    }
+    if (!isChicagoDelivery(fields.state, zip)) {
+      setErrors((prev) => ({ ...prev, zip: OUT_OF_AREA_MESSAGE }));
     }
   }
 
@@ -560,12 +586,21 @@ export default function DeliveryPage() {
                       name="zip"
                       value={fields.zip}
                       onChange={handleChange}
+                      onBlur={handleZipBlur}
                       autoComplete="postal-code"
                       placeholder="60601"
                       maxLength={10}
                     />
                     {errors.zip && (
                       <p className="text-destructive text-xs">{errors.zip}</p>
+                    )}
+                    {errors.zip === OUT_OF_AREA_MESSAGE && (
+                      <a
+                        href={`mailto:info@unclemays.com?subject=Waitlist%20-%20${encodeURIComponent(fields.zip || "my area")}&body=${encodeURIComponent("Please add me to the Uncle May's delivery waitlist. ZIP: " + (fields.zip || ""))}`}
+                        className="text-xs text-primary underline inline-block mt-1"
+                      >
+                        Join the waitlist →
+                      </a>
                     )}
                   </div>
                 </div>

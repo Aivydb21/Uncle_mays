@@ -172,7 +172,7 @@ Anthony manages Apollo outreach through Claude. Full workflow doc: `investor-out
 - Team/location details are confidential in public posts, OK in private DMs
 
 **Daily commands:**
-- `"daily report"` — Today's calendar (meetings from Gmail invites), account health, active Apollo campaigns (Tier 1 + Tier 2), Stripe, GA traffic, Mailchimp stats, action items
+- `"daily report"` — Today's calendar (meetings from Gmail invites), account health, active Apollo campaigns (Tier 1 + Tier 2), Stripe, GA traffic, Mailchimp newsletter stats (Resend transactional stats via [resend.com/emails](https://resend.com/emails)), action items
 - `"check replies"` — New replies needing personal follow-up (all campaigns)
 - `"campaign stats"` — Full Tier 1 performance breakdown
 - `"tier 2 stats"` — Performance across all 4 Tier 2 campaigns
@@ -243,7 +243,18 @@ Anthony manages Apollo outreach through Claude. Full workflow doc: `investor-out
 - **Daily report pulls:** Sessions, users, page views, top pages, traffic sources, conversion events
 - **Setup:** Service account key is on disk; OAuth also authorized. Grant Viewer on GA4 property to `claude-ga-reader@uncle-mays-automation.iam.gserviceaccount.com` if using service account auth
 
-## Mailchimp API
+## Mailchimp API — Newsletter broadcasts ONLY
+
+> **Scope (as of 2026-04-24):** Mailchimp is the **newsletter engine only**.
+> Transactional email (order confirmation, abandoned cart recovery, payment-failed,
+> subscription cancellation) moved to **Resend** — see the Resend section below.
+> Do NOT add new 1-subscriber `POST /campaigns` + `/actions/send` calls to
+> trigger per-customer emails; that pattern was the source of inbox spam and
+> broke newsletter analytics by polluting the campaign stats pool with dozens
+> of tiny sends. The `upsertContact`, `createCart`, `addSignupLead`, and
+> `tagOrderCompleted` helpers in [src/lib/mailchimp.ts](src/lib/mailchimp.ts)
+> still exist and are still called — customers land in the audience for
+> newsletter segmentation, just not for transactional delivery.
 
 - **Config:** `~/.claude/mailchimp-config.json` (API key + base URL)
 - **Base URL:** `https://us19.api.mailchimp.com/3.0`
@@ -251,8 +262,9 @@ Anthony manages Apollo outreach through Claude. Full workflow doc: `investor-out
 - **Account:** Uncle May's Produce (anthonypivy@gmail.com, us19 data center)
 - **Plan:** Free (500 sends/month)
 - **Audience:** "Uncle May's Produce" (list ID: `2645503d11`), **3 members as of 2026-04-11**. Was 119 before the 2026-04-10 lockdown lift; investors/stakeholders/non-customers were removed and customers have not yet been re-added. Treat the audience as effectively empty for outbound — re-import customers from Stripe before sending the next campaign.
-- **From:** Uncle May's Produce / info@unclemays.com
+- **From:** Uncle May's Produce / info@unclemays.com (newsletter From stays on info@)
 - **Performance (lifetime, 26 campaigns sent):** 63.9% open rate, 9.8% click rate
+  - **Caveat:** these lifetime numbers are inflated by hundreds of 1-subscriber transactional sends created as regular campaigns before the 2026-04-24 Resend migration. Post-migration newsletter stats will be lower and more honest.
 - **Last campaign:** 2026-03-25 (before the audience cleanup)
 
 ### Mailchimp Commands (or use `/newsletter` skill)
@@ -260,6 +272,53 @@ Anthony manages Apollo outreach through Claude. Full workflow doc: `investor-out
 - `/newsletter draft` — Create campaign in saved state for Mailchimp UI review
 - `/newsletter stats` — Pull campaign performance and audience growth
 - `/newsletter list` — Show audience segments and member counts
+
+## Resend API — Transactional email
+
+- **Config:** `~/.claude/resend-config.json` (API key + from_email + reply_to + base URL)
+- **Base URL:** `https://api.resend.com`
+- **Auth:** `Authorization: Bearer <api_key>` header
+- **Verified domain:** `unclemays.com` (DKIM + SPF + return-path MX on `send.unclemays.com`, all live in Porkbun DNS)
+- **From mailbox:** `Uncle May's Produce <hello@unclemays.com>` (mailbox created 2026-04-24 in Google Workspace)
+- **Reply-to:** `info@unclemays.com` (so customer replies land in the shared inbox)
+- **Plan:** Free tier, 3k sends/mo, 100/day (upgrade to $20/mo for 50k when paid acquisition scales)
+- **Docs:** https://resend.com/docs
+
+### Env vars (required for transactional send to fire)
+
+Both Vercel (Next.js runtime) AND Trigger.dev (task workers) need these — they are separate env var systems, setting Vercel alone won't make triggered emails send:
+
+```
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=Uncle May's Produce <hello@unclemays.com>
+RESEND_REPLY_TO=info@unclemays.com   # optional, defaults to info@unclemays.com
+```
+
+### Where transactional email is sent
+
+All triggered emails go through `sendTransactional()` in [src/lib/email/resend.ts](src/lib/email/resend.ts). The 5 Trigger.dev tasks that currently use it:
+
+- [src/trigger/order-confirmation.ts](src/trigger/order-confirmation.ts) — fires on Stripe `checkout.session.completed`
+- [src/trigger/abandoned-checkout.ts](src/trigger/abandoned-checkout.ts) — 3-email recovery sequence over 48h (delivery-form abandon, our local session store)
+- [src/trigger/stripe-abandoned-checkout.ts](src/trigger/stripe-abandoned-checkout.ts) — 3-email recovery for Stripe-hosted checkouts that expired without payment
+- [src/trigger/subscription-lifecycle.ts](src/trigger/subscription-lifecycle.ts) — payment-failed notification
+- [src/trigger/subscription-cancellation.ts](src/trigger/subscription-cancellation.ts) — cancellation confirmation
+
+### Suppression list (applied everywhere)
+
+Both [src/lib/email/suppression.ts](src/lib/email/suppression.ts) (Next.js) and [src/trigger/_email-suppression.ts](src/trigger/_email-suppression.ts) (Trigger.dev) block sends to:
+
+- `*@unclemays.com` (all internal staff mailboxes)
+- `anthonypivy@gmail.com` (Mailchimp account owner)
+- Anything in the `EMAIL_SUPPRESSION_LIST` env var (comma-separated)
+
+Suppressed recipients are also blocked from Mailchimp audience upserts so they never trigger newsletter Journeys either. This was added because test checkouts from internal mailboxes kicked off multi-day recovery sequences (pre-2026-04-24 incident).
+
+### Rules
+
+- **Never reintroduce the 1-subscriber Mailchimp campaign pattern.** If a new triggered email is needed, call `sendTransactional()` from a Trigger.dev task.
+- **Always include `tags`** on `sendTransactional()` calls (e.g. `{name: "type", value: "order_confirmation"}`) so Resend logs and event webhooks can filter by email type later.
+- **Run TypeScript check** (`npx tsc --noEmit`) and redeploy Trigger.dev (`npx trigger.dev@<version> deploy`) after any change to a trigger task — the Vercel deploy alone will not update the worker code.
 
 ## Firecrawl API (Web Scraping & Search)
 
@@ -501,6 +560,20 @@ The Advertising Creative is encouraged to **ask for creative tools when they nee
 4. **Do NOT deploy or subscribe to any new tool without explicit board approval.** The no-new-infrastructure guardrail still applies; this creates a permitted escalation path, it does not lift the guardrail.
 
 The goal is to keep the creative unblocked. Do not let tool gaps silently cap output. If a better tool exists and would materially change what the creative can ship, say so.
+
+## Checkout + Recovery — reality check (for audit agents without file-read)
+
+This section exists because Paperclip CRO-style agents that can't read the repo directly have repeatedly raised "bugs" that don't exist. Before flagging any of the below as broken, verify against the live file.
+
+- **Subscription payment page pricing is dynamic, not hardcoded.** [src/app/subscribe/[product]/payment/page.tsx](src/app/subscribe/[product]/payment/page.tsx) uses `${checkout.subPrice}` pulled from `localStorage` (populated by the delivery step from `PRODUCTS[slug].subPrice`). Starter $40, Family $58.50, Community $85.50 all render correctly.
+- **One-time checkout delivery + payment routes exist.** [src/app/checkout/[product]/delivery/page.tsx](src/app/checkout/[product]/delivery/page.tsx) and [src/app/checkout/[product]/payment/page.tsx](src/app/checkout/[product]/payment/page.tsx) are live. The `/checkout/[product]` flow is complete.
+- **Stripe abandon tracker uses Mailchimp tags, not a JSON file.** [src/trigger/stripe-abandoned-checkout.ts](src/trigger/stripe-abandoned-checkout.ts) marks progress via `abc_<sessionIdSuffix>_e<N>` tags on the Mailchimp contact. No filesystem state; serverless-safe.
+- **Purchase pixel fires on order-success for both GA4 and Meta, with retry.** [src/app/order-success/OrderSuccessContent.tsx](src/app/order-success/OrderSuccessContent.tsx) retries up to 8× at 1s intervals to survive 3DS redirects. Deduplication via `event_id` is wired.
+- **Pricing toggle defaults to subscription.** [src/components/Pricing.tsx](src/components/Pricing.tsx) `useState(true)`. `?mode=one-time` flips to one-time; `?mode=subscription` is a no-op.
+- **Delivery forms validate Chicago-only delivery.** Both [src/app/subscribe/[product]/delivery/page.tsx](src/app/subscribe/[product]/delivery/page.tsx) and [src/app/checkout/[product]/delivery/page.tsx](src/app/checkout/[product]/delivery/page.tsx) require state=IL and ZIP starting with `606`. Out-of-area visitors see an inline "Join the waitlist" mailto CTA to `info@unclemays.com`.
+- **Abandoned-cart recovery emails link to `/#boxes`**, which anchors to the pricing grid (section id `boxes` in [src/components/Pricing.tsx](src/components/Pricing.tsx)). There is no standalone `/boxes` route — `/#boxes` is intentional.
+
+If you are a CRO/audit agent without filesystem access, flag items at the **file path** level ("please verify X in file Y") rather than asserting specific line numbers you cannot see.
 
 ## Key Positioning Notes
 

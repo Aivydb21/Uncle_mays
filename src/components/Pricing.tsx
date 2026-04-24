@@ -38,13 +38,15 @@ function formatPrice(n: number) {
 }
 
 export const Pricing = () => {
-  const [isSubscription, setIsSubscription] = useState(false);
+  const [isSubscription, setIsSubscription] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    if (params.get("mode") === "subscription") setIsSubscription(true);
+    const mode = params.get("mode");
+    if (mode === "subscription") setIsSubscription(true);
+    else if (mode === "one-time" || mode === "onetime") setIsSubscription(false);
   }, []);
 
   const handleOrder = (slug: ProductSlug) => {

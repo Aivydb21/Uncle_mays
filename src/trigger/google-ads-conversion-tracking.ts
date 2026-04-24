@@ -346,9 +346,16 @@ export const setupGoogleAdsAudiences = task({
           ],
         },
       },
+      // Note: Meta builds the equivalent cart-abandoner audience from Pixel
+      // events (AddToCart fired but not Purchase in 7 days), not URLs. Google
+      // Ads supports the same model via GA4 audience linking on `begin_checkout`
+      // and `purchase` events — that's the preferred long-term migration
+      // (tracked separately). Until then, these URL-based rules stay in sync
+      // with the real checkout entry paths (`/subscribe/`, `/checkout/`) and
+      // real success page (`/order-success`), not the stale `/boxes` placeholder.
       {
         name: "Cart Abandoners",
-        description: "Visitors who added items to cart but didn't purchase",
+        description: "Visitors who entered checkout but didn't purchase",
         membershipLifespan: 7,
         rules: {
           inclusionRuleOperator: "AND",
@@ -358,7 +365,10 @@ export const setupGoogleAdsAudiences = task({
                 {
                   urlStringList: {
                     urlMatchType: "CONTAINS",
-                    urls: ["unclemays.com/boxes"],
+                    urls: [
+                      "unclemays.com/subscribe/",
+                      "unclemays.com/checkout/",
+                    ],
                   },
                 },
               ],
@@ -370,7 +380,7 @@ export const setupGoogleAdsAudiences = task({
                 {
                   urlStringList: {
                     urlMatchType: "CONTAINS",
-                    urls: ["unclemays.com/thank-you"],
+                    urls: ["unclemays.com/order-success"],
                   },
                 },
               ],
@@ -390,7 +400,7 @@ export const setupGoogleAdsAudiences = task({
                 {
                   urlStringList: {
                     urlMatchType: "CONTAINS",
-                    urls: ["unclemays.com/thank-you"],
+                    urls: ["unclemays.com/order-success"],
                   },
                 },
               ],

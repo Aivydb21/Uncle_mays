@@ -137,7 +137,7 @@ async function sendEmail(
   const firstName = name.first || "friend";
   const sessionTag = sessionId.substring(0, 8);
   const checkoutUrl =
-    `https://unclemays.com/boxes` +
+    `https://unclemays.com/#boxes` +
     `?utm_source=email&utm_medium=abandoned_cart&utm_campaign=recovery_email${emailNumber}&utm_content=${sessionTag}`;
 
   let subjectLine: string;

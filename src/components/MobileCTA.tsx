@@ -33,11 +33,11 @@ export const MobileCTA = () => {
         >
           <div className="flex items-center gap-2">
             <Link
-              href="/subscribe/starter"
+              href="/#boxes"
               className="flex-1 flex flex-col items-center justify-center rounded-xl border border-border bg-muted/50 py-2.5 text-center"
             >
               <span className="text-xs text-muted-foreground">Small</span>
-              <span className="text-base font-bold text-primary">$40</span>
+              <span className="text-base font-bold text-primary">From $40</span>
             </Link>
             <Link
               href="/subscribe/family"
