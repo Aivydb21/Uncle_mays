@@ -1,13 +1,19 @@
 // Proteins available as optional add-ons across every box.
-// Prices target ~30% gross margin on wholesale cost for the typical portion
-// size shipped. Do not add proteins we cannot actually source week-to-week.
+// Single price point ($15) with smaller, taste-test portions. The story is
+// quality and freshness, not bulk: pasture-raised, no antibiotics, no chemicals,
+// slaughtered fresh — the opposite of supermarket meat that ships for weeks.
 export const PROTEIN_OPTIONS = [
-  { id: "chicken", label: "Pasture-Raised Whole Chicken (4–5 lb)", price: 45 },
-  { id: "beef-short-ribs", label: "Grass-Fed Beef Short Ribs, bone-in (~3 lb)", price: 38 },
-  { id: "lamb-chops", label: "Lamb Chops (~1.5 lb)", price: 42 },
+  { id: "chicken", label: "Pasture-Raised Chicken Thighs (~1.5 lb)", price: 15 },
+  { id: "beef-short-ribs", label: "Grass-Fed Beef Short Ribs (~3/4 lb)", price: 15 },
+  { id: "lamb-chops", label: "Lamb Chop (1, ~6 oz)", price: 15 },
 ] as const;
 
 export type ProteinId = (typeof PROTEIN_OPTIONS)[number]["id"];
+
+// One-line differentiator shown above the protein options at checkout.
+// Keep it short — customers are deciding whether to add, not reading a story.
+export const PROTEIN_TAGLINE =
+  "Pasture-raised. No antibiotics, no chemicals. Slaughtered fresh, never shipped — better than organic.";
 
 /**
  * Two tiers. Contents are built from the current supplier's produce list

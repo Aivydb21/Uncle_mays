@@ -4,7 +4,7 @@ import { useParams, notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { PRODUCTS, PROTEIN_OPTIONS, type ProductSlug, type ProteinId } from "@/lib/products";
+import { PRODUCTS, PROTEIN_OPTIONS, PROTEIN_TAGLINE, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
@@ -329,18 +329,21 @@ export default function CheckoutSummaryPage() {
               >
                 <div>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    Add a protein <span className="text-muted-foreground/70 normal-case font-normal">(optional)</span>
+                    Add a protein <span className="text-muted-foreground/70 normal-case font-normal">($15 each)</span>
                   </h2>
                   <p className="text-xs text-muted-foreground mt-1">
                     {selectedProteins.length > 0
                       ? `${selectedProteins.length} added (+$${proteinCost})`
-                      : "Whole chicken, short ribs, or lamb chops."}
+                      : "Pasture-raised, no antibiotics. Slaughtered fresh."}
                   </p>
                 </div>
                 <span className={`text-xl text-muted-foreground transition-transform ${showProteinAddOns ? "rotate-45" : ""}`}>+</span>
               </button>
               {showProteinAddOns ? (
                 <div className="px-4 pb-4 space-y-2">
+                  <p className="text-xs text-foreground/70 leading-relaxed pb-1">
+                    {PROTEIN_TAGLINE}
+                  </p>
                   {PROTEIN_OPTIONS.map((opt) => {
                     const selected = selectedProteins.includes(opt.id);
                     return (

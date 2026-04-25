@@ -221,7 +221,7 @@ export const Pricing = () => {
         {/* One-line protein add-on note — explicit so customers know protein is
             available without cluttering the tier cards with pricing tables. */}
         <p className="text-center text-sm text-muted-foreground mb-10 max-w-xl mx-auto">
-          Add a pasture-raised chicken, short ribs, or lamb chops at checkout.
+          Add chicken, short ribs, or lamb chops at checkout — $15 each, pasture-raised, slaughtered fresh.
         </p>
 
         {/* Produce box image */}
