@@ -125,3 +125,36 @@ All colors MUST be HSL.
     @apply font-display;
   }
 }
+
+/* Google Places Autocomplete dropdown — must sit above sticky CTAs and modals.
+   Without this override, pac-container defaults to z-index:1000 and can hide
+   behind sticky bars (which use z-index up to 9999 on this site). */
+.pac-container {
+  z-index: 10000 !important;
+  font-family: inherit;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  border: 1px solid hsl(var(--border));
+}
+
+.pac-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.pac-item:hover,
+.pac-item-selected {
+  background-color: hsl(var(--muted));
+}
+
+.pac-item-query {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.pac-matched {
+  font-weight: 700;
+}
