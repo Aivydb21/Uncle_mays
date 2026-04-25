@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: true,
+    formats: ["image/avif", "image/webp"],
   },
   // Redirect retired routes to the active pricing section so old Meta ad
   // URLs and any organic backlinks don't 404. Add new entries here whenever

@@ -105,31 +105,23 @@ export function useAddressAutocomplete(onSelect: AutocompleteCallback) {
   const callbackRef = useRef(onSelect);
   callbackRef.current = onSelect;
 
-  const inputRef = useCallback((node: HTMLInputElement | null) => {
-    if (!node) return;
-    if (autocompleteRef.current) return; // already initialised
+  const nodeRef = useRef<HTMLInputElement | null>(null);
+  const initStartedRef = useRef(false);
+
+  const initAutocomplete = useCallback(() => {
+    const node = nodeRef.current;
+    if (!node || initStartedRef.current) return;
+    initStartedRef.current = true;
 
     loadGoogleMapsScript()
       .then(() => {
-        if (!window.google?.maps?.places?.Autocomplete) {
-          // Script didn't load or Places library missing — leave input as-is
-          return;
-        }
-
+        if (!window.google?.maps?.places?.Autocomplete) return;
         try {
-          // Chicago-bias is handled implicitly via componentRestrictions
-          // + the user's IP geolocation. We previously called setBounds with
-          // google.maps.LatLngBounds, but instantiating Maps-JS classes
-          // triggers a "This page can't load Google Maps correctly" popup
-          // on some Google Cloud key configurations even when both Places
-          // and Maps JS are enabled. Suggestions stay US-only and remain
-          // locally relevant without the explicit bounds.
           const autocomplete = new google.maps.places.Autocomplete(node, {
             types: ["address"],
             componentRestrictions: { country: "us" },
             fields: ["address_components"],
           });
-
           autocomplete.addListener("place_changed", () => {
             try {
               const place = autocomplete.getPlace();
@@ -139,13 +131,8 @@ export function useAddressAutocomplete(onSelect: AutocompleteCallback) {
               console.warn("[address-autocomplete] place_changed error:", err);
             }
           });
-
           autocompleteRef.current = autocomplete;
         } catch (err) {
-          // Autocomplete init can throw if the API key is invalid, billing
-          // is off, or referrer restrictions block the request. Logging here
-          // so the failure is visible in DevTools instead of silently
-          // poisoning the input element.
           console.warn("[address-autocomplete] init failed:", err);
         }
       })
@@ -153,6 +140,23 @@ export function useAddressAutocomplete(onSelect: AutocompleteCallback) {
         console.warn("[address-autocomplete] script load error:", err);
       });
   }, []);
+
+  // Attach the script-loading trigger to the FIRST user interaction with the
+  // input (focus, pointerdown, or keydown). Loading the Maps SDK on mount
+  // pushed the delivery-page LCP to >10s on mobile because ~300KB of JS
+  // competed with first paint. Deferring until first interaction means LCP
+  // is unaffected and the script only loads when the user actually wants to
+  // type an address.
+  const inputRef = useCallback((node: HTMLInputElement | null) => {
+    nodeRef.current = node;
+    if (!node) return;
+    if (autocompleteRef.current) return;
+
+    const trigger = () => initAutocomplete();
+    node.addEventListener("focus", trigger, { once: true });
+    node.addEventListener("pointerdown", trigger, { once: true });
+    node.addEventListener("keydown", trigger, { once: true });
+  }, [initAutocomplete]);
 
   // Cleanup on unmount
   useEffect(() => {

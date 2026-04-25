@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import HomePageContent from "@/page-content/Index";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 const localBusinessSchema = {
   "@context": "https://schema.org",
