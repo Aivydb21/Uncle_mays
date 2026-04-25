@@ -6,6 +6,7 @@ import { ShoppingBag, Bell, Package, ChevronDown } from "lucide-react";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
 import { HomeEmailCapture } from "@/components/HomeEmailCapture";
+import { TESTIMONIALS } from "@/lib/testimonials";
 
 const faqs = [
   {
@@ -137,6 +138,33 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Customer voice — real, attributed quotes only (see src/lib/testimonials.ts) */}
+      {TESTIMONIALS.length > 0 ? (
+        <section className="py-20 bg-muted/20">
+          <div className="container px-6 max-w-3xl mx-auto">
+            <div className="grid gap-6">
+              {TESTIMONIALS.map((t) => (
+                <motion.figure
+                  key={t.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6 }}
+                  className="bg-card rounded-2xl p-8 shadow-soft border border-border/50"
+                >
+                  <blockquote className="text-lg leading-relaxed text-foreground/85 italic">
+                    &ldquo;{t.quote}&rdquo;
+                  </blockquote>
+                  <figcaption className="mt-4 text-sm font-semibold text-foreground">
+                    {t.name}
+                  </figcaption>
+                </motion.figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       {/* FAQ */}
       <section className="py-24 bg-background">

@@ -304,7 +304,7 @@ export default function SubscribeSummaryPage() {
                 Order by Sunday 11:59 PM CT for Wednesday delivery
               </p>
               <p className="text-amber-700 text-xs mt-1">
-                Sourced from Run A Way Buckers Club, our Black farmer partner in Pembroke, IL. Packed fresh for every delivery.
+                100% fresh or refunded.
               </p>
             </div>
 

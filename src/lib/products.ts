@@ -1,8 +1,6 @@
 // Proteins available as optional add-ons across every box.
-// All items sourced from Run A Way Buckers Club (Pembroke, IL) — our named
-// farmer partner. Prices are end-customer add-on prices and target ~30% gross
-// margin on the RAB wholesale cost for the typical portion size shipped.
-// Do not add proteins we cannot actually source week-to-week.
+// Prices target ~30% gross margin on wholesale cost for the typical portion
+// size shipped. Do not add proteins we cannot actually source week-to-week.
 export const PROTEIN_OPTIONS = [
   { id: "chicken", label: "Pasture-Raised Whole Chicken (4–5 lb)", price: 45 },
   { id: "beef-short-ribs", label: "Grass-Fed Beef Short Ribs, bone-in (~3 lb)", price: 38 },
@@ -12,10 +10,10 @@ export const PROTEIN_OPTIONS = [
 export type ProteinId = (typeof PROTEIN_OPTIONS)[number]["id"];
 
 /**
- * Two tiers. Contents are built exclusively from the Run A Way Buckers
- * produce list (asparagus, kales, chard, salad mix, microgreens, carrots,
- * sweet potatoes, dry beans). No eggs, no tomatoes, no cucumbers, no
- * summer produce unless/until a second supplier is onboarded.
+ * Two tiers. Contents are built from the current supplier's produce list
+ * (asparagus, kales, chard, salad mix, microgreens, carrots, sweet potatoes,
+ * dry beans). No eggs, no tomatoes, no cucumbers, no summer produce
+ * unless/until a second supplier is onboarded.
  *
  * Proteins are optional paid add-ons selected at checkout (see
  * PROTEIN_OPTIONS above). No box includes protein in the base price.

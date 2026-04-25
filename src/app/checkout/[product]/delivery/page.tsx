@@ -632,9 +632,6 @@ export default function DeliveryPage() {
                   <p className="font-semibold text-amber-800">
                     Order by Sunday 11:59 PM CT for Wednesday delivery
                   </p>
-                  <p className="text-amber-700 text-xs mt-0.5">
-                    Sourced from Run A Way Buckers Club, Pembroke, IL.
-                  </p>
                 </div>
 
                 {/* Delivery notes */}

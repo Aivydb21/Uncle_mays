@@ -294,28 +294,13 @@ export default function CheckoutSummaryPage() {
               </div>
             </div>
 
-            {/* Compact trust strip — one line. Most checkout traffic is
-                deep-linked from Meta ads and never sees the homepage, so
-                provide just enough signal ("others bought this; you won't
-                lose your money") without re-bloating Step 1. */}
-            <div className="mb-5 flex items-center gap-3 text-xs text-muted-foreground border-y border-border py-2.5">
-              <span className="flex items-center gap-1 text-amber-600 font-semibold">
-                <span aria-hidden>★★★★★</span>
-                <span className="sr-only">5 out of 5 stars</span>
-              </span>
-              <span className="flex-1 truncate">
-                &ldquo;Best produce I&apos;ve had in Chicago.&rdquo; — Keisha, Hyde Park
-              </span>
-              <span className="text-primary font-semibold whitespace-nowrap">100% fresh or refunded</span>
-            </div>
-
             {/* Cutoff deadline */}
             <div className="mb-5 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm">
               <p className="font-semibold text-amber-800">
                 Order by Sunday 11:59 PM CT for Wednesday delivery
               </p>
               <p className="text-amber-700 text-xs mt-1">
-                Sourced from Run A Way Buckers Club, our Black farmer partner in Pembroke, IL. Packed fresh for every delivery.
+                100% fresh or refunded.
               </p>
             </div>
 

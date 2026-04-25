@@ -141,7 +141,10 @@ function SubscriptionPaymentForm({
 
   return (
     <form onSubmit={handleSubmit}>
-      <PaymentElement className="mb-6" />
+      <PaymentElement
+        className="mb-6"
+        options={{ wallets: { applePay: "auto", googlePay: "auto" } }}
+      />
 
       {paymentError && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
