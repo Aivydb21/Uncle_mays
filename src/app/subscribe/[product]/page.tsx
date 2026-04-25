@@ -4,6 +4,7 @@ import { useParams, notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { PRODUCTS, PROTEIN_OPTIONS, PROTEIN_TAGLINE, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -249,11 +250,14 @@ export default function SubscribeSummaryPage() {
         ) : null}
 
         <div className="rounded-2xl overflow-hidden shadow-soft bg-background">
-          <div className="relative">
-            <img
+          <div className="relative h-36 md:h-56">
+            <Image
               src="/images/produce-box.jpg"
               alt={`${product.name} — fresh seasonal produce`}
-              className="w-full h-36 md:h-56 object-cover"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 672px"
+              className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
             <div className="absolute bottom-4 left-5 flex items-center gap-2">
