@@ -117,18 +117,18 @@ export function useAddressAutocomplete(onSelect: AutocompleteCallback) {
         }
 
         try {
+          // Chicago-bias is handled implicitly via componentRestrictions
+          // + the user's IP geolocation. We previously called setBounds with
+          // google.maps.LatLngBounds, but instantiating Maps-JS classes
+          // triggers a "This page can't load Google Maps correctly" popup
+          // on some Google Cloud key configurations even when both Places
+          // and Maps JS are enabled. Suggestions stay US-only and remain
+          // locally relevant without the explicit bounds.
           const autocomplete = new google.maps.places.Autocomplete(node, {
             types: ["address"],
             componentRestrictions: { country: "us" },
             fields: ["address_components"],
           });
-
-          autocomplete.setBounds(
-            new google.maps.LatLngBounds(
-              { lat: 41.6445, lng: -87.9401 },
-              { lat: 42.0231, lng: -87.5237 }
-            )
-          );
 
           autocomplete.addListener("place_changed", () => {
             try {
