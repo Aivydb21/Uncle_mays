@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import {
   Truck,
@@ -36,13 +37,13 @@ export function GetStartedContent() {
       {/* HERO — FRESH10 is the lede */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src={HERO_IMAGE}
             alt="Uncle May's seasonal produce delivery in Chicago"
-            className="absolute inset-0 h-full w-full object-cover"
-            width={1920}
-            height={1080}
-            fetchPriority="high"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/85 to-background/95" />
         </div>
