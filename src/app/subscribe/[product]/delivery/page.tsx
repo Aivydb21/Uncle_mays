@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
 import { useAddressAutocomplete, type ParsedAddress } from "@/hooks/use-address-autocomplete";
 import { WaitlistCapture } from "@/components/WaitlistCapture";
+import { isInServiceArea, OUT_OF_AREA_MESSAGE } from "@/lib/service-area";
 
 declare global {
   interface Window {
@@ -92,17 +93,8 @@ function getEarliestDeliveryDate(): Date {
 }
 
 
-// Chicago city ZIP prefix. We currently only deliver inside Chicago proper.
-const CHICAGO_ZIP_PREFIX = "606";
-const OUT_OF_AREA_MESSAGE =
-  "We currently only deliver inside Chicago. Join our waitlist and we'll email you when we reach your area.";
-
-function isChicagoDelivery(state: string, zip: string): boolean {
-  const z = zip.trim();
-  if (!/^\d{5}(-\d{4})?$/.test(z)) return false;
-  if (state.trim().toUpperCase() !== "IL") return false;
-  return z.startsWith(CHICAGO_ZIP_PREFIX);
-}
+// Service area validation lives in src/lib/service-area.ts so both
+// checkout flows and any future API route share the same list.
 
 function validate(fields: FormFields): FormErrors {
   const errors: FormErrors = {};
@@ -116,7 +108,7 @@ function validate(fields: FormFields): FormErrors {
   if (!fields.state.trim()) errors.state = "State is required.";
   if (!fields.zip.trim() || !/^\d{5}(-\d{4})?$/.test(fields.zip.trim())) {
     errors.zip = "A valid ZIP code is required.";
-  } else if (!isChicagoDelivery(fields.state, fields.zip)) {
+  } else if (!isInServiceArea(fields.state, fields.zip)) {
     errors.zip = OUT_OF_AREA_MESSAGE;
   }
   return errors;
@@ -220,7 +212,7 @@ export default function SubscribeDeliveryPage() {
       setErrors((prev) => ({ ...prev, zip: "A valid ZIP code is required." }));
       return;
     }
-    if (!isChicagoDelivery(fields.state, zip)) {
+    if (!isInServiceArea(fields.state, zip)) {
       setErrors((prev) => ({ ...prev, zip: OUT_OF_AREA_MESSAGE }));
     }
   }
@@ -537,7 +529,7 @@ export default function SubscribeDeliveryPage() {
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground -mt-2 mb-4">
-                  Chicago, IL only. <span aria-hidden="true">·</span> ZIPs starting with 606.
+                  Chicagoland metro. <span aria-hidden="true">·</span> South Chicago + south suburbs.
                 </p>
 
                 {/* Delivery info — Wednesday, auto-assigned */}

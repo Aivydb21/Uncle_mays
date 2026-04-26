@@ -24,7 +24,7 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 | Delivery day | **Wednesday, every week** |
 | Delivery window | **Wednesday 5pm–8pm CT** (after-work, so someone is home to receive) |
 | Order cutoff | **Sunday 11:59 PM CT** — orders placed after cutoff ship the following Wednesday |
-| Service area | Chicago (Hyde Park and city-wide) |
+| Service area | **Chicagoland metro south** — south Chicago city ZIPs (606xx) plus south-suburban cluster (Calumet City, Dolton, Harvey, Markham, Hazel Crest, Homewood, Flossmoor, Lansing, South Holland, Matteson, Olympia Fields, Richton Park, Posen, Blue Island, Riverdale, Chicago Heights). Authoritative ZIP list: [`src/lib/service-area.ts`](./src/lib/service-area.ts). |
 | Delivery fee | Free |
 | Missed delivery policy | 100% freshness guarantee — full refund, no questions asked |
 
