@@ -214,7 +214,8 @@ export default function DeliveryPage() {
       ...prev,
       street: address.street,
       city: address.city || prev.city,
-      state: address.state || prev.state,
+      // State pinned to IL — Chicago-only delivery.
+      state: "IL",
       zip: address.zip || prev.zip,
     }));
     // Clear address-related errors when autocomplete fills fields
@@ -237,6 +238,15 @@ export default function DeliveryPage() {
     if (!isChicagoDelivery(fields.state, zip)) {
       setErrors((prev) => ({ ...prev, zip: OUT_OF_AREA_MESSAGE }));
     }
+  }
+
+  // Per-field blur validators — see subscribe/delivery for rationale.
+  function requireBlur(name: keyof FormFields, label: string) {
+    return () => {
+      if (!fields[name].trim()) {
+        setErrors((prev) => ({ ...prev, [name]: `${label} is required.` }));
+      }
+    };
   }
 
   function handleEmailBlur() {
@@ -413,7 +423,7 @@ export default function DeliveryPage() {
             see the sticky sidebar with the same info. Without this, mobile
             users fill the form with no visible reminder of what they're
             buying or how much it costs — a silent trust leak. */}
-        <div className="md:hidden mb-4 rounded-xl bg-background shadow-soft p-4 flex items-center justify-between gap-3">
+        <div className="md:hidden sticky top-0 z-30 mb-4 rounded-xl bg-background/95 backdrop-blur shadow-soft p-4 flex items-center justify-between gap-3">
           <div>
             <p className="text-xs uppercase tracking-wide text-muted-foreground">
               {product.name}
@@ -463,6 +473,8 @@ export default function DeliveryPage() {
                       name="firstName"
                       value={fields.firstName}
                       onChange={handleChange}
+                      onBlur={requireBlur("firstName", "First name")}
+                      autoFocus
                       autoComplete="given-name"
                       placeholder="Jane"
                     />
@@ -479,6 +491,7 @@ export default function DeliveryPage() {
                       name="lastName"
                       value={fields.lastName}
                       onChange={handleChange}
+                      onBlur={requireBlur("lastName", "Last name")}
                       autoComplete="family-name"
                       placeholder="Smith"
                     />
@@ -528,9 +541,9 @@ export default function DeliveryPage() {
                   />
                 </div>
 
-                {/* Street + Apt */}
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="col-span-2 space-y-1.5">
+                {/* Street + Apt — stacked on mobile. */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                  <div className="sm:col-span-2 space-y-1.5">
                     <Label htmlFor="street">
                       Street Address <span className="text-destructive">*</span>
                     </Label>
@@ -540,6 +553,7 @@ export default function DeliveryPage() {
                       ref={streetInputRef}
                       value={fields.street}
                       onChange={handleChange}
+                      onBlur={requireBlur("street", "Street address")}
                       autoComplete="off"
                       placeholder="Start typing your address..."
                     />
@@ -548,7 +562,9 @@ export default function DeliveryPage() {
                     )}
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="apt">Apt / Unit</Label>
+                    <Label htmlFor="apt">
+                      Apt / Unit <span className="text-muted-foreground font-normal">(optional)</span>
+                    </Label>
                     <Input
                       id="apt"
                       name="apt"
@@ -560,8 +576,8 @@ export default function DeliveryPage() {
                   </div>
                 </div>
 
-                {/* City, State, ZIP */}
-                <div className="grid grid-cols-3 gap-4 mb-4">
+                {/* City + ZIP — state locked to IL (Chicago-only). */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="city">
                       City <span className="text-destructive">*</span>
@@ -571,31 +587,12 @@ export default function DeliveryPage() {
                       name="city"
                       value={fields.city}
                       onChange={handleChange}
+                      onBlur={requireBlur("city", "City")}
                       autoComplete="address-level2"
                       placeholder="Chicago"
                     />
                     {errors.city && (
                       <p className="text-destructive text-xs">{errors.city}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="state">
-                      State <span className="text-destructive">*</span>
-                    </Label>
-                    <select
-                      id="state"
-                      name="state"
-                      value={fields.state}
-                      onChange={handleChange}
-                      autoComplete="address-level1"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    >
-                      {["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"].map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                      ))}
-                    </select>
-                    {errors.state && (
-                      <p className="text-destructive text-xs">{errors.state}</p>
                     )}
                   </div>
                   <div className="space-y-1.5">
@@ -609,6 +606,7 @@ export default function DeliveryPage() {
                       onChange={handleChange}
                       onBlur={handleZipBlur}
                       autoComplete="postal-code"
+                      inputMode="numeric"
                       placeholder="60601"
                       maxLength={10}
                     />
@@ -620,6 +618,9 @@ export default function DeliveryPage() {
                     )}
                   </div>
                 </div>
+                <p className="text-xs text-muted-foreground -mt-2 mb-4">
+                  Chicago, IL only. <span aria-hidden="true">·</span> ZIPs starting with 606.
+                </p>
 
                 {/* Delivery info — Wednesday, auto-assigned */}
                 <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary/5 px-4 py-2.5 text-sm text-primary border border-primary/20">
@@ -697,6 +698,10 @@ export default function DeliveryPage() {
                   <p className="text-xs text-primary mb-2">{activePromo.label}</p>
                 </>
               ) : null}
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
+                <span>Delivery</span>
+                <span className="text-primary font-medium">FREE</span>
+              </div>
               <div className="border-t border-border pt-3">
                 <div className="flex items-center justify-between text-sm font-semibold">
                   <span>Total</span>

@@ -11,6 +11,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { PRODUCTS, type ProductSlug } from "@/lib/products";
+import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
 
 // Load Stripe once outside component to avoid recreating on renders
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -381,9 +382,11 @@ export default function PaymentPage() {
                 Order Summary
               </h2>
 
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">{checkout.productName}</span>
-                <span className="font-bold text-primary">${checkout.price}</span>
+              {/* Line items — Baymard finding: show every line including
+                  $0 ones so users can confirm there are no hidden costs. */}
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span>{checkout.productName}</span>
+                <span>${checkout.price.toFixed(2)}</span>
               </div>
 
               {(() => {
@@ -406,10 +409,33 @@ export default function PaymentPage() {
                 );
               })()}
 
+              {(() => {
+                if (typeof window === "undefined") return null;
+                let promo: { code: string; amountOff: number } | null = null;
+                try {
+                  const saved = normalizePromo(sessionStorage.getItem("unc-promo"));
+                  if (saved && ACTIVE_PROMOS[saved] && ACTIVE_PROMOS[saved].appliesTo.includes("one-time")) {
+                    promo = { code: saved, amountOff: ACTIVE_PROMOS[saved].amountOffCents / 100 };
+                  }
+                } catch { /* ignore */ }
+                if (!promo) return null;
+                return (
+                  <div className="flex items-center justify-between text-sm mb-2 text-primary">
+                    <span>Promo {promo.code}</span>
+                    <span>−${promo.amountOff.toFixed(2)}</span>
+                  </div>
+                );
+              })()}
+
+              <div className="flex items-center justify-between text-sm mb-2 text-muted-foreground">
+                <span>Delivery</span>
+                <span className="text-primary">FREE</span>
+              </div>
+
               <div className="border-t border-border pt-3 mb-3">
-                <div className="flex items-center justify-between text-sm font-semibold">
+                <div className="flex items-center justify-between text-base font-semibold">
                   <span>Total</span>
-                  <span className="text-primary">${checkout.price}.00</span>
+                  <span className="text-primary">${checkout.price.toFixed(2)}</span>
                 </div>
               </div>
 

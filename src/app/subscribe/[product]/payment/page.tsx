@@ -11,6 +11,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { PRODUCTS, type ProductSlug } from "@/lib/products";
+import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
 
 declare global {
   interface Window {
@@ -379,6 +380,20 @@ export default function SubscribePaymentPage() {
     );
   }
 
+  // Resolve the promo (if any) so the payment-step summary can show the
+  // discount line and the explicit "Today's charge" total.
+  let appliedPromo: { code: string; amountOff: number; label: string } | null = null;
+  try {
+    if (typeof window !== "undefined") {
+      const saved = normalizePromo(sessionStorage.getItem("unc-promo"));
+      if (saved && ACTIVE_PROMOS[saved] && ACTIVE_PROMOS[saved].appliesTo.includes("subscription")) {
+        const entry = ACTIVE_PROMOS[saved];
+        appliedPromo = { code: saved, amountOff: entry.amountOffCents / 100, label: entry.label };
+      }
+    }
+  } catch { /* ignore */ }
+  const todayCharge = Math.max(0, checkout.subPrice - (appliedPromo?.amountOff ?? 0));
+
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
       <div className="container px-4 max-w-3xl mx-auto">
@@ -446,9 +461,11 @@ export default function SubscribePaymentPage() {
                 Subscription Summary
               </h2>
 
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">{checkout.productName}</span>
-                <span className="font-bold text-primary">${checkout.subPrice}/wk</span>
+              {/* Line items — Baymard finding: show every line including
+                  $0 ones so users can confirm there are no hidden costs. */}
+              <div className="flex items-center justify-between text-sm mb-2">
+                <span>{checkout.productName}</span>
+                <span>${checkout.subPrice.toFixed(2)}</span>
               </div>
 
               {checkout.proteinChoices && checkout.proteinChoices.length > 0 && (
@@ -464,13 +481,33 @@ export default function SubscribePaymentPage() {
                 </div>
               )}
 
-              <div className="border-t border-border pt-3 mb-3">
-                <div className="flex items-center justify-between text-sm font-semibold">
-                  <span>Weekly Total</span>
-                  <span className="text-primary">${checkout.subPrice}/wk</span>
+              {appliedPromo && (
+                <div className="flex items-center justify-between text-sm mb-2 text-primary">
+                  <span>Promo {appliedPromo.code}</span>
+                  <span>−${appliedPromo.amountOff.toFixed(2)}</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Billed weekly · Cancel anytime</p>
+              )}
+
+              <div className="flex items-center justify-between text-sm mb-2 text-muted-foreground">
+                <span>Delivery</span>
+                <span className="text-primary">FREE</span>
               </div>
+
+              <div className="border-t border-border pt-3 mb-1">
+                <div className="flex items-center justify-between text-base font-semibold">
+                  <span>Today&apos;s charge</span>
+                  <span className="text-primary">${todayCharge.toFixed(2)}</span>
+                </div>
+                {appliedPromo ? (
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-1">
+                    <span>Then weekly</span>
+                    <span>${checkout.subPrice.toFixed(2)}/wk</span>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground mt-1">Billed weekly · Cancel anytime</p>
+                )}
+              </div>
+              <div className="mb-3" />
 
               {/* First-delivery guarantee */}
               <div className="rounded-lg bg-green-50 border border-green-200 px-3 py-2 mb-3">
