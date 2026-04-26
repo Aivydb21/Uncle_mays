@@ -12,7 +12,7 @@ export const TESTIMONIALS: Testimonial[] = [
   {
     quote:
       "Loved my first box from them, looking to order more. Friendly customer service, fresh quality produce. Can't wait until I receive my next box next week.",
-    name: "Antoinette Woods",
+    name: "Antoinette W.",
     source: "Facebook comment, April 2026",
   },
 ];
