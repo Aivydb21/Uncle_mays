@@ -136,15 +136,15 @@ const faqSchema = {
       name: "How much does a box cost?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Two tiers: $40 for a Small Box (6 items, built for 1–2 people) or $70 for a Family Box (9 items, built for 3–4 people). Proteins (pasture-raised chicken, beef short ribs, or lamb chops) are optional paid add-ons at checkout. No subscription required — but Subscribe & Save takes 10% off every box.",
+        text: "Two tiers: $40 for a Small Box (6 items, built for 1–2 people) or $70 for a Family Box (9 items, built for 3–4 people). Proteins (pasture-raised chicken, beef short ribs, or lamb chops) are optional paid add-ons at checkout. Every box is a one-time order — no subscription, no auto-renewal.",
       },
     },
     {
       "@type": "Question",
-      name: "Do I need a subscription?",
+      name: "Is this a subscription? Will my card be auto-charged?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "No. Every box is a one-time purchase. Order when it works for you.",
+        text: "No. Every box is a one-time purchase. You order, you get charged once for that one box, that's it. No recurring billing, no auto-renewal, no card on file. The next time you want a box, you come back and order again.",
       },
     },
     {

@@ -72,7 +72,7 @@ export const Hero = () => {
             <span aria-hidden="true">•</span>
             <span className="font-semibold text-foreground/90">Chicago-wide delivery</span>
             <span aria-hidden="true">•</span>
-            <span className="font-semibold text-foreground/90">One-time or subscribe &amp; save</span>
+            <span className="font-semibold text-foreground/90">One-time orders, no subscription</span>
             <span aria-hidden="true">•</span>
             <span className="font-semibold text-foreground/90">
               Give this a try, we would love your support

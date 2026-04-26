@@ -34,9 +34,9 @@ const features = [
   },
   {
     icon: ShieldCheck,
-    title: "Flexible Ordering",
+    title: "One-Time Orders",
     description:
-      "Order one-time whenever you want, or subscribe weekly and save 10%. No long-term commitment on either option.",
+      "Every box is a one-time purchase. No subscription, no auto-renewal, no card on file. Order when you want a box.",
   },
 ];
 
@@ -46,7 +46,7 @@ const steps = [
     step: "01",
     title: "Choose Your Box",
     description:
-      "Pick the box size that works for your household: Small or Family. Order one-time or subscribe weekly and save 10%.",
+      "Pick the box size that works for your household: Small or Family. One-time order, no subscription, no auto-renewal.",
   },
   {
     icon: Package,
@@ -66,8 +66,8 @@ const steps = [
 
 const faqs = [
   {
-    q: "Do I need a subscription?",
-    a: "No subscription required. You can order any box as a one-time purchase whenever you want. If you'd like regular weekly deliveries, we also offer a Subscribe & Save option that takes 10% off every box. You can cancel anytime.",
+    q: "Is this a subscription? Will my card be auto-charged?",
+    a: "No. Every box is a one-time purchase. You order, you get charged once for that one box, that's it. No recurring billing, no auto-renewal, no card kept on file. The next time you want a box, you come back and order again.",
   },
   {
     q: "What if I have an issue with my order?",
@@ -83,11 +83,11 @@ const faqs = [
   },
   {
     q: "How much does a box cost?",
-    a: "The Small Box is $40 one-time ($36/wk with a subscription). The Family Box is $70 one-time ($63/wk with a subscription). Subscribe & Save takes 10% off every box and you can cancel anytime. Proteins (pasture-raised whole chicken, grass-fed beef short ribs, or lamb chops) are optional paid add-ons at checkout.",
+    a: "The Small Box is $40 and the Family Box is $70 — one-time, no subscription. Proteins (pasture-raised whole chicken, grass-fed beef short ribs, or lamb chops) are optional paid add-ons at checkout.",
   },
   {
-    q: "How do I cancel my subscription or order?",
-    a: "If you have a weekly subscription, you can cancel anytime by emailing info@unclemays.com and we'll stop future deliveries immediately. If you need to modify or cancel a one-time order you've already placed, email us as soon as possible and we'll take care of it.",
+    q: "How do I cancel an order?",
+    a: "There's nothing recurring to cancel. If you need to modify or cancel a one-time order you've already placed, email info@unclemays.com as soon as possible and we'll take care of it.",
   },
 ];
 

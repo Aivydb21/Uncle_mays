@@ -38,22 +38,25 @@ function formatPrice(n: number) {
 }
 
 export const Pricing = () => {
-  // Default to one-time. Stripe data through April 2026 showed real
-  // subscription-curious customers reaching the payment step and abandoning
-  // at the card form (15 attempts, 1 conversion), with at least one
-  // customer telling us directly she "didn't want a subscription hitting
-  // her card." Leading with one-time removes the commitment fear at the
-  // discovery step. Subscription is still one tap away via the toggle and
-  // ad URLs can still deep-link via ?mode=subscription.
+  // Homepage Pricing is one-time-only as of April 2026. Stripe data showed
+  // 14 of 15 real subscription attempts abandoning at the payment form,
+  // multiple customers explicitly saying they didn't want a recurring
+  // commitment, and one (Nicole) writing back unprompted to confirm the
+  // pattern. Subscription routes still exist (Doina is on $55/wk and
+  // /subscribe/[product] still works), but they're no longer surfaced to
+  // cold traffic.
+  //
+  // The deep-link path is preserved: visiting "/?mode=subscription" flips
+  // this component into subscription pricing for paid ads / direct emails
+  // that explicitly target subscribe-ready customers. The toggle UI is
+  // hidden — there's no way to switch modes on the page itself.
   const [isSubscription, setIsSubscription] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    const mode = params.get("mode");
-    if (mode === "subscription") setIsSubscription(true);
-    else if (mode === "one-time" || mode === "onetime") setIsSubscription(false);
+    if (params.get("mode") === "subscription") setIsSubscription(true);
   }, []);
 
   const handleOrder = (slug: ProductSlug) => {
@@ -114,46 +117,16 @@ export const Pricing = () => {
           </div>
         </motion.div>
 
-        {/* One-Time / Subscribe toggle */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="inline-flex items-center rounded-xl bg-card border border-border shadow-soft p-1 gap-1">
-            <button
-              type="button"
-              onClick={() => setIsSubscription(false)}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                !isSubscription
-                  ? "bg-primary text-primary-foreground shadow-soft"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              One-Time Box
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsSubscription(true)}
-              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                isSubscription
-                  ? "bg-primary text-primary-foreground shadow-soft"
-                  : "text-primary/90 hover:text-primary"
-              }`}
-            >
-              Subscribe &amp; Save
-              <span className={`ml-1.5 text-xs font-bold px-1.5 py-0.5 rounded ${
-                isSubscription
-                  ? "bg-primary-foreground/20 text-primary-foreground"
-                  : "bg-primary/15 text-primary"
-              }`}>
-                10% off
-              </span>
-            </button>
-          </div>
-
-          <p className="mt-3 text-center text-sm text-muted-foreground">
-            {isSubscription
-              ? "Free delivery. Cancel anytime."
-              : "Free delivery. Order when you want."}
-          </p>
-        </div>
+        {/* Toggle removed April 2026. Microcopy below conveys the same
+            "no commitment" reassurance without surfacing the subscription
+            option at the discovery step. Visitors arriving via
+            "?mode=subscription" still see subscription pricing because
+            isSubscription is set in useEffect above. */}
+        <p className="text-center text-sm text-muted-foreground mb-8">
+          {isSubscription
+            ? "Free delivery. Cancel anytime."
+            : "Free delivery. One-time order — no subscription, no auto-renewal."}
+        </p>
 
         {/* Two tiers side-by-side */}
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-10">
