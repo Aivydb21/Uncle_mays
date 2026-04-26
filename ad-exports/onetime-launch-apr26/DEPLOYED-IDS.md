@@ -15,7 +15,8 @@
 | Ad Set | ID | Daily | Targeting | Audience |
 |---|---|---|---|---|
 | Cold Lookalike (DISABLED - rebuild seed first) | `120243766364840762` | $30 | (paused; do not activate) | LAL seed too small (~20 customer emails). Rebuild as engagement audience first. |
-| Cold - Chicagoland Metro South 25-45 | `120243766365290762` | $15 | 33 service-area ZIPs (south Chicago city + south suburbs), age 25-45, both genders | (no custom audience) |
+| Cold - Chicagoland Metro South 25-45 | `120243766365290762` | $15 | 33 service-area ZIPs, age 25-45, both genders | (no custom audience) |
+| Cold - Engagement Seeded (Page + IG + Video) | `120243780048790762` | $25 | Same 33 ZIPs, age 25-45 | OR of: Don Video Viewers 25%+ `120243779139910762`, FB Page Engagement `120243779108380762`, IG Engagement `120243779148120762` |
 | Retargeting - Checkout Abandoners 30d | `120243766365650762` | $5 | Same 33 ZIPs | Checkout Abandoners 30d `120242831730990762` |
 
 ### Targeting refinement applied 2026-04-26 (post-deploy)
@@ -63,6 +64,8 @@ All ad sets:
 | OneTime - Cold Broad - Don Video 5 | `3120592748138275` | `2072553160256983` | `/get-started?utm_content=cold-broad` |
 | OneTime - Retarget - Don Jhonsan 4 | `1473006714222124` | `1752439495721179` | `/checkout/family?utm_content=retargeting&promo=FRESH10` |
 | OneTime - Retarget - Don Video 5 | `941299425463490` | `2072553160256983` | `/checkout/family?utm_content=retargeting&promo=FRESH10` |
+| OneTime - Engagement Seeded - Don Jhonsan 4 | `1526609295754283` | `1752439495721179` | `/get-started?utm_content=engagement-seeded&promo=FRESH10` |
+| OneTime - Engagement Seeded - Don Video 5 | `1699929914695409` | `2072553160256983` | `/get-started?utm_content=engagement-seeded&promo=FRESH10` |
 
 All UTMs include: `utm_source=meta&utm_medium=paid&utm_campaign=onetime-launch-apr26`
 
@@ -79,6 +82,8 @@ All copy is em-dash-free, periods/commas/colons only.
 | OneTime Broad - Don Video 5 | `120243766378270762` | Cold Broad |
 | OneTime Retarget - Don Jhonsan 4 | `120243766379160762` | Retargeting |
 | OneTime Retarget - Don Video 5 | `120243766380090762` | Retargeting |
+| OneTime Engagement-Seeded - Don Jhonsan 4 | `120243780049710762` | Cold Engagement Seeded |
+| OneTime Engagement-Seeded - Don Video 5 | `120243780050480762` | Cold Engagement Seeded |
 
 ## Google Ads — already live as of 2026-04-26
 
