@@ -104,17 +104,18 @@ export function GetStartedContent() {
         </div>
       </section>
 
-      {/* SOCIAL PROOF — real, attributed quote */}
+      {/* SOCIAL PROOF — real, attributed quote.
+          framer-motion removed from below-fold sections (this one + the
+          how-it-works cards) on 2026-04-26 because the cumulative JS
+          execution was pushing mobile TBT past 600ms. The visual polish
+          on the hero animation is enough; below-fold decoration was not
+          worth the per-click latency cost on cold ad traffic. */}
       {TESTIMONIALS.length > 0 ? (
         <section className="py-14 bg-background">
           <div className="container px-6 max-w-2xl mx-auto">
             {TESTIMONIALS.map((t) => (
-              <motion.figure
+              <figure
                 key={t.name}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
                 className="bg-card rounded-2xl p-7 md:p-8 shadow-soft border border-border/50"
               >
                 <blockquote className="text-base md:text-lg leading-relaxed text-foreground/85 italic">
@@ -123,7 +124,7 @@ export function GetStartedContent() {
                 <figcaption className="mt-4 text-sm font-semibold text-foreground">
                   {t.name}
                 </figcaption>
-              </motion.figure>
+              </figure>
             ))}
           </div>
         </section>
@@ -137,12 +138,8 @@ export function GetStartedContent() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             {STEPS.map((s, i) => (
-              <motion.div
+              <div
                 key={s.title}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="bg-card rounded-xl p-6 border border-border"
               >
                 <div className="text-primary text-2xl font-bold mb-2">
@@ -150,7 +147,7 @@ export function GetStartedContent() {
                 </div>
                 <h3 className="font-semibold mb-1.5">{s.title}</h3>
                 <p className="text-sm text-foreground/70">{s.body}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
