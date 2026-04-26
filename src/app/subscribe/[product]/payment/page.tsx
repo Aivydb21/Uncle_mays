@@ -153,12 +153,31 @@ function SubscriptionPaymentForm({
         </div>
       )}
 
-      {/* Cancel anytime badge — above CTA */}
-      <div className="mb-3 rounded-lg bg-green-50 border border-green-200 px-4 py-2.5 flex items-center gap-2">
-        <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-        <span className="text-sm text-green-800 font-medium">Flexible — pause or cancel before your next delivery</span>
+      {/* Cancellation proof block — placed above the CTA where the
+          subscription anxiety peaks. Concrete steps + visible URL beats
+          generic "cancel anytime" copy: customer feedback (April 2026) was
+          that vague reassurances trigger more skepticism, not less, because
+          subscribers have been burned by services that say "easy to cancel"
+          and then aren't. */}
+      <div className="mb-3 rounded-lg bg-green-50 border border-green-200 px-4 py-3">
+        <div className="flex items-start gap-2 mb-2">
+          <svg className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span className="text-sm text-green-900 font-semibold">Cancel in 30 seconds, any time</span>
+        </div>
+        <ol className="text-xs text-green-800 ml-6 space-y-0.5 list-decimal">
+          <li>
+            Sign in at{" "}
+            <a href="/manage-subscription" className="underline underline-offset-2 font-medium">
+              unclemays.com/manage-subscription
+            </a>
+          </li>
+          <li>Click <strong>Pause</strong> or <strong>Cancel</strong>. That&apos;s it.</li>
+        </ol>
+        <p className="text-xs text-green-800 mt-1.5 ml-6">
+          No phone calls, no forms, no waiting period. Or text Anthony at (312) 972-2595.
+        </p>
       </div>
 
       {/* FTC / Illinois ILCS 601 auto-renewal disclosure */}

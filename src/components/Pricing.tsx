@@ -38,7 +38,14 @@ function formatPrice(n: number) {
 }
 
 export const Pricing = () => {
-  const [isSubscription, setIsSubscription] = useState(true);
+  // Default to one-time. Stripe data through April 2026 showed real
+  // subscription-curious customers reaching the payment step and abandoning
+  // at the card form (15 attempts, 1 conversion), with at least one
+  // customer telling us directly she "didn't want a subscription hitting
+  // her card." Leading with one-time removes the commitment fear at the
+  // discovery step. Subscription is still one tap away via the toggle and
+  // ad URLs can still deep-link via ?mode=subscription.
+  const [isSubscription, setIsSubscription] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
