@@ -22,7 +22,7 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 | Fact | Value |
 |------|-------|
 | Delivery day | **Wednesday, every week** |
-| Delivery window | _TBD — confirm time window_ |
+| Delivery window | **Wednesday 5pm–8pm CT** (after-work, so someone is home to receive) |
 | Order cutoff | **Sunday 11:59 PM CT** — orders placed after cutoff ship the following Wednesday |
 | Service area | Chicago (Hyde Park and city-wide) |
 | Delivery fee | Free |
@@ -69,10 +69,14 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 
 ## Transactional Email Standards
 
+> Transactional email is delivered by **Resend** (as of 2026-04-24). Mailchimp
+> is newsletter-only. See [CLAUDE.md](./CLAUDE.md) "Resend API — Transactional email".
+
 | Fact | Value |
 |------|-------|
 | From name | Uncle May's Produce |
-| From email | info@unclemays.com |
+| From email (transactional) | hello@unclemays.com (Resend) |
+| From email (newsletter) | info@unclemays.com (Mailchimp) |
 | Reply-to | info@unclemays.com |
 | Phone (in-email) | (312) 972-2595 |
 | Footer line | Uncle May's Produce · Hyde Park, Chicago, IL |
@@ -81,12 +85,13 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 
 ---
 
-## Mailchimp
+## Mailchimp — Newsletter ONLY
 
 | Fact | Value |
 |------|-------|
+| Scope | Newsletter broadcasts only. Transactional email moved to Resend 2026-04-24. |
 | Audience list ID | `2645503d11` |
-| Active automations | Abandoned cart (to be activated), Welcome sequence (to be built) |
+| Active automations | None currently active in Mailchimp. Transactional sequences (abandoned cart, order confirmation, welcome) are Trigger.dev + Resend. |
 | Retired offers in copy | Remove all references to `WELCOME20`, `LAUNCH20`, "$30 first order", "Community Box" |
 
 ---

@@ -315,7 +315,7 @@ export default function SubscribeDeliveryPage() {
           },
           deliveryNotes: fields.deliveryNotes.trim() || undefined,
           deliveryDate: autoDeliveryDate,
-          deliveryWindow: '12pm-3pm',
+          deliveryWindow: '5pm-8pm',
           proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
         })
       );

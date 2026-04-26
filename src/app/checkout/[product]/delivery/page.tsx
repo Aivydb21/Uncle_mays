@@ -329,7 +329,7 @@ export default function DeliveryPage() {
       const day = String(date.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
     })();
-    const autoDeliveryWindow = '12pm-3pm';
+    const autoDeliveryWindow = '5pm-8pm';
 
     try {
       const res = await fetch("/api/checkout/session", {

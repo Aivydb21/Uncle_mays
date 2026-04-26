@@ -259,7 +259,7 @@ export default function OrderSuccessContent() {
                 <Truck className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <p className="font-semibold">Delivered Wednesday, 12-3pm</p>
+                <p className="font-semibold">Delivered Wednesday, 5pm&ndash;8pm</p>
                 <p className="text-sm text-foreground/70">
                   Free Chicago delivery. We&apos;ll text you a tighter window the morning of.
                 </p>
