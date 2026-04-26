@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { tagOrderCompleted, deleteCart } from "@/lib/mailchimp";
 import { sendCapiEvent } from "@/lib/meta-capi";
+import { sendInternalAlert } from "@/lib/email/resend";
 
 const TRIGGER_API_BASE = "https://api.trigger.dev/api/v1/tasks";
 
@@ -508,24 +509,62 @@ export async function POST(req: NextRequest) {
           ? subscription.customer
           : subscription.customer.id;
       console.log(
-        `[WEBHOOK] customer.subscription.deleted | sub=${subscription.id} customer=${customerId} canceledAt=${subscription.canceled_at}`
+        `[WEBHOOK] customer.subscription.deleted | sub=${subscription.id} customer=${customerId} status=${subscription.status} canceledAt=${subscription.canceled_at}`
       );
+
+      // Resolve customer details up front. Used by both the abandon-alert
+      // branch and the customer-cancellation-email branch below.
+      let resolvedEmail: string | null = null;
+      let resolvedName: string | null = null;
+      try {
+        const customer = await stripe.customers.retrieve(customerId);
+        if (customer && !("deleted" in customer)) {
+          resolvedEmail = customer.email ?? null;
+          resolvedName = customer.name ?? null;
+        }
+      } catch (e) {
+        console.warn(`[WEBHOOK] Could not retrieve customer ${customerId}:`, e);
+      }
+
+      // BRANCH: subscription expired without payment (incomplete_expired).
+      // The customer reached the payment form, never confirmed payment, and
+      // Stripe auto-canceled the sub after 23 hours. This is the silent
+      // drop-off pattern surfaced in the April 2026 audit. Send Anthony a
+      // real-time alert so he can follow up while the customer still
+      // remembers, and SKIP the customer-facing cancellation email
+      // (confusing — they didn't actually subscribe).
+      if (subscription.status === "incomplete_expired") {
+        const planAmount = subscription.items?.data?.[0]?.price?.unit_amount ?? 0;
+        const planLabel = subscription.metadata?.product || "unknown";
+        const subjectEmail = resolvedEmail || "(unknown email)";
+        const html = `
+          <p>A subscription was created but never paid for. The customer reached the payment form and abandoned before confirming.</p>
+          <table style="border-collapse:collapse;font-size:14px">
+            <tr><td style="padding:4px 12px 4px 0">Customer</td><td><strong>${resolvedName || "—"}</strong></td></tr>
+            <tr><td style="padding:4px 12px 4px 0">Email</td><td><a href="mailto:${subjectEmail}">${subjectEmail}</a></td></tr>
+            <tr><td style="padding:4px 12px 4px 0">Plan</td><td>${planLabel} · $${(planAmount / 100).toFixed(2)}/wk</td></tr>
+            <tr><td style="padding:4px 12px 4px 0">Subscription</td><td>${subscription.id}</td></tr>
+            <tr><td style="padding:4px 12px 4px 0">Customer ID</td><td>${customerId}</td></tr>
+          </table>
+          <p style="margin-top:16px">Suggested follow-up: short personal email asking what happened, offering to push the order through manually. Pattern from the April audit shows this group rarely returns on its own.</p>
+        `;
+        sendInternalAlert({
+          subject: `[Uncle May's] Subscription abandoned at payment — ${subjectEmail}`,
+          html,
+          tags: [
+            { name: "type", value: "internal_alert" },
+            { name: "alert", value: "sub_abandoned_at_payment" },
+          ],
+        }).catch((err) =>
+          console.error("[WEBHOOK] Internal alert send error (incomplete_expired):", err)
+        );
+        break;
+      }
 
       const triggerKeyForCancellation = process.env.TRIGGER_SECRET_KEY;
       if (triggerKeyForCancellation) {
-        // Resolve customer email now so the worker task doesn't need STRIPE_API_KEY
-        let cancellationEmail: string | null = null;
-        let cancellationName: string | null = null;
-        try {
-          const customer = await stripe.customers.retrieve(customerId);
-          if (customer && !("deleted" in customer)) {
-            cancellationEmail = customer.email ?? null;
-            cancellationName = customer.name ?? null;
-          }
-        } catch (e) {
-          console.warn(`[WEBHOOK] Could not retrieve customer ${customerId} for cancellation email:`, e);
-        }
-
+        const cancellationEmail = resolvedEmail;
+        const cancellationName = resolvedName;
         if (cancellationEmail) {
           fetch(`${TRIGGER_API_BASE}/send-subscription-cancellation-email/trigger`, {
             method: "POST",

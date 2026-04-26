@@ -73,3 +73,51 @@ export async function sendTransactional(
     return { sent: false, error: msg };
   }
 }
+
+// Operational alert to internal staff (defaults to anthony@unclemays.com).
+// Bypasses suppression because the suppression list intentionally blocks
+// transactional sends to *@unclemays.com — but operational alerts about
+// abandoned checkouts, incidents, etc. need to reach internal mailboxes.
+// Override the recipient via env INTERNAL_ALERT_EMAIL if a different
+// address (e.g. a shared on-call inbox) should receive these.
+export async function sendInternalAlert(params: {
+  subject: string;
+  html: string;
+  text?: string;
+  tags?: { name: string; value: string }[];
+}): Promise<SendTransactionalResult> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM_EMAIL;
+  const to = process.env.INTERNAL_ALERT_EMAIL || "anthony@unclemays.com";
+  if (!apiKey || !from) {
+    console.warn("[Resend] RESEND_API_KEY or RESEND_FROM_EMAIL not configured (internal alert)");
+    return { sent: false, reason: "not_configured" };
+  }
+  const body: Record<string, unknown> = {
+    from,
+    to: [to],
+    subject: params.subject,
+    html: params.html,
+    reply_to: process.env.RESEND_REPLY_TO || "info@unclemays.com",
+  };
+  if (params.text) body.text = params.text;
+  if (params.tags?.length) body.tags = params.tags;
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = (await res.json()) as { id?: string; message?: string; name?: string };
+    if (!res.ok) {
+      const err = data.message || data.name || `HTTP ${res.status}`;
+      console.error(`[Resend] internal alert failed: ${err}`);
+      return { sent: false, error: err };
+    }
+    return { sent: true, id: data.id };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error(`[Resend] internal alert error: ${msg}`);
+    return { sent: false, error: msg };
+  }
+}
