@@ -43,9 +43,9 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 
 | Protein | Price |
 |---------|-------|
-| Pasture-Raised Whole Chicken (4–5 lb) | +$45 |
-| Grass-Fed Beef Short Ribs, bone-in (~3 lb) | +$38 |
-| Lamb Chops (~1.5 lb) | +$42 |
+| Pasture-Raised Chicken Thighs (~1.5 lb) | +$15 |
+| Grass-Fed Beef Short Ribs (~3/4 lb) | +$15 |
+| Lamb Chop (1, ~6 oz) | +$15 |
 
 ### Rules
 - **Subscribe & Save** = exactly **10% off** the one-time price, same box every Wednesday.
