@@ -13,7 +13,6 @@ const PG_DATA = 'C:\\Users\\Anthony\\.paperclip\\instances\\default\\db';
 const PG_PORT = 54329;
 const PG_CONN = `postgres://paperclip:paperclip@127.0.0.1:${PG_PORT}/paperclip`;
 const CLI_MIGRATIONS_DIR = 'C:\\Users\\Anthony\\AppData\\Local\\npm-cache\\_npx\\43414d9b790239bb\\node_modules\\@paperclipai\\db\\dist\\migrations';
-const POSTGRES_PATH = require.resolve('@embedded-postgres/windows-x64/native/bin/postgres.exe');
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -123,7 +122,7 @@ async function main() {
   const proc = spawn('npx', ['paperclipai', 'run', '--instance', 'default'], {
     stdio: 'inherit',
     shell: true,
-    cwd: 'C:\\Users\\Anthony\\Desktop\\business',
+    cwd: 'C:\\Users\\Anthony\\Desktop\\um_website',
   });
 
   proc.on('exit', code => {
