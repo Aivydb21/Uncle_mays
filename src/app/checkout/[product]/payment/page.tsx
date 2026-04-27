@@ -35,6 +35,7 @@ interface StoredCheckout {
   deliveryNotes?: string;
   proteinChoices?: string[];
   additionalProteinChoices?: string[];
+  beanChoice?: string;
 }
 
 // Step indicator component
@@ -244,6 +245,7 @@ export default function PaymentPage() {
             address: data.address,
             proteins: data.proteinChoices,
             additionalProteins: data.additionalProteinChoices,
+            beanChoice: data.beanChoice,
             ...(promo ? { promo } : {}),
             ...utms,
           }),

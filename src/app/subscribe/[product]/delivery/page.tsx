@@ -265,12 +265,18 @@ export default function SubscribeDeliveryPage() {
 
     // Protein add-ons are optional on every box.
     let proteinChoices: ProteinId[] | undefined;
+    let beanChoice: string | undefined;
     if (typeof window !== "undefined") {
       try {
         const saved = sessionStorage.getItem(`unc-sub-proteins-${slug}`);
         if (saved) {
           const parsed = JSON.parse(saved) as ProteinId[];
           if (parsed.length > 0) proteinChoices = parsed;
+        }
+        // Bean choice — Full Harvest only. Default to "black" if missing.
+        if (slug === "family") {
+          const savedBean = sessionStorage.getItem(`unc-sub-bean-${slug}`);
+          beanChoice = (savedBean === "pinto" || savedBean === "kidney") ? savedBean : "black";
         }
       } catch {
         // ignore
@@ -309,10 +315,12 @@ export default function SubscribeDeliveryPage() {
           deliveryDate: autoDeliveryDate,
           deliveryWindow: '5pm-8pm',
           proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
+          beanChoice,
         })
       );
-      // Clear protein sessionStorage once saved
+      // Clear protein + bean sessionStorage once saved
       sessionStorage.removeItem(`unc-sub-proteins-${slug}`);
+      sessionStorage.removeItem(`unc-sub-bean-${slug}`);
     }
 
     router.push(`/subscribe/${slug}/payment`);

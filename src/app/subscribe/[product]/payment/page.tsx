@@ -81,6 +81,7 @@ interface StoredSubCheckout {
   };
   deliveryNotes?: string;
   proteinChoices?: string[];
+  beanChoice?: string;
 }
 
 // Inner form — must live inside <Elements>
@@ -293,6 +294,7 @@ export default function SubscribePaymentPage() {
             address: data.address,
             deliveryNotes: data.deliveryNotes,
             proteinChoices: data.proteinChoices,
+            beanChoice: data.beanChoice,
             eventId: icEventId,
             ...(promo ? { promo } : {}),
             ...utms,

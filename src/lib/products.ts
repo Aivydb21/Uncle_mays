@@ -1,6 +1,8 @@
 // Proteins available as optional add-ons across every box.
 // Flat $12 per 1 lb portion. Pasture-raised, no antibiotics, no chemicals,
-// slaughtered fresh. Chicken is the featured option for the Full Harvest Box.
+// slaughtered fresh. Chicken is the featured option (and is also INCLUDED
+// in the Full Harvest Box base price; the add-on stays available so
+// customers can buy additional quantity).
 export const PROTEIN_OPTIONS = [
   { id: "chicken", label: "Pasture-Raised Chicken Thighs (1 lb)", price: 12, featured: true },
   { id: "beef-short-ribs", label: "Grass-Fed Beef Short Ribs (1 lb)", price: 12 },
@@ -8,6 +10,19 @@ export const PROTEIN_OPTIONS = [
 ] as const;
 
 export type ProteinId = (typeof PROTEIN_OPTIONS)[number]["id"];
+
+// Bean varieties for the Full Harvest Box. Customer chooses one at
+// checkout; default is "black" if no choice is made (mirrors the Spring
+// Box's fixed black-bean inclusion). All same price (no upcharge).
+export const BEAN_OPTIONS = [
+  { id: "black", label: "Black beans" },
+  { id: "pinto", label: "Pinto beans" },
+  { id: "kidney", label: "Kidney beans" },
+] as const;
+
+export type BeanId = (typeof BEAN_OPTIONS)[number]["id"];
+
+export const DEFAULT_BEAN: BeanId = "black";
 
 // One-line differentiator shown above the protein options at checkout.
 // Keep it short. Customers are deciding whether to add, not reading a story.
@@ -52,8 +67,9 @@ export const PRODUCTS = {
       "Pea shoots, 1 clamshell",
       "Radishes, 1 bunch",
       "Choose your bean: black, pinto, or kidney (1 lb)",
+      "Pasture-raised chicken thighs, 1 lb (included)",
     ],
-    servingNote: "A full week of greens, roots, and pantry staples",
+    servingNote: "A full week of greens, roots, pantry staples, and protein",
     servingBadge: "for 3–4 people",
   },
 } as const;

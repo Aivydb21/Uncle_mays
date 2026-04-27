@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid, promo } = await req.json();
+    const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, beanChoice, utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid, promo } = await req.json();
 
     let amount = AMOUNT_MAP[product];
 
@@ -130,6 +130,9 @@ export async function POST(req: NextRequest) {
           : {}),
         ...(Array.isArray(additionalProteins) && additionalProteins.length > 0
           ? { additional_protein_selections: additionalProteins.join(", ") }
+          : {}),
+        ...(typeof beanChoice === "string" && beanChoice
+          ? { bean_choice: beanChoice }
           : {}),
         ...(utm_source ? { utm_source } : {}),
         ...(utm_medium ? { utm_medium } : {}),

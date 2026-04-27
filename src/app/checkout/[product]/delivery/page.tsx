@@ -284,6 +284,7 @@ export default function DeliveryPage() {
     // Protein add-ons are optional on every box.
     let proteinChoices: ProteinId[] | undefined;
     let additionalProteinChoices: ProteinId[] | undefined;
+    let beanChoice: string | undefined;
     if (typeof window !== "undefined") {
       try {
         const saved = sessionStorage.getItem(`unc-proteins-${slug}`);
@@ -295,6 +296,11 @@ export default function DeliveryPage() {
         if (savedAdditional) {
           const parsed = JSON.parse(savedAdditional) as ProteinId[];
           if (parsed.length > 0) additionalProteinChoices = parsed;
+        }
+        // Bean choice — Full Harvest only. Default to "black" if missing.
+        if (slug === "family") {
+          const savedBean = sessionStorage.getItem(`unc-bean-${slug}`);
+          beanChoice = (savedBean === "pinto" || savedBean === "kidney") ? savedBean : "black";
         }
       } catch {
         // ignore
@@ -347,6 +353,7 @@ export default function DeliveryPage() {
           deliveryWindow: autoDeliveryWindow,
           proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
           additionalProteinChoices: additionalProteinChoices?.length ? additionalProteinChoices : undefined,
+          beanChoice,
         }),
       });
 
@@ -381,11 +388,13 @@ export default function DeliveryPage() {
             deliveryWindow: autoDeliveryWindow,
             proteinChoices: proteinChoices?.length ? proteinChoices : undefined,
             additionalProteinChoices: additionalProteinChoices?.length ? additionalProteinChoices : undefined,
+            beanChoice,
           })
         );
-        // Clear protein sessionStorage once saved
+        // Clear protein + bean sessionStorage once saved
         sessionStorage.removeItem(`unc-proteins-${slug}`);
         sessionStorage.removeItem(`unc-additional-proteins-${slug}`);
+        sessionStorage.removeItem(`unc-bean-${slug}`);
       }
 
       router.push(`/checkout/${slug}/payment`);

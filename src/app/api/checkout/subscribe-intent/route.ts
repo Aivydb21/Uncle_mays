@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
       deliveryNotes,
       proteinChoices,
       additionalProteins,
+      beanChoice,
       utm_source,
       utm_medium,
       utm_campaign,
@@ -113,6 +114,9 @@ export async function POST(req: NextRequest) {
         .join(", ");
     }
     if (deliveryNotes) metadata.deliveryNotes = deliveryNotes;
+    if (typeof beanChoice === "string" && beanChoice) {
+      metadata.bean_choice = beanChoice;
+    }
     if (Array.isArray(proteinChoices) && proteinChoices.length) {
       metadata.proteinChoices = proteinChoices.join(", ");
     }

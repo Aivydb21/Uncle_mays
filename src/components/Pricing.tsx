@@ -167,12 +167,30 @@ export const Pricing = () => {
                     </p>
                   </div>
                   <ul className="space-y-3 mb-8 flex-grow">
-                    {product.items.map((feature) => (
-                      <li key={feature} className="flex items-start gap-3">
-                        <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
-                        <span className="text-foreground/80">{feature}</span>
-                      </li>
-                    ))}
+                    {product.items.map((feature) => {
+                      // Visual emphasis on two specific item types so they
+                      // catch the eye on the homepage Pricing card:
+                      //   1. "Everything in the Spring Box" (Full Harvest)
+                      //   2. "...included" lines (chicken on Full Harvest)
+                      const isInheritedSpring = feature.startsWith("Everything in the Spring Box");
+                      const isIncludedExtra = feature.includes("(included)");
+                      const isHighlighted = isInheritedSpring || isIncludedExtra;
+                      return (
+                        <li
+                          key={feature}
+                          className={`flex items-start gap-3 ${
+                            isHighlighted
+                              ? "rounded-lg bg-primary/10 border border-primary/30 px-3 py-2 -mx-1"
+                              : ""
+                          }`}
+                        >
+                          <Check className={`h-5 w-5 flex-shrink-0 mt-0.5 ${isHighlighted ? "text-primary" : "text-primary"}`} />
+                          <span className={isHighlighted ? "font-semibold text-foreground" : "text-foreground/80"}>
+                            {feature}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                   <button
                     onClick={(e) => {

@@ -25,6 +25,7 @@ export interface CheckoutSession {
   deliveryWindow?: string;
   proteins?: string[];
   additionalProteins?: string[];
+  beanChoice?: string;
   paymentIntentId?: string;
   completedAt?: string;
   recoveryEmailSent?: boolean; // Legacy field, use recoveryEmail1SentAt instead

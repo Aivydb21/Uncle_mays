@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { PRODUCTS, PROTEIN_OPTIONS, PROTEIN_TAGLINE, type ProductSlug, type ProteinId } from "@/lib/products";
+import { PRODUCTS, PROTEIN_OPTIONS, PROTEIN_TAGLINE, BEAN_OPTIONS, DEFAULT_BEAN, type ProductSlug, type ProteinId, type BeanId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShieldCheck, Truck, Leaf } from "lucide-react";
@@ -66,6 +66,11 @@ export default function SubscribeSummaryPage() {
   // Proteins are optional paid add-ons, available on every box.
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
   const [showProteinAddOns, setShowProteinAddOns] = useState(false);
+
+  // Bean choice — Full Harvest Box only. Defaults to black (matches the
+  // Spring Box's fixed black-bean inclusion). No upcharge for any choice.
+  const isFullHarvest = slug === "family";
+  const [selectedBean, setSelectedBean] = useState<BeanId>(DEFAULT_BEAN);
   const [email, setEmail] = useState("");
   const [emailCaptured, setEmailCaptured] = useState(false);
 
@@ -190,6 +195,10 @@ export default function SubscribeSummaryPage() {
   // Restore a prior protein selection if the user came back via browser-back.
   useEffect(() => {
     try {
+      const savedBean = sessionStorage.getItem(`unc-sub-bean-${slug}`);
+      if (savedBean && BEAN_OPTIONS.some((b) => b.id === savedBean)) {
+        setSelectedBean(savedBean as BeanId);
+      }
       const saved = sessionStorage.getItem(`unc-sub-proteins-${slug}`);
       if (saved) {
         const parsed = JSON.parse(saved) as ProteinId[];
@@ -312,20 +321,69 @@ export default function SubscribeSummaryPage() {
               </p>
             </div>
 
-            {/* What's in the box */}
+            {/* What's in the box. Items that start with "Everything in the
+                Spring Box" or end with "(included)" get a highlighted row so
+                they stand out as headline value props on the Full Harvest
+                Box. */}
             <div className="mb-6">
               <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
                 What&apos;s in your box each week
               </h2>
               <ul className="space-y-2">
-                {product.items.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm">
-                    <span className="text-primary mt-0.5">✓</span>
-                    <span>{item}</span>
-                  </li>
-                ))}
+                {product.items.map((item) => {
+                  const inheritedSpring = item.startsWith("Everything in the Spring Box");
+                  const includedExtra = item.includes("(included)");
+                  const highlight = inheritedSpring || includedExtra;
+                  return (
+                    <li
+                      key={item}
+                      className={`flex items-start gap-2 text-sm ${
+                        highlight
+                          ? "rounded-lg bg-primary/10 border border-primary/30 px-3 py-2 font-semibold text-foreground"
+                          : ""
+                      }`}
+                    >
+                      <span className="text-primary mt-0.5">{highlight ? "★" : "✓"}</span>
+                      <span>{item}</span>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
+
+            {/* Bean choice — Full Harvest Box only. Defaults to black. */}
+            {isFullHarvest && (
+              <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4">
+                <h2 className="text-sm font-bold uppercase tracking-wide text-primary mb-1">
+                  Choose your bean
+                </h2>
+                <p className="text-xs text-foreground/70 mb-3">
+                  Pick one variety. All same price, organic, 1 lb. Stays the same every week.
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {BEAN_OPTIONS.map((bean) => {
+                    const selected = selectedBean === bean.id;
+                    return (
+                      <button
+                        key={bean.id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedBean(bean.id);
+                          try { sessionStorage.setItem(`unc-sub-bean-${slug}`, bean.id); } catch { /* ignore */ }
+                        }}
+                        className={`px-3 py-2.5 rounded-lg border-2 text-sm font-semibold transition-colors ${
+                          selected
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background text-foreground hover:border-primary/50"
+                        }`}
+                      >
+                        {bean.label.replace(" beans", "")}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Optional protein add-on — single collapsed accordion. */}
             <div className="mb-6 rounded-xl border border-border bg-muted/30 overflow-hidden">
