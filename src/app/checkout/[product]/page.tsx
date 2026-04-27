@@ -8,10 +8,20 @@ import { PRODUCTS, PROTEIN_OPTIONS, PROTEIN_TAGLINE, BEAN_OPTIONS, DEFAULT_BEAN,
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { useAddressAutocomplete, type ParsedAddress } from "@/hooks/use-address-autocomplete";
+import { WaitlistCapture } from "@/components/WaitlistCapture";
+import { isInServiceArea, OUT_OF_AREA_MESSAGE } from "@/lib/service-area";
 
-// Step indicator component
-function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
-  const steps = ["Order Summary", "Delivery", "Payment"];
+declare global {
+  interface Window {
+    fbq: (...args: unknown[]) => void;
+    gtag: (...args: unknown[]) => void;
+  }
+}
+
+// 2-step indicator: Order Details -> Payment
+function StepIndicator({ current }: { current: 1 | 2 }) {
+  const steps = ["Order Details", "Payment"];
   return (
     <div className="flex items-center gap-2 mb-8">
       {steps.map((label, i) => {
@@ -51,7 +61,53 @@ function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
   );
 }
 
-export default function CheckoutSummaryPage() {
+interface FormFields {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  street: string;
+  apt: string;
+  city: string;
+  state: string;
+  zip: string;
+  deliveryNotes: string;
+}
+
+type FormErrors = Partial<Record<keyof FormFields, string>>;
+
+function getEarliestDeliveryDate(): Date {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  let current = new Date(today);
+  const daysUntilWednesday = (3 - current.getDay() + 7) % 7;
+  if (daysUntilWednesday === 0) {
+    current.setDate(current.getDate() + 7);
+  } else {
+    current.setDate(current.getDate() + daysUntilWednesday);
+  }
+  return current;
+}
+
+function validate(fields: FormFields): FormErrors {
+  const errors: FormErrors = {};
+  if (!fields.firstName.trim()) errors.firstName = "First name is required.";
+  if (!fields.lastName.trim()) errors.lastName = "Last name is required.";
+  if (!fields.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) {
+    errors.email = "A valid email address is required.";
+  }
+  if (!fields.street.trim()) errors.street = "Street address is required.";
+  if (!fields.city.trim()) errors.city = "City is required.";
+  if (!fields.state.trim()) errors.state = "State is required.";
+  if (!fields.zip.trim() || !/^\d{5}(-\d{4})?$/.test(fields.zip.trim())) {
+    errors.zip = "A valid ZIP code is required.";
+  } else if (!isInServiceArea(fields.state, fields.zip)) {
+    errors.zip = OUT_OF_AREA_MESSAGE;
+  }
+  return errors;
+}
+
+export default function CheckoutPage() {
   const params = useParams<{ product: string }>();
   const router = useRouter();
   const slug = params.product as ProductSlug;
@@ -63,20 +119,15 @@ export default function CheckoutSummaryPage() {
   const product = PRODUCTS[slug];
   const basePrice = product.price;
 
-  // Proteins are optional paid add-ons, available on every box, multi-select,
-  // collapsed by default so the CTA sits higher on mobile.
+  // Protein add-ons: optional, multi-select, collapsed by default.
   const [selectedProteins, setSelectedProteins] = useState<ProteinId[]>([]);
   const [showProteinAddOns, setShowProteinAddOns] = useState(false);
 
-  // Bean choice — Full Harvest Box only. Defaults to black (matches the
-  // Spring Box's fixed black-bean inclusion). No upcharge for any choice.
+  // Bean choice: Full Harvest Box only.
   const isFullHarvest = slug === "family";
   const [selectedBean, setSelectedBean] = useState<BeanId>(DEFAULT_BEAN);
-  const [email, setEmail] = useState("");
-  const [emailCaptured, setEmailCaptured] = useState(false);
 
-  // Promo code: captured from ?promo= on mount, validated against ACTIVE_PROMOS,
-  // or entered manually by the user via the promo input field.
+  // Promo code
   const [promoCode, setPromoCode] = useState<string | null>(null);
   const [promoInput, setPromoInput] = useState("");
   const [promoError, setPromoError] = useState("");
@@ -116,7 +167,7 @@ export default function CheckoutSummaryPage() {
     ? activePromo.amountOffCents / 100
     : 0;
 
-  // Fire Meta Pixel ViewContent + server CAPI, deduped by eventID.
+  // Fire Meta Pixel ViewContent + server CAPI.
   useEffect(() => {
     const eventId =
       typeof crypto !== "undefined" && "randomUUID" in crypto
@@ -153,14 +204,9 @@ export default function CheckoutSummaryPage() {
     }
   }, [slug, product.name, basePrice]);
 
-  // Restore any prior email and protein selections.
+  // Restore prior protein/bean selections from sessionStorage.
   useEffect(() => {
     try {
-      const savedEmail = sessionStorage.getItem(`unc-email-${slug}`);
-      if (savedEmail) {
-        setEmail(savedEmail);
-        setEmailCaptured(true);
-      }
       const savedBean = sessionStorage.getItem(`unc-bean-${slug}`);
       if (savedBean && BEAN_OPTIONS.some((b) => b.id === savedBean)) {
         setSelectedBean(savedBean as BeanId);
@@ -178,23 +224,6 @@ export default function CheckoutSummaryPage() {
     }
   }, [slug]);
 
-  function handleEmailBlur() {
-    const trimmed = email.trim();
-    if (trimmed && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      try {
-        sessionStorage.setItem(`unc-email-${slug}`, trimmed);
-      } catch { /* ignore */ }
-      if (!emailCaptured) {
-        setEmailCaptured(true);
-        fetch("/api/capture-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: trimmed, product: slug }),
-        }).catch(() => {});
-      }
-    }
-  }
-
   function toggleProtein(id: ProteinId) {
     setSelectedProteins((prev) => {
       const next = prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id];
@@ -210,12 +239,114 @@ export default function CheckoutSummaryPage() {
     return sum + (opt?.price ?? 0);
   }, 0);
   const totalPrice = basePrice + proteinCost;
+  const discountedTotal = Math.max(0, totalPrice - promoDiscount);
 
-  function continueToDelivery() {
+  // --- Delivery form state ---
+  const [fields, setFields] = useState<FormFields>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    street: "",
+    apt: "",
+    city: "",
+    state: "IL",
+    zip: "",
+    deliveryNotes: "",
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [leadFired, setLeadFired] = useState(false);
+  const [deliveryDateLabel, setDeliveryDateLabel] = useState("Wednesday");
+
+  useEffect(() => {
+    const d = getEarliestDeliveryDate();
+    setDeliveryDateLabel(d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }));
+  }, []);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
+    const { name, value } = e.target;
+    setFields((prev) => ({ ...prev, [name]: value }));
+    if (errors[name as keyof FormFields]) {
+      setErrors((prev) => ({ ...prev, [name]: undefined }));
+    }
+  }
+
+  const streetInputRef = useAddressAutocomplete((address: ParsedAddress) => {
+    setFields((prev) => ({
+      ...prev,
+      street: address.street,
+      city: address.city || prev.city,
+      state: "IL",
+      zip: address.zip || prev.zip,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      street: undefined,
+      city: undefined,
+      state: undefined,
+      zip: undefined,
+    }));
+  });
+
+  function handleZipBlur() {
+    const zip = fields.zip.trim();
+    if (!zip) return;
+    if (!/^\d{5}(-\d{4})?$/.test(zip)) {
+      setErrors((prev) => ({ ...prev, zip: "A valid ZIP code is required." }));
+      return;
+    }
+    if (!isInServiceArea(fields.state, zip)) {
+      setErrors((prev) => ({ ...prev, zip: OUT_OF_AREA_MESSAGE }));
+    }
+  }
+
+  function requireBlur(name: keyof FormFields, label: string) {
+    return () => {
+      if (!fields[name].trim()) {
+        setErrors((prev) => ({ ...prev, [name]: `${label} is required.` }));
+      }
+    };
+  }
+
+  function handleEmailBlur() {
+    const email = fields.email.trim();
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (!leadFired) {
+        setLeadFired(true);
+        try {
+          if (typeof window !== "undefined") {
+            if (window.fbq) window.fbq("track", "Lead");
+            if (window.gtag) window.gtag("event", "generate_lead");
+          }
+        } catch {
+          // Never block checkout for tracking failures
+        }
+      }
+      fetch("/api/capture-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, product: slug }),
+      }).catch(() => {});
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const validationErrors = validate(fields);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    // Fire AddToCart pixel
     try {
-      const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
-      if (fbq) {
-        fbq("track", "AddToCart", {
+      if (window.fbq) {
+        window.fbq("track", "AddToCart", {
           content_name: product.name,
           content_ids: [slug],
           content_type: "product",
@@ -225,21 +356,96 @@ export default function CheckoutSummaryPage() {
         });
       }
     } catch { /* ignore */ }
-    try {
-      sessionStorage.setItem(`unc-price-${slug}`, String(totalPrice));
-      const trimmed = email.trim();
-      if (trimmed && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-        sessionStorage.setItem(`unc-email-${slug}`, trimmed);
-      }
-    } catch { /* ignore */ }
-    router.push(`/checkout/${slug}/delivery`);
-  }
 
-  const discountedTotal = Math.max(0, totalPrice - promoDiscount);
+    let beanChoice: string | undefined;
+    if (isFullHarvest) {
+      beanChoice = (selectedBean === "pinto" || selectedBean === "kidney") ? selectedBean : "black";
+    }
+
+    const autoDeliveryDate = (() => {
+      const date = getEarliestDeliveryDate();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    })();
+    const autoDeliveryWindow = '5pm-8pm';
+
+    try {
+      const res = await fetch("/api/checkout/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product: slug,
+          price: totalPrice,
+          productName: product.name,
+          email: fields.email.trim(),
+          firstName: fields.firstName.trim(),
+          lastName: fields.lastName.trim(),
+          phone: fields.phone.trim() || undefined,
+          address: {
+            street: fields.street.trim(),
+            apt: fields.apt.trim() || undefined,
+            city: fields.city.trim(),
+            state: fields.state.trim(),
+            zip: fields.zip.trim(),
+          },
+          deliveryNotes: fields.deliveryNotes.trim() || undefined,
+          deliveryDate: autoDeliveryDate,
+          deliveryWindow: autoDeliveryWindow,
+          proteinChoices: selectedProteins.length > 0 ? selectedProteins : undefined,
+          beanChoice,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        setSubmitError(data.error || "Something went wrong. Please try again.");
+        return;
+      }
+
+      // Persist to localStorage for payment page
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "unc-checkout",
+          JSON.stringify({
+            sessionId: data.sessionId,
+            product: slug,
+            productName: product.name,
+            price: totalPrice,
+            email: fields.email.trim(),
+            firstName: fields.firstName.trim(),
+            lastName: fields.lastName.trim(),
+            phone: fields.phone.trim() || undefined,
+            address: {
+              street: fields.street.trim(),
+              apt: fields.apt.trim() || undefined,
+              city: fields.city.trim(),
+              state: fields.state.trim(),
+              zip: fields.zip.trim(),
+            },
+            deliveryNotes: fields.deliveryNotes.trim() || undefined,
+            deliveryDate: autoDeliveryDate,
+            deliveryWindow: autoDeliveryWindow,
+            proteinChoices: selectedProteins.length > 0 ? selectedProteins : undefined,
+            beanChoice,
+          })
+        );
+        sessionStorage.removeItem(`unc-proteins-${slug}`);
+        sessionStorage.removeItem(`unc-bean-${slug}`);
+      }
+
+      router.push(`/checkout/${slug}/payment`);
+    } catch {
+      setSubmitError("Network error. Please check your connection and try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
-      <div className="container px-4 max-w-2xl mx-auto">
+      <div className="container px-4 max-w-3xl mx-auto">
         {/* Back link */}
         <div className="mb-6">
           <Link
@@ -252,261 +458,474 @@ export default function CheckoutSummaryPage() {
 
         <StepIndicator current={1} />
 
-        {/* Promo chip — one slim line when a valid ?promo= is applied. */}
+        {/* Promo chip */}
         {activePromo && promoDiscount > 0 ? (
           <div className="mb-4 rounded-lg border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary">
             <strong>{promoCode}</strong> applied · {activePromo.label}
           </div>
         ) : null}
 
-        <div className="rounded-2xl overflow-hidden shadow-soft bg-background">
-          {/* Product image — decorative, not interactive. Clarity replays
-              (2026-04-27) showed users tapping the image and the gradient
-              expecting something to happen. Marking it pointer-events-none
-              so taps fall through to the page itself rather than registering
-              as dead clicks. */}
-          <div className="relative pointer-events-none select-none">
-            <img
-              src="/images/produce-box.jpg"
-              alt={`${product.name} — fresh seasonal produce`}
-              className="w-full h-36 md:h-56 object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-            <div className="absolute bottom-4 left-5">
-              <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
-                {product.servingBadge}
-              </span>
-            </div>
-          </div>
-
-          <div className="p-6 md:p-8">
-            {/* Product name + price */}
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
-                  {product.name}
-                </h1>
-                <p className="text-muted-foreground text-sm mt-1">
-                  Delivered fresh every Wednesday
-                </p>
-              </div>
-              <div className="text-right shrink-0">
-                {promoDiscount > 0 ? (
-                  <>
-                    <div className="text-sm line-through text-muted-foreground">${totalPrice}</div>
-                    <span className="text-3xl font-bold text-primary">${discountedTotal}</span>
-                  </>
-                ) : (
-                  <span className="text-3xl font-bold text-primary">${totalPrice}</span>
-                )}
-                {proteinCost > 0 ? (
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Box ${basePrice} + Protein ${proteinCost}
+        <form onSubmit={handleSubmit} noValidate>
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Main content: product summary + delivery form */}
+            <div className="md:col-span-2 space-y-6">
+              {/* Product summary card */}
+              <div className="rounded-2xl overflow-hidden shadow-soft bg-background">
+                {/* Product image */}
+                <div className="relative pointer-events-none select-none">
+                  <img
+                    src="/images/produce-box.jpg"
+                    alt={`${product.name} -- fresh seasonal produce`}
+                    className="w-full h-36 md:h-56 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                  <div className="absolute bottom-4 left-5">
+                    <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
+                      {product.servingBadge}
+                    </span>
                   </div>
-                ) : null}
-              </div>
-            </div>
-
-            {/* Cutoff deadline */}
-            <div className="mb-5 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm">
-              <p className="font-semibold text-amber-800">
-                Order by Sunday 11:59 PM CT for Wednesday delivery
-              </p>
-              <p className="text-amber-700 text-xs mt-1">
-                100% fresh or refunded.
-              </p>
-            </div>
-
-            {/* What's in the box. Items that start with "Everything in the
-                Spring Box" or end with "(included)" get a highlighted row so
-                they stand out as headline value props on the Full Harvest
-                Box. */}
-            <div className="mb-6">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-                What&apos;s in your box
-              </h2>
-              <ul className="space-y-2">
-                {product.items.map((item) => {
-                  const isIncluded = item.includes("(included)");
-                  return (
-                    <li key={item} className="flex items-start gap-2 text-sm">
-                      <span className={`mt-0.5 ${isIncluded ? "text-primary text-base leading-none" : "text-primary"}`}>
-                        {isIncluded ? "★" : "✓"}
-                      </span>
-                      <span className={isIncluded ? "font-semibold text-foreground" : ""}>{item}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-              <p className="mt-3 text-xs text-muted-foreground italic">{product.weightEstimate}</p>
-            </div>
-
-            {/* Bean choice — Full Harvest Box only. Defaults to black. */}
-            {isFullHarvest && (
-              <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4">
-                <h2 className="text-sm font-bold uppercase tracking-wide text-primary mb-1">
-                  Choose your bean
-                </h2>
-                <p className="text-xs text-foreground/70 mb-3">
-                  Pick one variety. All same price, organic, included with your box.
-                </p>
-                <div className="grid grid-cols-3 gap-2">
-                  {BEAN_OPTIONS.map((bean) => {
-                    const selected = selectedBean === bean.id;
-                    return (
-                      <button
-                        key={bean.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedBean(bean.id);
-                          try { sessionStorage.setItem(`unc-bean-${slug}`, bean.id); } catch { /* ignore */ }
-                        }}
-                        className={`px-3 py-2.5 rounded-lg border-2 text-sm font-semibold transition-colors ${
-                          selected
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border bg-background text-foreground hover:border-primary/50"
-                        }`}
-                      >
-                        {bean.label.replace(" beans", "")}
-                      </button>
-                    );
-                  })}
                 </div>
-              </div>
-            )}
 
-            {/* Optional protein add-on — single collapsed accordion. */}
-            <div className="mb-6 rounded-xl border border-border bg-muted/30 overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setShowProteinAddOns((v) => !v)}
-                className="w-full flex items-center justify-between gap-3 p-4 text-left"
-                aria-expanded={showProteinAddOns}
-              >
-                <div>
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    Add a protein <span className="text-muted-foreground/70 normal-case font-normal">($12 each)</span>
-                  </h2>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {selectedProteins.length > 0
-                      ? `${selectedProteins.length} added (+$${proteinCost})`
-                      : "Pasture-raised, no antibiotics. Slaughtered fresh."}
-                  </p>
-                </div>
-                <span className={`text-xl text-muted-foreground transition-transform ${showProteinAddOns ? "rotate-45" : ""}`}>+</span>
-              </button>
-              {showProteinAddOns ? (
-                <div className="px-4 pb-4 space-y-2">
-                  <p className="text-xs text-foreground/70 leading-relaxed pb-1">
-                    {PROTEIN_TAGLINE}
-                  </p>
-                  {PROTEIN_OPTIONS.filter((o) => !(isFullHarvest && o.id === "chicken")).map((opt) => {
-                    const selected = selectedProteins.includes(opt.id);
-                    return (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => toggleProtein(opt.id)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium text-left transition-all ${
-                          selected
-                            ? "border-primary bg-primary/10 text-primary"
-                            : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
-                        }`}
-                      >
-                        <span
-                          className={`w-5 h-5 rounded flex-shrink-0 border-2 flex items-center justify-center ${
-                            selected ? "border-primary bg-primary" : "border-muted-foreground/40"
-                          }`}
-                        >
-                          {selected && (
-                            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                            </svg>
-                          )}
-                        </span>
-                        <span className="flex-1">{opt.label}</span>
-                        <span className="text-muted-foreground font-normal">+${opt.price}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : null}
-            </div>
+                <div className="p-6 md:p-8">
+                  {/* Product name + price */}
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div>
+                      <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}>
+                        {product.name}
+                      </h1>
+                      <p className="text-muted-foreground text-sm mt-1">
+                        Delivered fresh every Wednesday
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      {promoDiscount > 0 ? (
+                        <>
+                          <div className="text-sm line-through text-muted-foreground">${totalPrice}</div>
+                          <span className="text-3xl font-bold text-primary">${discountedTotal}</span>
+                        </>
+                      ) : (
+                        <span className="text-3xl font-bold text-primary">${totalPrice}</span>
+                      )}
+                      {proteinCost > 0 ? (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Box ${basePrice} + Protein ${proteinCost}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
 
-            {/* Order start: email + optional promo grouped under one
-                explicit "Start your order" header. Clarity replays
-                (2026-04-27) showed users reading the menu and protein
-                section thoroughly, then bouncing without realizing the
-                email field was the entry point to ordering. The grouped
-                section + colored border + explicit step language makes
-                "where the order begins" unmissable. */}
-            <div className="mb-6 rounded-xl border-2 border-primary/30 bg-primary/5 p-5">
-              <p className="text-xs font-bold uppercase tracking-wider text-primary mb-1">
-                Start your order
-              </p>
-              <p className="text-sm text-foreground/80 mb-4">
-                Enter your email and we&apos;ll take you to delivery and payment.
-              </p>
+                  {/* Cutoff deadline */}
+                  <div className="mb-5 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm">
+                    <p className="font-semibold text-amber-800">
+                      Order by Sunday 11:59 PM CT for Wednesday delivery
+                    </p>
+                    <p className="text-amber-700 text-xs mt-1">
+                      100% fresh or refunded.
+                    </p>
+                  </div>
 
-              <div className="mb-4">
-                <Label htmlFor="email" className="text-sm font-semibold mb-2 block">
-                  Email <span className="text-destructive">*</span>
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onBlur={handleEmailBlur}
-                  autoComplete="email"
-                  placeholder="you@example.com"
-                  className="bg-background"
-                />
-              </div>
+                  {/* What's in the box */}
+                  <div className="mb-6">
+                    <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+                      What&apos;s in your box
+                    </h2>
+                    <ul className="space-y-2">
+                      {product.items.map((item) => {
+                        const isIncluded = item.includes("(included)");
+                        return (
+                          <li key={item} className="flex items-start gap-2 text-sm">
+                            <span className={`mt-0.5 ${isIncluded ? "text-primary text-base leading-none" : "text-primary"}`}>
+                              {isIncluded ? "\u2605" : "\u2713"}
+                            </span>
+                            <span className={isIncluded ? "font-semibold text-foreground" : ""}>{item}</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    <p className="mt-3 text-xs text-muted-foreground italic">{product.weightEstimate}</p>
+                  </div>
 
-              {!promoCode ? (
-                <div>
-                  <Label htmlFor="promo" className="text-sm font-semibold mb-2 block">
-                    Promo code <span className="text-muted-foreground font-normal">(optional)</span>
-                  </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="promo"
-                      type="text"
-                      value={promoInput}
-                      onChange={(e) => { setPromoInput(e.target.value); setPromoError(""); }}
-                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyPromoCode(); } }}
-                      placeholder="e.g. FRESH10"
-                      className="flex-1 bg-background"
-                    />
+                  {/* Bean choice: Full Harvest Box only */}
+                  {isFullHarvest && (
+                    <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4">
+                      <h2 className="text-sm font-bold uppercase tracking-wide text-primary mb-1">
+                        Choose your bean
+                      </h2>
+                      <p className="text-xs text-foreground/70 mb-3">
+                        Pick one variety. All same price, organic, included with your box.
+                      </p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {BEAN_OPTIONS.map((bean) => {
+                          const selected = selectedBean === bean.id;
+                          return (
+                            <button
+                              key={bean.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedBean(bean.id);
+                                try { sessionStorage.setItem(`unc-bean-${slug}`, bean.id); } catch { /* ignore */ }
+                              }}
+                              className={`px-3 py-2.5 rounded-lg border-2 text-sm font-semibold transition-colors ${
+                                selected
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-border bg-background text-foreground hover:border-primary/50"
+                              }`}
+                            >
+                              {bean.label.replace(" beans", "")}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Optional protein add-on */}
+                  <div className="rounded-xl border border-border bg-muted/30 overflow-hidden">
                     <button
                       type="button"
-                      onClick={applyPromoCode}
-                      className="px-4 py-2 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
+                      onClick={() => setShowProteinAddOns((v) => !v)}
+                      className="w-full flex items-center justify-between gap-3 p-4 text-left"
+                      aria-expanded={showProteinAddOns}
                     >
-                      Apply
+                      <div>
+                        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                          Add a protein <span className="text-muted-foreground/70 normal-case font-normal">($12 each)</span>
+                        </h2>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {selectedProteins.length > 0
+                            ? `${selectedProteins.length} added (+$${proteinCost})`
+                            : "Pasture-raised, no antibiotics. Slaughtered fresh."}
+                        </p>
+                      </div>
+                      <span className={`text-xl text-muted-foreground transition-transform ${showProteinAddOns ? "rotate-45" : ""}`}>+</span>
                     </button>
+                    {showProteinAddOns ? (
+                      <div className="px-4 pb-4 space-y-2">
+                        <p className="text-xs text-foreground/70 leading-relaxed pb-1">
+                          {PROTEIN_TAGLINE}
+                        </p>
+                        {PROTEIN_OPTIONS.filter((o) => !(isFullHarvest && o.id === "chicken")).map((opt) => {
+                          const selected = selectedProteins.includes(opt.id);
+                          return (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => toggleProtein(opt.id)}
+                              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-sm font-medium text-left transition-all ${
+                                selected
+                                  ? "border-primary bg-primary/10 text-primary"
+                                  : "border-border bg-background text-foreground hover:border-primary/50 hover:bg-primary/5"
+                              }`}
+                            >
+                              <span
+                                className={`w-5 h-5 rounded flex-shrink-0 border-2 flex items-center justify-center ${
+                                  selected ? "border-primary bg-primary" : "border-muted-foreground/40"
+                                }`}
+                              >
+                                {selected && (
+                                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                )}
+                              </span>
+                              <span className="flex-1">{opt.label}</span>
+                              <span className="text-muted-foreground font-normal">+${opt.price}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
                   </div>
-                  {promoError && <p className="text-xs text-red-500 mt-1">{promoError}</p>}
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Try <span className="font-semibold text-primary">FRESH10</span> for $10 off your first box
-                  </p>
                 </div>
-              ) : null}
+              </div>
+
+              {/* Delivery details card */}
+              <div className="rounded-2xl bg-background shadow-soft p-6 md:p-8">
+                <h2
+                  className="text-xl font-bold mb-1"
+                  style={{ fontFamily: "var(--font-playfair, 'Playfair Display', serif)" }}
+                >
+                  Delivery Details
+                </h2>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Where should we deliver your box?
+                </p>
+
+                {/* Name row */}
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="firstName">
+                      First Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="firstName"
+                      name="firstName"
+                      value={fields.firstName}
+                      onChange={handleChange}
+                      onBlur={requireBlur("firstName", "First name")}
+                      autoComplete="given-name"
+                      placeholder="Jane"
+                    />
+                    {errors.firstName && (
+                      <p className="text-destructive text-xs">{errors.firstName}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="lastName">
+                      Last Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="lastName"
+                      name="lastName"
+                      value={fields.lastName}
+                      onChange={handleChange}
+                      onBlur={requireBlur("lastName", "Last name")}
+                      autoComplete="family-name"
+                      placeholder="Smith"
+                    />
+                    {errors.lastName && (
+                      <p className="text-destructive text-xs">{errors.lastName}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="space-y-1.5 mb-4">
+                  <Label htmlFor="email">
+                    Email <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={fields.email}
+                    onChange={handleChange}
+                    onBlur={handleEmailBlur}
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                  />
+                  {errors.email && (
+                    <p className="text-destructive text-xs">{errors.email}</p>
+                  )}
+                </div>
+
+                {/* Phone */}
+                <div className="space-y-1.5 mb-4">
+                  <Label htmlFor="phone">
+                    Phone <span className="text-muted-foreground font-normal">(optional)</span>
+                  </Label>
+                  <p className="text-xs text-muted-foreground -mt-1">Helps with delivery coordination.</p>
+                  <Input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={fields.phone}
+                    onChange={handleChange}
+                    autoComplete="tel"
+                    placeholder="(312) 555-0100"
+                  />
+                </div>
+
+                {/* Street + Apt */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                  <div className="sm:col-span-2 space-y-1.5">
+                    <Label htmlFor="street">
+                      Street Address <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="street"
+                      name="street"
+                      ref={streetInputRef}
+                      value={fields.street}
+                      onChange={handleChange}
+                      onBlur={requireBlur("street", "Street address")}
+                      autoComplete="off"
+                      placeholder="Start typing your address..."
+                    />
+                    {errors.street && (
+                      <p className="text-destructive text-xs">{errors.street}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="apt">
+                      Apt / Unit <span className="text-muted-foreground font-normal">(optional)</span>
+                    </Label>
+                    <Input
+                      id="apt"
+                      name="apt"
+                      value={fields.apt}
+                      onChange={handleChange}
+                      autoComplete="address-line2"
+                      placeholder="2B"
+                    />
+                  </div>
+                </div>
+
+                {/* City + ZIP */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="city">
+                      City <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="city"
+                      name="city"
+                      value={fields.city}
+                      onChange={handleChange}
+                      onBlur={requireBlur("city", "City")}
+                      autoComplete="address-level2"
+                      placeholder="Chicago"
+                    />
+                    {errors.city && (
+                      <p className="text-destructive text-xs">{errors.city}</p>
+                    )}
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="zip">
+                      ZIP <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="zip"
+                      name="zip"
+                      value={fields.zip}
+                      onChange={handleChange}
+                      onBlur={handleZipBlur}
+                      autoComplete="postal-code"
+                      inputMode="numeric"
+                      placeholder="60601"
+                      maxLength={10}
+                    />
+                    {errors.zip && (
+                      <p className="text-destructive text-xs">{errors.zip}</p>
+                    )}
+                    {errors.zip === OUT_OF_AREA_MESSAGE && (
+                      <WaitlistCapture zip={fields.zip} />
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground -mt-2 mb-4">
+                  Chicagoland metro. <span aria-hidden="true">&middot;</span> South Chicago + south suburbs.
+                </p>
+
+                {/* Delivery info */}
+                <div className="mb-4 flex items-center gap-2 rounded-lg bg-primary/5 px-4 py-2.5 text-sm text-primary border border-primary/20">
+                  <span>&#x1F69A;</span>
+                  <span>Your next delivery: <strong>{deliveryDateLabel}</strong></span>
+                </div>
+
+                {/* Delivery notes */}
+                <div className="space-y-1.5 mb-4">
+                  <Label htmlFor="deliveryNotes">Delivery Notes (optional)</Label>
+                  <textarea
+                    id="deliveryNotes"
+                    name="deliveryNotes"
+                    value={fields.deliveryNotes}
+                    onChange={handleChange}
+                    placeholder="Leave at front door, gate code, etc."
+                    rows={3}
+                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                  />
+                </div>
+
+                {/* Promo code (if not already applied) */}
+                {!promoCode ? (
+                  <div className="mb-4">
+                    <Label htmlFor="promo" className="text-sm font-semibold mb-2 block">
+                      Promo code <span className="text-muted-foreground font-normal">(optional)</span>
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="promo"
+                        type="text"
+                        value={promoInput}
+                        onChange={(e) => { setPromoInput(e.target.value); setPromoError(""); }}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyPromoCode(); } }}
+                        placeholder="e.g. FRESH10"
+                        className="flex-1 bg-background"
+                      />
+                      <button
+                        type="button"
+                        onClick={applyPromoCode}
+                        className="px-4 py-2 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    {promoError && <p className="text-xs text-red-500 mt-1">{promoError}</p>}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Try <span className="font-semibold text-primary">FRESH10</span> for $10 off your first box
+                    </p>
+                  </div>
+                ) : null}
+
+                {submitError && (
+                  <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+                    {submitError}
+                  </div>
+                )}
+
+                {/* Trust signals */}
+                <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1">&#x1F512; Secure checkout</span>
+                  <span className="flex items-center gap-1">&#x2713; No subscription lock-in</span>
+                  <span className="flex items-center gap-1">&#x1F4E6; Fresh-guaranteed</span>
+                </div>
+
+                {/* Submit CTA */}
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {submitting ? "Saving\u2026" : `Continue to Payment \u00b7 $${discountedTotal} \u2192`}
+                </button>
+              </div>
             </div>
 
-            {/* CTA */}
-            <button
-              type="button"
-              onClick={continueToDelivery}
-              className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft"
-            >
-              Continue to delivery details →
-            </button>
+            {/* Order summary sidebar (desktop only) */}
+            <div className="hidden md:block md:col-span-1">
+              <div className="rounded-2xl bg-background shadow-soft p-5 sticky top-6">
+                <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+                  Order Summary
+                </h2>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-medium text-sm">{product.name}</span>
+                  <span className="font-bold text-primary">${basePrice}</span>
+                </div>
+                {proteinCost > 0 ? (
+                  <div className="flex items-center justify-between mb-2 text-sm">
+                    <span className="text-foreground/70">Protein add-ons</span>
+                    <span className="font-medium">+${proteinCost}</span>
+                  </div>
+                ) : null}
+                {promoDiscount > 0 && activePromo ? (
+                  <>
+                    <div className="flex items-center justify-between mb-2 text-sm">
+                      <span className="text-primary font-medium">{promoCode} discount</span>
+                      <span className="text-primary font-medium">&minus;${promoDiscount}</span>
+                    </div>
+                    <p className="text-xs text-primary mb-2">{activePromo.label}</p>
+                  </>
+                ) : null}
+                <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
+                  <span>Delivery</span>
+                  <span className="text-primary font-medium">FREE</span>
+                </div>
+                <div className="border-t border-border pt-3">
+                  <div className="flex items-center justify-between text-sm font-semibold">
+                    <span>Total</span>
+                    <span className="text-primary">${discountedTotal}.00</span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3">
+                  No subscription. Order when you want.
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        </form>
 
-        {/* Spacer so the sticky mobile CTA bar doesn't cover the last scrolled content. */}
+        {/* Spacer for sticky mobile CTA */}
         <div className="h-20 md:hidden" />
       </div>
 
@@ -514,11 +933,15 @@ export default function CheckoutSummaryPage() {
       <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-background/95 backdrop-blur border-t border-border px-4 py-3 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)]">
         <button
           type="button"
-          onClick={continueToDelivery}
-          className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft flex items-center justify-center gap-2"
+          onClick={() => {
+            const form = document.querySelector("form");
+            if (form) form.requestSubmit();
+          }}
+          disabled={submitting}
+          className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          <span>Continue</span>
-          <span className="font-normal opacity-80">· ${discountedTotal}</span>
+          <span>Continue to Payment</span>
+          <span className="font-normal opacity-80">&middot; ${discountedTotal}</span>
         </button>
       </div>
     </section>

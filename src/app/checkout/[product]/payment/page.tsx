@@ -38,9 +38,9 @@ interface StoredCheckout {
   beanChoice?: string;
 }
 
-// Step indicator component
-function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
-  const steps = ["Order Summary", "Delivery", "Payment"];
+// Step indicator component — 2-step flow (Order Details -> Payment)
+function StepIndicator({ current }: { current: 1 | 2 }) {
+  const steps = ["Order Details", "Payment"];
   return (
     <div className="flex items-center gap-2 mb-8">
       {steps.map((label, i) => {
@@ -307,7 +307,7 @@ export default function PaymentPage() {
           <div className="rounded-2xl bg-background shadow-soft p-8 text-center">
             <p className="text-destructive mb-4">{intentError}</p>
             <Link
-              href={`/checkout/${slug}/delivery`}
+              href={`/checkout/${slug}`}
               className="text-primary underline underline-offset-4 text-sm"
             >
               &larr; Go back and try again
@@ -324,14 +324,14 @@ export default function PaymentPage() {
         {/* Back link */}
         <div className="mb-6">
           <Link
-            href={`/checkout/${slug}/delivery`}
+            href={`/checkout/${slug}`}
             className="text-sm text-muted-foreground hover:text-primary transition-colors"
           >
-            &larr; Back to delivery details
+            &larr; Back to order details
           </Link>
         </div>
 
-        <StepIndicator current={3} />
+        <StepIndicator current={2} />
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Payment form */}
