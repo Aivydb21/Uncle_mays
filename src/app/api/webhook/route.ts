@@ -628,6 +628,54 @@ export async function POST(req: NextRequest) {
         `[WEBHOOK] customer.subscription.updated | sub=${subscription.id} customer=${customerId} status=${subscription.status}${previousStatus ? ` (was ${previousStatus})` : ""} cancel_at_period_end=${subscription.cancel_at_period_end} plan=${subscription.metadata?.product ?? "unknown"}`
       );
 
+      // ABANDON ALERT: subscription expired without ever being paid for.
+      // Stripe fires this as customer.subscription.updated with status
+      // transitioning to "incomplete_expired" (NOT customer.subscription.deleted
+      // — that one only fires for canceled-after-active subs). The previous
+      // wiring of this alert lived in the deleted handler and never ran. Found
+      // 2026-04-27 when Antoinette's 4 incomplete subs from Apr 25 expired
+      // silently with no email reaching anthony@unclemays.com.
+      if (
+        subscription.status === "incomplete_expired" &&
+        previousStatus !== "incomplete_expired"
+      ) {
+        let alertEmail: string | null = null;
+        let alertName: string | null = null;
+        try {
+          const customer = await stripe.customers.retrieve(customerId);
+          if (customer && !("deleted" in customer)) {
+            alertEmail = customer.email ?? null;
+            alertName = customer.name ?? null;
+          }
+        } catch (e) {
+          console.warn(`[WEBHOOK] Could not retrieve customer ${customerId} for abandon alert:`, e);
+        }
+        const planAmount = subscription.items?.data?.[0]?.price?.unit_amount ?? 0;
+        const planLabel = subscription.metadata?.product || "unknown";
+        const subjectEmail = alertEmail || "(unknown email)";
+        const html = `
+          <p>A subscription was created but never paid for. The customer reached the payment form and abandoned before confirming.</p>
+          <table style="border-collapse:collapse;font-size:14px">
+            <tr><td style="padding:4px 12px 4px 0">Customer</td><td><strong>${alertName || "—"}</strong></td></tr>
+            <tr><td style="padding:4px 12px 4px 0">Email</td><td><a href="mailto:${subjectEmail}">${subjectEmail}</a></td></tr>
+            <tr><td style="padding:4px 12px 4px 0">Plan</td><td>${planLabel} · $${(planAmount / 100).toFixed(2)}/wk</td></tr>
+            <tr><td style="padding:4px 12px 4px 0">Subscription</td><td>${subscription.id}</td></tr>
+            <tr><td style="padding:4px 12px 4px 0">Customer ID</td><td>${customerId}</td></tr>
+          </table>
+          <p style="margin-top:16px">Suggested follow-up: short personal email asking what happened, offering to push the order through manually.</p>
+        `;
+        sendInternalAlert({
+          subject: `[Uncle May's] Subscription abandoned at payment — ${subjectEmail}`,
+          html,
+          tags: [
+            { name: "type", value: "internal_alert" },
+            { name: "alert", value: "sub_abandoned_at_payment" },
+          ],
+        }).catch((err) =>
+          console.error("[WEBHOOK] Internal alert send error (incomplete_expired via update):", err)
+        );
+      }
+
       // Send cancellation email when cancel_at_period_end transitions to true.
       // This is the typical portal flow: user clicks Cancel, subscription stays active
       // until end of period but cancel_at_period_end flips to true immediately.

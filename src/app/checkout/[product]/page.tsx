@@ -251,8 +251,12 @@ export default function CheckoutSummaryPage() {
         ) : null}
 
         <div className="rounded-2xl overflow-hidden shadow-soft bg-background">
-          {/* Product image */}
-          <div className="relative">
+          {/* Product image — decorative, not interactive. Clarity replays
+              (2026-04-27) showed users tapping the image and the gradient
+              expecting something to happen. Marking it pointer-events-none
+              so taps fall through to the page itself rather than registering
+              as dead clicks. */}
+          <div className="relative pointer-events-none select-none">
             <img
               src="/images/produce-box.jpg"
               alt={`${product.name} — fresh seasonal produce`}
@@ -377,52 +381,67 @@ export default function CheckoutSummaryPage() {
               ) : null}
             </div>
 
-            {/* Email capture */}
-            <div className="mb-6">
-              <Label htmlFor="email" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
-                Your Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onBlur={handleEmailBlur}
-                autoComplete="email"
-                placeholder="you@example.com"
-              />
-            </div>
+            {/* Order start: email + optional promo grouped under one
+                explicit "Start your order" header. Clarity replays
+                (2026-04-27) showed users reading the menu and protein
+                section thoroughly, then bouncing without realizing the
+                email field was the entry point to ordering. The grouped
+                section + colored border + explicit step language makes
+                "where the order begins" unmissable. */}
+            <div className="mb-6 rounded-xl border-2 border-primary/30 bg-primary/5 p-5">
+              <p className="text-xs font-bold uppercase tracking-wider text-primary mb-1">
+                Start your order
+              </p>
+              <p className="text-sm text-foreground/80 mb-4">
+                Enter your email and we&apos;ll take you to delivery and payment.
+              </p>
 
-            {/* Promo code input */}
-            {!promoCode ? (
-              <div className="mb-6">
-                <Label htmlFor="promo" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2 block">
-                  Promo Code
+              <div className="mb-4">
+                <Label htmlFor="email" className="text-sm font-semibold mb-2 block">
+                  Email <span className="text-destructive">*</span>
                 </Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="promo"
-                    type="text"
-                    value={promoInput}
-                    onChange={(e) => { setPromoInput(e.target.value); setPromoError(""); }}
-                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyPromoCode(); } }}
-                    placeholder="e.g. FRESH10"
-                    className="flex-1"
-                  />
-                  <button
-                    type="button"
-                    onClick={applyPromoCode}
-                    className="px-4 py-2 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
-                  >
-                    Apply
-                  </button>
-                </div>
-                {promoError && <p className="text-xs text-red-500 mt-1">{promoError}</p>}
-                <p className="text-xs text-muted-foreground mt-1">
-                  Try <span className="font-semibold text-primary">FRESH10</span> for $10 off your first box
-                </p>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  onBlur={handleEmailBlur}
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  className="bg-background"
+                />
               </div>
-            ) : null}
+
+              {!promoCode ? (
+                <div>
+                  <Label htmlFor="promo" className="text-sm font-semibold mb-2 block">
+                    Promo code <span className="text-muted-foreground font-normal">(optional)</span>
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="promo"
+                      type="text"
+                      value={promoInput}
+                      onChange={(e) => { setPromoInput(e.target.value); setPromoError(""); }}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); applyPromoCode(); } }}
+                      placeholder="e.g. FRESH10"
+                      className="flex-1 bg-background"
+                    />
+                    <button
+                      type="button"
+                      onClick={applyPromoCode}
+                      className="px-4 py-2 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/10 transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  {promoError && <p className="text-xs text-red-500 mt-1">{promoError}</p>}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Try <span className="font-semibold text-primary">FRESH10</span> for $10 off your first box
+                  </p>
+                </div>
+              ) : null}
+            </div>
 
             {/* CTA */}
             <button
@@ -430,7 +449,7 @@ export default function CheckoutSummaryPage() {
               onClick={continueToDelivery}
               className="w-full bg-primary text-primary-foreground rounded-xl h-12 px-6 text-base font-semibold hover:bg-primary/90 transition-colors shadow-soft"
             >
-              Continue to Delivery →
+              Continue to delivery details →
             </button>
           </div>
         </div>
