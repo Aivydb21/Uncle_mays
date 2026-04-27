@@ -400,7 +400,7 @@ export default function CheckoutSummaryPage() {
                   <p className="text-xs text-foreground/70 leading-relaxed pb-1">
                     {PROTEIN_TAGLINE}
                   </p>
-                  {PROTEIN_OPTIONS.map((opt) => {
+                  {PROTEIN_OPTIONS.filter((o) => !(isFullHarvest && o.id === "chicken")).map((opt) => {
                     const selected = selectedProteins.includes(opt.id);
                     return (
                       <button
