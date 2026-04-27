@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, notFound, useRouter } from "next/navigation";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
@@ -252,9 +252,15 @@ export default function SubscribePaymentPage() {
   const [intentError, setIntentError] = useState<string | null>(null);
   const [loadingIntent, setLoadingIntent] = useState(true);
   const [paymentComplete, setPaymentComplete] = useState(false);
+  // Guard against double-mount creating duplicate subscriptions (UNC-643)
+  const intentCalledRef = useRef(false);
 
   const createIntent = useCallback(
     async (data: StoredSubCheckout) => {
+      // Prevent duplicate calls from React re-mounts (UNC-643)
+      if (intentCalledRef.current) return;
+      intentCalledRef.current = true;
+
       try {
         // Read any captured UTM params from localStorage
         let utms: Record<string, string> = {};

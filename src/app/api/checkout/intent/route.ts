@@ -12,9 +12,9 @@ const AMOUNT_MAP: Record<string, number> = {
 // Optional protein add-on prices in cents.
 // MUST match src/lib/products.ts PROTEIN_OPTIONS[].price * 100.
 const PROTEIN_ADD_ON_PRICING: Record<string, number> = {
-  chicken: 1500,
-  "beef-short-ribs": 1500,
-  "lamb-chops": 1500,
+  chicken: 1200,
+  "beef-short-ribs": 1200,
+  "lamb-chops": 1200,
 };
 
 export async function POST(req: NextRequest) {

@@ -139,27 +139,13 @@ export async function POST(req: NextRequest) {
       metadata.promo_discount_cents = String(validPromo.entry.amountOffCents);
     }
 
-    // Create subscription and expand latest_invoice.payments.
-    //
-    // CRITICAL: In Stripe API 2025-11-17+, invoice.payment_intent is no longer
-    // populated. The PaymentIntent ID is now found under:
-    //   invoice.payments.data[0].payment.payment_intent
-    // We expand payments, extract the PI ID, then retrieve it to get client_secret.
-    // This is the ONLY PaymentIntent that will mark the invoice paid and activate
-    // the subscription. Using a separate PaymentIntent (previous bug) caused
-    // charges to succeed while the subscription invoice remained unpaid.
-    const subscription = await stripe.subscriptions.create({
-      customer: customerId,
-      items: [{ price: priceId }],
-      payment_behavior: "default_incomplete",
-      payment_settings: { save_default_payment_method: "on_subscription" },
-      expand: ["latest_invoice.payments"],
-      metadata,
-      ...(validPromo ? { discounts: [{ coupon: validPromo.entry.couponId }] } : {}),
-    });
+    // --- Idempotency: reuse an existing incomplete subscription if one exists ---
+    // Without this, every page mount creates a NEW subscription. When a second
+    // subscription is created for the same customer+price, Stripe voids the
+    // previous invoice, canceling its PaymentIntent with `void_invoice`.
+    // This was the root cause of UNC-643.
 
-    // In Stripe API 2025-11-17, the PaymentIntent is nested under payments list.
-    const invoice = subscription.latest_invoice as Stripe.Invoice & {
+    type InvoiceWithPayments = Stripe.Invoice & {
       payments?: {
         data: Array<{
           payment: { payment_intent: string | null; type: string };
@@ -168,33 +154,105 @@ export async function POST(req: NextRequest) {
       };
     };
 
-    const paymentIntentId = invoice?.payments?.data?.[0]?.payment?.payment_intent ?? null;
+    // Helper: extract a usable PaymentIntent from a subscription's latest invoice
+    async function extractUsablePI(sub: Stripe.Subscription): Promise<Stripe.PaymentIntent | null> {
+      const inv = sub.latest_invoice as InvoiceWithPayments | null;
+      if (!inv || inv.status !== "open") return null;
+      const piId = inv.payments?.data?.[0]?.payment?.payment_intent ?? null;
+      if (!piId) return null;
+      const pi = await stripe.paymentIntents.retrieve(piId);
+      // Only reuse if the PI is still waiting for payment
+      if (pi.status === "canceled" || !pi.client_secret) return null;
+      return pi;
+    }
 
-    if (!paymentIntentId) {
-      await stripe.subscriptions.cancel(subscription.id);
-      return NextResponse.json(
-        { error: "Could not initialize subscription payment" },
-        { status: 500 }
+    let subscription!: Stripe.Subscription;
+    let paymentIntent!: Stripe.PaymentIntent;
+
+    // Check for existing incomplete subscriptions for same customer + price
+    const existingSubs = await stripe.subscriptions.list({
+      customer: customerId,
+      status: "incomplete",
+      limit: 10,
+      expand: ["data.latest_invoice.payments"],
+    });
+
+    // Find the first incomplete sub with the same price and a usable PI
+    let reusedSub: Stripe.Subscription | null = null;
+    const orphanedSubIds: string[] = [];
+
+    for (const sub of existingSubs.data) {
+      const hasMatchingPrice = sub.items.data.some((item) => item.price.id === priceId);
+      if (!hasMatchingPrice) continue;
+
+      if (!reusedSub) {
+        const pi = await extractUsablePI(sub);
+        if (pi) {
+          reusedSub = sub;
+          paymentIntent = pi;
+        } else {
+          orphanedSubIds.push(sub.id);
+        }
+      } else {
+        orphanedSubIds.push(sub.id);
+      }
+    }
+
+    // Cancel orphaned incomplete subscriptions in the background
+    for (const orphanId of orphanedSubIds) {
+      stripe.subscriptions.cancel(orphanId).catch((e) =>
+        console.warn("Failed to cancel orphaned subscription:", orphanId, e)
       );
     }
 
-    // Retrieve the full PaymentIntent to get client_secret, then stamp it with
-    // subscription metadata so the payment_intent.succeeded webhook handler can:
-    // (1) fire the CAPI Purchase event, and (2) clean up the Mailchimp cart.
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    if (reusedSub) {
+      // Reuse existing subscription — just re-stamp the PI metadata
+      subscription = reusedSub;
+      // paymentIntent is already set from extractUsablePI above
+    } else {
+      // Create a new subscription.
+      //
+      // CRITICAL: In Stripe API 2025-11-17+, invoice.payment_intent is no longer
+      // populated. The PaymentIntent ID is now found under:
+      //   invoice.payments.data[0].payment.payment_intent
+      // We expand payments, extract the PI ID, then retrieve it to get client_secret.
+      subscription = await stripe.subscriptions.create({
+        customer: customerId,
+        items: [{ price: priceId }],
+        payment_behavior: "default_incomplete",
+        payment_settings: { save_default_payment_method: "on_subscription" },
+        expand: ["latest_invoice.payments"],
+        metadata,
+        ...(validPromo ? { discounts: [{ coupon: validPromo.entry.couponId }] } : {}),
+      });
 
-    if (!paymentIntent.client_secret) {
-      await stripe.subscriptions.cancel(subscription.id);
-      return NextResponse.json(
-        { error: "Could not initialize subscription payment — no client secret" },
-        { status: 500 }
-      );
+      const invoice = subscription.latest_invoice as InvoiceWithPayments;
+      const paymentIntentId = invoice?.payments?.data?.[0]?.payment?.payment_intent ?? null;
+
+      if (!paymentIntentId) {
+        await stripe.subscriptions.cancel(subscription.id);
+        return NextResponse.json(
+          { error: "Could not initialize subscription payment" },
+          { status: 500 }
+        );
+      }
+
+      const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+      if (!pi.client_secret) {
+        await stripe.subscriptions.cancel(subscription.id);
+        return NextResponse.json(
+          { error: "Could not initialize subscription payment — no client secret" },
+          { status: 500 }
+        );
+      }
+
+      paymentIntent = pi;
     }
 
     // Stamp the PaymentIntent with subscription metadata so the
     // payment_intent.succeeded webhook can fire CAPI Purchase and Mailchimp cleanup.
-    // Without this the webhook's firstPayment check would always fail.
-    await stripe.paymentIntents.update(paymentIntentId, {
+    await stripe.paymentIntents.update(paymentIntent.id, {
       metadata: {
         ...metadata,
         firstPayment: "true",
