@@ -125,7 +125,7 @@ export const Pricing = () => {
         <p className="text-center text-sm text-muted-foreground mb-8">
           {isSubscription
             ? "Free delivery. Cancel anytime."
-            : "Free delivery. One-time order — no subscription, no auto-renewal."}
+            : "Free delivery. One-time order, no subscription, no auto-renewal."}
         </p>
 
         {/* Two tiers side-by-side */}
@@ -188,8 +188,8 @@ export const Pricing = () => {
                   >
                     <span className="text-center">
                       {isSubscription
-                        ? `Subscribe — ${sub}/wk`
-                        : `Order Now — ${oneTime}`}
+                        ? `Subscribe ${sub}/wk`
+                        : `Order Now ${oneTime}`}
                     </span>
                   </button>
                 </div>
@@ -201,7 +201,7 @@ export const Pricing = () => {
         {/* One-line protein add-on note — explicit so customers know protein is
             available without cluttering the tier cards with pricing tables. */}
         <p className="text-center text-sm text-muted-foreground mb-10 max-w-xl mx-auto">
-          Add chicken, short ribs, or lamb chops at checkout — $15 each, pasture-raised, slaughtered fresh.
+          Add chicken, short ribs, or lamb chops at checkout. $12 per pound, pasture-raised, slaughtered fresh.
         </p>
 
         {/* Produce box image */}

@@ -79,11 +79,11 @@ const faqs = [
   },
   {
     q: "What's actually in the box?",
-    a: "Every box is sourced from our Black-owned farm partners and packed with what's freshest that week. The Small Box currently includes a salad-mix clamshell, a bunch of kale, candy orange carrots, sweet potatoes, organic pinto beans, and a clamshell of microgreens — built for 1–2 people. The Family Box adds asparagus (spring only), rainbow chard, extra carrots and sweet potatoes, and a second variety of organic beans — built for 3–4 people. Contents rotate each delivery based on what's in season.",
+    a: "Every box is sourced from our Black-owned farm partners and packed with what's freshest that week. The Spring Box currently includes a salad-mix clamshell, candy orange carrots, sweet potatoes, potatoes, a head of broccoli, and 1 lb of organic black beans, built for 1 to 2 people. The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, and a customer choice of bean (black, pinto, or kidney), built for 3 to 4 people. Contents rotate each delivery based on what's in season.",
   },
   {
     q: "How much does a box cost?",
-    a: "The Small Box is $40 and the Family Box is $70 — one-time, no subscription. Proteins (pasture-raised whole chicken, grass-fed beef short ribs, or lamb chops) are optional paid add-ons at checkout.",
+    a: "The Spring Box is $40 and the Full Harvest Box is $70, one-time and no subscription. Proteins (pasture-raised chicken thighs, grass-fed beef short ribs, or lamb chops) are optional add-ons at checkout for $12 each, served as 1 lb portions.",
   },
   {
     q: "How do I cancel an order?",
@@ -93,11 +93,11 @@ const faqs = [
 
 const sampleStarterBox = [
   "Salad mix (5 oz)",
-  "Kale (1 bunch)",
   "Candy orange carrots (1 lb)",
   "Sweet potatoes (1.5 lb)",
-  "Organic pinto beans (1 lb)",
-  "Microgreens (chef's pick)",
+  "Potatoes (1.5 lb)",
+  "Broccoli (1 head)",
+  "Organic black beans (1 lb)",
 ];
 
 const FaqContent = () => {
@@ -172,7 +172,7 @@ const FaqContent = () => {
             className="bg-card rounded-2xl p-8 shadow-soft border border-border/50 max-w-3xl mx-auto"
           >
             <h3 className="text-2xl font-bold mb-2 text-center">
-              Sample Small Box
+              Sample Spring Box
             </h3>
             <p className="text-muted-foreground text-center mb-6">
               Contents rotate each delivery based on what's freshest. Here's a

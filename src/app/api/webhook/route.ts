@@ -432,8 +432,8 @@ export async function POST(req: NextRequest) {
         if (triggerKeyForOtConfirmation) {
           const productKey = intent.metadata?.product ?? null;
           const PRODUCT_NAMES: Record<string, string> = {
-            starter: "Small Box",
-            family: "Family Box",
+            starter: "Spring Box",
+            family: "Full Harvest Box",
           };
           const productName = productKey ? (PRODUCT_NAMES[productKey] ?? productKey) : "Produce Box";
 

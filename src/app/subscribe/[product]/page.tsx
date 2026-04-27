@@ -337,7 +337,7 @@ export default function SubscribeSummaryPage() {
               >
                 <div>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    Add a protein <span className="text-muted-foreground/70 normal-case font-normal">($15/wk each)</span>
+                    Add a protein <span className="text-muted-foreground/70 normal-case font-normal">($12/wk each, 1 lb)</span>
                   </h2>
                   <p className="text-xs text-muted-foreground mt-1">
                     {selectedProteins.length > 0

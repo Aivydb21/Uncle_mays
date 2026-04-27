@@ -36,15 +36,15 @@ export const MobileCTA = () => {
               href="/#boxes"
               className="flex-1 flex flex-col items-center justify-center rounded-xl border border-border bg-muted/50 py-2.5 text-center"
             >
-              <span className="text-xs text-muted-foreground">Small</span>
+              <span className="text-xs text-muted-foreground">Spring Box</span>
               <span className="text-base font-bold text-primary">From $40</span>
             </Link>
             <Link
               href="/#boxes"
               className="flex-[2] flex flex-col items-center justify-center rounded-xl bg-primary text-primary-foreground py-2.5 text-center shadow-soft"
             >
-              <span className="text-xs opacity-80">Family Box</span>
-              <span className="text-base font-bold">Order — $70</span>
+              <span className="text-xs opacity-80">Full Harvest Box</span>
+              <span className="text-base font-bold">Order $70</span>
             </Link>
           </div>
         </motion.div>

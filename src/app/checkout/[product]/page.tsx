@@ -333,7 +333,7 @@ export default function CheckoutSummaryPage() {
               >
                 <div>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    Add a protein <span className="text-muted-foreground/70 normal-case font-normal">($15 each)</span>
+                    Add a protein <span className="text-muted-foreground/70 normal-case font-normal">($12 each, 1 lb)</span>
                   </h2>
                   <p className="text-xs text-muted-foreground mt-1">
                     {selectedProteins.length > 0

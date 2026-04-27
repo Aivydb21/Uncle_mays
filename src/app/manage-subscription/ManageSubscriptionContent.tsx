@@ -7,25 +7,25 @@ import { Check } from "lucide-react";
 
 const plans = [
   {
-    name: "Small Box",
-    description: "For 1–2 people",
+    name: "Spring Box",
+    description: "For 1 to 2 people",
     subPrice: "$36",
     subFrequency: "/wk",
     bullets: [
-      "6 seasonal items from our farmer partners",
-      "Greens, roots, and pantry staples",
+      "Salad mix, carrots, sweet potatoes, potatoes, broccoli, black beans",
+      "Sourced from our Black farmer partners",
       "Delivered fresh every Wednesday",
     ],
     slug: "starter",
   },
   {
-    name: "Family Box",
-    description: "For 3–4 people",
+    name: "Full Harvest Box",
+    description: "For 3 to 4 people",
     subPrice: "$63",
     subFrequency: "/wk",
     bullets: [
-      "9 seasonal items, rotating with the harvest",
-      "Add a protein at checkout if you want one",
+      "Everything in the Spring Box, plus pea shoots, radishes, and your choice of bean",
+      "Add a protein (1 lb) at checkout for $12",
       "Delivered fresh every Wednesday",
     ],
     popular: true,

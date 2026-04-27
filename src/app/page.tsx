@@ -75,9 +75,9 @@ const productListSchema = {
       position: 1,
       item: {
         "@type": "Product",
-        name: "Small Box",
+        name: "Spring Box",
         description:
-          "6 seasonal items from our Black farmer partners: salad mix, kale, candy orange carrots, sweet potatoes, organic pinto beans, and microgreens. Built for 1–2 people.",
+          "6 seasonal items from our Black farmer partners: salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans. Built for 1 to 2 people.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
@@ -94,9 +94,9 @@ const productListSchema = {
       position: 2,
       item: {
         "@type": "Product",
-        name: "Family Box",
+        name: "Full Harvest Box",
         description:
-          "9 seasonal items from our Black farmer partners: asparagus (spring; rotates seasonally), kale, rainbow chard, salad mix, candy orange carrots, sweet potatoes, organic pinto beans, organic kidney beans, and microgreens. Built for 3–4 people.",
+          "Everything in the Spring Box, plus pea shoots, radishes, and a customer choice of bean (black, pinto, or kidney). Pasture-raised chicken thighs available as a featured add-on at checkout. Built for 3 to 4 people.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
@@ -128,7 +128,7 @@ const faqSchema = {
       name: "What's actually in the box?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. A Small Box currently includes items like salad mix, kale, candy orange carrots, sweet potatoes, organic pinto beans, and microgreens. Contents vary each delivery based on what our farmer partners are harvesting.",
+        text: "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. The Spring Box currently includes salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans. The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, and a customer choice of bean. Contents vary each delivery based on what our farmer partners are harvesting.",
       },
     },
     {
@@ -136,7 +136,7 @@ const faqSchema = {
       name: "How much does a box cost?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Two tiers: $40 for a Small Box (6 items, built for 1–2 people) or $70 for a Family Box (9 items, built for 3–4 people). Proteins (pasture-raised chicken, beef short ribs, or lamb chops) are optional paid add-ons at checkout. Every box is a one-time order — no subscription, no auto-renewal.",
+        text: "Two tiers. The Spring Box is $40, built for 1 to 2 people. The Full Harvest Box is $70, built for 3 to 4 people, and includes everything in the Spring Box plus more. Proteins (pasture-raised chicken thighs, grass-fed beef short ribs, or lamb chops) are optional add-ons at checkout for $12 each. Every box is a one-time order with no subscription and no auto-renewal.",
       },
     },
     {

@@ -11,9 +11,9 @@
 
 ## Sourcing
 
-Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL)**. Everything we ship is drawn from their weekly produce list: greens, salad mix, microgreens, candy orange carrots, sweet potatoes, and organic dry beans. Proteins (whole pastured chicken, grass-fed beef short ribs, lamb chops) come from the same partner.
+Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL)**. Everything we ship is drawn from their weekly produce list: salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, organic dry beans (black, pinto, kidney), pea shoots, and radishes. Proteins (whole pastured chicken thighs, grass-fed beef short ribs, lamb chops) come from the same partner.
 
-**Do not claim** the box contains eggs, tomatoes, cucumbers, snap peas, strawberries, zucchini, beets, spring onions, collards, shishito peppers, eggplant, turnips, or any other produce not on RAB's list. Adding those back requires onboarding a second supplier first.
+**Do not claim** the box contains eggs, tomatoes, cucumbers, snap peas, strawberries, zucchini, beets, spring onions, kale, rainbow chard, microgreens, collards, shishito peppers, eggplant, turnips, or any other produce not on RAB's current list. Adding those back requires onboarding a second supplier first.
 
 ---
 
@@ -36,16 +36,18 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 
 | Box | One-Time | Subscription (10% off) | Who it's for | What's inside |
 |-----|----------|------------------------|--------------|----------------|
-| **Small Box** | $40 | $36/wk | 1–2 people | Salad mix, 1 bunch kale, 1 lb candy carrots, 1.5 lb sweet potatoes, 1 lb organic pinto beans, 1 clam microgreens |
-| **Family Box** | $70 | $63/wk | 3–4 people | 1 lb asparagus (spring; rotates), 2 bunches kale, 1 bunch rainbow chard, salad mix, 2 lb candy carrots, 2 lb sweet potatoes, 1 lb pinto beans, 1 lb kidney beans, 1 clam microgreens |
+| **Spring Box** | $40 | $36/wk | 1–2 people | Salad mix (5 oz), 1 lb candy carrots, 1.5 lb sweet potatoes, 1.5 lb potatoes, 1 head broccoli, 1 lb organic black beans |
+| **Full Harvest Box** | $70 | $63/wk | 3–4 people | Everything in the Spring Box, plus 1 clamshell pea shoots, 1 bunch radishes, and a customer choice of bean (black, pinto, or kidney) |
 
 ### Protein Add-Ons (optional, available on every box)
 
-| Protein | Price |
+Flat $12 each. Chicken is the featured option.
+
+| Protein (1 lb each) | Price |
 |---------|-------|
-| Pasture-Raised Chicken Thighs (~1.5 lb) | +$15 |
-| Grass-Fed Beef Short Ribs (~3/4 lb) | +$15 |
-| Lamb Chop (1, ~6 oz) | +$15 |
+| Pasture-Raised Chicken Thighs (1 lb) — featured | +$12 |
+| Grass-Fed Beef Short Ribs (1 lb) | +$12 |
+| Lamb Chops (1 lb) | +$12 |
 
 ### Rules
 - **Subscribe & Save** = exactly **10% off** the one-time price, same box every Wednesday.

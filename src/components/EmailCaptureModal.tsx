@@ -116,7 +116,7 @@ export const EmailCaptureModal = ({
           onClick={onDismiss}
           className="mt-2 w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors py-1"
         >
-          Skip — go straight to checkout
+          Skip, go straight to checkout
         </button>
       </DialogContent>
     </Dialog>

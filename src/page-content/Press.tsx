@@ -192,7 +192,7 @@ const Press = () => {
                     <ul className="space-y-2">
                       {section.angles.map((angle, j) => (
                         <li key={j} className="flex items-start gap-2 text-sm text-foreground/75">
-                          <span className="text-primary font-bold mt-0.5 shrink-0">—</span>
+                          <span className="text-primary font-bold mt-0.5 shrink-0">•</span>
                           {angle}
                         </li>
                       ))}
@@ -258,23 +258,23 @@ const Press = () => {
                 </p>
                 <ul className="space-y-2 text-sm text-foreground/70">
                   <li className="flex items-start gap-2">
-                    <span className="text-primary font-bold shrink-0">—</span>
+                    <span className="text-primary font-bold shrink-0">•</span>
                     Company logo (high-res PNG and SVG)
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-primary font-bold shrink-0">—</span>
+                    <span className="text-primary font-bold shrink-0">•</span>
                     Founder headshot
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-primary font-bold shrink-0">—</span>
+                    <span className="text-primary font-bold shrink-0">•</span>
                     Product photography (produce boxes)
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-primary font-bold shrink-0">—</span>
+                    <span className="text-primary font-bold shrink-0">•</span>
                     Store renderings (Hyde Park flagship)
                   </li>
                   <li className="flex items-start gap-2">
-                    <span className="text-primary font-bold shrink-0">—</span>
+                    <span className="text-primary font-bold shrink-0">•</span>
                     Company boilerplate and bio
                   </li>
                 </ul>

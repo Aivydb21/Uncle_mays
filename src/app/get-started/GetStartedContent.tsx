@@ -19,7 +19,7 @@ const HERO_IMAGE = "/images/hero-produce.jpg";
 const STEPS = [
   {
     title: "Pick your box",
-    body: "Small Box for 1–2 people, or Family Box for 3–4.",
+    body: "Spring Box for 1 to 2 people, or Full Harvest Box for 3 to 4.",
   },
   {
     title: "We pack it Tuesday",

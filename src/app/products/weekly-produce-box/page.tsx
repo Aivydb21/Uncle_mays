@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
  * Campaign URLs point to /products/weekly-produce-box
  * Redirect directly to starter box checkout — skip homepage friction for ad traffic
  * UTM params are forwarded so GA4 attribution is preserved
- * NOTE: Active video ads link directly to /checkout/family (Family Box, includes chicken)
+ * NOTE: Active video ads link directly to /checkout/family (Full Harvest Box, featured chicken add-on)
  */
 export default async function WeeklyProduceBoxPage({
   searchParams,

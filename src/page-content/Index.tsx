@@ -17,12 +17,12 @@ const faqs = [
   {
     question: "What's actually in the box?",
     answer:
-      "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. A Small Box currently includes items like salad mix, kale, candy orange carrots, sweet potatoes, organic pinto beans, and microgreens. Contents vary each delivery based on what our farmer partners are harvesting.",
+      "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. The Spring Box currently includes salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans. The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, and a customer choice of bean. Contents vary each delivery based on what our farmer partners are harvesting.",
   },
   {
     question: "How much does a box cost?",
     answer:
-      "Two tiers: $40 for a Small Box (6 items, built for 1\u20132 people) or $70 for a Family Box (9 items, built for 3\u20134 people). Proteins (pasture-raised chicken, beef short ribs, or lamb chops) are optional paid add-ons at checkout. Every box is a one-time order \u2014 no subscription, no auto-renewal.",
+      "Two tiers. The Spring Box is $40, built for 1 to 2 people. The Full Harvest Box is $70, built for 3 to 4 people, and includes everything in the Spring Box plus more. Proteins (pasture-raised chicken thighs, grass-fed beef short ribs, or lamb chops) are optional add-ons at checkout for $12 each (1 lb portions). Every box is a one-time order with no subscription and no auto-renewal.",
   },
   {
     question: "Is this a subscription? Will my card be auto-charged?",
