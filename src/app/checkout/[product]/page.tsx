@@ -327,24 +327,18 @@ export default function CheckoutSummaryPage() {
               </h2>
               <ul className="space-y-2">
                 {product.items.map((item) => {
-                  const inheritedSpring = item.startsWith("Everything in the Spring Box");
-                  const includedExtra = item.includes("(included)");
-                  const highlight = inheritedSpring || includedExtra;
+                  const isIncluded = item.includes("(included)");
                   return (
-                    <li
-                      key={item}
-                      className={`flex items-start gap-2 text-sm ${
-                        highlight
-                          ? "rounded-lg bg-primary/10 border border-primary/30 px-3 py-2 font-semibold text-foreground"
-                          : ""
-                      }`}
-                    >
-                      <span className="text-primary mt-0.5">{highlight ? "★" : "✓"}</span>
-                      <span>{item}</span>
+                    <li key={item} className="flex items-start gap-2 text-sm">
+                      <span className={`mt-0.5 ${isIncluded ? "text-primary text-base leading-none" : "text-primary"}`}>
+                        {isIncluded ? "★" : "✓"}
+                      </span>
+                      <span className={isIncluded ? "font-semibold text-foreground" : ""}>{item}</span>
                     </li>
                   );
                 })}
               </ul>
+              <p className="mt-3 text-xs text-muted-foreground italic">{product.weightEstimate}</p>
             </div>
 
             {/* Bean choice — Full Harvest Box only. Defaults to black. */}
@@ -354,7 +348,7 @@ export default function CheckoutSummaryPage() {
                   Choose your bean
                 </h2>
                 <p className="text-xs text-foreground/70 mb-3">
-                  Pick one variety. All same price, organic, 1 lb.
+                  Pick one variety. All same price, organic, included with your box.
                 </p>
                 <div className="grid grid-cols-3 gap-2">
                   {BEAN_OPTIONS.map((bean) => {
@@ -391,7 +385,7 @@ export default function CheckoutSummaryPage() {
               >
                 <div>
                   <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                    Add a protein <span className="text-muted-foreground/70 normal-case font-normal">($12 each, 1 lb)</span>
+                    Add a protein <span className="text-muted-foreground/70 normal-case font-normal">($12 each)</span>
                   </h2>
                   <p className="text-xs text-muted-foreground mt-1">
                     {selectedProteins.length > 0

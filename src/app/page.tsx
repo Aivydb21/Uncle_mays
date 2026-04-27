@@ -77,7 +77,7 @@ const productListSchema = {
         "@type": "Product",
         name: "Spring Box",
         description:
-          "6 seasonal items from our Black farmer partners: salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans. Built for 1 to 2 people.",
+          "6 seasonal items from our Black farmer partners: salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans. About 6 lbs of fresh food. Built for 1 to 2 people.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
@@ -96,7 +96,7 @@ const productListSchema = {
         "@type": "Product",
         name: "Full Harvest Box",
         description:
-          "Everything in the Spring Box, plus pea shoots, radishes, and a customer choice of bean (black, pinto, or kidney). Pasture-raised chicken thighs available as a featured add-on at checkout. Built for 3 to 4 people.",
+          "Everything in the Spring Box, plus pea shoots, radishes, a customer choice of bean (black, pinto, or kidney), and pasture-raised chicken thighs (included). About 10 lbs of fresh food. Built for 3 to 4 people. Additional proteins available at checkout for $12 each.",
         url: "https://unclemays.com/#boxes",
         brand: { "@type": "Brand", name: "Uncle Mays Produce" },
         offers: {
@@ -128,7 +128,7 @@ const faqSchema = {
       name: "What's actually in the box?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. The Spring Box currently includes salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans. The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, and a customer choice of bean. Contents vary each delivery based on what our farmer partners are harvesting.",
+        text: "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. The Spring Box currently includes salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans (about 6 lbs total). The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, a customer choice of bean, and pasture-raised chicken thighs (about 10 lbs total). Contents vary each delivery based on what our farmer partners are harvesting.",
       },
     },
     {
@@ -136,7 +136,7 @@ const faqSchema = {
       name: "How much does a box cost?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Two tiers. The Spring Box is $40, built for 1 to 2 people. The Full Harvest Box is $70, built for 3 to 4 people, and includes everything in the Spring Box plus more. Proteins (pasture-raised chicken thighs, grass-fed beef short ribs, or lamb chops) are optional add-ons at checkout for $12 each. Every box is a one-time order with no subscription and no auto-renewal.",
+        text: "Two tiers. The Spring Box is $40, built for 1 to 2 people, about 6 lbs of fresh food. The Full Harvest Box is $70, built for 3 to 4 people, about 10 lbs of fresh food. The Full Harvest Box includes pasture-raised chicken thighs at no extra charge. Additional proteins can be added at checkout for $12 each. Every box is a one-time order with no subscription and no auto-renewal.",
       },
     },
     {

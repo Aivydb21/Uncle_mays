@@ -384,12 +384,31 @@ export default function PaymentPage() {
                 Order Summary
               </h2>
 
-              {/* Line items — Baymard finding: show every line including
-                  $0 ones so users can confirm there are no hidden costs. */}
+              {/* Line items. Show every line including $0 ones so users can
+                  confirm there are no hidden costs. Specifically itemize:
+                  the box, the chosen bean (no charge), the included chicken
+                  (Full Harvest only, no charge), and each protein add-on
+                  with its $12 price. Chicken add-ons on Full Harvest get
+                  re-labeled "Extra chicken" to disambiguate from the
+                  included chicken. */}
               <div className="flex items-center justify-between text-sm mb-2">
                 <span>{checkout.productName}</span>
                 <span>${checkout.price.toFixed(2)}</span>
               </div>
+
+              {checkout.beanChoice && (
+                <div className="flex items-center justify-between text-xs mb-2 pl-3 text-muted-foreground">
+                  <span>{checkout.beanChoice.charAt(0).toUpperCase() + checkout.beanChoice.slice(1)} beans</span>
+                  <span className="italic">no charge</span>
+                </div>
+              )}
+
+              {checkout.product === "family" && (
+                <div className="flex items-center justify-between text-xs mb-2 pl-3 text-muted-foreground">
+                  <span>Pasture-raised chicken thighs</span>
+                  <span className="italic">included</span>
+                </div>
+              )}
 
               {(() => {
                 const allProteins = [
@@ -397,17 +416,30 @@ export default function PaymentPage() {
                   ...(checkout.additionalProteinChoices ?? []),
                 ];
                 if (allProteins.length === 0) return null;
+                const PROTEIN_PRICE = 12;
+                const PROTEIN_LABELS: Record<string, string> = {
+                  "chicken": "Chicken thighs",
+                  "beef-short-ribs": "Beef short ribs",
+                  "lamb-chops": "Lamb chops",
+                };
                 return (
-                  <div className="mb-2">
-                    <p className="text-xs text-muted-foreground font-medium mb-1">
-                      Protein{allProteins.length > 1 ? "s" : ""} added:
-                    </p>
-                    <ul className="space-y-0.5">
-                      {allProteins.map((p) => (
-                        <li key={p} className="text-xs text-foreground/80">• {p.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</li>
-                      ))}
-                    </ul>
-                  </div>
+                  <>
+                    {allProteins.map((p, idx) => {
+                      // On Full Harvest, the first chicken in the order is
+                      // "Extra chicken" because one is already included with
+                      // the box. Label it accordingly so the customer
+                      // doesn't think they're being double-charged.
+                      const baseLabel = PROTEIN_LABELS[p] || p;
+                      const labelPrefix = (checkout.product === "family" && p === "chicken") ? "Extra " : "";
+                      const label = labelPrefix + baseLabel.toLowerCase();
+                      return (
+                        <div key={`${p}-${idx}`} className="flex items-center justify-between text-sm mb-2">
+                          <span>{label.charAt(0).toUpperCase() + label.slice(1)}</span>
+                          <span>+${PROTEIN_PRICE.toFixed(2)}</span>
+                        </div>
+                      );
+                    })}
+                  </>
                 );
               })()}
 

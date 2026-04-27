@@ -24,8 +24,8 @@ const plans = [
     subPrice: "$63",
     subFrequency: "/wk",
     bullets: [
-      "Everything in the Spring Box, plus pea shoots, radishes, and your choice of bean",
-      "Add a protein (1 lb) at checkout for $12",
+      "Everything in the Spring Box, plus pea shoots, radishes, your choice of bean, and chicken thighs",
+      "Add an extra protein at checkout for $12",
       "Delivered fresh every Wednesday",
     ],
     popular: true,

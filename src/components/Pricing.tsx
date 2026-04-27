@@ -168,29 +168,28 @@ export const Pricing = () => {
                   </div>
                   <ul className="space-y-3 mb-8 flex-grow">
                     {product.items.map((feature) => {
-                      // Visual emphasis on two specific item types so they
-                      // catch the eye on the homepage Pricing card:
-                      //   1. "Everything in the Spring Box" (Full Harvest)
-                      //   2. "...included" lines (chicken on Full Harvest)
-                      const isInheritedSpring = feature.startsWith("Everything in the Spring Box");
-                      const isIncludedExtra = feature.includes("(included)");
-                      const isHighlighted = isInheritedSpring || isIncludedExtra;
+                      // Star icon (no border wrap) on items marked "(included)"
+                      // so the chicken inclusion on Full Harvest stands out
+                      // without the heavy bordered card treatment. All other
+                      // items, including "Everything in the Spring Box", use
+                      // the regular checkmark.
+                      const isIncluded = feature.includes("(included)");
                       return (
-                        <li
-                          key={feature}
-                          className={`flex items-start gap-3 ${
-                            isHighlighted
-                              ? "rounded-lg bg-primary/10 border border-primary/30 px-3 py-2 -mx-1"
-                              : ""
-                          }`}
-                        >
-                          <Check className={`h-5 w-5 flex-shrink-0 mt-0.5 ${isHighlighted ? "text-primary" : "text-primary"}`} />
-                          <span className={isHighlighted ? "font-semibold text-foreground" : "text-foreground/80"}>
+                        <li key={feature} className="flex items-start gap-3">
+                          {isIncluded ? (
+                            <span className="text-primary flex-shrink-0 mt-0.5 text-xl leading-none">★</span>
+                          ) : (
+                            <Check className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                          )}
+                          <span className={isIncluded ? "font-semibold text-foreground" : "text-foreground/80"}>
                             {feature}
                           </span>
                         </li>
                       );
                     })}
+                    <li className="text-xs text-muted-foreground italic mt-2 pt-2 border-t border-border/50">
+                      {product.weightEstimate}
+                    </li>
                   </ul>
                   <button
                     onClick={(e) => {

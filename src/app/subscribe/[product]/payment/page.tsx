@@ -482,25 +482,53 @@ export default function SubscribePaymentPage() {
                 Subscription Summary
               </h2>
 
-              {/* Line items — Baymard finding: show every line including
-                  $0 ones so users can confirm there are no hidden costs. */}
+              {/* Line items. Show every line including $0 ones so users can
+                  confirm there are no hidden costs. Bean choice and (on
+                  Full Harvest) included chicken render as zero-charge sub
+                  lines under the box. Each protein add-on is its own
+                  $12 line. */}
               <div className="flex items-center justify-between text-sm mb-2">
                 <span>{checkout.productName}</span>
                 <span>${checkout.subPrice.toFixed(2)}</span>
               </div>
 
-              {checkout.proteinChoices && checkout.proteinChoices.length > 0 && (
-                <div className="mb-2">
-                  <p className="text-xs text-muted-foreground font-medium mb-1">
-                    Protein{checkout.proteinChoices.length > 1 ? "s" : ""}:
-                  </p>
-                  <ul className="space-y-0.5">
-                    {checkout.proteinChoices.map((p) => (
-                      <li key={p} className="text-xs text-foreground/80">• {p.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}</li>
-                    ))}
-                  </ul>
+              {checkout.beanChoice && (
+                <div className="flex items-center justify-between text-xs mb-2 pl-3 text-muted-foreground">
+                  <span>{checkout.beanChoice.charAt(0).toUpperCase() + checkout.beanChoice.slice(1)} beans</span>
+                  <span className="italic">no charge</span>
                 </div>
               )}
+
+              {checkout.product === "family" && (
+                <div className="flex items-center justify-between text-xs mb-2 pl-3 text-muted-foreground">
+                  <span>Pasture-raised chicken thighs</span>
+                  <span className="italic">included</span>
+                </div>
+              )}
+
+              {checkout.proteinChoices && checkout.proteinChoices.length > 0 && (() => {
+                const PROTEIN_PRICE = 12;
+                const PROTEIN_LABELS: Record<string, string> = {
+                  "chicken": "Chicken thighs",
+                  "beef-short-ribs": "Beef short ribs",
+                  "lamb-chops": "Lamb chops",
+                };
+                return (
+                  <>
+                    {checkout.proteinChoices.map((p, idx) => {
+                      const baseLabel = PROTEIN_LABELS[p] || p;
+                      const labelPrefix = (checkout.product === "family" && p === "chicken") ? "Extra " : "";
+                      const label = labelPrefix + baseLabel.toLowerCase();
+                      return (
+                        <div key={`${p}-${idx}`} className="flex items-center justify-between text-sm mb-2">
+                          <span>{label.charAt(0).toUpperCase() + label.slice(1)}</span>
+                          <span>+${PROTEIN_PRICE.toFixed(2)}/wk</span>
+                        </div>
+                      );
+                    })}
+                  </>
+                );
+              })()}
 
               {appliedPromo && (
                 <div className="flex items-center justify-between text-sm mb-2 text-primary">

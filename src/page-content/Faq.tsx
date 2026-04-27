@@ -79,11 +79,11 @@ const faqs = [
   },
   {
     q: "What's actually in the box?",
-    a: "Every box is sourced from our Black-owned farm partners and packed with what's freshest that week. The Spring Box currently includes a salad-mix clamshell, candy orange carrots, sweet potatoes, potatoes, a head of broccoli, and 1 lb of organic black beans, built for 1 to 2 people. The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, and a customer choice of bean (black, pinto, or kidney), built for 3 to 4 people. Contents rotate each delivery based on what's in season.",
+    a: "Every box is sourced from our Black-owned farm partners and packed with what's freshest that week. The Spring Box includes salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans, about 6 lbs of fresh food, built for 1 to 2 people. The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, a customer choice of bean (black, pinto, or kidney), and pasture-raised chicken thighs, about 10 lbs of fresh food, built for 3 to 4 people. Contents rotate each delivery based on what's in season.",
   },
   {
     q: "How much does a box cost?",
-    a: "The Spring Box is $40 and the Full Harvest Box is $70, one-time and no subscription. Proteins (pasture-raised chicken thighs, grass-fed beef short ribs, or lamb chops) are optional add-ons at checkout for $12 each, served as 1 lb portions.",
+    a: "The Spring Box is $40 and the Full Harvest Box is $70, one-time and no subscription. The Full Harvest Box includes pasture-raised chicken thighs at no extra charge. Additional proteins (chicken, beef short ribs, or lamb chops) can be added at checkout for $12 each.",
   },
   {
     q: "How do I cancel an order?",
@@ -92,12 +92,12 @@ const faqs = [
 ];
 
 const sampleStarterBox = [
-  "Salad mix (5 oz)",
-  "Candy orange carrots (1 lb)",
-  "Sweet potatoes (1.5 lb)",
-  "Potatoes (1.5 lb)",
-  "Broccoli (1 head)",
-  "Organic black beans (1 lb)",
+  "Salad mix",
+  "Candy orange carrots",
+  "Sweet potatoes",
+  "Potatoes",
+  "Broccoli",
+  "Organic black beans",
 ];
 
 const FaqContent = () => {

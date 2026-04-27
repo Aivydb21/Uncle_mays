@@ -1,13 +1,19 @@
 // Proteins available as optional add-ons across every box.
-// Flat $12 per 1 lb portion. Pasture-raised, no antibiotics, no chemicals,
+// Flat $12 per portion. Pasture-raised, no antibiotics, no chemicals,
 // slaughtered fresh. Chicken is the featured option (and is also INCLUDED
 // in the Full Harvest Box base price; the add-on stays available so
 // customers can buy additional quantity).
+//
+// Per-item weights stripped from labels per 2026-04-27 customer feedback:
+// per-item measurements slowed checkout because customers paused to do
+// math. Overall portion size is communicated once via PROTEIN_PORTION_NOTE.
 export const PROTEIN_OPTIONS = [
-  { id: "chicken", label: "Pasture-Raised Chicken Thighs (1 lb)", price: 12, featured: true },
-  { id: "beef-short-ribs", label: "Grass-Fed Beef Short Ribs (1 lb)", price: 12 },
-  { id: "lamb-chops", label: "Lamb Chops (1 lb)", price: 12 },
+  { id: "chicken", label: "Pasture-Raised Chicken Thighs", price: 12, featured: true },
+  { id: "beef-short-ribs", label: "Grass-Fed Beef Short Ribs", price: 12 },
+  { id: "lamb-chops", label: "Lamb Chops", price: 12 },
 ] as const;
+
+export const PROTEIN_PORTION_NOTE = "Each protein is a 1 lb portion.";
 
 export type ProteinId = (typeof PROTEIN_OPTIONS)[number]["id"];
 
@@ -48,15 +54,16 @@ export const PRODUCTS = {
     price: 40,
     subPrice: 36,
     items: [
-      "Salad mix, 1 clamshell (5 oz)",
-      "Candy orange carrots, 1 lb",
-      "Sweet potatoes, 1.5 lb",
-      "Potatoes, 1.5 lb",
-      "Broccoli, 1 head",
-      "Organic black beans, 1 lb",
+      "Salad mix",
+      "Candy orange carrots",
+      "Sweet potatoes",
+      "Potatoes",
+      "Broccoli",
+      "Organic black beans",
     ],
     servingNote: "Fresh greens, roots, and pantry staples for the week",
     servingBadge: "for 1–2 people",
+    weightEstimate: "About 6 lbs of fresh food",
   },
   family: {
     name: "Full Harvest Box",
@@ -64,13 +71,14 @@ export const PRODUCTS = {
     subPrice: 63,
     items: [
       "Everything in the Spring Box",
-      "Pea shoots, 1 clamshell",
-      "Radishes, 1 bunch",
-      "Choose your bean: black, pinto, or kidney (1 lb)",
-      "Pasture-raised chicken thighs, 1 lb (included)",
+      "Pea shoots",
+      "Radishes",
+      "Choose your bean: black, pinto, or kidney",
+      "Pasture-raised chicken thighs (included)",
     ],
     servingNote: "A full week of greens, roots, pantry staples, and protein",
     servingBadge: "for 3–4 people",
+    weightEstimate: "About 10 lbs of fresh food",
   },
 } as const;
 

@@ -34,20 +34,22 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 
 **Two tiers. Proteins are optional paid add-ons — no protein is ever included in the base box price.**
 
-| Box | One-Time | Subscription (10% off) | Who it's for | What's inside |
-|-----|----------|------------------------|--------------|----------------|
-| **Spring Box** | $40 | $36/wk | 1–2 people | Salad mix (5 oz), 1 lb candy carrots, 1.5 lb sweet potatoes, 1.5 lb potatoes, 1 head broccoli, 1 lb organic black beans |
-| **Full Harvest Box** | $70 | $63/wk | 3–4 people | Everything in the Spring Box, plus 1 clamshell pea shoots, 1 bunch radishes, and a customer choice of bean (black, pinto, or kidney) |
+| Box | One-Time | Subscription (10% off) | Who it's for | What's inside | Approx. weight |
+|-----|----------|------------------------|--------------|----------------|----------------|
+| **Spring Box** | $40 | $36/wk | 1–2 people | Salad mix, candy carrots, sweet potatoes, potatoes, broccoli, organic black beans | About 6 lbs |
+| **Full Harvest Box** | $70 | $63/wk | 3–4 people | Everything in the Spring Box, plus pea shoots, radishes, customer choice of bean (black, pinto, or kidney), and pasture-raised chicken thighs (included) | About 10 lbs |
 
 ### Protein Add-Ons (optional, available on every box)
 
-Flat $12 each. Chicken is the featured option.
+Flat $12 each. 1 lb portions. Chicken is the featured option and is **already included** in the Full Harvest Box (chicken add-ons on Full Harvest are extra portions on top of the included one).
 
-| Protein (1 lb each) | Price |
+| Protein | Price |
 |---------|-------|
-| Pasture-Raised Chicken Thighs (1 lb) — featured | +$12 |
-| Grass-Fed Beef Short Ribs (1 lb) | +$12 |
-| Lamb Chops (1 lb) | +$12 |
+| Pasture-Raised Chicken Thighs (featured, included with Full Harvest) | +$12 |
+| Grass-Fed Beef Short Ribs | +$12 |
+| Lamb Chops | +$12 |
+
+**Customer-facing display rule:** do NOT show per-item weights on the website, in ad copy, or in customer emails. The "About X lbs" total weight is the only weight figure customers see. Internal docs (this file) keep weights for reference only. Per-item measurements were removed 2026-04-27 because they slowed checkout — customers paused to do math.
 
 ### Rules
 - **Subscribe & Save** = exactly **10% off** the one-time price, same box every Wednesday.
