@@ -35,7 +35,7 @@ export const Hero = () => {
             {/* Delivery badge */}
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-4">
               <Truck className="h-4 w-4 shrink-0" />
-              <span>Now delivering in Chicago</span>
+              <span>Now delivering across the Chicago metro area</span>
             </div>
 
             {/* Value anchor — primary headline */}
@@ -46,7 +46,7 @@ export const Hero = () => {
 
             {/* Offer subhead */}
             <p className="text-xl md:text-2xl mb-6 text-foreground/80 font-light">
-              Black-farmed seasonal produce, delivered to your Chicago door every Wednesday.
+              Black-farmed seasonal produce, delivered across the Chicago metro area every Wednesday.
               Boxes from <span className="font-semibold text-foreground">$40</span>. No subscription required.
             </p>
 
@@ -70,7 +70,7 @@ export const Hero = () => {
           >
             <span className="font-semibold text-foreground/90">Black-farmed produce</span>
             <span aria-hidden="true">•</span>
-            <span className="font-semibold text-foreground/90">Chicago-wide delivery</span>
+            <span className="font-semibold text-foreground/90">Chicago metro delivery (city + south suburbs)</span>
             <span aria-hidden="true">•</span>
             <span className="font-semibold text-foreground/90">One-time orders, no subscription</span>
             <span aria-hidden="true">•</span>

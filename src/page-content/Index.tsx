@@ -12,7 +12,7 @@ const faqs = [
   {
     question: "How does delivery work?",
     answer:
-      "We deliver directly to your Chicago address every Wednesday. Order by Sunday 11:59 PM CT and your box ships that Wednesday. After placing your order, you'll receive a confirmation email with your estimated delivery window.",
+      "We deliver directly to your door across the Chicago metro area (city plus south suburbs) every Wednesday. Order by Sunday 11:59 PM CT and your box ships that Wednesday. After placing your order, you'll receive a confirmation email with your estimated delivery window.",
   },
   {
     question: "What's actually in the box?",
@@ -114,7 +114,7 @@ const Index = () => {
                 step: "03",
                 title: "Delivered to Your Door",
                 description:
-                  "We deliver straight to your Chicago address every Wednesday. You'll get a confirmation and delivery window by email as soon as your order is placed.",
+                  "We deliver straight to your door across the Chicago metro area every Wednesday. You'll get a confirmation and delivery window by email as soon as your order is placed.",
               },
             ].map((step, idx) => (
               <motion.div

@@ -24,16 +24,16 @@ const workSans = Work_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered in Chicago",
+  title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered Across the Chicago Metro Area",
   description:
-    "Curated seasonal produce boxes sourced directly from Black farmers, delivered to your Chicago door. Boxes from $40. No subscription required. Order today.",
+    "Curated seasonal produce boxes sourced directly from Black farmers, delivered across the Chicago metro area (city plus south suburbs). Boxes from $40. No subscription required. Order today.",
   authors: [{ name: "Uncle Mays Produce" }],
   metadataBase: new URL("https://unclemays.com"),
   openGraph: {
     type: "website",
-    title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered in Chicago",
+    title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered Across the Chicago Metro Area",
     description:
-      "Curated seasonal produce boxes sourced directly from Black farmers, delivered to your Chicago door. Boxes from $40. No subscription required. Order today.",
+      "Curated seasonal produce boxes sourced directly from Black farmers, delivered across the Chicago metro area (city plus south suburbs). Boxes from $40. No subscription required. Order today.",
     images: [
       {
         url: "https://www.unclemays.com/og-social.png",
@@ -47,9 +47,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     site: "@unclemaysproduce",
-    title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered in Chicago",
+    title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered Across the Chicago Metro Area",
     description:
-      "Curated seasonal produce boxes sourced directly from Black farmers, delivered to your Chicago door. Boxes from $40. No subscription required. Order today.",
+      "Curated seasonal produce boxes sourced directly from Black farmers, delivered across the Chicago metro area (city plus south suburbs). Boxes from $40. No subscription required. Order today.",
     images: ["https://www.unclemays.com/og-social.png"],
   },
   icons: {

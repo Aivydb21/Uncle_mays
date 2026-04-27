@@ -22,9 +22,9 @@ const features = [
   },
   {
     icon: MapPin,
-    title: "Chicago-Wide Delivery",
+    title: "Chicago Metro Delivery",
     description:
-      "We deliver across Chicago. No pickup required. Fresh produce arrives at your door every Wednesday.",
+      "We deliver across the Chicago metro area, city and south suburbs. No pickup required. Fresh produce arrives at your door every Wednesday.",
   },
   {
     icon: RotateCcw,
@@ -60,7 +60,7 @@ const steps = [
     step: "03",
     title: "Delivered to Your Door",
     description:
-      "We deliver straight to your Chicago address every Wednesday. You'll get a confirmation and delivery window by email as soon as your order is placed.",
+      "We deliver straight to your door across the Chicago metro area every Wednesday. You'll get a confirmation and delivery window by email as soon as your order is placed.",
   },
 ];
 
@@ -75,7 +75,7 @@ const faqs = [
   },
   {
     q: "How does delivery work?",
-    a: "We deliver directly to your Chicago address every Wednesday. Place your order any day of the week and it will be delivered the following Wednesday. You'll receive a confirmation email with your delivery window as soon as your order is placed.",
+    a: "We deliver directly to your door across the Chicago metro area (city plus south suburbs) every Wednesday. Place your order any day of the week and it will be delivered the following Wednesday. You'll receive a confirmation email with your delivery window as soon as your order is placed.",
   },
   {
     q: "What's actually in the box?",

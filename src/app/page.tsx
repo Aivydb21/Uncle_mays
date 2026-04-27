@@ -11,7 +11,7 @@ const localBusinessSchema = {
   "@id": "https://unclemays.com/",
   name: "Uncle Mays Produce",
   description:
-    "Seasonal produce boxes sourced directly from Black farmers, delivered to Chicago households every Wednesday. Boxes start at $35. No subscription required.",
+    "Seasonal produce boxes sourced directly from Black farmers, delivered to households across the Chicago metro area every Wednesday. Boxes start at $40. No subscription required.",
   url: "https://unclemays.com",
   logo: "https://www.unclemays.com/uncle-mays-logo.png",
   image: "https://www.unclemays.com/uncle-mays-logo.png",
@@ -32,9 +32,9 @@ const localBusinessSchema = {
   sameAs: ["https://www.instagram.com/unclemaysproduce/"],
   priceRange: "$$",
   areaServed: {
-    "@type": "City",
-    name: "Chicago",
-    sameAs: "https://www.wikidata.org/wiki/Q1297",
+    "@type": "AdministrativeArea",
+    name: "Chicago metropolitan area",
+    sameAs: "https://www.wikidata.org/wiki/Q683732",
   },
 };
 
@@ -45,7 +45,7 @@ const organizationSchema = {
   url: "https://unclemays.com",
   logo: "https://www.unclemays.com/uncle-mays-logo.png",
   description:
-    "Uncle May's Produce connects Black farmers directly to Chicago through curated seasonal produce boxes. Delivering every Wednesday. Boxes from $40, no subscription required.",
+    "Uncle May's Produce connects Black farmers directly to households across the Chicago metro area through curated seasonal produce boxes. Delivering every Wednesday. Boxes from $40, no subscription required.",
   contactPoint: {
     "@type": "ContactPoint",
     telephone: "+1-312-972-2595",
@@ -68,7 +68,7 @@ const productListSchema = {
   "@type": "ItemList",
   name: "Uncle Mays Produce Boxes",
   description:
-    "Seasonal produce boxes sourced from Black farmers, delivered across Chicago every Wednesday.",
+    "Seasonal produce boxes sourced from Black farmers, delivered across the Chicago metro area every Wednesday.",
   itemListElement: [
     {
       "@type": "ListItem",
@@ -120,7 +120,7 @@ const faqSchema = {
       name: "How does delivery work?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "We deliver directly to your Chicago address every Wednesday. Place your order any day of the week and it will be delivered the following Wednesday. After placing your order, you'll receive a confirmation email with your estimated delivery window.",
+        text: "We deliver directly to your door across the Chicago metro area (city plus south suburbs) every Wednesday. Place your order any day of the week and it will be delivered the following Wednesday. After placing your order, you'll receive a confirmation email with your estimated delivery window.",
       },
     },
     {

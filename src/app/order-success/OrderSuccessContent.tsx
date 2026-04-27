@@ -183,7 +183,7 @@ export default function OrderSuccessContent() {
   const handleShare = async () => {
     const shareData = {
       title: "Uncle May's Produce",
-      text: "Just ordered fresh produce delivered weekly across Chicago from Uncle May's. Use code FRESH10 for $10 off your first box.",
+      text: "Just ordered fresh produce delivered weekly across the Chicago metro area from Uncle May's. Use code FRESH10 for $10 off your first box.",
       url: "https://unclemays.com/get-started?utm_source=share&utm_medium=organic&utm_campaign=order_success",
     };
     try {
@@ -217,7 +217,7 @@ export default function OrderSuccessContent() {
           <p className="text-muted-foreground leading-relaxed">
             {isSubscription
               ? "Your subscription is active. We'll pack and deliver your first box this Wednesday."
-              : "Your box is confirmed. We pack from what's freshest and deliver across Chicago on Wednesdays."}
+              : "Your box is confirmed. We pack from what's freshest and deliver across the Chicago metro area on Wednesdays."}
           </p>
           {ref ? (
             <p className="mt-4 text-xs text-muted-foreground break-all">
@@ -261,7 +261,7 @@ export default function OrderSuccessContent() {
               <div>
                 <p className="font-semibold">Delivered Wednesday, 5pm&ndash;8pm</p>
                 <p className="text-sm text-foreground/70">
-                  Free Chicago delivery. We&apos;ll text you a tighter window the morning of.
+                  Free Chicago metro delivery. We&apos;ll text you a tighter window the morning of.
                 </p>
               </div>
             </li>

@@ -64,8 +64,8 @@ Flat $12 each. 1 lb portions. Chicken is the featured option and is **already in
 | Fact | Value |
 |------|-------|
 | Tagline | Cleaner than Whole Foods. Cheaper than Aldi. |
-| Short description | Black-farmed seasonal produce, delivered to your Chicago door every Wednesday. |
-| Who it's for | Chicago households (1–4 people) who want fresh, ethically sourced produce without a long-term commitment |
+| Short description | Black-farmed seasonal produce, delivered across the Chicago metro area every Wednesday. |
+| Who it's for | Chicago metro households (1–4 people, city + south suburbs) who want fresh, ethically sourced produce without a long-term commitment |
 | Sourcing claim | Sourced directly from Run A Way Buckers Club (Pembroke, IL) and our growing network of Black farmer partners |
 | Guarantee | 100% freshness guarantee — if it's off, full refund, no questions asked |
 

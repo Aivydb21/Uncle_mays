@@ -27,7 +27,7 @@ const STEPS = [
   },
   {
     title: "Delivered Wednesday",
-    body: "Free Chicago delivery. We text you a window.",
+    body: "Free Chicago metro delivery. We text you a window.",
   },
 ];
 
@@ -57,7 +57,7 @@ export function GetStartedContent() {
           >
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/15 px-5 py-2 text-sm font-semibold text-primary mb-5">
               <Truck className="h-4 w-4" />
-              Now delivering across Chicago
+              Now delivering across the Chicago metro area
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold mb-5 leading-tight">
@@ -66,7 +66,7 @@ export function GetStartedContent() {
             </h1>
 
             <p className="text-lg md:text-xl text-foreground/80 mb-7 leading-relaxed">
-              Fresh seasonal produce, delivered to your Chicago door every
+              Fresh seasonal produce, delivered across the Chicago metro area every
               Wednesday. Boxes from $40. Free delivery. Cancel anytime.
             </p>
 
@@ -94,7 +94,7 @@ export function GetStartedContent() {
             </div>
             <div className="flex items-center gap-2 text-sm text-foreground/80 justify-center">
               <Truck className="h-5 w-5 text-primary shrink-0" />
-              <span>Free Chicago delivery</span>
+              <span>Free Chicago metro delivery</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-foreground/80 justify-center sm:justify-end">
               <Leaf className="h-5 w-5 text-primary shrink-0" />

@@ -56,12 +56,13 @@ export const SERVICE_AREA_ZIPS: readonly string[] = [
 
 const ZIP_SET = new Set<string>(SERVICE_AREA_ZIPS);
 
-export function isInServiceArea(state: string, zip: string): boolean {
-  const z = zip.trim();
-  if (!/^\d{5}(-\d{4})?$/.test(z)) return false;
-  if (state.trim().toUpperCase() !== "IL") return false;
-  return ZIP_SET.has(z.slice(0, 5));
+// Service-area gating is currently OPEN: any 5-digit US ZIP is accepted at
+// checkout. The SERVICE_AREA_ZIPS list above is retained for ad-targeting
+// and for any future re-tightening, but is no longer enforced at the
+// validator. Re-introduce the state/ZIP_SET check here to re-gate.
+export function isInServiceArea(_state: string, zip: string): boolean {
+  return /^\d{5}(-\d{4})?$/.test(zip.trim());
 }
 
 export const OUT_OF_AREA_MESSAGE =
-  "We deliver to Chicagoland metro (south Chicago + south suburbs). Join our waitlist and we'll email you when we reach your area.";
+  "Please enter a valid 5-digit ZIP code.";

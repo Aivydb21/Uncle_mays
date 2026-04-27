@@ -142,6 +142,44 @@ export default function SubscribeDeliveryPage() {
   const [leadFired, setLeadFired] = useState(false);
   const [deliveryDateLabel, setDeliveryDateLabel] = useState("Wednesday");
 
+  // Disclosure state for optional fields — collapsed by default. Auto-expand
+  // if a value is rehydrated from storage so users see what they typed.
+  const [showPhone, setShowPhone] = useState(false);
+  const [showApt, setShowApt] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
+  // After Google Places autocomplete fills street/city/state/zip we collapse
+  // city + zip into a single confirmation chip with a Change link.
+  const [addressConfirmed, setAddressConfirmed] = useState(false);
+
+  const formStorageKey = `unc-sub-form-${slug}`;
+
+  // Rehydrate the form from localStorage so abandoners do not have to retype.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = localStorage.getItem(formStorageKey);
+      if (!saved) return;
+      const parsed = JSON.parse(saved) as Partial<FormFields>;
+      setFields((prev) => ({ ...prev, ...parsed }));
+      if (parsed.phone) setShowPhone(true);
+      if (parsed.apt) setShowApt(true);
+      if (parsed.deliveryNotes) setShowNotes(true);
+      if (parsed.city && parsed.zip) setAddressConfirmed(true);
+    } catch {
+      // ignore corrupt storage
+    }
+  }, [formStorageKey]);
+
+  // Persist on every change so we never lose more than the last keystroke.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      localStorage.setItem(formStorageKey, JSON.stringify(fields));
+    } catch {
+      // ignore quota / private mode
+    }
+  }, [fields, formStorageKey]);
+
   useEffect(() => {
     const d = getEarliestDeliveryDate();
     setDeliveryDateLabel(d.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" }));
@@ -190,10 +228,7 @@ export default function SubscribeDeliveryPage() {
       ...prev,
       street: address.street,
       city: address.city || prev.city,
-      // State is locked to IL — Chicago-only delivery. Even if the user
-      // picks an out-of-state suggestion, we keep the state value pinned
-      // so the validator's Chicago check fires correctly downstream.
-      state: "IL",
+      state: address.state || prev.state,
       zip: address.zip || prev.zip,
     }));
     setErrors((prev) => ({
@@ -203,6 +238,7 @@ export default function SubscribeDeliveryPage() {
       state: undefined,
       zip: undefined,
     }));
+    setAddressConfirmed(true);
   });
 
   function handleZipBlur() {
@@ -321,6 +357,7 @@ export default function SubscribeDeliveryPage() {
       // Clear protein + bean sessionStorage once saved
       sessionStorage.removeItem(`unc-sub-proteins-${slug}`);
       sessionStorage.removeItem(`unc-sub-bean-${slug}`);
+      localStorage.removeItem(formStorageKey);
     }
 
     router.push(`/subscribe/${slug}/payment`);
@@ -443,41 +480,58 @@ export default function SubscribeDeliveryPage() {
                   )}
                 </div>
 
-                <div className="space-y-1.5 mb-4">
-                  <Label htmlFor="phone">Phone (optional)</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={fields.phone}
-                    onChange={handleChange}
-                    autoComplete="tel"
-                    placeholder="(312) 555-0100"
-                  />
-                </div>
-
-                {/* Stack street/apt on mobile (Baymard: multi-column inputs
-                    cramp tap targets on <380px viewports). */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                  <div className="sm:col-span-2 space-y-1.5">
-                    <Label htmlFor="street">
-                      Street Address <span className="text-destructive">*</span>
+                {/* Phone — collapsed by default */}
+                {showPhone ? (
+                  <div className="space-y-1.5 mb-4">
+                    <Label htmlFor="phone">
+                      Phone <span className="text-muted-foreground font-normal">(optional)</span>
                     </Label>
+                    <p className="text-xs text-muted-foreground -mt-1">Helps with delivery coordination.</p>
                     <Input
-                      id="street"
-                      name="street"
-                      ref={streetInputRef}
-                      value={fields.street}
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      value={fields.phone}
                       onChange={handleChange}
-                      onBlur={requireBlur("street", "Street address")}
-                      autoComplete="off"
-                      placeholder="Start typing your address..."
+                      autoComplete="tel"
+                      placeholder="(312) 555-0100"
+                      autoFocus
                     />
-                    {errors.street && (
-                      <p className="text-destructive text-xs">{errors.street}</p>
-                    )}
                   </div>
-                  <div className="space-y-1.5">
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowPhone(true)}
+                    className="text-sm text-primary hover:underline mb-4 block"
+                  >
+                    + Add phone (helps with delivery)
+                  </button>
+                )}
+
+                {/* Street (full width). Apt/Unit collapsed by default. */}
+                <div className="space-y-1.5 mb-4">
+                  <Label htmlFor="street">
+                    Street Address <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="street"
+                    name="street"
+                    ref={streetInputRef}
+                    value={fields.street}
+                    onChange={(e) => {
+                      handleChange(e);
+                      if (addressConfirmed) setAddressConfirmed(false);
+                    }}
+                    onBlur={requireBlur("street", "Street address")}
+                    autoComplete="off"
+                    placeholder="Start typing your address..."
+                  />
+                  {errors.street && (
+                    <p className="text-destructive text-xs">{errors.street}</p>
+                  )}
+                </div>
+                {showApt ? (
+                  <div className="space-y-1.5 mb-4">
                     <Label htmlFor="apt">
                       Apt / Unit <span className="text-muted-foreground font-normal">(optional)</span>
                     </Label>
@@ -488,56 +542,81 @@ export default function SubscribeDeliveryPage() {
                       onChange={handleChange}
                       autoComplete="address-line2"
                       placeholder="2B"
+                      autoFocus
                     />
                   </div>
-                </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowApt(true)}
+                    className="text-sm text-primary hover:underline mb-4 block"
+                  >
+                    + Add apt or unit
+                  </button>
+                )}
 
-                {/* City and ZIP only — state is locked to IL because we
-                    only deliver inside Chicago. Hiding the state dropdown
-                    removes a 50-option distraction and reflects reality. */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="city">
-                      City <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="city"
-                      name="city"
-                      value={fields.city}
-                      onChange={handleChange}
-                      onBlur={requireBlur("city", "City")}
-                      autoComplete="address-level2"
-                      placeholder="Chicago"
-                    />
-                    {errors.city && (
-                      <p className="text-destructive text-xs">{errors.city}</p>
-                    )}
+                {/* City + ZIP. After Google Places autocomplete fills these,
+                    collapse to a confirmation chip with a Change link. */}
+                {addressConfirmed && fields.city && fields.zip && !errors.city && !errors.zip ? (
+                  <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+                    <span className="text-foreground/80">
+                      <span aria-hidden="true">&#x1F4CD;</span> {fields.city}
+                      {fields.state ? `, ${fields.state}` : ""}{" "}
+                      {fields.zip}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setAddressConfirmed(false)}
+                      className="text-primary hover:underline text-xs font-medium"
+                    >
+                      Change
+                    </button>
                   </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="zip">
-                      ZIP <span className="text-destructive">*</span>
-                    </Label>
-                    <Input
-                      id="zip"
-                      name="zip"
-                      value={fields.zip}
-                      onChange={handleChange}
-                      onBlur={handleZipBlur}
-                      autoComplete="postal-code"
-                      inputMode="numeric"
-                      placeholder="60601"
-                      maxLength={10}
-                    />
-                    {errors.zip && (
-                      <p className="text-destructive text-xs">{errors.zip}</p>
-                    )}
-                    {errors.zip === OUT_OF_AREA_MESSAGE && (
-                      <WaitlistCapture zip={fields.zip} />
-                    )}
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div className="space-y-1.5">
+                      <Label htmlFor="city">
+                        City <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="city"
+                        name="city"
+                        value={fields.city}
+                        onChange={handleChange}
+                        onBlur={requireBlur("city", "City")}
+                        autoComplete="address-level2"
+                        placeholder="Chicago"
+                      />
+                      {errors.city && (
+                        <p className="text-destructive text-xs">{errors.city}</p>
+                      )}
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor="zip">
+                        ZIP <span className="text-destructive">*</span>
+                      </Label>
+                      <Input
+                        id="zip"
+                        name="zip"
+                        value={fields.zip}
+                        onChange={handleChange}
+                        onBlur={handleZipBlur}
+                        autoComplete="postal-code"
+                        inputMode="numeric"
+                        placeholder="60601"
+                        maxLength={10}
+                      />
+                      {errors.zip && (
+                        <p className="text-destructive text-xs">{errors.zip}</p>
+                      )}
+                      {errors.zip === OUT_OF_AREA_MESSAGE && (
+                        <WaitlistCapture zip={fields.zip} />
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
                 <p className="text-xs text-muted-foreground -mt-2 mb-4">
-                  Chicagoland metro. <span aria-hidden="true">·</span> South Chicago + south suburbs.
+                  Outside the Chicago metro area? We&apos;ll reach out to confirm a delivery window before charging.
                 </p>
 
                 {/* Delivery info — Wednesday, auto-assigned */}
@@ -553,18 +632,30 @@ export default function SubscribeDeliveryPage() {
                   </p>
                 </div>
 
-                <div className="space-y-1.5 mb-6">
-                  <Label htmlFor="deliveryNotes">Delivery Notes (optional)</Label>
-                  <textarea
-                    id="deliveryNotes"
-                    name="deliveryNotes"
-                    value={fields.deliveryNotes}
-                    onChange={handleChange}
-                    placeholder="Leave at front door, gate code, etc."
-                    rows={3}
-                    className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                  />
-                </div>
+                {/* Delivery notes — collapsed by default */}
+                {showNotes ? (
+                  <div className="space-y-1.5 mb-6">
+                    <Label htmlFor="deliveryNotes">Delivery instructions (optional)</Label>
+                    <textarea
+                      id="deliveryNotes"
+                      name="deliveryNotes"
+                      value={fields.deliveryNotes}
+                      onChange={handleChange}
+                      placeholder="Leave at front door, gate code, etc."
+                      rows={3}
+                      className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                      autoFocus
+                    />
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowNotes(true)}
+                    className="text-sm text-primary hover:underline mb-6 block"
+                  >
+                    + Delivery instructions
+                  </button>
+                )}
 
                 {/* Trust signals — counteract the info-entry pause. */}
                 <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">

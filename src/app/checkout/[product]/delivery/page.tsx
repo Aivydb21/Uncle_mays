@@ -206,8 +206,7 @@ export default function DeliveryPage() {
       ...prev,
       street: address.street,
       city: address.city || prev.city,
-      // State pinned to IL — Chicago-only delivery.
-      state: "IL",
+      state: address.state || prev.state,
       zip: address.zip || prev.zip,
     }));
     // Clear address-related errors when autocomplete fills fields
@@ -577,7 +576,7 @@ export default function DeliveryPage() {
                   </div>
                 </div>
 
-                {/* City + ZIP — state locked to IL (Chicago-only). */}
+                {/* City + ZIP. ZIP validation is currently open to any 5-digit US ZIP. */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div className="space-y-1.5">
                     <Label htmlFor="city">
@@ -620,7 +619,7 @@ export default function DeliveryPage() {
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground -mt-2 mb-4">
-                  Chicagoland metro. <span aria-hidden="true">·</span> South Chicago + south suburbs.
+                  Outside the Chicago metro area? We&apos;ll reach out to confirm a delivery window before charging.
                 </p>
 
                 {/* Delivery info — Wednesday, auto-assigned */}
