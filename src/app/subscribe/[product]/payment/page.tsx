@@ -24,43 +24,22 @@ declare global {
 // Load Stripe once outside component to avoid recreating on renders
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
+// Passive progress bar (see /checkout/[product]/page.tsx for rationale).
 function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
   const steps = ["Subscription Summary", "Your Details", "Payment"];
+  const total = steps.length;
+  const pct = Math.round((current / total) * 100);
   return (
-    <div className="flex items-center gap-2 mb-8">
-      {steps.map((label, i) => {
-        const step = i + 1;
-        const filled = step <= current;
-        return (
-          <div key={step} className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5">
-              <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                  filled
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {step}
-              </div>
-              <span
-                className={`text-sm hidden sm:inline ${
-                  filled ? "text-foreground font-medium" : "text-muted-foreground"
-                }`}
-              >
-                {label}
-              </span>
-            </div>
-            {i < steps.length - 1 && (
-              <div
-                className={`h-px flex-1 min-w-[24px] ${
-                  step < current ? "bg-primary" : "bg-muted"
-                }`}
-              />
-            )}
-          </div>
-        );
-      })}
+    <div className="mb-8 select-none">
+      <div className="flex items-center justify-between text-xs mb-2">
+        <span className="font-semibold text-foreground">
+          Step {current} of {total}: {steps[current - 1]}
+        </span>
+        <span className="text-muted-foreground">{pct}%</span>
+      </div>
+      <div className="h-1 bg-muted rounded-full overflow-hidden">
+        <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+      </div>
     </div>
   );
 }

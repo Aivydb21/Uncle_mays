@@ -10,6 +10,7 @@ import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
 import { useAddressAutocomplete, type ParsedAddress } from "@/hooks/use-address-autocomplete";
 import { WaitlistCapture } from "@/components/WaitlistCapture";
 import { isInServiceArea, OUT_OF_AREA_MESSAGE } from "@/lib/service-area";
+import { TESTIMONIALS } from "@/lib/testimonials";
 
 declare global {
   interface Window {
@@ -494,20 +495,35 @@ export default function CheckoutPage() {
             <div className="md:col-span-2 space-y-6">
               {/* Product summary card */}
               <div className="rounded-2xl overflow-hidden shadow-soft bg-background">
-                {/* Product image */}
-                <div className="relative pointer-events-none select-none">
-                  <img
-                    src="/images/produce-box.jpg"
-                    alt={`${product.name} -- fresh seasonal produce`}
-                    className="w-full h-36 md:h-56 object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                  <div className="absolute bottom-4 left-5">
-                    <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
-                      {product.servingBadge}
-                    </span>
-                  </div>
-                </div>
+                {/* Social proof banner — replaced the hero produce image
+                    2026-04-28. Clarity heatmap showed users tapping the image
+                    expecting interaction; now the dead-tap area is a
+                    high-intent moment of social proof instead. */}
+                {(() => {
+                  const t = TESTIMONIALS[0];
+                  return (
+                    <div className="relative bg-gradient-to-br from-primary/10 via-primary/5 to-background px-6 py-6 md:px-8 md:py-7 border-b border-border">
+                      <div className="flex items-start gap-3">
+                        <span aria-label="five stars" className="text-amber-500 text-lg leading-none mt-0.5 tracking-tight shrink-0">
+                          &#x2605;&#x2605;&#x2605;&#x2605;&#x2605;
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm md:text-base text-foreground/90 leading-relaxed italic">
+                            &ldquo;{t.quote}&rdquo;
+                          </p>
+                          <p className="mt-2 text-xs md:text-sm text-muted-foreground font-medium">
+                            {t.name}, Chicago
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-3 flex">
+                        <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
+                          {product.servingBadge}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <div className="p-6 md:p-8">
                   {/* Product name + price */}
