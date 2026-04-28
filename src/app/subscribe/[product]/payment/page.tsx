@@ -12,6 +12,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { PRODUCTS, type ProductSlug } from "@/lib/products";
 import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { getFbAttribution } from "@/lib/fb-attribution";
 
 declare global {
   interface Window {
@@ -270,7 +271,15 @@ export default function SubscribePaymentPage() {
             const val = localStorage.getItem(`unc-${k}`);
             if (val) utms[k] = val;
           });
+          const gclid = localStorage.getItem("unc-gclid");
+          if (gclid) utms["gclid"] = gclid;
+          const fbclid = localStorage.getItem("unc-fbclid");
+          if (fbclid) utms["fbclid"] = fbclid;
         } catch { /* ignore */ }
+
+        // Meta CAPI: forward _fbc / _fbp cookies through Stripe metadata so
+        // the webhook can include them in the Purchase CAPI event.
+        const fb = getFbAttribution();
 
         // Generate one eventId shared by the browser pixel fire and the server
         // CAPI fire inside /api/checkout/subscribe-intent, so Meta deduplicates
@@ -304,6 +313,8 @@ export default function SubscribePaymentPage() {
             eventId: icEventId,
             ...(promo ? { promo } : {}),
             ...utms,
+            ...(fb.fbc ? { fbc: fb.fbc } : {}),
+            ...(fb.fbp ? { fbp: fb.fbp } : {}),
           }),
         });
         const json = await res.json();

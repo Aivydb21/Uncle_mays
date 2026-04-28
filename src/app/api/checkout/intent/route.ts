@@ -24,7 +24,14 @@ export async function POST(req: NextRequest) {
     }
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, beanChoice, utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid, promo } = await req.json();
+    const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, beanChoice, utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid, fbclid, fbc, fbp, promo } = await req.json();
+
+    // Capture client IP + user agent for Meta CAPI match quality. These add
+    // strong signals on top of email/phone hashes and meaningfully improve
+    // the share of CAPI Purchase events that get attributed back to ad clicks.
+    const fwd = req.headers.get("x-forwarded-for") || "";
+    const clientIp = (fwd.split(",")[0] || req.headers.get("x-real-ip") || "").trim() || undefined;
+    const clientUa = req.headers.get("user-agent") || undefined;
 
     let amount = AMOUNT_MAP[product];
 
@@ -140,6 +147,11 @@ export async function POST(req: NextRequest) {
         ...(utm_content ? { utm_content } : {}),
         ...(utm_term ? { utm_term } : {}),
         ...(gclid ? { gclid } : {}),
+        ...(fbclid ? { fbclid } : {}),
+        ...(fbc ? { fbc } : {}),
+        ...(fbp ? { fbp } : {}),
+        ...(clientIp ? { client_ip: clientIp } : {}),
+        ...(clientUa ? { client_user_agent: clientUa.slice(0, 500) } : {}),
         ...(appliedPromoCode ? { promo_code: appliedPromoCode, promo_discount_cents: String(appliedPromoDiscount) } : {}),
       },
       automatic_payment_methods: { enabled: true },

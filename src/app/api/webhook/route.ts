@@ -123,6 +123,10 @@ export async function POST(req: NextRequest) {
         userData: {
           email: email !== "unknown" ? email : undefined,
           phone: phone || undefined,
+          fbc: session.metadata?.fbc || undefined,
+          fbp: session.metadata?.fbp || undefined,
+          client_ip_address: session.metadata?.client_ip || undefined,
+          client_user_agent: session.metadata?.client_user_agent || undefined,
         },
         customData: {
           value: amountInDollars,
@@ -350,6 +354,10 @@ export async function POST(req: NextRequest) {
           userData: {
             email: intentEmail || undefined,
             phone: intent.metadata?.phone || undefined,
+            fbc: intent.metadata?.fbc || undefined,
+            fbp: intent.metadata?.fbp || undefined,
+            client_ip_address: intent.metadata?.client_ip || undefined,
+            client_user_agent: intent.metadata?.client_user_agent || undefined,
           },
           customData: {
             value: intent.amount / 100,
@@ -398,6 +406,10 @@ export async function POST(req: NextRequest) {
           userData: {
             email: confirmEmail,
             phone: intent.metadata?.customer_phone || intent.metadata?.phone || undefined,
+            fbc: intent.metadata?.fbc || undefined,
+            fbp: intent.metadata?.fbp || undefined,
+            client_ip_address: intent.metadata?.client_ip || undefined,
+            client_user_agent: intent.metadata?.client_user_agent || undefined,
           },
           customData: {
             value: intent.amount / 100,

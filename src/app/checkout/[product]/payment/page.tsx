@@ -12,6 +12,7 @@ import {
 } from "@stripe/react-stripe-js";
 import { PRODUCTS, type ProductSlug } from "@/lib/products";
 import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { getFbAttribution } from "@/lib/fb-attribution";
 
 // Load Stripe once outside component to avoid recreating on renders
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -223,7 +224,14 @@ export default function PaymentPage() {
           });
           const gclid = localStorage.getItem("unc-gclid");
           if (gclid) utms["gclid"] = gclid;
+          const fbclid = localStorage.getItem("unc-fbclid");
+          if (fbclid) utms["fbclid"] = fbclid;
         } catch { /* ignore */ }
+
+        // Meta CAPI attribution: read _fbc / _fbp cookies (or reconstruct fbc
+        // from persisted fbclid). These travel through Stripe metadata and
+        // are forwarded to CAPI Purchase by the webhook for proper match.
+        const fb = getFbAttribution();
 
         // Pull the validated promo code out of sessionStorage (set on the
         // summary page when ?promo= is in the URL). The server re-validates.
@@ -248,6 +256,8 @@ export default function PaymentPage() {
             beanChoice: data.beanChoice,
             ...(promo ? { promo } : {}),
             ...utms,
+            ...(fb.fbc ? { fbc: fb.fbc } : {}),
+            ...(fb.fbp ? { fbp: fb.fbp } : {}),
           }),
         });
         const json = await res.json();

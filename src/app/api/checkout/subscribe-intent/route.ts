@@ -37,9 +37,17 @@ export async function POST(req: NextRequest) {
       utm_campaign,
       utm_content,
       utm_term,
+      gclid,
+      fbclid,
+      fbc,
+      fbp,
       eventId: clientEventId,
       promo,
     } = await req.json();
+
+    const fwd = req.headers.get("x-forwarded-for") || "";
+    const clientIp = (fwd.split(",")[0] || req.headers.get("x-real-ip") || "").trim() || undefined;
+    const clientUa = req.headers.get("user-agent") || undefined;
 
     const priceId = SUB_PRICE_MAP[product];
 
@@ -128,6 +136,12 @@ export async function POST(req: NextRequest) {
     if (utm_campaign) metadata.utm_campaign = utm_campaign;
     if (utm_content) metadata.utm_content = utm_content;
     if (utm_term) metadata.utm_term = utm_term;
+    if (gclid) metadata.gclid = gclid;
+    if (fbclid) metadata.fbclid = fbclid;
+    if (fbc) metadata.fbc = fbc;
+    if (fbp) metadata.fbp = fbp;
+    if (clientIp) metadata.client_ip = clientIp;
+    if (clientUa) metadata.client_user_agent = clientUa.slice(0, 500);
 
     // Validate promo. For subscriptions we attach the Stripe coupon directly
     // so Stripe handles the first-invoice discount — duration=once means the
@@ -269,11 +283,7 @@ export async function POST(req: NextRequest) {
       .catch((err) => console.error("Mailchimp createCart error (subscribe-intent):", err));
 
     // Fire CAPI InitiateCheckout server-side for subscription (bypasses ITP/ad blockers)
-    const clientIp =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      req.headers.get("x-real-ip") ||
-      "";
-    const userAgent = req.headers.get("user-agent") || "";
+    const userAgent = clientUa || "";
     const referer = req.headers.get("referer") || "";
     sendCapiEvent({
       eventName: "InitiateCheckout",

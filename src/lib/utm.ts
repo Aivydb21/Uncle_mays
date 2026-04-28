@@ -10,6 +10,7 @@ export interface UTMParams {
   utm_content?: string;
   utm_term?: string;
   gclid?: string;
+  fbclid?: string;
 }
 
 const UTM_STORAGE_KEY = "unclemays_utm";
@@ -41,6 +42,11 @@ export function getUTMFromURL(): UTMParams {
   const gclid = params.get("gclid");
   if (gclid) {
     utm.gclid = gclid;
+  }
+
+  const fbclid = params.get("fbclid");
+  if (fbclid) {
+    utm.fbclid = fbclid;
   }
 
   return utm;
@@ -92,6 +98,15 @@ export function captureUTMParams(): UTMParams {
   if (utm.gclid) {
     try {
       localStorage.setItem("unc-gclid", utm.gclid);
+    } catch {
+      // Ignore storage errors
+    }
+  }
+  // Same for fbclid — needed to reconstruct fbc for Meta CAPI when the
+  // _fbc cookie is missing (private mode, ITP, fresh sessions).
+  if (utm.fbclid) {
+    try {
+      localStorage.setItem("unc-fbclid", utm.fbclid);
     } catch {
       // Ignore storage errors
     }
