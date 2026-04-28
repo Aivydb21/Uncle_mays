@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { tagOrderCompleted, deleteCart } from "@/lib/mailchimp";
 import { sendCapiEvent } from "@/lib/meta-capi";
 import { sendInternalAlert } from "@/lib/email/resend";
+import { isSuppressed } from "@/lib/email/suppression";
 
 const TRIGGER_API_BASE = "https://api.trigger.dev/api/v1/tasks";
 
@@ -116,28 +117,34 @@ export async function POST(req: NextRequest) {
         clientId: customerId || undefined,
       });
 
-      // Fire CAPI Purchase server-side (bypasses ITP/ad blockers, critical for Meta attribution)
-      sendCapiEvent({
-        eventName: "Purchase",
-        eventSourceUrl: `https://unclemays.com/order-success`,
-        userData: {
-          email: email !== "unknown" ? email : undefined,
-          phone: phone || undefined,
-          fbc: session.metadata?.fbc || undefined,
-          fbp: session.metadata?.fbp || undefined,
-          client_ip_address: session.metadata?.client_ip || undefined,
-          client_user_agent: session.metadata?.client_user_agent || undefined,
-        },
-        customData: {
-          value: amountInDollars,
-          currency: "USD",
-          content_ids: [productId],
-          content_name: productName,
-          content_type: "product",
-          order_id: session.id,
-        },
-        eventId: `purchase-${session.id}`,
-      }).catch((err) => console.error("[CAPI] Purchase (checkout.session.completed) error:", err));
+      // Fire CAPI Purchase server-side (bypasses ITP/ad blockers, critical for Meta attribution).
+      // Skip for internal/test emails — feeding Meta's optimizer test-purchase signal teaches it
+      // to chase profiles that look like Anthony rather than real customers.
+      if (!isSuppressed(email !== "unknown" ? email : null)) {
+        sendCapiEvent({
+          eventName: "Purchase",
+          eventSourceUrl: `https://unclemays.com/order-success`,
+          userData: {
+            email: email !== "unknown" ? email : undefined,
+            phone: phone || undefined,
+            fbc: session.metadata?.fbc || undefined,
+            fbp: session.metadata?.fbp || undefined,
+            client_ip_address: session.metadata?.client_ip || undefined,
+            client_user_agent: session.metadata?.client_user_agent || undefined,
+          },
+          customData: {
+            value: amountInDollars,
+            currency: "USD",
+            content_ids: [productId],
+            content_name: productName,
+            content_type: "product",
+            order_id: session.id,
+          },
+          eventId: `purchase-${session.id}`,
+        }).catch((err) => console.error("[CAPI] Purchase (checkout.session.completed) error:", err));
+      } else {
+        console.log(`[CAPI] Skipped Purchase for suppressed email: ${email}`);
+      }
 
       // Trigger SMS confirmation if phone number and delivery date are available
       // The session metadata should contain the checkout session ID from our local store
@@ -346,29 +353,33 @@ export async function POST(req: NextRequest) {
         deleteCart(intent.id)
           .catch((err) => console.error("[WEBHOOK] Mailchimp deleteCart error (pi):", err));
 
-        // Fire CAPI Purchase for subscription first payment
+        // Fire CAPI Purchase for subscription first payment (skip internal test orders).
         const intentProduct = intent.metadata?.product || "subscription";
-        sendCapiEvent({
-          eventName: "Purchase",
-          eventSourceUrl: `https://unclemays.com/order-success`,
-          userData: {
-            email: intentEmail || undefined,
-            phone: intent.metadata?.phone || undefined,
-            fbc: intent.metadata?.fbc || undefined,
-            fbp: intent.metadata?.fbp || undefined,
-            client_ip_address: intent.metadata?.client_ip || undefined,
-            client_user_agent: intent.metadata?.client_user_agent || undefined,
-          },
-          customData: {
-            value: intent.amount / 100,
-            currency: "USD",
-            content_ids: [intentProduct],
-            content_name: intentProduct,
-            content_type: "product",
-            order_id: intent.id,
-          },
-          eventId: `purchase-sub-${intent.id}`,
-        }).catch((err) => console.error("[CAPI] Purchase (payment_intent.succeeded) error:", err));
+        if (!isSuppressed(intentEmail)) {
+          sendCapiEvent({
+            eventName: "Purchase",
+            eventSourceUrl: `https://unclemays.com/order-success`,
+            userData: {
+              email: intentEmail || undefined,
+              phone: intent.metadata?.phone || undefined,
+              fbc: intent.metadata?.fbc || undefined,
+              fbp: intent.metadata?.fbp || undefined,
+              client_ip_address: intent.metadata?.client_ip || undefined,
+              client_user_agent: intent.metadata?.client_user_agent || undefined,
+            },
+            customData: {
+              value: intent.amount / 100,
+              currency: "USD",
+              content_ids: [intentProduct],
+              content_name: intentProduct,
+              content_type: "product",
+              order_id: intent.id,
+            },
+            eventId: `purchase-sub-${intent.id}`,
+          }).catch((err) => console.error("[CAPI] Purchase (payment_intent.succeeded) error:", err));
+        } else {
+          console.log(`[CAPI] Skipped Purchase (sub) for suppressed email: ${intentEmail}`);
+        }
 
         // Fire server-side GA4 purchase event (subscription first payment).
         // Client-side gtag on /order-success is unreliable (3DS redirects,
@@ -400,27 +411,31 @@ export async function POST(req: NextRequest) {
       // and this is not already covered by the firstPayment branch.
       if (confirmEmail && !intentInvoice && intent.metadata?.firstPayment !== "true") {
         const otProduct = intent.metadata?.product || "produce_box";
-        sendCapiEvent({
-          eventName: "Purchase",
-          eventSourceUrl: `https://unclemays.com/order-success`,
-          userData: {
-            email: confirmEmail,
-            phone: intent.metadata?.customer_phone || intent.metadata?.phone || undefined,
-            fbc: intent.metadata?.fbc || undefined,
-            fbp: intent.metadata?.fbp || undefined,
-            client_ip_address: intent.metadata?.client_ip || undefined,
-            client_user_agent: intent.metadata?.client_user_agent || undefined,
-          },
-          customData: {
-            value: intent.amount / 100,
-            currency: "USD",
-            content_ids: [otProduct],
-            content_name: otProduct,
-            content_type: "product",
-            order_id: intent.id,
-          },
-          eventId: `purchase-ot-${intent.id}`,
-        }).catch((err) => console.error("[CAPI] Purchase (payment_intent.succeeded one-time) error:", err));
+        if (!isSuppressed(confirmEmail)) {
+          sendCapiEvent({
+            eventName: "Purchase",
+            eventSourceUrl: `https://unclemays.com/order-success`,
+            userData: {
+              email: confirmEmail,
+              phone: intent.metadata?.customer_phone || intent.metadata?.phone || undefined,
+              fbc: intent.metadata?.fbc || undefined,
+              fbp: intent.metadata?.fbp || undefined,
+              client_ip_address: intent.metadata?.client_ip || undefined,
+              client_user_agent: intent.metadata?.client_user_agent || undefined,
+            },
+            customData: {
+              value: intent.amount / 100,
+              currency: "USD",
+              content_ids: [otProduct],
+              content_name: otProduct,
+              content_type: "product",
+              order_id: intent.id,
+            },
+            eventId: `purchase-ot-${intent.id}`,
+          }).catch((err) => console.error("[CAPI] Purchase (payment_intent.succeeded one-time) error:", err));
+        } else {
+          console.log(`[CAPI] Skipped Purchase (one-time) for suppressed email: ${confirmEmail}`);
+        }
 
         // Fire server-side GA4 purchase event (one-time embedded checkout).
         // Covers the primary flow that previously only relied on client-side
