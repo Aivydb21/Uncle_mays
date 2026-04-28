@@ -10,34 +10,19 @@ import { TESTIMONIALS } from "@/lib/testimonials";
 
 const faqs = [
   {
-    question: "How does delivery work?",
-    answer:
-      "We deliver directly to your door across the Chicago metro area (city plus south suburbs) every Wednesday. Order by Sunday 11:59 PM CT and your box ships that Wednesday. After placing your order, you'll receive a confirmation email with your estimated delivery window.",
-  },
-  {
-    question: "What's actually in the box?",
-    answer:
-      "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. The Spring Box currently includes salad mix, kale, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans (about 6 lbs total). The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, a customer choice of bean, and pasture-raised chicken thighs (about 10 lbs total). Contents vary each delivery based on what our farmer partners are harvesting.",
-  },
-  {
-    question: "How much does a box cost?",
-    answer:
-      "Two tiers. The Spring Box is $40, built for 1 to 2 people, about 6 lbs of fresh food. The Full Harvest Box is $70, built for 3 to 4 people, about 10 lbs of fresh food. The Full Harvest Box includes pasture-raised chicken thighs at no extra charge. Additional proteins (chicken, beef short ribs, or lamb chops) can be added at checkout for $12 each. Every box is a one-time order with no subscription and no auto-renewal.",
-  },
-  {
     question: "Is this a subscription? Will my card be auto-charged?",
     answer:
       "No. Every box is a one-time purchase. You order, you get charged once for that one box, that's it. No recurring billing, no auto-renewal, no card on file. The next time you want a box, you come back and order again.",
   },
   {
+    question: "How does delivery work?",
+    answer:
+      "We deliver directly to your door across the Chicago metro area (city plus south suburbs) every Wednesday. Order by Sunday 11:59 PM CT and your box ships that Wednesday. After placing your order, you'll receive a confirmation email with your estimated delivery window.",
+  },
+  {
     question: "What if I have an issue with my order?",
     answer:
       "We stand behind every box. If anything is wrong with your delivery (missing items, quality issues, anything), email us at info@unclemays.com and we'll make it right, no questions asked.",
-  },
-  {
-    question: "How do I cancel my order?",
-    answer:
-      "There's nothing to cancel. Every box is a one-time purchase with no recurring charges. If you need to modify or cancel an order you've already placed, email info@unclemays.com as soon as possible and we'll take care of it.",
   },
 ];
 
@@ -77,63 +62,21 @@ const Index = () => {
         <Pricing />
       </Suspense>
 
-      {/* 2. HOW IT WORKS — Live ordering flow */}
-      <section className="py-24 bg-background">
+      {/* 2. HOW IT WORKS — compact 3-step strip */}
+      <section className="py-10 bg-background border-t border-border/40">
         <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">How It Works</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              From order to your door in three simple steps.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto text-center">
             {[
-              {
-                icon: ShoppingBag,
-                step: "01",
-                title: "Choose Your Box",
-                description:
-                  "Pick the box size that works for your household: Small or Family. Order one-time or subscribe weekly and save 10%.",
-              },
-              {
-                icon: Package,
-                step: "02",
-                title: "We Pack It Fresh",
-                description:
-                  "Your box is packed with seasonal produce sourced directly from Black farmers. Every item is selected for freshness at time of packing.",
-              },
-              {
-                icon: Bell,
-                step: "03",
-                title: "Delivered to Your Door",
-                description:
-                  "We deliver straight to your door across the Chicago metro area every Wednesday. You'll get a confirmation and delivery window by email as soon as your order is placed.",
-              },
-            ].map((step, idx) => (
-              <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: idx * 0.1 }}
-                className="bg-card rounded-2xl p-8 shadow-soft border border-border/50 relative"
-              >
-                <div className="text-6xl font-bold text-primary/10 absolute top-6 right-6 leading-none select-none">
-                  {step.step}
+              { icon: ShoppingBag, title: "Order by Sunday 11:59 PM" },
+              { icon: Package, title: "We pack it fresh Wednesday" },
+              { icon: Bell, title: "At your door Wednesday" },
+            ].map((step) => (
+              <div key={step.title} className="flex items-center justify-center sm:justify-start gap-3">
+                <div className="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+                  <step.icon className="h-5 w-5 text-primary" />
                 </div>
-                <div className="bg-primary/10 w-14 h-14 rounded-full flex items-center justify-center mb-5">
-                  <step.icon className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
-                <p className="text-foreground/70 leading-relaxed">{step.description}</p>
-              </motion.div>
+                <span className="text-sm font-medium text-foreground/80">{step.title}</span>
+              </div>
             ))}
           </div>
         </div>
@@ -141,7 +84,7 @@ const Index = () => {
 
       {/* Customer voice — real, attributed quotes only (see src/lib/testimonials.ts) */}
       {TESTIMONIALS.length > 0 ? (
-        <section className="py-20 bg-muted/20">
+        <section className="py-12 bg-muted/20">
           <div className="container px-6 max-w-3xl mx-auto">
             <div className="grid gap-6">
               {TESTIMONIALS.map((t) => (
@@ -166,40 +109,22 @@ const Index = () => {
         </section>
       ) : null}
 
-      {/* FAQ */}
-      <section className="py-24 bg-background">
+      {/* FAQ — top 3 only */}
+      <section className="py-12 bg-background">
         <div className="container px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="text-center mb-12"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to know before your first box.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="max-w-2xl mx-auto bg-card rounded-2xl shadow-soft border border-border/50 px-6 md:px-8"
-          >
+          <h2 className="text-center text-2xl md:text-3xl font-bold mb-6">
+            Quick answers
+          </h2>
+          <div className="max-w-2xl mx-auto bg-card rounded-2xl shadow-soft border border-border/50 px-6 md:px-8">
             {faqs.map((faq) => (
               <FAQItem key={faq.question} question={faq.question} answer={faq.answer} />
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* EMAIL CAPTURE */}
-      <section className="py-20 bg-background">
+      <section className="py-10 bg-background">
         <div className="container px-6">
           <HomeEmailCapture source="home_newsletter" />
         </div>
