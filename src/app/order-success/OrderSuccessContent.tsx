@@ -61,21 +61,36 @@ function trackGA(transactionId: string, value: number, items: TrackingItem[]) {
 }
 
 /**
- * Fire Meta Pixel Purchase event. Returns true if fbq was available and the
- * event fired. Returns false if fbq hasn't loaded yet — caller should retry.
+ * Fire Meta Pixel Purchase event. The eventId MUST match the CAPI server-side
+ * event_id ([src/app/api/webhook/route.ts]) so Meta dedupes the two events
+ * and keeps the better-attributed one (usually CAPI, since browser pixels
+ * are blocked by in-app browsers and ITP). Without dedup Meta double-counts
+ * and ad attribution lands on the worse-quality event = no purchases credited
+ * back to ads.
  */
-function fireMetaPurchase(value: number, product: string): boolean {
+function fireMetaPurchase(value: number, product: string, eventId?: string): boolean {
   if (typeof window === "undefined" || typeof window.fbq !== "function") return false;
-  window.fbq("track", "Purchase", {
+  const data = {
     value,
     currency: "USD",
     content_type: "product",
     content_ids: [product],
-  });
+  };
+  if (eventId) {
+    window.fbq("track", "Purchase", data, { eventID: eventId });
+  } else {
+    window.fbq("track", "Purchase", data);
+  }
   return true;
 }
 
-function trackPurchase(transactionId: string, value: number, product?: string, items?: TrackingItem[]) {
+function trackPurchase(
+  transactionId: string,
+  value: number,
+  product?: string,
+  items?: TrackingItem[],
+  metaEventId?: string,
+) {
   if (typeof window === "undefined") return;
 
   const resolvedProduct = product || "produce_box";
@@ -90,7 +105,7 @@ function trackPurchase(transactionId: string, value: number, product?: string, i
   let attempts = 0;
   const maxAttempts = 8;
   const tryMeta = () => {
-    if (fireMetaPurchase(value, resolvedProduct)) return;
+    if (fireMetaPurchase(value, resolvedProduct, metaEventId)) return;
     if (++attempts < maxAttempts) setTimeout(tryMeta, 1000);
   };
   tryMeta();
@@ -119,35 +134,46 @@ export default function OrderSuccessContent() {
   useEffect(() => {
     if (fired.current) return;
 
-    // Subscription intent flow — amount derived from product slug
+    // Subscription intent flow. Event_id mismatch caveat: the webhook fires
+    // CAPI Purchase with event_id `purchase-sub-${pi}` keyed off the underlying
+    // PaymentIntent, but the redirect URL only carries the subscription_id.
+    // We approximate with `purchase-sub-id-${subscription_id}` so future
+    // server changes can align both sides; today there is no dedup match
+    // on this branch, but it is also a small share of orders.
     if (subscriptionId) {
       fired.current = true;
       setIsSubscription(true);
       const value = productParam ? (SUB_AMOUNT[productParam] ?? 0) : 0;
       if (value > 0) {
-        try { trackPurchase(subscriptionId, value, productParam); } catch { /* ignore */ }
+        const eventId = `purchase-sub-id-${subscriptionId}`;
+        try { trackPurchase(subscriptionId, value, productParam, undefined, eventId); } catch { /* ignore */ }
       }
       return;
     }
 
-    // PaymentIntent flow — data is available from URL params directly
+    // PaymentIntent flow (one-time embedded checkout). CAPI fires
+    // `purchase-ot-${pi}` from the payment_intent.succeeded webhook, so
+    // browser pixel must use the same event_id for dedup.
     if (paymentIntentId && amountParam) {
       fired.current = true;
       const value = parseFloat(amountParam);
       if (!isNaN(value)) {
-        try { trackPurchase(paymentIntentId, value, productParam); } catch { /* ignore */ }
+        const eventId = `purchase-ot-${paymentIntentId}`;
+        try { trackPurchase(paymentIntentId, value, productParam, undefined, eventId); } catch { /* ignore */ }
       }
       return;
     }
 
-    // Stripe Checkout Sessions flow — fetch order details from API
+    // Stripe Checkout Sessions flow. CAPI fires `purchase-${session.id}`
+    // from checkout.session.completed; browser pixel matches.
     if (sessionId) {
       fired.current = true;
       fetch(`/api/order-details?session_id=${sessionId}`)
         .then((r) => r.json())
         .then((data) => {
           if (data.error) return;
-          try { trackPurchase(data.transactionId, data.value, undefined, data.items); } catch { /* ignore */ }
+          const eventId = `purchase-${data.transactionId}`;
+          try { trackPurchase(data.transactionId, data.value, undefined, data.items, eventId); } catch { /* ignore */ }
           if (data.mode === "subscription") setIsSubscription(true);
         })
         .catch(() => {});
