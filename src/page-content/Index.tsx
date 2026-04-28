@@ -17,7 +17,7 @@ const faqs = [
   {
     question: "What's actually in the box?",
     answer:
-      "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. The Spring Box currently includes salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans (about 6 lbs total). The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, a customer choice of bean, and pasture-raised chicken thighs (about 10 lbs total). Contents vary each delivery based on what our farmer partners are harvesting.",
+      "Every box is seasonal and rotating, so you get what's freshest, not what's been sitting in a warehouse. The Spring Box currently includes salad mix, kale, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans (about 6 lbs total). The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, a customer choice of bean, and pasture-raised chicken thighs (about 10 lbs total). Contents vary each delivery based on what our farmer partners are harvesting.",
   },
   {
     question: "How much does a box cost?",

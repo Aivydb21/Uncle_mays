@@ -11,9 +11,9 @@
 
 ## Sourcing
 
-Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL)**. Everything we ship is drawn from their weekly produce list: salad mix, candy orange carrots, sweet potatoes, potatoes, broccoli, organic dry beans (black, pinto, kidney), pea shoots, and radishes. Proteins (whole pastured chicken thighs, grass-fed beef short ribs, lamb chops) come from the same partner.
+Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL)**. Everything we ship is drawn from their weekly produce list: salad mix, kale, candy orange carrots, sweet potatoes, potatoes, broccoli, organic dry beans (black, pinto, kidney), pea shoots, and radishes. Proteins (whole pastured chicken thighs, grass-fed beef short ribs, lamb chops) come from the same partner.
 
-**Do not claim** the box contains eggs, tomatoes, cucumbers, snap peas, strawberries, zucchini, beets, spring onions, kale, rainbow chard, microgreens, collards, shishito peppers, eggplant, turnips, or any other produce not on RAB's current list. Adding those back requires onboarding a second supplier first.
+**Do not claim** the box contains eggs, tomatoes, cucumbers, snap peas, strawberries, zucchini, beets, spring onions, rainbow chard, microgreens, collards, shishito peppers, eggplant, turnips, or any other produce not on RAB's current list. Adding those back requires onboarding a second supplier first.
 
 ---
 
@@ -36,7 +36,7 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 
 | Box | One-Time | Subscription (10% off) | Who it's for | What's inside | Approx. weight |
 |-----|----------|------------------------|--------------|----------------|----------------|
-| **Spring Box** | $40 | $36/wk | 1–2 people | Salad mix, candy carrots, sweet potatoes, potatoes, broccoli, organic black beans | About 6 lbs |
+| **Spring Box** | $40 | $36/wk | 1–2 people | Salad mix, kale, candy carrots, sweet potatoes, potatoes, broccoli, organic black beans | About 6 lbs |
 | **Full Harvest Box** | $70 | $63/wk | 3–4 people | Everything in the Spring Box, plus pea shoots, radishes, customer choice of bean (black, pinto, or kidney), and pasture-raised chicken thighs (included) | About 10 lbs |
 
 ### Protein Add-Ons (optional, available on every box)

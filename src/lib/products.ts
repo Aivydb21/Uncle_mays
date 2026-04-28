@@ -55,6 +55,7 @@ export const PRODUCTS = {
     subPrice: 36,
     items: [
       "Salad mix",
+      "Kale",
       "Candy orange carrots",
       "Sweet potatoes",
       "Potatoes",

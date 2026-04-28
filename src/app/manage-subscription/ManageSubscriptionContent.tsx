@@ -12,7 +12,7 @@ const plans = [
     subPrice: "$36",
     subFrequency: "/wk",
     bullets: [
-      "Salad mix, carrots, sweet potatoes, potatoes, broccoli, black beans",
+      "Salad mix, kale, carrots, sweet potatoes, potatoes, broccoli, black beans",
       "Sourced from our Black farmer partners",
       "Delivered fresh every Wednesday",
     ],
