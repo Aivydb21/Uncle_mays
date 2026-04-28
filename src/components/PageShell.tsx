@@ -12,15 +12,28 @@ import { MobileCTA } from "@/components/MobileCTA";
 // without the site chrome.
 const LANDING_PAGE_PATHS: string[] = [];
 
+// Routes inside the active conversion funnel. The footer is hidden on
+// mobile here (Clarity 2026-04-28: mobile users were scrolling into the
+// footer dead-area below the boxes and bouncing). Desktop keeps the
+// footer because real-estate isn't the constraint there.
+function isInCheckoutFunnel(pathname: string): boolean {
+  return pathname.startsWith("/checkout/") || pathname.startsWith("/subscribe/");
+}
+
 export function PageShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
   const isLandingPage = LANDING_PAGE_PATHS.includes(pathname);
+  const inFunnel = isInCheckoutFunnel(pathname);
 
   return (
     <div className="flex min-h-screen flex-col">
       {!isLandingPage && <Navigation />}
       <main className="flex-1">{children}</main>
-      {!isLandingPage && <Footer />}
+      {!isLandingPage && (
+        <div className={inFunnel ? "hidden md:block" : ""}>
+          <Footer />
+        </div>
+      )}
       {!isLandingPage && <MobileCTA />}
     </div>
   );

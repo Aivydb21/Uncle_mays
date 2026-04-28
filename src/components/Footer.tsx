@@ -9,9 +9,12 @@ export const Footer = () => {
         <div className="grid md:grid-cols-4 gap-12 mb-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-2xl font-bold text-background">
+              <Link
+                href="/"
+                className="text-2xl font-bold text-background hover:text-background/80 transition-colors"
+              >
                 Uncle May's Produce
-              </span>
+              </Link>
             </div>
             <p className="text-background/70 mb-6 max-w-md leading-relaxed">
               Fresh produce from Black farmers, delivered across the Chicago metro area. No subscription required. Just good food.

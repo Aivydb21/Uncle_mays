@@ -13,7 +13,6 @@ declare global {
   }
 }
 
-const produceBoxImage = "/images/produce-box.jpg";
 
 // Two tiers only. Box contents are the single source of truth in
 // src/lib/products.ts — do not duplicate item lists here.
@@ -221,20 +220,9 @@ export const Pricing = () => {
           Add chicken, short ribs, or lamb chops at checkout. $12 per pound, pasture-raised, slaughtered fresh.
         </p>
 
-        {/* Produce box image */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-medium"
-        >
-          <img
-            src={produceBoxImage}
-            alt="Fresh seasonal produce box filled with greens and roots from Black-owned farms"
-            className="w-full h-64 object-cover"
-          />
-        </motion.div>
+        {/* Produce box image removed 2026-04-28 — Clarity recordings showed
+            mobile users scrolling past the pricing into the image area and
+            losing interest. Image read as a distraction, not a hook. */}
       </div>
     </section>
   );
