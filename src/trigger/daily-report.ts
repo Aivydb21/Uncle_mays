@@ -477,12 +477,16 @@ ${metaStats ? `
 </html>`;
 }
 
-// --- The scheduled task ---
+// --- The task ---
+// Schedule disabled 2026-04-28 by CEO: the daily morning report email to
+// anthony@/peter@/joe.harwood@kellogg was no longer wanted. Task definition
+// is retained so it can be triggered manually (via Trigger.dev dashboard
+// or `tasks.trigger("daily-report", {})`) if a future need arises.
+// To re-enable the cron, restore `schedules.task({ id, cron: "0 13 * * 1-5", run })`
+// and redeploy.
 
-export const dailyReport = schedules.task({
+export const dailyReport = task({
   id: "daily-report",
-  // Runs Monday through Friday at 8:00 AM Central Time (UTC-5/6)
-  cron: "0 13 * * 1-5",
   run: async () => {
     const stripeKey = process.env.STRIPE_API_KEY!;
     const apolloKey = process.env.APOLLO_API_KEY!;
