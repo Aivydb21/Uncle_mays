@@ -15,4 +15,9 @@ export const TESTIMONIALS: Testimonial[] = [
     name: "Antoinette W.",
     source: "Facebook comment, April 2026",
   },
+  {
+    quote: "Beautiful veggies.",
+    name: "Maria Thornton",
+    source: "Customer review, April 2026",
+  },
 ];

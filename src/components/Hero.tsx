@@ -45,15 +45,13 @@ export const Hero = () => {
               <span className="text-primary">Black farmers</span>, delivered weekly across the Chicago metro area.
             </h1>
 
-            {/* Instant proof — survey stat (we have ~3 active subscribers; the
-                "100+" number comes from the pre-launch shopper survey, not from
-                paying customers). */}
+            {/* Instant proof line. */}
             <div className="flex items-center gap-2 mb-5 text-base">
               <span aria-label="five stars" className="text-amber-500 tracking-tight">
                 &#x2605;&#x2605;&#x2605;&#x2605;&#x2605;
               </span>
               <span className="font-medium text-foreground/85">
-                97% of 100+ Chicago shoppers said they&apos;d buy
+                Serving hundreds across Chicago
               </span>
             </div>
 

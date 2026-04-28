@@ -658,11 +658,14 @@ export default function SubscribeDeliveryPage() {
                 )}
 
                 {/* Trust signals — counteract the info-entry pause. */}
-                <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">🔒 Secure checkout</span>
                   <span className="flex items-center gap-1">✓ Cancel anytime</span>
                   <span className="flex items-center gap-1">📦 Fresh-guaranteed</span>
                 </div>
+                <p className="mb-4 text-xs text-muted-foreground italic">
+                  This will take 30 seconds.
+                </p>
 
                 <button
                   type="submit"

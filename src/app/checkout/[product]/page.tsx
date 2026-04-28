@@ -967,11 +967,14 @@ export default function CheckoutPage() {
                 )}
 
                 {/* Trust signals */}
-                <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">&#x1F512; Secure checkout</span>
                   <span className="flex items-center gap-1">&#x2713; No subscription lock-in</span>
                   <span className="flex items-center gap-1">&#x1F4E6; Fresh-guaranteed</span>
                 </div>
+                <p className="mb-4 text-xs text-muted-foreground italic">
+                  This will take 30 seconds.
+                </p>
 
                 {/* Submit CTA */}
                 <button
