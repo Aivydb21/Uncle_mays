@@ -9,7 +9,7 @@ export interface CheckoutSession {
   product: string;
   price: number;
   productName: string;
-  email: string;
+  email?: string;
   firstName: string;
   lastName: string;
   phone?: string;

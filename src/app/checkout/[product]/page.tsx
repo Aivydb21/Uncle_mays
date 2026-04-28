@@ -3,7 +3,6 @@
 import { useParams, notFound } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { PRODUCTS, PROTEIN_OPTIONS, PROTEIN_TAGLINE, BEAN_OPTIONS, DEFAULT_BEAN, type ProductSlug, type ProteinId, type BeanId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,44 +18,25 @@ declare global {
   }
 }
 
-// 2-step indicator: Order Details -> Payment
+// 2-step progress indicator. Replaced 2026-04-28 from filled circles +
+// connector lines (which Clarity heatmaps showed users tapping as if they
+// were navigation) to a passive progress bar with a single label. No
+// tappable affordance = no dead clicks.
 function StepIndicator({ current }: { current: 1 | 2 }) {
   const steps = ["Order Details", "Payment"];
+  const total = steps.length;
+  const pct = Math.round((current / total) * 100);
   return (
-    <div className="flex items-center gap-2 mb-8">
-      {steps.map((label, i) => {
-        const step = i + 1;
-        const filled = step <= current;
-        return (
-          <div key={step} className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5">
-              <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                  filled
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {step}
-              </div>
-              <span
-                className={`text-sm hidden sm:inline ${
-                  filled ? "text-foreground font-medium" : "text-muted-foreground"
-                }`}
-              >
-                {label}
-              </span>
-            </div>
-            {i < steps.length - 1 && (
-              <div
-                className={`h-px flex-1 min-w-[24px] ${
-                  step < current ? "bg-primary" : "bg-muted"
-                }`}
-              />
-            )}
-          </div>
-        );
-      })}
+    <div className="mb-8 select-none">
+      <div className="flex items-center justify-between text-xs mb-2">
+        <span className="font-semibold text-foreground">
+          Step {current} of {total}: {steps[current - 1]}
+        </span>
+        <span className="text-muted-foreground">{pct}%</span>
+      </div>
+      <div className="h-1 bg-muted rounded-full overflow-hidden">
+        <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
+      </div>
     </div>
   );
 }
@@ -93,8 +73,14 @@ function validate(fields: FormFields): FormErrors {
   const errors: FormErrors = {};
   if (!fields.firstName.trim()) errors.firstName = "First name is required.";
   if (!fields.lastName.trim()) errors.lastName = "Last name is required.";
-  if (!fields.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) {
-    errors.email = "A valid email address is required.";
+  // Email is OPTIONAL on this step (experiment 2026-04-28). Stripe collects
+  // it on the payment page either way. The onBlur handler still fires
+  // Lead pixel + Mailchimp upsert + abandoned-cart capture for users who
+  // do enter it, so we don't lose recovery infra — we just don't gate
+  // submission on it. If the field has *something* in it, it must be a
+  // valid email; empty is fine.
+  if (fields.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email.trim())) {
+    errors.email = "Please enter a valid email or leave blank.";
   }
   if (!fields.street.trim()) errors.street = "Street address is required.";
   if (!fields.city.trim()) errors.city = "City is required.";
@@ -490,15 +476,8 @@ export default function CheckoutPage() {
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
       <div className="container px-4 max-w-3xl mx-auto">
-        {/* Back link */}
-        <div className="mb-6">
-          <Link
-            href="/#boxes"
-            className="text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            &larr; Back to boxes
-          </Link>
-        </div>
+        {/* "Back to boxes" link removed 2026-04-28: Clarity heatmap showed
+            zero clicks on it; users back out via browser back instead. */}
 
         <StepIndicator current={1} />
 
@@ -739,8 +718,9 @@ export default function CheckoutPage() {
                 {/* Email */}
                 <div className="space-y-1.5 mb-4">
                   <Label htmlFor="email">
-                    Email <span className="text-destructive">*</span>
+                    Email <span className="text-muted-foreground font-normal">(optional)</span>
                   </Label>
+                  <p className="text-xs text-muted-foreground -mt-1">For order confirmation. We&apos;ll grab it on the next step if you skip.</p>
                   <Input
                     id="email"
                     name="email"

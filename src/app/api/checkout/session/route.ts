@@ -7,7 +7,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { product, price, productName, email, firstName, lastName, phone, address, deliveryNotes, deliveryDate, deliveryWindow, proteinChoices, additionalProteinChoices, beanChoice } = body;
 
-    if (!product || !price || !email || !firstName || !lastName || !address) {
+    // Email is now optional at this step (experiment 2026-04-28). Stripe
+    // collects it on the payment page either way; the abandoned-cart and
+    // Mailchimp recovery infra below only fire when an email IS provided.
+    if (!product || !price || !firstName || !lastName || !address) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -15,7 +18,7 @@ export async function POST(req: NextRequest) {
       product,
       price: Number(price),
       productName: productName || product,
-      email,
+      email: email || undefined,
       firstName,
       lastName,
       phone,
@@ -28,36 +31,35 @@ export async function POST(req: NextRequest) {
       beanChoice: typeof beanChoice === "string" ? beanChoice : undefined,
     });
 
-    // Non-blocking: upsert subscriber + create abandoned cart trigger
-    upsertContact(email, firstName, lastName)
-      .catch((err) => console.error("Mailchimp upsertContact error:", err));
-    createCart(session.id, email, firstName, lastName, product, session.price)
-      .catch((err) => console.error("Mailchimp createCart error:", err));
+    // Recovery infra: only run when we actually have an email to recover to.
+    if (email) {
+      upsertContact(email, firstName, lastName)
+        .catch((err) => console.error("Mailchimp upsertContact error:", err));
+      createCart(session.id, email, firstName, lastName, product, session.price)
+        .catch((err) => console.error("Mailchimp createCart error:", err));
 
-    // Non-blocking: queue 1-hour recovery email via Trigger.dev.
-    // If TRIGGER_SECRET_KEY is missing, the cron abandonedCheckoutProcessor (every 15 min)
-    // catches abandoned sessions instead.
-    const triggerKey = process.env.TRIGGER_SECRET_KEY;
-    if (triggerKey) {
-      fetch("https://api.trigger.dev/api/v1/tasks/send-abandoned-checkout-email/trigger", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${triggerKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          payload: {
-            sessionId: session.id,
-            email,
-            firstName,
-            lastName,
-            product,
+      const triggerKey = process.env.TRIGGER_SECRET_KEY;
+      if (triggerKey) {
+        fetch("https://api.trigger.dev/api/v1/tasks/send-abandoned-checkout-email/trigger", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${triggerKey}`,
+            "Content-Type": "application/json",
           },
-          options: {
-            idempotencyKey: `abandoned-checkout-${session.id}`,
-          },
-        }),
-      }).catch((err) => console.warn("Trigger.dev queue error (non-fatal):", err));
+          body: JSON.stringify({
+            payload: {
+              sessionId: session.id,
+              email,
+              firstName,
+              lastName,
+              product,
+            },
+            options: {
+              idempotencyKey: `abandoned-checkout-${session.id}`,
+            },
+          }),
+        }).catch((err) => console.warn("Trigger.dev queue error (non-fatal):", err));
+      }
     }
 
     return NextResponse.json({ sessionId: session.id });
