@@ -3,6 +3,15 @@
 > ### 🟢 Customer-facing single source of truth: [`customer-facts.md`](./customer-facts.md)
 > Delivery day, pricing, active promo codes, cutoff times, and brand positioning that customers can see live on the site live in `customer-facts.md`. **Any agent writing ads, emails, social posts, or landing-page copy MUST read `customer-facts.md` first.** Do not use older planning docs (`emergency-promotion-*`, `promo-launch-offer-*`, `AD-COPY-TEMPLATES.md`, etc.) as authoritative — they contain retired promo codes (WELCOME20, LAUNCH20, FREESHIP, first-order $30) that are no longer live.
 
+> ### 🛑 Standing Order — Marketing & Advertising Infrastructure (effective 2026-04-29)
+> **No agent (Paperclip, Claude Code, or otherwise) may change, pause, launch, or otherwise impact marketing or advertising infrastructure without explicit board approval (CEO: Anthony Ivy).**
+>
+> **In scope (touching requires board approval first):** Meta (FB/IG) + Google Ads accounts and everything in them (campaigns, ad sets, creatives, audiences, budgets, schedules, conversion events, pixel/tag config); Mailchimp newsletter audience changes, campaign drafts, scheduled sends; promo codes (`FRESH10`, `FRESH30`, future codes) AND the underlying Stripe coupon registry (`fresh*-apr-2026`); marketing landing pages (`/ask` and future ad-funnel variants — both code and copy); organic social posts on owned accounts (FB Page 755316477673748, Uncle May's IG, LinkedIn company); attribution wiring tied to the above (UTM parameters used in marketing URLs, Meta Pixel + CAPI, Google Ads conversion tracking, GA4 events feeding ad optimization).
+>
+> **Out of scope (touch freely):** transactional emails (order confirmation, payment failed, shipping); core product pages (`/`, `/shop`, `/faq`, `/about`) unless changes are part of an active ad test; investor / BD outreach via Apollo (that is BD/IR, not consumer marketing); internal-only analytics dashboards.
+>
+> **Compliance path:** open a Paperclip issue describing the proposed change + impact + rollback plan, file a board approval (`POST /api/companies/{companyId}/approvals` with `type: "request_board_approval"`), link the issue, wait for resolution. Do not make the change preemptively — code commits to marketing assets are in scope. If urgent (campaign wasting spend), pause at the platform and mark the issue `blocked` with `priority: critical` plus `@CEO`. Do not ship autonomous code changes to fix it. The same standing order is appended to all 12 active Paperclip agent `AGENTS.md` files.
+
 > ### 🚢 Deploy target: `uncle-mays` Vercel project (ONLY)
 > - Production domain: **unclemays.com** → aliased to the `uncle-mays` Vercel project (`prj_jwMT8iMOmaEdETzwnsKYBrg2lPoI`).
 > - Local folder `um_website/` is linked to this project via `.vercel/project.json`. Every `git push` to `Aivydb21/Uncle_mays` main auto-deploys to production here.
