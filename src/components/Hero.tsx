@@ -86,8 +86,6 @@ export const Hero = () => {
             <span className="font-semibold text-foreground/90">100% fresh or refunded</span>
             <span aria-hidden="true">•</span>
             <span className="font-semibold text-foreground/90">Free Chicago metro delivery</span>
-            <span aria-hidden="true">•</span>
-            <span className="font-semibold text-foreground/90">Cancel anytime</span>
           </motion.div>
         </div>
       </div>

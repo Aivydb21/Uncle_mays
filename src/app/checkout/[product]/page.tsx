@@ -11,6 +11,7 @@ import { useAddressAutocomplete, type ParsedAddress } from "@/hooks/use-address-
 import { WaitlistCapture } from "@/components/WaitlistCapture";
 import { isInServiceArea, OUT_OF_AREA_MESSAGE } from "@/lib/service-area";
 import { TESTIMONIALS } from "@/lib/testimonials";
+import { CheckoutExitSurvey } from "@/components/CheckoutExitSurvey";
 
 declare global {
   interface Window {
@@ -387,10 +388,7 @@ export default function CheckoutPage() {
       }
     } catch { /* ignore */ }
 
-    let beanChoice: string | undefined;
-    if (isFullHarvest) {
-      beanChoice = (selectedBean === "pinto" || selectedBean === "kidney") ? selectedBean : "black";
-    }
+    const beanChoice: string = (selectedBean === "pinto" || selectedBean === "kidney") ? selectedBean : "black";
 
     const autoDeliveryDate = (() => {
       const date = getEarliestDeliveryDate();
@@ -476,6 +474,7 @@ export default function CheckoutPage() {
 
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
+      <CheckoutExitSurvey productSlug={slug} />
       <div className="container px-4 max-w-3xl mx-auto">
         {/* "Back to boxes" link removed 2026-04-28: Clarity heatmap showed
             zero clicks on it; users back out via browser back instead. */}
@@ -581,11 +580,11 @@ export default function CheckoutPage() {
                         );
                       })}
                     </ul>
-                    <p className="mt-3 text-xs text-muted-foreground italic">{product.weightEstimate}</p>
+                    <p className="mt-3 text-base font-semibold text-foreground">{product.weightEstimate}</p>
                   </div>
 
-                  {/* Bean choice: Full Harvest Box only */}
-                  {isFullHarvest && (
+                  {/* Bean choice: every box */}
+                  {(
                     <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4">
                       <h2 className="text-sm font-bold uppercase tracking-wide text-primary mb-1">
                         Choose your bean

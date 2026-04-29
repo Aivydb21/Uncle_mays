@@ -32,6 +32,10 @@ out
 .claude/scheduled_tasks.lock
 google-ads-customer-match.csv
 
+# Customer Feedback Program — local stores, regenerated from Gmail
+data/feedback/
+data/clarity-checkout-dwell-*.json
+
 # Local archive of the former business/ folder (on-disk safety copy, not tracked).
 # Crisis-docs archive IS tracked (git mv preserved history).
 _archive/business-2026-04-22/

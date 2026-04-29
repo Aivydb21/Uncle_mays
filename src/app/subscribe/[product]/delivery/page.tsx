@@ -288,11 +288,9 @@ export default function SubscribeDeliveryPage() {
           const parsed = JSON.parse(saved) as ProteinId[];
           if (parsed.length > 0) proteinChoices = parsed;
         }
-        // Bean choice — Full Harvest only. Default to "black" if missing.
-        if (slug === "family") {
-          const savedBean = sessionStorage.getItem(`unc-sub-bean-${slug}`);
-          beanChoice = (savedBean === "pinto" || savedBean === "kidney") ? savedBean : "black";
-        }
+        // Bean choice — every box. Default to "black" if missing.
+        const savedBean = sessionStorage.getItem(`unc-sub-bean-${slug}`);
+        beanChoice = (savedBean === "pinto" || savedBean === "kidney") ? savedBean : "black";
       } catch {
         // ignore
       }
@@ -642,7 +640,6 @@ export default function SubscribeDeliveryPage() {
                 {/* Trust signals — counteract the info-entry pause. */}
                 <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">🔒 Secure checkout</span>
-                  <span className="flex items-center gap-1">✓ Cancel anytime</span>
                   <span className="flex items-center gap-1">📦 Fresh-guaranteed</span>
                 </div>
 
@@ -670,7 +667,7 @@ export default function SubscribeDeliveryPage() {
                   ${product.subPrice}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground mb-4">/week · cancel anytime</p>
+              <p className="text-xs text-muted-foreground mb-4">/week</p>
               <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
                 <span>Delivery</span>
                 <span className="text-primary font-medium">FREE</span>
@@ -697,7 +694,7 @@ export default function SubscribeDeliveryPage() {
                 ) : null}
               </div>
               <p className="text-xs text-muted-foreground mt-3">
-                Delivered every Wednesday. Cancel anytime — no fees.
+                Delivered every Wednesday.
               </p>
             </div>
           </div>

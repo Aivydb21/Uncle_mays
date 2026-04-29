@@ -67,7 +67,7 @@ export function GetStartedContent() {
 
             <p className="text-lg md:text-xl text-foreground/80 mb-7 leading-relaxed">
               Fresh seasonal produce, delivered across the Chicago metro area every
-              Wednesday. Boxes from $40. Free delivery. Cancel anytime.
+              Wednesday. Boxes from $40. Free delivery.
             </p>
 
             <Link
@@ -98,7 +98,7 @@ export function GetStartedContent() {
             </div>
             <div className="flex items-center gap-2 text-sm text-foreground/80 justify-center sm:justify-end">
               <Leaf className="h-5 w-5 text-primary shrink-0" />
-              <span>Cancel anytime, no fees</span>
+              <span>Local farms, freshly picked</span>
             </div>
           </div>
         </div>

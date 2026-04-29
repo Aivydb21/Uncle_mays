@@ -789,4 +789,27 @@ client.defineJob({
 
 Use SDK (`@trigger.dev/sdk`), check `result.ok` before accessing `result.output`
 
+## Customer Feedback Program
+
+Standing CRO infrastructure for capturing voice-of-customer at scale.
+Operating doc, cadence, theme list, env vars, and roadmap live at
+[`notes/feedback-program.md`](./notes/feedback-program.md). Theme backlog
+(items recurring ≥3× across respondents) at
+[`notes/feedback-backlog.md`](./notes/feedback-backlog.md). Exit-survey
+trigger thresholds (re-calibrate when checkout layout changes) at
+[`notes/exit-survey-thresholds-2026-04-29.md`](./notes/exit-survey-thresholds-2026-04-29.md).
+
+Sources, ingestion API, classifier, and digest are all wired. Canonical
+store is Anthony's Gmail inbox under the `feedback-inbound` label;
+`investor-outreach/scripts/ingest-gmail-feedback.py` reconstructs the
+local JSONL on demand. Do not bypass `sendInternalAlert` to write feedback
+rows directly to the filesystem — Vercel's filesystem is ephemeral, and
+the email-as-store pattern is durable across deploys.
+
+The abandoned-cart sequences (`src/trigger/abandoned-checkout.ts` and
+`src/trigger/stripe-abandoned-checkout.ts`) now lead with a feedback ask
+("Step 0") at +2h before any sales-recovery email. This is the program's
+"ask before we sell" rule; do not reorder it back without revisiting the
+operating doc first.
+
 <!-- TRIGGER.DEV basic END -->

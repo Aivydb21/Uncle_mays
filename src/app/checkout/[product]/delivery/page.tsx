@@ -275,11 +275,9 @@ export default function DeliveryPage() {
           const parsed = JSON.parse(savedAdditional) as ProteinId[];
           if (parsed.length > 0) additionalProteinChoices = parsed;
         }
-        // Bean choice — Full Harvest only. Default to "black" if missing.
-        if (slug === "family") {
-          const savedBean = sessionStorage.getItem(`unc-bean-${slug}`);
-          beanChoice = (savedBean === "pinto" || savedBean === "kidney") ? savedBean : "black";
-        }
+        // Bean choice — every box. Default to "black" if missing.
+        const savedBean = sessionStorage.getItem(`unc-bean-${slug}`);
+        beanChoice = (savedBean === "pinto" || savedBean === "kidney") ? savedBean : "black";
       } catch {
         // ignore
       }

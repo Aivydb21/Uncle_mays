@@ -191,7 +191,7 @@ function SubscriptionPaymentForm({
           <svg className="w-4 h-4 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
-          <span className="text-sm text-foreground/75">${checkout.subPrice}/week · Pause or cancel anytime in your account</span>
+          <span className="text-sm text-foreground/75">${checkout.subPrice}/week · Manage in your account</span>
         </div>
       </div>
 
@@ -549,7 +549,7 @@ export default function SubscribePaymentPage() {
                     <span>${checkout.subPrice.toFixed(2)}/wk</span>
                   </div>
                 ) : (
-                  <p className="text-xs text-muted-foreground mt-1">Billed weekly · Cancel anytime</p>
+                  <p className="text-xs text-muted-foreground mt-1">Billed weekly</p>
                 )}
               </div>
               <div className="mb-3" />

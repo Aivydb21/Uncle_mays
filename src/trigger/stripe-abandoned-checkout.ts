@@ -24,7 +24,9 @@ function md5(s: string) {
  *   - N = 1, 2, or 3 (which recovery email)
  * Example: `abc_9XpT2aKq_e2`
  */
-function sessionEmailTag(sessionId: string, emailNumber: 1 | 2 | 3): string {
+// emailNumber=0 is the Customer Feedback Program feedback ask, fired before
+// any sales-recovery email. Numbers 1-3 are the original recovery sequence.
+function sessionEmailTag(sessionId: string, emailNumber: 0 | 1 | 2 | 3): string {
   return `abc_${sessionId.slice(-8)}_e${emailNumber}`;
 }
 
@@ -131,7 +133,7 @@ async function sendEmail(
   email: string,
   name: { first?: string; last?: string },
   sessionId: string,
-  emailNumber: 1 | 2 | 3
+  emailNumber: 0 | 1 | 2 | 3
 ): Promise<{ campaignId: string }> {
   void apiKey;
   const firstName = name.first || "friend";
@@ -144,7 +146,40 @@ async function sendEmail(
   let htmlContent: string;
   let plainText: string;
 
-  if (emailNumber === 1) {
+  if (emailNumber === 0) {
+    // Step 0: feedback ask (Customer Feedback Program, Source C). Plain-text-feeling,
+    // signed by Anthony, replies land in info@unclemays.com.
+    subjectLine = "before I bug you about coming back...";
+    htmlContent = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="font-family:Georgia,serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 24px;font-size:16px;line-height:1.6;">
+    <p>Hi ${firstName},</p>
+    <p>Saw you started checking out at Uncle May's and didn't finish.</p>
+    <p>
+      Before I bug you about coming back, I'd rather just ask: what would we have
+      needed to do to win you over? Anything missing from the box, anything confusing,
+      any item you wanted that wasn't there.
+    </p>
+    <p>One sentence is plenty. I read every reply.</p>
+    <p>Thanks,<br>Anthony<br>Founder, Uncle May's Produce<br>(312) 972-2595</p>
+  </div>
+</body>
+</html>`;
+    plainText = `Hi ${firstName},
+
+Saw you started checking out at Uncle May's and didn't finish.
+
+Before I bug you about coming back, I'd rather just ask: what would we have needed to do to win you over? Anything missing from the box, anything confusing, any item you wanted that wasn't there.
+
+One sentence is plenty. I read every reply.
+
+Thanks,
+Anthony
+Founder, Uncle May's Produce
+(312) 972-2595`;
+  } else if (emailNumber === 1) {
     // Email 1: Cart Reminder (1 hour after abandonment)
     subjectLine = "Your Uncle May's box is waiting";
     htmlContent = `<!DOCTYPE html>
@@ -296,7 +331,11 @@ unclemays.com | info@unclemays.com`;
     html: htmlContent,
     text: plainText,
     tags: [
-      { name: "type", value: "abandoned_cart_stripe" },
+      {
+        name: "type",
+        value:
+          emailNumber === 0 ? "abandon_feedback_request" : "abandoned_cart_stripe",
+      },
       { name: "step", value: String(emailNumber) },
       { name: "session", value: sessionTag },
     ],
@@ -315,15 +354,18 @@ function parseNameParts(fullName: string): { first: string; last: string } {
 }
 
 /**
- * Stripe Abandoned Checkout Recovery - 3-Email Sequence
+ * Stripe Abandoned Checkout Recovery — 4-step sequence (feedback first, then recovery).
  *
  * Polls Stripe API every 30 minutes for expired checkout sessions.
- * Sends 3-email recovery sequence:
- * - Email 1: 1 hour after expiration (sessions expired 1-24 hours ago)
- * - Email 2: 24 hours after expiration (sessions expired 24-48 hours ago)
- * - Email 3: 48 hours after expiration (sessions expired 48-72 hours ago)
+ * Customer Feedback Program (Source C) inserts a feedback ask before any
+ * recovery email — "ask before we sell".
  *
- * This is Phase 1A with full 3-email sequence support.
+ * - Email 0 (feedback ask):  expired 2-24 hours ago
+ * - Email 1 (recovery):      expired 24-48 hours ago
+ * - Email 2 (recovery):      expired 48-72 hours ago
+ * - Email 3 (recovery):      expired 72-96 hours ago
+ *
+ * Each window is independent; Mailchimp tag dedup prevents duplicates.
  */
 export const stripeAbandonedCheckoutProcessor = schedules.task({
   id: "stripe-abandoned-checkout-processor-v2",
@@ -338,10 +380,11 @@ export const stripeAbandonedCheckoutProcessor = schedules.task({
     }
 
     const now = Math.floor(Date.now() / 1000);
-    const oneHourAgo = now - 3600;
+    const twoHoursAgo = now - 2 * 3600;
     const twentyFourHoursAgo = now - 24 * 3600;
     const fortyEightHoursAgo = now - 48 * 3600;
     const seventyTwoHoursAgo = now - 72 * 3600;
+    const ninetySixHoursAgo = now - 96 * 3600;
 
     const results: any[] = [];
 
@@ -356,7 +399,7 @@ export const stripeAbandonedCheckoutProcessor = schedules.task({
      * for this specific session — skip. Otherwise send, then add the tag.
      */
     async function processWindow(
-      emailNumber: 1 | 2 | 3,
+      emailNumber: 0 | 1 | 2 | 3,
       windowStart: number,
       windowEnd: number,
       windowLabel: string
@@ -403,11 +446,17 @@ export const stripeAbandonedCheckoutProcessor = schedules.task({
       return sessions.length;
     }
 
-    const email1Count = await processWindow(1, twentyFourHoursAgo, oneHourAgo, "1-24h window");
-    const email2Count = await processWindow(2, fortyEightHoursAgo, twentyFourHoursAgo, "24-48h window");
-    const email3Count = await processWindow(3, seventyTwoHoursAgo, fortyEightHoursAgo, "48-72h window");
+    const email0Count = await processWindow(0, twentyFourHoursAgo, twoHoursAgo, "2-24h window (feedback ask)");
+    const email1Count = await processWindow(1, fortyEightHoursAgo, twentyFourHoursAgo, "24-48h window");
+    const email2Count = await processWindow(2, seventyTwoHoursAgo, fortyEightHoursAgo, "48-72h window");
+    const email3Count = await processWindow(3, ninetySixHoursAgo, seventyTwoHoursAgo, "72-96h window");
 
     return {
+      email0: {
+        totalSessions: email0Count,
+        sent: results.filter((r) => r.emailNumber === 0 && r.sent).length,
+        failed: results.filter((r) => r.emailNumber === 0 && !r.sent).length,
+      },
       email1: {
         totalSessions: email1Count,
         sent: results.filter((r) => r.emailNumber === 1 && r.sent).length,

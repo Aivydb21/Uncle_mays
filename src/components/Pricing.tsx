@@ -123,7 +123,7 @@ export const Pricing = () => {
             isSubscription is set in useEffect above. */}
         <p className="text-center text-sm text-muted-foreground mb-8">
           {isSubscription
-            ? "Free delivery. Cancel anytime."
+            ? "Free delivery."
             : "Free delivery. One-time order, no subscription, no auto-renewal."}
         </p>
 
@@ -186,7 +186,7 @@ export const Pricing = () => {
                         </li>
                       );
                     })}
-                    <li className="text-xs text-muted-foreground italic mt-2 pt-2 border-t border-border/50">
+                    <li className="text-base font-semibold text-foreground mt-2 pt-2 border-t border-border/50">
                       {product.weightEstimate}
                     </li>
                   </ul>

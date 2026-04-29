@@ -29,6 +29,9 @@ export interface CheckoutSession {
   paymentIntentId?: string;
   completedAt?: string;
   recoveryEmailSent?: boolean; // Legacy field, use recoveryEmail1SentAt instead
+  // Customer Feedback Program — Source C. Step 0 is the feedback ask
+  // ("ask before we sell") and fires before any sales-recovery email.
+  recoveryEmail0SentAt?: string;
   recoveryEmail1SentAt?: string;
   recoveryEmail2SentAt?: string;
   recoveryEmail3SentAt?: string;

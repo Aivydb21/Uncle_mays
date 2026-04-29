@@ -4,7 +4,7 @@ import { GetStartedContent } from "./GetStartedContent";
 export const metadata: Metadata = {
   title: "Get Your First Box — Uncle May's Produce",
   description:
-    "Fresh seasonal produce delivered weekly across the Chicago metro area. Use code FRESH10 for $10 off your first box. Free delivery, cancel anytime.",
+    "Fresh seasonal produce delivered weekly across the Chicago metro area. Use code FRESH10 for $10 off your first box. Free delivery.",
   openGraph: {
     title: "Get Your First Box — $10 off with FRESH10",
     description:

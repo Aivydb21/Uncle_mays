@@ -36,6 +36,9 @@ interface LocalCheckoutSession {
   createdAt: string;
   updatedAt: string;
   recoveryEmailSent?: boolean; // Legacy
+  // Customer Feedback Program — Source C. Step 0 is the feedback ask
+  // ("ask before we sell") that fires before any recovery email.
+  recoveryEmail0SentAt?: string;
   recoveryEmail1SentAt?: string;
   recoveryEmail2SentAt?: string;
   recoveryEmail3SentAt?: string;
@@ -59,10 +62,12 @@ async function fetchAbandonedLocalSessions(since: string): Promise<LocalCheckout
   return (data.sessions || []) as LocalCheckoutSession[];
 }
 
-// Mark which recovery email was sent
+// Mark which recovery email was sent. emailNumber=0 is the feedback-ask
+// step that fires before any sales-recovery email (Customer Feedback
+// Program, Source C).
 async function markRecoveryEmailSent(
   sessionId: string,
-  emailNumber: 1 | 2 | 3
+  emailNumber: 0 | 1 | 2 | 3
 ): Promise<void> {
   const field = `recoveryEmail${emailNumber}SentAt` as const;
   await fetch(`${SITE_BASE_URL}/api/checkout/session`, {
@@ -104,7 +109,7 @@ async function sendEmail(
   email: string,
   name: { first?: string; last?: string },
   sessionId: string,
-  emailNumber: 1 | 2 | 3,
+  emailNumber: 0 | 1 | 2 | 3,
   product?: string | null
 ): Promise<{ campaignId: string }> {
   const firstName = name.first || "friend";
@@ -118,7 +123,42 @@ async function sendEmail(
   let htmlContent: string;
   let plainText: string;
 
-  if (emailNumber === 1) {
+  if (emailNumber === 0) {
+    // Step 0: the "ask before we sell" feedback request. Plain-text-feeling,
+    // signed by Anthony, replies land in info@unclemays.com. This is the
+    // first thing a non-converting visitor hears from us — a question, not
+    // a coupon.
+    subjectLine = "before I bug you about coming back...";
+    htmlContent = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="font-family:Georgia,serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
+  <div style="max-width:560px;margin:0 auto;padding:32px 24px;font-size:16px;line-height:1.6;">
+    <p>Hi ${firstName},</p>
+    <p>Saw you started checking out at Uncle May's and didn't finish.</p>
+    <p>
+      Before I bug you about coming back, I'd rather just ask: what would we have
+      needed to do to win you over? Anything missing from the box, anything confusing,
+      any item you wanted that wasn't there.
+    </p>
+    <p>One sentence is plenty. I read every reply.</p>
+    <p>Thanks,<br>Anthony<br>Founder, Uncle May's Produce<br>(312) 972-2595</p>
+  </div>
+</body>
+</html>`;
+    plainText = `Hi ${firstName},
+
+Saw you started checking out at Uncle May's and didn't finish.
+
+Before I bug you about coming back, I'd rather just ask: what would we have needed to do to win you over? Anything missing from the box, anything confusing, any item you wanted that wasn't there.
+
+One sentence is plenty. I read every reply.
+
+Thanks,
+Anthony
+Founder, Uncle May's Produce
+(312) 972-2595`;
+  } else if (emailNumber === 1) {
     // Email 1: Cart Reminder (1 hour after abandonment)
     subjectLine = "Your Uncle May's box is waiting";
     htmlContent = `<!DOCTYPE html>
@@ -270,7 +310,10 @@ unclemays.com | info@unclemays.com`;
     html: htmlContent,
     text: plainText,
     tags: [
-      { name: "type", value: "abandoned_cart" },
+      {
+        name: "type",
+        value: emailNumber === 0 ? "abandon_feedback_request" : "abandoned_cart",
+      },
       { name: "step", value: String(emailNumber) },
       { name: "session", value: sessionTag },
     ],
@@ -352,15 +395,20 @@ async function isSessionStillAbandoned(sessionId: string): Promise<boolean> {
 }
 
 /**
- * Webhook-triggered task: 3-email sequence with Trigger.dev waits
+ * Webhook-triggered task: 4-step sequence with Trigger.dev waits.
  *
  * Triggered from /api/checkout/session (POST) after delivery form submission.
- * Sends 3 recovery emails:
- * - Email 1: 1 hour after abandonment
- * - Email 2: 24 hours after abandonment (if still abandoned)
- * - Email 3: 48 hours after abandonment (if still abandoned)
+ * Step 0 (Customer Feedback Program, Source C) fires first — "ask before we
+ * sell" — and recovery emails follow only if the contact didn't reply.
  *
- * Expected recovery rate: 10-15% (vs. current 3-5% with single email)
+ * - Email 0 (feedback ask):    2 hours after abandonment
+ * - Email 1 (recovery):       24 hours after abandonment
+ * - Email 2 (recovery):       48 hours after abandonment (if still abandoned)
+ * - Email 3 (recovery):       72 hours after abandonment (if still abandoned)
+ *
+ * V1.1: detect Step 0 replies and suppress Steps 1-3 automatically. For now,
+ * Anthony manually flags replied threads and skips the remaining steps via
+ * the session API.
  */
 export const sendAbandonedCheckoutEmail = task({
   id: "send-abandoned-checkout-email",
@@ -393,12 +441,37 @@ export const sendAbandonedCheckoutEmail = task({
       console.warn("Mailchimp upsert warning:", e.message)
     );
 
-    // --- Email 1: Wait 1 hour, then send ---
-    await wait.for({ hours: 1 });
+    // --- Email 0: Wait 2 hours, then send the feedback ask ---
+    await wait.for({ hours: 2 });
 
     if (!(await isSessionStillAbandoned(payload.sessionId))) {
-      console.log(`Session ${payload.sessionId} was paid — stopping sequence`);
-      return { stopped: true, reason: "checkout_completed_before_email1" };
+      console.log(`Session ${payload.sessionId} was paid — stopping before Email 0`);
+      return { stopped: true, reason: "checkout_completed_before_email0" };
+    }
+
+    try {
+      const { campaignId } = await sendEmail(
+        mailchimpKey,
+        email,
+        name,
+        payload.sessionId,
+        0,
+        payload.product
+      );
+      await markRecoveryEmailSent(payload.sessionId, 0);
+      console.log(`Email 0 (feedback ask) sent | session=${payload.sessionId} campaign=${campaignId}`);
+      results.push({ emailNumber: 0, sent: true, campaignId });
+    } catch (e: any) {
+      console.error(`Email 0 failed for session ${payload.sessionId}:`, e.message);
+      results.push({ emailNumber: 0, sent: false, error: e.message });
+    }
+
+    // --- Email 1: Wait 22 more hours (24h total), then send recovery ---
+    await wait.for({ hours: 22 });
+
+    if (!(await isSessionStillAbandoned(payload.sessionId))) {
+      console.log(`Session ${payload.sessionId} was paid — stopping after Email 0`);
+      return { results, stopped: true, reason: "checkout_completed_before_email1" };
     }
 
     try {
@@ -419,8 +492,8 @@ export const sendAbandonedCheckoutEmail = task({
       // Continue to Email 2 despite Email 1 failure
     }
 
-    // --- Email 2: Wait 23 more hours (24h total), then send ---
-    await wait.for({ hours: 23 });
+    // --- Email 2: Wait 24 more hours (48h total post-abandon), then send ---
+    await wait.for({ hours: 24 });
 
     if (!(await isSessionStillAbandoned(payload.sessionId))) {
       console.log(`Session ${payload.sessionId} was paid — stopping after Email 1`);
@@ -445,7 +518,7 @@ export const sendAbandonedCheckoutEmail = task({
       // Continue to Email 3 despite Email 2 failure
     }
 
-    // --- Email 3: Wait 24 more hours (48h total), then send ---
+    // --- Email 3: Wait 24 more hours (72h total post-abandon), then send ---
     await wait.for({ hours: 24 });
 
     if (!(await isSessionStillAbandoned(payload.sessionId))) {
@@ -491,14 +564,16 @@ export const abandonedCheckoutProcessor = schedules.task({
     const apolloKey = process.env.APOLLO_API_KEY!;
     const mailchimpKey = process.env.MAILCHIMP_API_KEY!;
 
-    // Fetch local sessions created in the last 72h (covers all 3 email windows)
-    const since = new Date(Date.now() - 72 * 3600 * 1000).toISOString();
+    // Fetch local sessions created in the last 96h (covers Email 0 at 2h
+    // through Email 3 at 72h, with a 24h buffer for cron drift).
+    const since = new Date(Date.now() - 96 * 3600 * 1000).toISOString();
     const allSessions = await fetchAbandonedLocalSessions(since);
 
     const now = Date.now();
-    const oneHourAgo = now - 3600 * 1000;
+    const twoHoursAgo = now - 2 * 3600 * 1000;
     const twentyFourHoursAgo = now - 24 * 3600 * 1000;
     const fortyEightHoursAgo = now - 48 * 3600 * 1000;
+    const seventyTwoHoursAgo = now - 72 * 3600 * 1000;
 
     const results: any[] = [];
 
@@ -512,15 +587,44 @@ export const abandonedCheckoutProcessor = schedules.task({
       const name = { first: session.firstName, last: session.lastName ?? "" };
 
       // Tag in Apollo for CRM tracking (once per session)
-      if (!session.recoveryEmail1SentAt && !session.recoveryEmailSent) {
+      if (
+        !session.recoveryEmail0SentAt &&
+        !session.recoveryEmail1SentAt &&
+        !session.recoveryEmailSent
+      ) {
         await upsertApolloContact(apolloKey, email, name).catch((e: any) =>
           console.warn("Apollo error:", e.message)
         );
       }
 
-      // Email 1: Send if created 1+ hours ago and not sent
+      // Email 0 (feedback ask): Send if created 2+ hours ago and not sent.
+      // Customer Feedback Program — Source C. Goes before any recovery email.
+      if (createdMs <= twoHoursAgo && !session.recoveryEmail0SentAt) {
+        await upsertMailchimpContact(mailchimpKey, email, name).catch((e) =>
+          console.warn("Mailchimp upsert warning:", e.message)
+        );
+        try {
+          const { campaignId } = await sendEmail(
+            mailchimpKey,
+            email,
+            name,
+            session.id,
+            0,
+            session.product
+          );
+          await markRecoveryEmailSent(session.id, 0);
+          console.log(`Email 0 sent (cron) | session=${session.id} campaign=${campaignId}`);
+          results.push({ sessionId: session.id, email, emailNumber: 0, sent: true, campaignId });
+        } catch (e: any) {
+          console.error(`Email 0 failed (cron) for session ${session.id}:`, e.message);
+          results.push({ sessionId: session.id, email, emailNumber: 0, sent: false, error: e.message });
+        }
+      }
+
+      // Email 1: Send if created 24+ hours ago, Email 0 was sent, and Email 1 not sent
       if (
-        createdMs <= oneHourAgo &&
+        createdMs <= twentyFourHoursAgo &&
+        session.recoveryEmail0SentAt &&
         !session.recoveryEmail1SentAt &&
         !session.recoveryEmailSent
       ) {
@@ -546,9 +650,9 @@ export const abandonedCheckoutProcessor = schedules.task({
         }
       }
 
-      // Email 2: Send if created 24+ hours ago, Email 1 was sent, and Email 2 not sent
+      // Email 2: Send if created 48+ hours ago, Email 1 was sent, and Email 2 not sent
       if (
-        createdMs <= twentyFourHoursAgo &&
+        createdMs <= fortyEightHoursAgo &&
         (session.recoveryEmail1SentAt || session.recoveryEmailSent) &&
         !session.recoveryEmail2SentAt
       ) {
@@ -570,9 +674,9 @@ export const abandonedCheckoutProcessor = schedules.task({
         }
       }
 
-      // Email 3: Send if created 48+ hours ago, Email 2 was sent, and Email 3 not sent
+      // Email 3: Send if created 72+ hours ago, Email 2 was sent, and Email 3 not sent
       if (
-        createdMs <= fortyEightHoursAgo &&
+        createdMs <= seventyTwoHoursAgo &&
         session.recoveryEmail2SentAt &&
         !session.recoveryEmail3SentAt
       ) {
@@ -599,6 +703,7 @@ export const abandonedCheckoutProcessor = schedules.task({
       totalSessions: allSessions.length,
       processed: results.length,
       byEmail: {
+        email0: results.filter((r) => r.emailNumber === 0).length,
         email1: results.filter((r) => r.emailNumber === 1).length,
         email2: results.filter((r) => r.emailNumber === 2).length,
         email3: results.filter((r) => r.emailNumber === 3).length,

@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShieldCheck, Truck, Leaf } from "lucide-react";
 import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { CheckoutExitSurvey } from "@/components/CheckoutExitSurvey";
 
 // Passive progress bar (see /checkout/[product]/page.tsx for rationale).
 function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
@@ -211,6 +212,7 @@ export default function SubscribeSummaryPage() {
 
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
+      <CheckoutExitSurvey productSlug={slug} />
       <div className="container px-4 max-w-2xl mx-auto">
         <div className="mb-6">
           <Link
@@ -321,11 +323,11 @@ export default function SubscribeSummaryPage() {
                   );
                 })}
               </ul>
-              <p className="mt-3 text-xs text-muted-foreground italic">{product.weightEstimate}</p>
+              <p className="mt-3 text-base font-semibold text-foreground">{product.weightEstimate}</p>
             </div>
 
-            {/* Bean choice — Full Harvest Box only. Defaults to black. */}
-            {isFullHarvest && (
+            {/* Bean choice — every box. Defaults to black. */}
+            {(
               <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4">
                 <h2 className="text-sm font-bold uppercase tracking-wide text-primary mb-1">
                   Choose your bean
@@ -420,7 +422,7 @@ export default function SubscribeSummaryPage() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 py-4 border-y border-border">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
-                <span>Cancel anytime, no fees</span>
+                <span>100% fresh or refunded</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Truck className="h-4 w-4 text-primary shrink-0" />

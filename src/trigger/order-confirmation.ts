@@ -54,7 +54,7 @@ function buildConfirmationEmail(params: {
   const sessionTag = sessionId.substring(0, 8);
   const formattedAmount = `$${amountDollars.toFixed(2)}`;
   const billingLine = isSubscription
-    ? `Billing: ${formattedAmount} / ${billingInterval || "month"} — renews automatically, cancel anytime`
+    ? `Billing: ${formattedAmount} / ${billingInterval || "month"} — renews automatically`
     : `Payment: ${formattedAmount} (one-time)`;
   const subscriptionNote = isSubscription
     ? `<p style="font-size:14px;color:#666;line-height:1.6;">
