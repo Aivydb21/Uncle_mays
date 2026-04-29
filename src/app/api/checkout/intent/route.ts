@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { validatePromo } from "@/lib/promo";
+import { getDiscountCents, validatePromo } from "@/lib/promo";
 
 // Map product slugs to amounts in cents (one-time price).
 // MUST match src/lib/products.ts PRODUCTS[slug].price * 100.
@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
     const validPromo = validatePromo(promo, "one-time");
     if (validPromo) {
       appliedPromoCode = validPromo.code;
-      appliedPromoDiscount = Math.min(validPromo.entry.amountOffCents, Math.max(0, amount - 100));
+      appliedPromoDiscount = Math.min(getDiscountCents(validPromo.entry, amount), Math.max(0, amount - 100));
       amount -= appliedPromoDiscount;
     }
 

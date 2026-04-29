@@ -9,7 +9,7 @@ import { PRODUCTS, PROTEIN_OPTIONS, PROTEIN_TAGLINE, BEAN_OPTIONS, DEFAULT_BEAN,
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShieldCheck, Truck, Leaf } from "lucide-react";
-import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { ACTIVE_PROMOS, getDiscountCents, normalizePromo } from "@/lib/promo";
 import { CheckoutExitSurvey } from "@/components/CheckoutExitSurvey";
 
 // Passive progress bar (see /checkout/[product]/page.tsx for rationale).
@@ -92,8 +92,8 @@ export default function SubscribeSummaryPage() {
     setPromoInput("");
   }
   const activePromo = promoCode ? ACTIVE_PROMOS[promoCode] : null;
-  const promoDiscount = activePromo?.appliesTo.includes("subscription")
-    ? activePromo.amountOffCents / 100
+  const promoDiscount = activePromo && activePromo.appliesTo.includes("subscription")
+    ? getDiscountCents(activePromo, Math.round(product.subPrice * 100)) / 100
     : 0;
 
   // Fire Meta Pixel ViewContent on page load (client-side) AND server-side CAPI,

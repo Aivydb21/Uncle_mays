@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { PRODUCTS, PROTEIN_OPTIONS, PROTEIN_TAGLINE, BEAN_OPTIONS, DEFAULT_BEAN, type ProductSlug, type ProteinId, type BeanId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { ACTIVE_PROMOS, getDiscountCents, normalizePromo } from "@/lib/promo";
 import { useAddressAutocomplete, type ParsedAddress } from "@/hooks/use-address-autocomplete";
 import { WaitlistCapture } from "@/components/WaitlistCapture";
 import { isInServiceArea, OUT_OF_AREA_MESSAGE } from "@/lib/service-area";
@@ -151,9 +151,6 @@ export default function CheckoutPage() {
     setPromoInput("");
   }
   const activePromo = promoCode ? ACTIVE_PROMOS[promoCode] : null;
-  const promoDiscount = activePromo?.appliesTo.includes("one-time")
-    ? activePromo.amountOffCents / 100
-    : 0;
 
   // Fire Meta Pixel ViewContent + server CAPI.
   useEffect(() => {
@@ -227,6 +224,9 @@ export default function CheckoutPage() {
     return sum + (opt?.price ?? 0);
   }, 0);
   const totalPrice = basePrice + proteinCost;
+  const promoDiscount = activePromo && activePromo.appliesTo.includes("one-time")
+    ? getDiscountCents(activePromo, Math.round(totalPrice * 100)) / 100
+    : 0;
   const discountedTotal = Math.max(0, totalPrice - promoDiscount);
 
   // --- Delivery form state ---

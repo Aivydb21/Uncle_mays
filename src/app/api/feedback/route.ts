@@ -22,6 +22,7 @@ const VALID_SOURCES = new Set([
   "interview",
   "manual-upload",
   "abandon-reply",
+  "social-ask",
 ]);
 const VALID_CHANNELS = new Set(["web", "email", "interview", "phone", "social"]);
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

@@ -150,7 +150,11 @@ export async function POST(req: NextRequest) {
     const validPromo = validatePromo(promo, "subscription");
     if (validPromo) {
       metadata.promo_code = validPromo.code;
-      metadata.promo_discount_cents = String(validPromo.entry.amountOffCents);
+      if (validPromo.entry.percentOff != null) {
+        metadata.promo_percent_off = String(validPromo.entry.percentOff);
+      } else if (validPromo.entry.amountOffCents != null) {
+        metadata.promo_discount_cents = String(validPromo.entry.amountOffCents);
+      }
     }
 
     // --- Idempotency: reuse an existing incomplete subscription if one exists ---

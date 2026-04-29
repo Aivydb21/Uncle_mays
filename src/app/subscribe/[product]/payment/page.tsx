@@ -11,7 +11,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { PRODUCTS, type ProductSlug } from "@/lib/products";
-import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { ACTIVE_PROMOS, getDiscountCents, normalizePromo } from "@/lib/promo";
 import { getFbAttribution } from "@/lib/fb-attribution";
 
 declare global {
@@ -405,7 +405,7 @@ export default function SubscribePaymentPage() {
       const saved = normalizePromo(sessionStorage.getItem("unc-promo"));
       if (saved && ACTIVE_PROMOS[saved] && ACTIVE_PROMOS[saved].appliesTo.includes("subscription")) {
         const entry = ACTIVE_PROMOS[saved];
-        appliedPromo = { code: saved, amountOff: entry.amountOffCents / 100, label: entry.label };
+        appliedPromo = { code: saved, amountOff: getDiscountCents(entry, Math.round(checkout.subPrice * 100)) / 100, label: entry.label };
       }
     }
   } catch { /* ignore */ }

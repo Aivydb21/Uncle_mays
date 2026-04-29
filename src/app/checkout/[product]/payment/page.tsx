@@ -11,7 +11,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { PRODUCTS, type ProductSlug } from "@/lib/products";
-import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { ACTIVE_PROMOS, getDiscountCents, normalizePromo } from "@/lib/promo";
 import { getFbAttribution } from "@/lib/fb-attribution";
 
 // Load Stripe once outside component to avoid recreating on renders
@@ -438,7 +438,8 @@ export default function PaymentPage() {
                 try {
                   const saved = normalizePromo(sessionStorage.getItem("unc-promo"));
                   if (saved && ACTIVE_PROMOS[saved] && ACTIVE_PROMOS[saved].appliesTo.includes("one-time")) {
-                    promo = { code: saved, amountOff: ACTIVE_PROMOS[saved].amountOffCents / 100 };
+                    const entry = ACTIVE_PROMOS[saved];
+                    promo = { code: saved, amountOff: getDiscountCents(entry, Math.round(checkout.price * 100)) / 100 };
                   }
                 } catch { /* ignore */ }
                 if (!promo) return null;

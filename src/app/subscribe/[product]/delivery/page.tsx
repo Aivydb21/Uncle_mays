@@ -6,7 +6,7 @@ import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { ACTIVE_PROMOS, getDiscountCents, normalizePromo } from "@/lib/promo";
 import { useAddressAutocomplete, type ParsedAddress } from "@/hooks/use-address-autocomplete";
 import { WaitlistCapture } from "@/components/WaitlistCapture";
 import { isInServiceArea, OUT_OF_AREA_MESSAGE } from "@/lib/service-area";
@@ -175,8 +175,8 @@ export default function SubscribeDeliveryPage() {
     } catch { /* ignore */ }
   }, []);
   const activePromo = promoCode ? ACTIVE_PROMOS[promoCode] : null;
-  const promoDiscount = activePromo?.appliesTo.includes("subscription")
-    ? activePromo.amountOffCents / 100
+  const promoDiscount = activePromo && activePromo.appliesTo.includes("subscription")
+    ? getDiscountCents(activePromo, Math.round(product.subPrice * 100)) / 100
     : 0;
   const firstBoxPrice = Math.max(0, product.subPrice - promoDiscount);
 

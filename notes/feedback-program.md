@@ -66,6 +66,24 @@ No code path. Anthony emails paying customers, takes notes in
 `notes/customer-interviews-<date>.md`, and uploads them via
 `/admin/feedback` (gated by `FEEDBACK_ADMIN_TOKEN` env var).
 
+### E — Social ask (FB/IG follower funnel)
+
+Page: `src/app/ask/page.tsx`. Component: `src/components/AskForm.tsx`.
+Two-question form (what would you want in the box, what would make you
+buy) plus optional email. On submit, posts to `/api/feedback` with
+`source=social-ask`, `channel=social`, and reveals `FRESH35` (35% off
+first box) on the thank-you screen.
+
+Anthony posts links to `unclemays.com/ask?utm_source=facebook|instagram&utm_medium=organic&utm_campaign=social_ask_<month>_<year>`
+on the FB Page (755316477673748) and the IG feed manually. UTM/fbclid
+captured globally by `<UTMCapture/>` flow into the feedback row's
+`notes` field, so the weekly digest's source breakdown shows FB vs IG
+split.
+
+The page is `noindex` (it's an outreach surface, not SEO content) and
+revealing FRESH35 on submit rather than gating it behind an email is
+intentional — the goal is feedback volume, not lead capture.
+
 ## Operating cadence
 
 | Cadence | Owner | Action |

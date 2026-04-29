@@ -6,7 +6,7 @@ import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ACTIVE_PROMOS, normalizePromo } from "@/lib/promo";
+import { ACTIVE_PROMOS, getDiscountCents, normalizePromo } from "@/lib/promo";
 import { useAddressAutocomplete, type ParsedAddress } from "@/hooks/use-address-autocomplete";
 import { WaitlistCapture } from "@/components/WaitlistCapture";
 import { isInServiceArea, OUT_OF_AREA_MESSAGE } from "@/lib/service-area";
@@ -153,8 +153,8 @@ export default function DeliveryPage() {
     } catch { /* ignore */ }
   }, []);
   const activePromo = promoCode ? ACTIVE_PROMOS[promoCode] : null;
-  const promoDiscount = activePromo?.appliesTo.includes("one-time")
-    ? activePromo.amountOffCents / 100
+  const promoDiscount = activePromo && activePromo.appliesTo.includes("one-time")
+    ? getDiscountCents(activePromo, Math.round(product.price * 100)) / 100
     : 0;
 
   // Pre-fill email from Step 1 capture (sessionStorage)
