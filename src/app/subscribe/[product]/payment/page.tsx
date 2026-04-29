@@ -260,13 +260,18 @@ export default function SubscribePaymentPage() {
         // the webhook can include them in the Purchase CAPI event.
         const fb = getFbAttribution();
 
-        // Generate one eventId shared by the browser pixel fire and the server
-        // CAPI fire inside /api/checkout/subscribe-intent, so Meta deduplicates
-        // the pair and only counts a single InitiateCheckout.
-        const icEventId =
-          typeof crypto !== "undefined" && "randomUUID" in crypto
-            ? crypto.randomUUID()
-            : `ic-sub-${data.product}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        // Stable eventId per browser session per product so return-visits dedup
+        // at Meta's side (UNC-571). Browser pixel + CAPI both use this same id.
+        const icStorageKey = `unc-ic-sub-${data.product}`;
+        let icEventId: string | null = null;
+        try { icEventId = sessionStorage.getItem(icStorageKey); } catch { /* ignore */ }
+        if (!icEventId) {
+          icEventId =
+            typeof crypto !== "undefined" && "randomUUID" in crypto
+              ? crypto.randomUUID()
+              : `ic-sub-${data.product}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          try { sessionStorage.setItem(icStorageKey, icEventId); } catch { /* ignore */ }
+        }
 
         // Pull the validated promo code out of sessionStorage (set on the
         // summary page when ?promo= is in the URL). Server re-validates.

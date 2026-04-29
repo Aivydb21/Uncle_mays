@@ -245,6 +245,41 @@ export default function PaymentPage() {
           return;
         }
         setClientSecret(json.clientSecret);
+
+        // Fire InitiateCheckout for one-time checkout (UNC-571).
+        // Stable eventId per session per product so return-visits dedup at Meta.
+        const icStorageKey = `unc-ic-ot-${data.product}`;
+        let icEventId: string | null = null;
+        try { icEventId = sessionStorage.getItem(icStorageKey); } catch { /* ignore */ }
+        if (!icEventId) {
+          icEventId =
+            typeof crypto !== "undefined" && "randomUUID" in crypto
+              ? crypto.randomUUID()
+              : `ic-ot-${data.product}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+          try { sessionStorage.setItem(icStorageKey, icEventId); } catch { /* ignore */ }
+        }
+        try {
+          if (typeof window !== "undefined" && window.fbq) {
+            window.fbq("track", "InitiateCheckout", {
+              content_ids: [data.product],
+              content_type: "product",
+              value: data.price,
+              currency: "USD",
+              num_items: 1,
+            }, { eventID: icEventId });
+          }
+        } catch { /* Never block checkout for tracking */ }
+        // CAPI server-side fire for ad-blocker bypass
+        fetch("/api/capi/initiate-checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug: data.product,
+            contentName: data.productName,
+            value: data.price,
+            eventId: icEventId,
+          }),
+        }).catch(() => {});
       } catch {
         setIntentError("Network error. Please check your connection and try again.");
       } finally {
