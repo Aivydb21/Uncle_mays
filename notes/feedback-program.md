@@ -71,7 +71,7 @@ No code path. Anthony emails paying customers, takes notes in
 Page: `src/app/ask/page.tsx`. Component: `src/components/AskForm.tsx`.
 Two-question form (what would you want in the box, what would make you
 buy) plus optional email. On submit, posts to `/api/feedback` with
-`source=social-ask`, `channel=social`, and reveals `FRESH35` (35% off
+`source=social-ask`, `channel=social`, and reveals `FRESH30` (30% off
 first box) on the thank-you screen.
 
 Anthony posts links to `unclemays.com/ask?utm_source=facebook|instagram&utm_medium=organic&utm_campaign=social_ask_<month>_<year>`
@@ -81,7 +81,7 @@ captured globally by `<UTMCapture/>` flow into the feedback row's
 split.
 
 The page is `noindex` (it's an outreach surface, not SEO content) and
-revealing FRESH35 on submit rather than gating it behind an email is
+revealing FRESH30 on submit rather than gating it behind an email is
 intentional — the goal is feedback volume, not lead capture.
 
 ## Operating cadence

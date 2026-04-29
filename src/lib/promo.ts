@@ -21,10 +21,10 @@ export const ACTIVE_PROMOS: Record<string, PromoEntry> = {
     label: "$10 off your first box",
     appliesTo: ["one-time", "subscription"],
   },
-  FRESH35: {
-    couponId: "fresh35-apr-2026",
-    percentOff: 35,
-    label: "35% off your first box",
+  FRESH30: {
+    couponId: "fresh30-apr-2026",
+    percentOff: 30,
+    label: "30% off your first box",
     appliesTo: ["one-time", "subscription"],
   },
 };

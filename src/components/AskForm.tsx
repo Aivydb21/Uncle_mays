@@ -6,7 +6,7 @@ import { getUTMParams } from "@/lib/utm";
 
 // Source E of the Customer Feedback Program. Two-question landing form for
 // FB/IG follower outreach. On submit, posts to /api/feedback with
-// source=social-ask and reveals the FRESH35 promo as the carrot. Distinct
+// source=social-ask and reveals the FRESH30 promo as the carrot. Distinct
 // from AskCapture (homepage variant, no promo, single question).
 
 const Q1 = "What would you want in your produce box?";
@@ -87,7 +87,7 @@ export function AskForm() {
 
   const copyCode = async () => {
     try {
-      await navigator.clipboard.writeText("FRESH35");
+      await navigator.clipboard.writeText("FRESH30");
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -100,7 +100,7 @@ export function AskForm() {
       <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6 md:p-8 shadow-soft">
         <h2 className="text-xl md:text-2xl font-bold mb-2">Got it. Thank you.</h2>
         <p className="text-sm text-foreground/75 mb-5">
-          Anthony reads every reply personally. Here&apos;s 35% off your first box as a thank you.
+          Anthony reads every reply personally. Here&apos;s 30% off your first box as a thank-you.
         </p>
 
         <div className="rounded-lg border border-primary/40 bg-background p-4 mb-4">
@@ -108,7 +108,7 @@ export function AskForm() {
             Your code
           </div>
           <div className="flex items-center justify-between gap-3">
-            <span className="text-2xl font-bold tracking-wider text-primary">FRESH35</span>
+            <span className="text-2xl font-bold tracking-wider text-primary">FRESH30</span>
             <button
               type="button"
               onClick={copyCode}
@@ -118,18 +118,18 @@ export function AskForm() {
             </button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            35% off your first box. Auto-applies at checkout.
+            30% off your first box. Auto-applies at checkout.
           </p>
         </div>
 
         <Link
-          href="/?promo=FRESH35#boxes"
+          href="/?promo=FRESH30#boxes"
           onClick={() => {
             // Pre-stash the promo so it carries to whichever box the visitor
             // taps on the homepage. The /checkout and /subscribe routes both
             // read sessionStorage["unc-promo"] on mount.
             try {
-              sessionStorage.setItem("unc-promo", "FRESH35");
+              sessionStorage.setItem("unc-promo", "FRESH30");
             } catch {
               // ignore
             }
@@ -191,7 +191,7 @@ export function AskForm() {
         disabled={submitting || (!q1.trim() && !q2.trim())}
         className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold disabled:opacity-60"
       >
-        {submitting ? "Sending…" : "Send and get my 35% off"}
+        {submitting ? "Sending…" : "Send and get my 30% off"}
       </button>
     </form>
   );

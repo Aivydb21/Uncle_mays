@@ -23,7 +23,7 @@ same URL, and let the feed post drive people to the Story.
 
 We want to know what you'd actually buy.
 
-Two questions, takes 30 seconds. We'll send you 35% off your first box as a thank you.
+Two questions, takes 30 seconds. We'll send you 30% off your first box as a thank you.
 
 What would you want in your produce box? What would make you actually pull the trigger?
 
@@ -35,7 +35,7 @@ We restock every week based on what people ask for. The more specific you are, t
 
 What would you actually buy?
 
-Two questions, 30 seconds. 35% off your first box for telling us.
+Two questions, 30 seconds. 30% off your first box for telling us.
 
 We restock every Wednesday based on what people ask for. So tell us: what do you want in your produce box, and what would make you pull the trigger?
 
@@ -55,7 +55,7 @@ I want to ship the box you'd actually buy. Right now we have salad mix, kale, ca
 
 But I know I'm missing things. Tell me what you'd want, and tell me what's stopping you from ordering. Two questions, 30 seconds.
 
-I'll send you 35% off your first box for the time.
+I'll send you 30% off your first box for the time.
 
 https://unclemays.com/ask?utm_source=facebook&utm_medium=organic&utm_campaign=social_ask_apr2026
 
@@ -65,7 +65,7 @@ Anthony here, founder.
 
 I want to ship the box you'd actually buy. So tell me: what would you want in it, and what's stopping you from ordering?
 
-Two questions, 30 seconds. 35% off your first box as a thank you.
+Two questions, 30 seconds. 30% off your first box as a thank you.
 
 👆 Link in bio (/ask)
 
@@ -77,7 +77,7 @@ Two questions, 30 seconds. 35% off your first box as a thank you.
 
 **FB caption:**
 
-Two questions. 30 seconds. 35% off your first box for answering.
+Two questions. 30 seconds. 30% off your first box for answering.
 
 1. What would you want in your produce box?
 2. What would make you buy?
@@ -88,7 +88,7 @@ We're a Black-owned produce delivery sourced from Run A Way Buckers Club (Pembro
 
 **IG caption (link in bio):**
 
-Two questions. 30 seconds. 35% off for answering.
+Two questions. 30 seconds. 30% off for answering.
 
 1. What would you want in your produce box?
 2. What would make you buy?
