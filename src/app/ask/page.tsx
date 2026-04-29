@@ -17,10 +17,12 @@ export default function AskPage() {
             What would you want in your box?
           </h1>
           <p className="text-sm md:text-base text-foreground/75">
-            We&apos;re a Black-owned produce delivery serving the Chicago metro, sourced from
-            Run A Way Buckers Club in Pembroke, IL. We restock weekly based on what people
-            ask for. Tell us what you&apos;d want and what would make you buy, and we&apos;ll
-            send you 35% off your first box.
+            We&apos;re a Black-owned grocery delivery serving the Chicago metro, sourcing from
+            Black farmers and Black vendors, starting with Run A Way Buckers Club in
+            Pembroke, IL. We restock weekly based on what people ask for, and we&apos;re open
+            to anything: produce, proteins, seasonings, baked goods, pantry items, you name
+            it. Tell us what you&apos;d want and what would make you buy, and we&apos;ll send
+            you 35% off your first box.
           </p>
         </div>
 

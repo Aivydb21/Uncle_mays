@@ -154,7 +154,7 @@ export function AskForm() {
           onChange={(e) => setQ1(e.target.value)}
           rows={3}
           maxLength={1000}
-          placeholder="e.g., 'more salad mix', 'smaller box for one person', 'add fresh herbs'…"
+          placeholder="Anything goes: produce, a protein, seasonings, baked goods, pantry staples, a Black-owned brand you love…"
           className="w-full rounded-lg border border-border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
         />
       </div>
