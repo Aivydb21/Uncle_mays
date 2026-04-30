@@ -632,7 +632,7 @@ export default function CheckoutPage() {
                         <p className="text-xs text-muted-foreground mt-1">
                           {selectedProteins.length > 0
                             ? `${selectedProteins.length} added (+$${proteinCost})`
-                            : "Pasture-raised, no antibiotics. Slaughtered fresh."}
+                            : "Pasture-raised, no antibiotics. Never frozen."}
                         </p>
                       </div>
                       <span className={`text-xl text-muted-foreground transition-transform ${showProteinAddOns ? "rotate-45" : ""}`}>+</span>

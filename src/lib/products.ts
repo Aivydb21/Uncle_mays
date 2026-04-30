@@ -1,6 +1,6 @@
 // Proteins available as optional add-ons across every box.
 // Flat $12 per portion. Pasture-raised, no antibiotics, no chemicals,
-// slaughtered fresh. Chicken is the featured option (and is also INCLUDED
+// never frozen. Chicken is the featured option (and is also INCLUDED
 // in the Full Harvest Box base price; the add-on stays available so
 // customers can buy additional quantity).
 //
@@ -33,7 +33,7 @@ export const DEFAULT_BEAN: BeanId = "black";
 // One-line differentiator shown above the protein options at checkout.
 // Keep it short. Customers are deciding whether to add, not reading a story.
 export const PROTEIN_TAGLINE =
-  "Pasture-raised. No antibiotics, no chemicals. Slaughtered fresh, never shipped. Better than organic.";
+  "Pasture-raised. No antibiotics, no chemicals. Never frozen, never shipped. Better than organic.";
 
 /**
  * Two tiers. Contents are built from the current supplier's produce list

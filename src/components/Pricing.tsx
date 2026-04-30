@@ -217,7 +217,7 @@ export const Pricing = () => {
         {/* One-line protein add-on note — explicit so customers know protein is
             available without cluttering the tier cards with pricing tables. */}
         <p className="text-center text-sm text-muted-foreground mb-10 max-w-xl mx-auto">
-          Add chicken, short ribs, or lamb chops at checkout. $12 per pound, pasture-raised, slaughtered fresh.
+          Add chicken, short ribs, or lamb chops at checkout. $12 per pound, pasture-raised, never frozen.
         </p>
 
         {/* Produce box image removed 2026-04-28 — Clarity recordings showed
