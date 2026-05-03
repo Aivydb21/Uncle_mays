@@ -45,7 +45,8 @@ function authHeader(apiKey: string): string {
 export async function upsertContact(
   email: string,
   firstName: string,
-  lastName?: string
+  lastName?: string,
+  tags: string[] = ["checkout_started"]
 ): Promise<void> {
   if (isSuppressed(email)) return;
   const config = getConfig();
@@ -65,7 +66,7 @@ export async function upsertContact(
         email_address: email,
         status_if_new: "subscribed",
         status: "subscribed",
-        tags: ["checkout_started"],
+        tags,
         merge_fields: { FNAME: firstName, ...(lastName ? { LNAME: lastName } : {}) },
       }),
     });

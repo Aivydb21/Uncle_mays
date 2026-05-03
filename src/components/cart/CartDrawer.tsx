@@ -226,10 +226,111 @@ export function CartDrawer() {
             >
               Continue to checkout
             </Link>
+            <SaveCartCapture
+              cart={lines}
+              fulfillmentMode={fulfillmentMode}
+              shippingZip={shippingZip}
+              promoCode={promoCode}
+            />
           </div>
         )}
       </SheetContent>
     </Sheet>
+  );
+}
+
+function SaveCartCapture({
+  cart,
+  fulfillmentMode,
+  shippingZip,
+  promoCode,
+}: {
+  cart: { sku: string; quantity: number }[];
+  fulfillmentMode: "delivery" | "pickup";
+  shippingZip: string | null;
+  promoCode: string | null;
+}) {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  if (done) {
+    return (
+      <p className="mt-3 text-center text-xs text-primary">
+        Sent. Check your inbox to come back to this cart.
+      </p>
+    );
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mt-3 block w-full text-center text-xs font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+      >
+        Email me my cart
+      </button>
+    );
+  }
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setSubmitting(true);
+    setErr(null);
+    try {
+      const res = await fetch("/api/cart/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: email.trim().toLowerCase(),
+          cart,
+          fulfillmentMode,
+          shippingZip,
+          promoCode,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        setDone(true);
+      } else {
+        setErr(
+          data.error === "invalid_email"
+            ? "That email doesn't look right."
+            : "Couldn't send. Try again?"
+        );
+      }
+    } catch {
+      setErr("Couldn't send. Try again?");
+    }
+    setSubmitting(false);
+  }
+
+  return (
+    <form onSubmit={submit} className="mt-3 flex gap-2">
+      <input
+        type="email"
+        required
+        autoFocus
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="your@email.com"
+        className="h-9 flex-1 rounded-md border border-border bg-background px-3 text-sm"
+      />
+      <button
+        type="submit"
+        disabled={submitting}
+        className="rounded-md border border-primary px-3 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground disabled:opacity-60"
+      >
+        {submitting ? "Sending…" : "Send"}
+      </button>
+      {err && (
+        <p className="basis-full text-xs text-destructive">{err}</p>
+      )}
+    </form>
   );
 }
 

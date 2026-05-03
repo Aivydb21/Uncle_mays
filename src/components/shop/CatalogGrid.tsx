@@ -6,6 +6,7 @@ import { Search, X } from "lucide-react";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { MobileCartTotal } from "@/components/shop/MobileCartTotal";
 import { formatCents } from "@/lib/format";
+import { useCartStore } from "@/lib/cart/store";
 import type { CatalogCategory, CatalogItem } from "@/lib/catalog/types";
 
 const CATEGORY_ORDER: CatalogCategory[] = [
@@ -20,12 +21,55 @@ function slugForCategory(c: CatalogCategory): string {
   return `cat-${c.toLowerCase()}`;
 }
 
+// Restore a cart from a "save my cart" email link (?cart=sku:qty,sku:qty,...)
+// Only runs once on mount. Skips items not in the live catalog (sold out or
+// retired). Strips the param from the URL after loading so refreshes don't
+// re-merge it. Also accepts ?fm=delivery|pickup, ?zip=, ?promo= as side info.
+function useRestoreCartFromUrl(items: CatalogItem[]): void {
+  const addLine = useCartStore((s) => s.addLine);
+  const setFulfillmentMode = useCartStore((s) => s.setFulfillmentMode);
+  const setShippingZip = useCartStore((s) => s.setShippingZip);
+  const setPromoCode = useCartStore((s) => s.setPromoCode);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    const cartParam = url.searchParams.get("cart");
+    if (!cartParam) return;
+    const valid = new Set(items.map((i) => i.sku));
+    let added = 0;
+    for (const piece of cartParam.split(",")) {
+      const [sku, qtyRaw] = piece.split(":");
+      const qty = Math.max(1, Math.min(99, Math.floor(Number(qtyRaw) || 1)));
+      if (sku && valid.has(sku.trim())) {
+        addLine(sku.trim(), qty);
+        added += 1;
+      }
+    }
+    const fm = url.searchParams.get("fm");
+    if (fm === "pickup" || fm === "delivery") setFulfillmentMode(fm);
+    const zip = url.searchParams.get("zip");
+    if (zip && /^\d{5}$/.test(zip)) setShippingZip(zip);
+    const promo = url.searchParams.get("promo");
+    if (promo) setPromoCode(promo.toUpperCase());
+    if (added > 0) {
+      // Clean the param so a refresh doesn't double-add. Keep utm_* etc.
+      url.searchParams.delete("cart");
+      url.searchParams.delete("fm");
+      url.searchParams.delete("zip");
+      url.searchParams.delete("promo");
+      window.history.replaceState({}, "", url.toString());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
 export function CatalogGrid({
   items,
 }: {
   items: CatalogItem[];
 }) {
   const [search, setSearch] = useState("");
+  useRestoreCartFromUrl(items);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
