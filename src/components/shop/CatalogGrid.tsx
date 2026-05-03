@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { Search, X } from "lucide-react";
-import { useCartStore } from "@/lib/cart/store";
 import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { MobileCartTotal } from "@/components/shop/MobileCartTotal";
 import { formatCents } from "@/lib/format";
@@ -23,17 +22,10 @@ function slugForCategory(c: CatalogCategory): string {
 
 export function CatalogGrid({
   items,
-  initialPromo,
 }: {
   items: CatalogItem[];
-  initialPromo: string | null;
 }) {
-  const setPromoCode = useCartStore((s) => s.setPromoCode);
   const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    if (initialPromo) setPromoCode(initialPromo.toUpperCase());
-  }, [initialPromo, setPromoCode]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();

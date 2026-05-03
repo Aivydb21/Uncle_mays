@@ -47,7 +47,7 @@ export default async function ShopPage({
       ) : catalog.length === 0 ? (
         <EmptyMessage />
       ) : (
-        <CatalogGrid items={catalog} initialPromo={promo} />
+        <CatalogGrid items={catalog} />
       )}
     </div>
   );
