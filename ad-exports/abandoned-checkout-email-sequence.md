@@ -1,8 +1,8 @@
 # Abandoned Checkout Email Sequence - Phase 1
 
-**Target:** 36 abandoned checkouts in last 30 days  
-**Goal:** 10-15% recovery rate (3-5 orders/month)  
-**Deployment:** RevOps via Mailchimp  
+**Target:** 36 abandoned checkouts in last 30 days
+**Goal:** 10-15% recovery rate (3-5 orders/month)
+**Deployment (as of 2026-04-24):** Trigger.dev tasks in [src/trigger/abandoned-checkout.ts](../src/trigger/abandoned-checkout.ts) and [src/trigger/stripe-abandoned-checkout.ts](../src/trigger/stripe-abandoned-checkout.ts). Sends via Resend from `hello@unclemays.com`. This doc is the original spec; the actual copy in those files is the source of truth.
 
 ---
 

@@ -1,0 +1,54 @@
+{
+  "timestamp": "2026-04-20T21:05:06Z",
+  "export_dir": "C:\\Users\\Anthony\\Desktop\\business\\brand-assets\\ad-exports\\discount-variants-2026-04-20",
+  "canva_assets": {
+    "var_a_feed": null,
+    "var_a_stories": null,
+    "var_c_feed": null,
+    "var_c_stories": null
+  },
+  "ads": [
+    {
+      "variant": "A",
+      "placement": "IG Feed",
+      "ad_id": "120243372439750762",
+      "creative_id": "1711182073083199",
+      "image_hash": "795dc33ae5c2c54085707548a09a0286"
+    },
+    {
+      "variant": "A",
+      "placement": "IG Stories",
+      "ad_id": "120243372441590762",
+      "creative_id": "891877060541732",
+      "image_hash": "73fad9918f30e5de55b521b3fda0ca3b"
+    },
+    {
+      "variant": "A",
+      "placement": "FB Feed",
+      "ad_id": "120243372442590762",
+      "creative_id": "2325246054631675",
+      "image_hash": "795dc33ae5c2c54085707548a09a0286"
+    },
+    {
+      "variant": "C",
+      "placement": "IG Feed",
+      "ad_id": "120243372443950762",
+      "creative_id": "4435427030025267",
+      "image_hash": "cb2a7c9fa999a229b7da4b5b489dd16f"
+    },
+    {
+      "variant": "C",
+      "placement": "IG Stories",
+      "ad_id": "120243372445190762",
+      "creative_id": "964130453017148",
+      "image_hash": "9b5f75f3732f70e7518c1503eb876311"
+    },
+    {
+      "variant": "C",
+      "placement": "FB Feed",
+      "ad_id": "120243372446130762",
+      "creative_id": "1458006522732993",
+      "image_hash": "cb2a7c9fa999a229b7da4b5b489dd16f"
+    }
+  ]
+}

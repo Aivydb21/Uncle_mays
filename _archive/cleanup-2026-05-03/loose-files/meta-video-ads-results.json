@@ -1,0 +1,60 @@
+{
+  "campaign_id": "120243219649250762",
+  "page_id": "755316477673748",
+  "video_ids": [
+    "1437672617665607",
+    "2355242318591638"
+  ],
+  "ads": [
+    {
+      "ad_set": "Instagram Feed",
+      "ad_set_id": "120243219914430762",
+      "video_index": 1,
+      "video_id": "1437672617665607",
+      "ad_id": "120243221203760762",
+      "creative_id": "1280764066819531"
+    },
+    {
+      "ad_set": "Instagram Feed",
+      "ad_set_id": "120243219914430762",
+      "video_index": 2,
+      "video_id": "2355242318591638",
+      "ad_id": "120243221205970762",
+      "creative_id": "3966684956796146"
+    },
+    {
+      "ad_set": "Instagram Stories",
+      "ad_set_id": "120243219918030762",
+      "video_index": 1,
+      "video_id": "1437672617665607",
+      "ad_id": "120243221207200762",
+      "creative_id": "1280764066819531"
+    },
+    {
+      "ad_set": "Instagram Stories",
+      "ad_set_id": "120243219918030762",
+      "video_index": 2,
+      "video_id": "2355242318591638",
+      "ad_id": "120243221208210762",
+      "creative_id": "3966684956796146"
+    },
+    {
+      "ad_set": "Facebook Feed",
+      "ad_set_id": "120243219919870762",
+      "video_index": 1,
+      "video_id": "1437672617665607",
+      "ad_id": "120243221208940762",
+      "creative_id": "1577563503305032"
+    },
+    {
+      "ad_set": "Facebook Feed",
+      "ad_set_id": "120243219919870762",
+      "video_index": 2,
+      "video_id": "2355242318591638",
+      "ad_id": "120243221209870762",
+      "creative_id": "1306430608106512"
+    }
+  ],
+  "total_created": 6,
+  "total_expected": 6
+}
