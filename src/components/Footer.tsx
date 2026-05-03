@@ -41,12 +41,12 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <a
-                  href="/#boxes"
+                <Link
+                  href="/shop"
                   className="text-background/70 hover:text-background transition-colors"
                 >
-                  Shop Produce Boxes
-                </a>
+                  Shop the catalog
+                </Link>
               </li>
               <li>
                 <Link

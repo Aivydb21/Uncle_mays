@@ -26,14 +26,14 @@ const workSans = Work_Sans({
 export const metadata: Metadata = {
   title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered Across the Chicago Metro Area",
   description:
-    "Curated seasonal produce boxes sourced directly from Black farmers, delivered across the Chicago metro area (city plus south suburbs). Boxes from $40. No subscription required. Order today.",
+    "Build your own grocery order from Uncle May's catalog: premium produce, pantry staples, and pasture-raised protein from Black farmers. Chicago delivery or free Hyde Park pickup. $25 minimum, no subscription required.",
   authors: [{ name: "Uncle Mays Produce" }],
   metadataBase: new URL("https://unclemays.com"),
   openGraph: {
     type: "website",
     title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered Across the Chicago Metro Area",
     description:
-      "Curated seasonal produce boxes sourced directly from Black farmers, delivered across the Chicago metro area (city plus south suburbs). Boxes from $40. No subscription required. Order today.",
+      "Build your own grocery order from Uncle May's catalog: premium produce, pantry staples, and pasture-raised protein from Black farmers. Chicago delivery or free Hyde Park pickup. $25 minimum, no subscription required.",
     images: [
       {
         url: "https://www.unclemays.com/og-social.png",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     site: "@unclemaysproduce",
     title: "Uncle Mays Produce - Fresh Produce from Black Farmers, Delivered Across the Chicago Metro Area",
     description:
-      "Curated seasonal produce boxes sourced directly from Black farmers, delivered across the Chicago metro area (city plus south suburbs). Boxes from $40. No subscription required. Order today.",
+      "Build your own grocery order from Uncle May's catalog: premium produce, pantry staples, and pasture-raised protein from Black farmers. Chicago delivery or free Hyde Park pickup. $25 minimum, no subscription required.",
     images: ["https://www.unclemays.com/og-social.png"],
   },
   icons: {

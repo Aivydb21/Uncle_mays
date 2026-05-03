@@ -38,11 +38,9 @@ export const Hero = () => {
               <span>Now delivering across the Chicago metro area</span>
             </div>
 
-            {/* Headline — under test 2026-04-27 (was: "Cleaner than Whole Foods.
-                Cheaper than Aldi.") to reduce skepticism on cold paid traffic. */}
             <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">
               Farm-fresh produce from{" "}
-              <span className="text-primary">Black farmers</span>, delivered weekly across the Chicago metro area.
+              <span className="text-primary">Black farmers</span>, in Chicago.
             </h1>
 
             {/* Instant proof line. */}
@@ -55,24 +53,24 @@ export const Hero = () => {
               </span>
             </div>
 
-            {/* Tightened subhead */}
+            {/* Subhead — cart model */}
             <p className="text-xl md:text-2xl mb-6 text-foreground/80 font-light">
-              From <span className="font-semibold text-foreground">$40</span> a box. Delivered Wednesday. No subscription.
+              Build your order from our catalog. Chicago delivery or free Hyde Park pickup. No subscription.
             </p>
 
-            {/* Dominant above-fold CTA + subtext */}
+            {/* Dominant above-fold CTA */}
             <div className="flex flex-col items-start gap-2">
               <Button
                 size="lg"
                 asChild
                 className="text-xl font-bold px-10 py-7 rounded-xl shadow-lg w-full sm:w-auto"
               >
-                <Link href="/#boxes">
-                  Get Your Box
+                <Link href="/shop">
+                  Shop the catalog
                 </Link>
               </Button>
               <span className="text-sm text-foreground/70 ml-1">
-                Delivered this Wednesday
+                $25 minimum. Use code FRESH10 for $10 off.
               </span>
             </div>
           </motion.div>
@@ -85,7 +83,7 @@ export const Hero = () => {
           >
             <span className="font-semibold text-foreground/90">100% fresh or refunded</span>
             <span aria-hidden="true">•</span>
-            <span className="font-semibold text-foreground/90">Free Chicago metro delivery</span>
+            <span className="font-semibold text-foreground/90">Direct from Black farmers</span>
           </motion.div>
         </div>
       </div>
