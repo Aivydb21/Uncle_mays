@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { Loader2, Lock, Phone, ShieldCheck } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useHydratedCart, useCartStore, useCartHydrated } from "@/lib/cart/store";
 import { useAddressAutocomplete } from "@/hooks/use-address-autocomplete";
 import { formatCents } from "@/lib/format";
@@ -866,25 +866,6 @@ function PaymentSection({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <h2 className="text-xl font-semibold">Payment</h2>
-
-      {/* Trust strip — three signals reduce abandonment at the last step. */}
-      <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
-        <ul className="grid grid-cols-1 gap-2 text-xs text-foreground/80 sm:grid-cols-3 sm:gap-3">
-          <li className="flex items-center gap-2">
-            <Lock className="h-3.5 w-3.5 text-primary shrink-0" />
-            <span>Secure checkout via Stripe</span>
-          </li>
-          <li className="flex items-center gap-2">
-            <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
-            <span>100% fresh or refunded</span>
-          </li>
-          <li className="flex items-center gap-2">
-            <Phone className="h-3.5 w-3.5 text-primary shrink-0" />
-            <span>(312) 972-2595 if anything&rsquo;s off</span>
-          </li>
-        </ul>
-      </div>
-
       <PaymentElement />
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="flex items-center gap-3">
