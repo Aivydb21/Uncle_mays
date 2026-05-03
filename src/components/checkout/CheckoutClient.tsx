@@ -396,16 +396,16 @@ function MobileCollapsibleSummary({
 
 function EmptyCheckout() {
   return (
-    <div className="mx-auto mt-16 max-w-md rounded-2xl border border-border bg-muted/40 p-8 text-center">
-      <h2 className="text-lg font-semibold">Your cart is empty</h2>
-      <p className="mt-2 text-sm text-muted-foreground">
-        Add a few items first so we have something to deliver.
+    <div className="mx-auto mt-12 max-w-lg rounded-2xl border border-border bg-card p-10 text-center shadow-sm">
+      <h2 className="text-2xl font-bold">Your cart is empty</h2>
+      <p className="mt-3 text-base text-muted-foreground">
+        Pick out a few items from the catalog and we&apos;ll handle the rest.
       </p>
       <Link
         href="/shop"
-        className="mt-4 inline-flex items-center text-sm font-semibold text-primary hover:underline"
+        className="mt-6 inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-base font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
       >
-        Browse the catalog →
+        Browse the catalog
       </Link>
     </div>
   );

@@ -180,40 +180,17 @@ export function CartDrawer() {
           )}
 
           {!isEmpty && (!pricing || loading) && <CartLineSkeleton lines={lines.length} />}
-
-          {!isEmpty && (
-            <div className="mt-6 space-y-3">
-              <label className="block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                Promo code
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={promoInput}
-                  onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
-                  placeholder="FRESH10"
-                  className="h-10 flex-1 rounded-md border border-border bg-background px-3 text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setPromoCode(promoInput.trim() || null)}
-                  className="rounded-md border border-primary px-3 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground"
-                >
-                  Apply
-                </button>
-              </div>
-              {pricing && pricing.ok && pricing.appliedPromoCode && (
-                <p className="text-xs text-primary">
-                  {pricing.appliedPromoCode} applied
-                </p>
-              )}
-            </div>
-          )}
         </div>
 
         {!isEmpty && (
           <div className="border-t border-border bg-muted/40 px-6 py-5">
             <Totals pricing={pricing} loading={loading} />
+            <PromoDisclosure
+              promoInput={promoInput}
+              setPromoInput={setPromoInput}
+              setPromoCode={setPromoCode}
+              applied={pricing && pricing.ok ? pricing.appliedPromoCode : null}
+            />
             {!meetsMin && pricing && pricing.ok && (
               <p className="mt-2 text-xs text-amber-700">
                 Add {formatCents(Math.max(0, MIN_SUBTOTAL_CENTS - subtotalCents))}{" "}
@@ -329,6 +306,54 @@ function EmptyCartContent({
             </div>
           ))}
         </div>
+      )}
+    </div>
+  );
+}
+
+function PromoDisclosure({
+  promoInput,
+  setPromoInput,
+  setPromoCode,
+  applied,
+}: {
+  promoInput: string;
+  setPromoInput: (v: string) => void;
+  setPromoCode: (v: string | null) => void;
+  applied: string | null;
+}) {
+  const [open, setOpen] = useState(Boolean(applied));
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="mt-3 text-xs font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+      >
+        Have a promo code?
+      </button>
+    );
+  }
+  return (
+    <div className="mt-3 space-y-2">
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={promoInput}
+          onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
+          placeholder="Enter code"
+          className="h-9 flex-1 rounded-md border border-border bg-background px-3 text-sm"
+        />
+        <button
+          type="button"
+          onClick={() => setPromoCode(promoInput.trim() || null)}
+          className="rounded-md border border-primary px-3 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground"
+        >
+          Apply
+        </button>
+      </div>
+      {applied && (
+        <p className="text-xs text-primary">{applied} applied</p>
       )}
     </div>
   );

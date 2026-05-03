@@ -25,10 +25,14 @@ export function PageShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
   const isLandingPage = LANDING_PAGE_PATHS.includes(pathname);
   const inFunnel = isInCheckoutFunnel(pathname);
+  // Hide the FRESH10 promo strip on the checkout page itself — by then the
+  // customer is at the totals stage and the discount input lives next to the
+  // tally. The banner up top is for top-of-funnel traffic, not the close.
+  const showPromoStrip = !isLandingPage && pathname !== "/checkout" && !inFunnel;
 
   return (
     <div className="flex min-h-screen flex-col">
-      {!isLandingPage && <PromoStrip />}
+      {showPromoStrip && <PromoStrip />}
       {!isLandingPage && <Navigation />}
       <main className="flex-1">{children}</main>
       {!isLandingPage && (
