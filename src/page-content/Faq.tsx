@@ -83,7 +83,7 @@ const faqs = [
   },
   {
     q: "What's the minimum order?",
-    a: "$25. Most customers fill a cart of $40-80. There's no upper limit.",
+    a: "$25. Most customers land between $30 and $60 for a week of produce + a protein. There's no upper limit.",
   },
   {
     q: "What if I have an issue with my order?",

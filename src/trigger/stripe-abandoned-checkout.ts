@@ -14,7 +14,7 @@ function md5(s: string) {
  * Per-session send-state tracking.
  *
  * We used to keep a JSON file on disk (".stripe-abandoned-emails.json") but
- * trigger.dev runs in ephemeral containers — the file gets wiped between every
+ * trigger.dev runs in ephemeral containers , the file gets wiped between every
  * run, so the "already-sent" gate could never fire and nothing ever got sent
  * past the first email. We persist the state as Mailchimp tags on the contact
  * instead: tags survive runs and are read/written via the audience API.
@@ -67,7 +67,7 @@ const SITE_BASE_URL = process.env.SITE_BASE_URL || "https://unclemays.com";
 /**
  * Check if a customer email is already tracked by the local checkout-store
  * abandoned cart processor. If so, the local system handles recovery emails
- * with better per-session dedup — the Stripe processor should skip.
+ * with better per-session dedup , the Stripe processor should skip.
  */
 async function hasLocalAbandonedSession(email: string): Promise<boolean> {
   try {
@@ -172,34 +172,32 @@ async function sendEmail(
   let plainText: string;
 
   if (emailNumber === 1) {
-    // Email 1: Cart Reminder (1 hour after abandonment)
-    subjectLine = "Your Uncle May's box is waiting";
+    // Email 1: gentle nudge (24h post-expiry)
+    subjectLine = "Your Uncle May's order is waiting";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Arial,sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
   <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
-    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Your Uncle May's box is waiting</h2>
+    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Your Uncle May's order is waiting</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
-      You started an order for premium produce from Uncle May's but didn't finish.
-      Your items are still in your cart, ready to go. We curate every box with care
-      for Black families who want quality they can count on.
+      You started an order at Uncle May's but didn't finish checking out.
+      Pop back over to the catalog and finish whenever you're ready.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      Complete your order now and get Wednesday delivery. Questions? Call us anytime at
-      <strong>(312) 972-2595</strong>.
+      Use code <strong>FRESH10</strong> at checkout for $10 off your first order ($25 minimum).
     </p>
     <p style="margin:32px 0;">
       <a href="${checkoutUrl}"
          style="background:#2d7a2d;color:white;padding:14px 28px;text-decoration:none;border-radius:4px;font-size:16px;font-weight:bold;display:inline-block;">
-        Complete Your Order
+        Finish Your Order
       </a>
     </p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
-      Uncle May's Produce | Hyde Park, Chicago, IL<br>
-      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> |
+      Uncle May's Produce · Hyde Park, Chicago, IL<br>
+      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> ·
       <a href="mailto:info@unclemays.com" style="color:#999;">info@unclemays.com</a>
     </p>
   </div>
@@ -207,17 +205,17 @@ async function sendEmail(
 </html>`;
     plainText = `Hi ${firstName},
 
-You started an order for premium produce from Uncle May's but didn't finish. Your items are still in your cart, ready to go. We curate every box with care for Black families who want quality they can count on.
+You started an order at Uncle May's but didn't finish checking out. Pop back over to the catalog and finish whenever you're ready.
 
-Complete your order now and get Wednesday delivery. Questions? Call us anytime at (312) 972-2595.
+Use code FRESH10 at checkout for $10 off your first order ($25 minimum).
 
 ${checkoutUrl}
 
 ---
-Uncle May's Produce | Hyde Park, Chicago, IL
-unclemays.com | info@unclemays.com`;
+Uncle May's Produce · Hyde Park, Chicago, IL
+unclemays.com · info@unclemays.com`;
   } else if (emailNumber === 2) {
-    // Email 2: Urgency Reminder (24 hours after abandonment)
+    // Email 2: cutoff reminder (48h post-expiry)
     subjectLine = "Order by Sunday for Wednesday delivery";
     htmlContent = `<!DOCTYPE html>
 <html>
@@ -227,27 +225,23 @@ unclemays.com | info@unclemays.com`;
     <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Order by Sunday for Wednesday delivery</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
-      We saved your cart, but time is running out. To get your fresh produce delivered this Wednesday,
-      complete your order by Sunday at 11:59 PM CT. Orders after that ship next Wednesday.
+      We deliver every Wednesday across the Chicago metro. To get your order
+      this Wednesday, finish checking out by Sunday at 11:59 PM CT. After
+      that, your order ships the following Wednesday.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      Uncle May's isn't your average grocery box. We curate premium produce for Black communities
-      that deserve the best. 89% of our customers refer friends and family because they trust what
-      we deliver.
+      Code <strong>FRESH10</strong> still works on your first order ($25 minimum).
     </p>
     <p style="margin:32px 0;">
       <a href="${checkoutUrl}"
          style="background:#2d7a2d;color:white;padding:14px 28px;text-decoration:none;border-radius:4px;font-size:16px;font-weight:bold;display:inline-block;">
-        Order Now for This Week's Delivery
+        Finish Your Order
       </a>
-    </p>
-    <p style="font-size:14px;color:#666;line-height:1.6;">
-      Questions? We're here: <strong>(312) 972-2595</strong>
     </p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
-      Uncle May's Produce | Hyde Park, Chicago, IL<br>
-      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> |
+      Uncle May's Produce · Hyde Park, Chicago, IL<br>
+      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> ·
       <a href="mailto:info@unclemays.com" style="color:#999;">info@unclemays.com</a>
     </p>
   </div>
@@ -255,48 +249,47 @@ unclemays.com | info@unclemays.com`;
 </html>`;
     plainText = `Hi ${firstName},
 
-We saved your cart, but time is running out. To get your fresh produce delivered this Wednesday, complete your order by Sunday at 11:59 PM CT. Orders after that ship next Wednesday.
+We deliver every Wednesday across the Chicago metro. To get your order this Wednesday, finish checking out by Sunday at 11:59 PM CT. After that, your order ships the following Wednesday.
 
-Uncle May's isn't your average grocery box. We curate premium produce for Black communities that deserve the best. 89% of our customers refer friends and family because they trust what we deliver.
+Code FRESH10 still works on your first order ($25 minimum).
 
 ${checkoutUrl}
 
-Questions? We're here: (312) 972-2595
-
 ---
-Uncle May's Produce | Hyde Park, Chicago, IL
-unclemays.com | info@unclemays.com`;
+Uncle May's Produce · Hyde Park, Chicago, IL
+unclemays.com · info@unclemays.com`;
   } else {
-    // Email 3: Final Urgency (48 hours after abandonment)
-    subjectLine = "Last chance: Limited boxes left this week";
+    // Email 3: last touch (72h post-expiry)
+    subjectLine = "Still want to finish your Uncle May's order?";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Arial,sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
   <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
-    <h2 style="font-size:22px;margin-bottom:16px;color:#d9534f;">Last chance: Limited boxes left this week</h2>
+    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Still want to finish your order?</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
-      This is your final reminder. We have limited boxes available for Wednesday delivery, and your cart
-      is still sitting there. Once they're gone, you'll have to wait until next week.
+      Last note from us. The catalog is still open whenever you're ready.
+      No commitment, no subscription , just fresh produce, pantry, and
+      pasture-raised protein from Black farmers, delivered weekly.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      Our customers love Uncle May's because we bring quality produce to neighborhoods that have been
-      overlooked for too long. Don't miss your chance to join them this week.
+      <strong>FRESH10</strong> is good for $10 off your first order ($25 minimum).
     </p>
     <p style="margin:32px 0;">
       <a href="${checkoutUrl}"
-         style="background:#d9534f;color:white;padding:14px 28px;text-decoration:none;border-radius:4px;font-size:16px;font-weight:bold;display:inline-block;">
-        Complete My Order Now
+         style="background:#2d7a2d;color:white;padding:14px 28px;text-decoration:none;border-radius:4px;font-size:16px;font-weight:bold;display:inline-block;">
+        Finish Your Order
       </a>
     </p>
     <p style="font-size:14px;color:#666;line-height:1.6;">
-      Need help? Call <strong>(312) 972-2595</strong> before it's too late.
+      Not for you right now? No problem , reply to this email and we'll stop
+      these reminders.
     </p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
-      Uncle May's Produce | Hyde Park, Chicago, IL<br>
-      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> |
+      Uncle May's Produce · Hyde Park, Chicago, IL<br>
+      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> ·
       <a href="mailto:info@unclemays.com" style="color:#999;">info@unclemays.com</a>
     </p>
   </div>
@@ -304,17 +297,17 @@ unclemays.com | info@unclemays.com`;
 </html>`;
     plainText = `Hi ${firstName},
 
-This is your final reminder. We have limited boxes available for Wednesday delivery, and your cart is still sitting there. Once they're gone, you'll have to wait until next week.
+Last note from us. The catalog is still open whenever you're ready. No commitment, no subscription , just fresh produce, pantry, and pasture-raised protein from Black farmers, delivered weekly.
 
-Our customers love Uncle May's because we bring quality produce to neighborhoods that have been overlooked for too long. Don't miss your chance to join them this week.
+FRESH10 is good for $10 off your first order ($25 minimum).
 
 ${checkoutUrl}
 
-Need help? Call (312) 972-2595 before it's too late.
+Not for you right now? No problem , reply to this email and we'll stop these reminders.
 
 ---
-Uncle May's Produce | Hyde Park, Chicago, IL
-unclemays.com | info@unclemays.com`;
+Uncle May's Produce · Hyde Park, Chicago, IL
+unclemays.com · info@unclemays.com`;
   }
 
   const result = await sendTransactional({
@@ -342,7 +335,7 @@ function parseNameParts(fullName: string): { first: string; last: string } {
 }
 
 /**
- * Stripe Abandoned Checkout Recovery — 3-step sequence.
+ * Stripe Abandoned Checkout Recovery , 3-step sequence.
  *
  * Polls Stripe API every 30 minutes for expired checkout sessions.
  * Step 0 (the +2h "feedback ask") was retired 2026-05-02.
@@ -374,14 +367,14 @@ export const stripeAbandonedCheckoutProcessor = schedules.task({
     const results: any[] = [];
 
     /**
-     * Process a single time window. Each window is INDEPENDENT of the others —
+     * Process a single time window. Each window is INDEPENDENT of the others ,
      * we don't require that an earlier email was sent before sending a later one,
      * because the old "chain" logic combined with ephemeral state silently skipped
      * carts that aged past the first window without ever getting any email.
      *
      * Gate is a Mailchimp tag on the customer: `abc_<session8>_e<N>`. If the
      * contact already has that tag, we've already sent them this specific email
-     * for this specific session — skip. Otherwise send, then add the tag.
+     * for this specific session , skip. Otherwise send, then add the tag.
      */
     async function processWindow(
       emailNumber: 1 | 2 | 3,
@@ -402,7 +395,7 @@ export const stripeAbandonedCheckoutProcessor = schedules.task({
 
         // Skip if the local checkout-store is already tracking this customer.
         // The local abandoned-checkout processor has per-session field dedup
-        // and handles the full 4-email sequence — sending from both systems
+        // and handles the full 4-email sequence , sending from both systems
         // causes duplicates (see UNC-709).
         if (await hasLocalAbandonedSession(email)) {
           console.log(
@@ -414,7 +407,7 @@ export const stripeAbandonedCheckoutProcessor = schedules.task({
         const tag = sessionEmailTag(session.id, emailNumber);
         const existingTags = await getContactTags(mailchimpKey, email);
         if (existingTags.has(tag)) {
-          // Already sent this email for this session — skip
+          // Already sent this email for this session , skip
           continue;
         }
 

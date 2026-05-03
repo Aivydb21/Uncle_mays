@@ -4,7 +4,7 @@
 > Website, emails, ads, Mailchimp campaigns, and agent-generated copy must match this doc.
 > If any of these facts change, update this file FIRST, then propagate to every surface.
 
-**Last updated:** 2026-04-23
+**Last updated:** 2026-05-03 (catalog launch + right-sized portions)
 **Owner:** Anthony Ivy
 
 ---
@@ -32,30 +32,35 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 
 ## Pricing — ONE AUTHORITATIVE TABLE
 
-**Two tiers. Proteins are optional paid add-ons — no protein is ever included in the base box price.**
+**Build-your-own catalog. No fixed boxes. $25 minimum cart. The customer adds individual items at right-sized portions and checks out one-time.**
 
-| Box | One-Time | Subscription (10% off) | Who it's for | What's inside | Approx. weight |
-|-----|----------|------------------------|--------------|----------------|----------------|
-| **Spring Box** | $40 | $36/wk | 1–2 people | Salad mix, kale, candy carrots, sweet potatoes, potatoes, broccoli, organic black beans | About 6 lbs |
-| **Full Harvest Box** | $70 | $63/wk | 3–4 people | Everything in the Spring Box, plus pea shoots, radishes, customer choice of bean (black, pinto, or kidney), and pasture-raised chicken thighs (included) | About 10 lbs |
+Live SKU-by-SKU pricing is in Airtable (base `appm6F6H9obydzAM2`, table `Catalog`) and rendered live at `/shop`. The full per-SKU sizing rationale is in [`notes/catalog-right-sizing-2026-05-03.md`](./notes/catalog-right-sizing-2026-05-03.md). Headline anchors customers see:
 
-### Protein Add-Ons (optional, available on every box)
+| Category | Anchor item | Price | Portion |
+|---|---|---|---|
+| Greens | Asparagus | $2.50 | 1/4 lb (handful) |
+| Greens | Tuscan kale, chard | $3.00 | 0.3 lb |
+| Greens | Romaine, summer crisp | $3.00 | 5 oz head |
+| Roots | Candy carrots | $1.50 | 0.5 lb |
+| Roots | Sweet potato | $2.50 | 1 potato (~0.5 lb) |
+| Microgreens | Pea shoots, purple radish | $5.00 | 1 oz clamshell |
+| Pantry | Beans (1 lb) | $6.00–$6.65 | 1 lb bag |
+| Pantry | Black turtle beans (sampler) | $3.50 | 1/2 lb bag |
+| Protein | Lamb chops | $10.00 | 0.5 lb (pair) |
+| Protein | Whole chicken (estimated) | $32.00 | ~4–5 lb bird |
+| Protein | Beef short ribs (bone-in / boneless) | $8.50 / $12.50 | 1 lb pack |
+| Protein | Farm-fresh eggs | $5.99 | dozen |
 
-Flat $12 each. 1 lb portions. Chicken is the featured option and is **already included** in the Full Harvest Box (chicken add-ons on Full Harvest are extra portions on top of the included one).
-
-| Protein | Price |
-|---------|-------|
-| Pasture-Raised Chicken Thighs (featured, included with Full Harvest) | +$12 |
-| Grass-Fed Beef Short Ribs | +$12 |
-| Lamb Chops | +$12 |
-
-**Customer-facing display rule:** do NOT show per-item weights on the website, in ad copy, or in customer emails. The "About X lbs" total weight is the only weight figure customers see. Internal docs (this file) keep weights for reference only. Per-item measurements were removed 2026-04-27 because they slowed checkout — customers paused to do math.
+Typical first-time cart lands $30–$60 (produce + one protein). No upper limit.
 
 ### Rules
-- **Subscribe & Save** = exactly **10% off** the one-time price, same box every Wednesday.
-- **`FRESH10`** is the only active promo code: $10 off the first box, one-time and subscription. Applied via `?promo=FRESH10` in the URL.
-- Subscriptions can be paused or cancelled anytime in the customer account portal (no fees, no phone call).
-- Community Box ($95) is **retired**. Do not mention it anywhere.
+
+- **Build-your-own catalog only.** No fixed Spring Box / Full Harvest Box / Community Box. No subscription tier.
+- **$25 minimum** cart. Customers under $25 see a "add a few more items to reach $25" gate at the cart drawer; checkout is blocked.
+- **`FRESH10`** is the primary promo code: $10 off the first order ($25 minimum). Customer enters it in the cart drawer or on the checkout page; we do **not** auto-apply it from `?promo=` URL params anymore.
+- **`FRESH30`** is the social-ask promo on `/ask` (35% off, capped). Both codes can coexist; they are separate Stripe coupons in `src/lib/promo.ts`.
+- Customer-facing display rule: portion size is shown in the unit label on every catalog card (e.g. "$2.50 / 1/4 lb"). The customer-facing visual is the AI-generated portion photo at `/catalog/{sku}.jpg`.
+- Doina has a **grandfathered $55/wk subscription** through Stripe directly. She is the only active subscription customer; we are not signing up new subscriptions until further notice.
 
 ---
 
@@ -102,31 +107,39 @@ Flat $12 each. 1 lb portions. Chicken is the featured option and is **already in
 
 ## Website Cross-Check
 
-Every claim on these pages must match this doc:
+Every claim on these pages must match this doc. Files marked DELETED were removed in the catalog launch and should not be referenced.
 
-- `src/app/page.tsx` (home — schema markup, hero, pricing)
+- `src/app/page.tsx` (home schema markup + hero)
 - `src/components/Hero.tsx`
-- `src/components/Pricing.tsx`
-- `src/app/shop/page.tsx`
-- `src/app/starter-box/page.tsx`
+- `src/app/shop/page.tsx` (catalog grid)
+- `src/components/shop/CatalogGrid.tsx` (catalog card layout + price/unit display)
+- `src/app/checkout/page.tsx` + `src/components/checkout/CheckoutClient.tsx`
 - `src/app/about/page.tsx`
-- `src/app/faq/page.tsx`
-- `src/app/checkout/[product]/*`
-- `src/app/subscribe/[product]/*`
-- `src/lib/products.ts`
-- `src/app/api/checkout/intent/route.ts`
+- `src/page-content/Faq.tsx`
+- `src/app/get-started/GetStartedContent.tsx`
+- `src/app/api/checkout/intent/route.ts` (Stripe PaymentIntent build, metadata)
+- `src/app/api/webhook/route.ts` (order-confirmation trigger)
 - `src/trigger/order-confirmation.ts`
-- `src/trigger/subscription-cancellation.ts`
 - `src/trigger/abandoned-checkout.ts`
 - `src/trigger/stripe-abandoned-checkout.ts`
+- `src/lib/promo.ts` (FRESH10, FRESH30 entries)
+- DELETED: `src/lib/products.ts` (legacy fixed-box catalog)
+- DELETED: `src/app/checkout/[product]/*` (legacy per-box checkout, now redirects to /shop)
+- DELETED: `src/app/subscribe/[product]/*` (legacy subscription flow)
+- DELETED: `src/app/starter-box/page.tsx` (legacy box landing page)
+- DELETED: `src/components/Pricing.tsx` (legacy box pricing grid)
 
 ---
 
 ## Retired Claims (do NOT use anywhere)
 
-- ❌ "Community Box" / the $95 tier / "choice of protein included"
-- ❌ "Whole chicken included" / "eggs included" / any in-box protein claim
-- ❌ Collards, tomatoes, cucumbers, strawberries, zucchini, snap peas, beets, spring onions, shishito peppers, eggplant, turnips, ramps on shelf (not in current RAB supply)
-- ❌ `WELCOME20`, `LAUNCH20`, "$30 first order" / "Starter Box from $30" / "First box from $30"
-- ❌ "Thursday delivery" / "Thursday 2–6pm" / "Order by Thursday for Wednesday delivery"
-- ❌ "Now delivering in Hyde Park" alone (service area is Chicago-wide; Hyde Park is the flagship neighborhood)
+- ❌ **Spring Box / Full Harvest Box / Community Box** and any fixed-box product names. The catalog model replaced all of these on 2026-04-30.
+- ❌ Old box prices: $30, $36, $40, $50, $58.50, $63, $70, $85.50, $95.
+- ❌ "Subscribe & Save" / "10% off subscription". No new subscriptions are being sold (Doina is grandfathered, see Pricing).
+- ❌ "Choice of protein included" / "chicken included with the box" / any in-box protein claim. Protein is a separate catalog SKU.
+- ❌ Old per-lb produce prices: $9.38/lb asparagus, $10/lb kale, $5.63/lb sweet potato, $39.38 whole chicken. These were deprecated when portions were right-sized 2026-05-03.
+- ❌ Collards, tomatoes, cucumbers, strawberries, zucchini, snap peas, beets, spring onions, shishito peppers, eggplant, turnips, broccoli florets (not in current RAB supply). **Ramps and microgreens are now in the catalog** (added 2026-05-03), so the old "no ramps" rule is retired.
+- ❌ `WELCOME20`, `LAUNCH20`, `FREESHIP`, "$30 first order" / "Starter Box from $30" / "First box from $30". Only `FRESH10` and `FRESH30` are live.
+- ❌ Auto-applied promo codes via `?promo=CODE` URL params. The customer must type the code in the cart drawer or on /checkout.
+- ❌ "Thursday delivery" / "Thursday 2–6pm" / "Order by Thursday for Wednesday delivery".
+- ❌ "Now delivering in Hyde Park" alone (service area is Chicago-wide; Hyde Park is the flagship neighborhood).

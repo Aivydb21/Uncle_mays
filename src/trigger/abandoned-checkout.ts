@@ -114,9 +114,12 @@ async function sendEmail(
 ): Promise<{ campaignId: string }> {
   const firstName = name.first || "friend";
   const sessionTag = sessionId.substring(0, 8);
-  const productSlug = product || "starter";
+  // Catalog model: link back to /shop where the customer rebuilds their
+  // cart. localStorage will repopulate if they're on the same browser; if
+  // they're on a different device, /shop is the right starting point.
+  void product; // legacy product slug , no longer used in URL
   const checkoutUrl =
-    `https://unclemays.com/checkout/${productSlug}` +
+    `https://unclemays.com/shop` +
     `?utm_source=email&utm_medium=abandoned_cart&utm_campaign=recovery_email${emailNumber}&utm_content=${sessionTag}`;
 
   let subjectLine: string;
@@ -124,34 +127,32 @@ async function sendEmail(
   let plainText: string;
 
   if (emailNumber === 1) {
-    // Email 1: Cart Reminder (1 hour after abandonment)
-    subjectLine = "Your Uncle May's box is waiting";
+    // Email 1: gentle nudge (24h after abandonment)
+    subjectLine = "Your Uncle May's order is waiting";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Arial,sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
   <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
-    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Your Uncle May's box is waiting</h2>
+    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Your Uncle May's order is waiting</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
-      You started an order for premium produce from Uncle May's but didn't finish.
-      Your items are still in your cart, ready to go. We curate every box with care
-      for Black families who want quality they can count on.
+      You started an order at Uncle May's but didn't finish checking out.
+      Your cart is still saved. Pick up where you left off whenever you're ready.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      Complete your order now and get Wednesday delivery. Questions? Call us anytime at
-      <strong>(312) 972-2595</strong>.
+      Use code <strong>FRESH10</strong> at checkout for $10 off your first order ($25 minimum).
     </p>
     <p style="margin:32px 0;">
       <a href="${checkoutUrl}"
          style="background:#2d7a2d;color:white;padding:14px 28px;text-decoration:none;border-radius:4px;font-size:16px;font-weight:bold;display:inline-block;">
-        Complete Your Order
+        Finish Your Order
       </a>
     </p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
-      Uncle May's Produce | Hyde Park, Chicago, IL<br>
-      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> |
+      Uncle May's Produce · Hyde Park, Chicago, IL<br>
+      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> ·
       <a href="mailto:info@unclemays.com" style="color:#999;">info@unclemays.com</a>
     </p>
   </div>
@@ -159,17 +160,17 @@ async function sendEmail(
 </html>`;
     plainText = `Hi ${firstName},
 
-You started an order for premium produce from Uncle May's but didn't finish. Your items are still in your cart, ready to go. We curate every box with care for Black families who want quality they can count on.
+You started an order at Uncle May's but didn't finish checking out. Your cart is still saved. Pick up where you left off whenever you're ready.
 
-Complete your order now and get Wednesday delivery. Questions? Call us anytime at (312) 972-2595.
+Use code FRESH10 at checkout for $10 off your first order ($25 minimum).
 
 ${checkoutUrl}
 
 ---
-Uncle May's Produce | Hyde Park, Chicago, IL
-unclemays.com | info@unclemays.com`;
+Uncle May's Produce · Hyde Park, Chicago, IL
+unclemays.com · info@unclemays.com`;
   } else if (emailNumber === 2) {
-    // Email 2: Urgency Reminder (24 hours after abandonment)
+    // Email 2: cutoff reminder (48h after abandonment)
     subjectLine = "Order by Sunday for Wednesday delivery";
     htmlContent = `<!DOCTYPE html>
 <html>
@@ -179,27 +180,23 @@ unclemays.com | info@unclemays.com`;
     <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Order by Sunday for Wednesday delivery</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
-      We saved your cart, but time is running out. To get your fresh produce delivered this Wednesday,
-      you need to complete your order by Sunday at 11:59 PM CT.
+      We deliver every Wednesday across the Chicago metro. To get your order
+      this Wednesday, finish checking out by Sunday at 11:59 PM CT. After
+      that, your order ships the following Wednesday.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      Uncle May's isn't your average grocery box. We curate premium produce for Black communities
-      that deserve the best. 89% of our customers refer friends and family because they trust what
-      we deliver.
+      Code <strong>FRESH10</strong> still works on your first order ($25 minimum).
     </p>
     <p style="margin:32px 0;">
       <a href="${checkoutUrl}"
          style="background:#2d7a2d;color:white;padding:14px 28px;text-decoration:none;border-radius:4px;font-size:16px;font-weight:bold;display:inline-block;">
-        Order Now for This Week's Delivery
+        Finish Your Order
       </a>
-    </p>
-    <p style="font-size:14px;color:#666;line-height:1.6;">
-      Questions? We're here: <strong>(312) 972-2595</strong>
     </p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
-      Uncle May's Produce | Hyde Park, Chicago, IL<br>
-      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> |
+      Uncle May's Produce · Hyde Park, Chicago, IL<br>
+      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> ·
       <a href="mailto:info@unclemays.com" style="color:#999;">info@unclemays.com</a>
     </p>
   </div>
@@ -207,48 +204,47 @@ unclemays.com | info@unclemays.com`;
 </html>`;
     plainText = `Hi ${firstName},
 
-We saved your cart, but time is running out. To get your fresh produce delivered this Wednesday, complete your order by Sunday at 11:59 PM CT. Orders after that ship next Wednesday.
+We deliver every Wednesday across the Chicago metro. To get your order this Wednesday, finish checking out by Sunday at 11:59 PM CT. After that, your order ships the following Wednesday.
 
-Uncle May's isn't your average grocery box. We curate premium produce for Black communities that deserve the best. 89% of our customers refer friends and family because they trust what we deliver.
+Code FRESH10 still works on your first order ($25 minimum).
 
 ${checkoutUrl}
 
-Questions? We're here: (312) 972-2595
-
 ---
-Uncle May's Produce | Hyde Park, Chicago, IL
-unclemays.com | info@unclemays.com`;
+Uncle May's Produce · Hyde Park, Chicago, IL
+unclemays.com · info@unclemays.com`;
   } else {
-    // Email 3: Final Urgency (48 hours after abandonment)
-    subjectLine = "Last chance: Limited boxes left this week";
+    // Email 3: last touch (72h after abandonment)
+    subjectLine = "Still want to finish your Uncle May's order?";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Arial,sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
   <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
-    <h2 style="font-size:22px;margin-bottom:16px;color:#d9534f;">Last chance: Limited boxes left this week</h2>
+    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Still want to finish your order?</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
-      This is your final reminder. We have limited boxes available for Wednesday delivery, and your cart
-      is still sitting there. Once they're gone, you'll have to wait until next week.
+      Last note from us. Your cart is still here whenever you're ready.
+      No commitment, no subscription , just fresh produce, pantry, and
+      pasture-raised protein from Black farmers, delivered weekly.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      Our customers love Uncle May's because we bring quality produce to neighborhoods that have been
-      overlooked for too long. Don't miss your chance to join them this week.
+      <strong>FRESH10</strong> is good for $10 off your first order ($25 minimum).
     </p>
     <p style="margin:32px 0;">
       <a href="${checkoutUrl}"
-         style="background:#d9534f;color:white;padding:14px 28px;text-decoration:none;border-radius:4px;font-size:16px;font-weight:bold;display:inline-block;">
-        Complete My Order Now
+         style="background:#2d7a2d;color:white;padding:14px 28px;text-decoration:none;border-radius:4px;font-size:16px;font-weight:bold;display:inline-block;">
+        Finish Your Order
       </a>
     </p>
     <p style="font-size:14px;color:#666;line-height:1.6;">
-      Need help? Call <strong>(312) 972-2595</strong> before it's too late.
+      Not for you right now? No problem , reply to this email and we'll stop
+      these reminders.
     </p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
-      Uncle May's Produce | Hyde Park, Chicago, IL<br>
-      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> |
+      Uncle May's Produce · Hyde Park, Chicago, IL<br>
+      <a href="https://unclemays.com" style="color:#999;">unclemays.com</a> ·
       <a href="mailto:info@unclemays.com" style="color:#999;">info@unclemays.com</a>
     </p>
   </div>
@@ -256,17 +252,17 @@ unclemays.com | info@unclemays.com`;
 </html>`;
     plainText = `Hi ${firstName},
 
-This is your final reminder. We have limited boxes available for Wednesday delivery, and your cart is still sitting there. Once they're gone, you'll have to wait until next week.
+Last note from us. Your cart is still here whenever you're ready. No commitment, no subscription , just fresh produce, pantry, and pasture-raised protein from Black farmers, delivered weekly.
 
-Our customers love Uncle May's because we bring quality produce to neighborhoods that have been overlooked for too long. Don't miss your chance to join them this week.
+FRESH10 is good for $10 off your first order ($25 minimum).
 
 ${checkoutUrl}
 
-Need help? Call (312) 972-2595 before it's too late.
+Not for you right now? No problem , reply to this email and we'll stop these reminders.
 
 ---
-Uncle May's Produce | Hyde Park, Chicago, IL
-unclemays.com | info@unclemays.com`;
+Uncle May's Produce · Hyde Park, Chicago, IL
+unclemays.com · info@unclemays.com`;
   }
 
   const result = await sendTransactional({
@@ -364,7 +360,7 @@ async function isRecoveryEmailAlreadySent(
   emailNumber: 1 | 2 | 3
 ): Promise<boolean> {
   const session = await fetchSession(sessionId);
-  if (!session) return false; // Can't verify — allow send
+  if (!session) return false; // Can't verify , allow send
   const field = `recoveryEmail${emailNumber}SentAt` as keyof LocalCheckoutSession;
   return !!session[field];
 }
@@ -403,7 +399,7 @@ export const sendAbandonedCheckoutEmail = task({
       : parseNameParts(payload.customerName ?? "");
 
     if (isSuppressed(email)) {
-      console.log(`[AbandonedCheckout] Suppressed recipient ${email} — skipping sequence`);
+      console.log(`[AbandonedCheckout] Suppressed recipient ${email} , skipping sequence`);
       return { skipped: true, reason: "suppressed_recipient", email };
     }
 
@@ -418,12 +414,12 @@ export const sendAbandonedCheckoutEmail = task({
     await wait.for({ hours: 24 });
 
     if (!(await isSessionStillAbandoned(payload.sessionId))) {
-      console.log(`Session ${payload.sessionId} was paid — stopping before Email 1`);
+      console.log(`Session ${payload.sessionId} was paid , stopping before Email 1`);
       return { stopped: true, reason: "checkout_completed_before_email1" };
     }
 
     if (await isRecoveryEmailAlreadySent(payload.sessionId, 1)) {
-      console.log(`Email 1 already sent for session ${payload.sessionId} (cron beat us) — skipping`);
+      console.log(`Email 1 already sent for session ${payload.sessionId} (cron beat us) , skipping`);
       results.push({ emailNumber: 1, sent: false, reason: "already_sent" });
     } else {
       try {
@@ -448,12 +444,12 @@ export const sendAbandonedCheckoutEmail = task({
     await wait.for({ hours: 24 });
 
     if (!(await isSessionStillAbandoned(payload.sessionId))) {
-      console.log(`Session ${payload.sessionId} was paid — stopping after Email 1`);
+      console.log(`Session ${payload.sessionId} was paid , stopping after Email 1`);
       return { results, stopped: true, reason: "checkout_completed_before_email2" };
     }
 
     if (await isRecoveryEmailAlreadySent(payload.sessionId, 2)) {
-      console.log(`Email 2 already sent for session ${payload.sessionId} (cron beat us) — skipping`);
+      console.log(`Email 2 already sent for session ${payload.sessionId} (cron beat us) , skipping`);
       results.push({ emailNumber: 2, sent: false, reason: "already_sent" });
     } else {
       try {
@@ -478,12 +474,12 @@ export const sendAbandonedCheckoutEmail = task({
     await wait.for({ hours: 24 });
 
     if (!(await isSessionStillAbandoned(payload.sessionId))) {
-      console.log(`Session ${payload.sessionId} was paid — stopping after Email 2`);
+      console.log(`Session ${payload.sessionId} was paid , stopping after Email 2`);
       return { results, stopped: true, reason: "checkout_completed_before_email3" };
     }
 
     if (await isRecoveryEmailAlreadySent(payload.sessionId, 3)) {
-      console.log(`Email 3 already sent for session ${payload.sessionId} (cron beat us) — skipping`);
+      console.log(`Email 3 already sent for session ${payload.sessionId} (cron beat us) , skipping`);
       results.push({ emailNumber: 3, sent: false, reason: "already_sent" });
     } else {
       try {

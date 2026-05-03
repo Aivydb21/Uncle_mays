@@ -522,12 +522,15 @@ export async function POST(req: NextRequest) {
         const triggerKeyForOtConfirmation = process.env.TRIGGER_SECRET_KEY;
         if (triggerKeyForOtConfirmation) {
           const productKey = intent.metadata?.product ?? null;
+          // 'starter' and 'family' map to the legacy fixed-box flow, kept
+          // only so historical pending orders render correctly. New orders
+          // since the catalog launch (2026-04-30) all carry 'custom_cart'.
           const PRODUCT_NAMES: Record<string, string> = {
-            starter: "Spring Box",
-            family: "Full Harvest Box",
-            custom_cart: "Custom cart",
+            starter: "Spring Box (legacy)",
+            family: "Full Harvest Box (legacy)",
+            custom_cart: "Your Uncle May's order",
           };
-          const productName = productKey ? (PRODUCT_NAMES[productKey] ?? productKey) : "Produce Box";
+          const productName = productKey ? (PRODUCT_NAMES[productKey] ?? productKey) : "Your Uncle May's order";
 
           // Custom-cart orders carry itemized data in metadata. Parse and
           // pass through so the order-confirmation email can render line
