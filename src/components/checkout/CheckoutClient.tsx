@@ -7,6 +7,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Loader2 } from "lucide-react";
 import { useHydratedCart, useCartStore, useCartHydrated } from "@/lib/cart/store";
+import { getUTMParams } from "@/lib/utm";
 import { useAddressAutocomplete } from "@/hooks/use-address-autocomplete";
 import { formatCents } from "@/lib/format";
 import { MIN_SUBTOTAL_CENTS } from "@/lib/cart-pricing-constants";
@@ -19,6 +20,16 @@ import type {
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 );
+
+// Read a cookie by name; returns undefined client-side if missing or SSR.
+function readCookie(name: string): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  const match = document.cookie
+    .split(";")
+    .map((c) => c.trim())
+    .find((c) => c.startsWith(`${name}=`));
+  return match ? decodeURIComponent(match.slice(name.length + 1)) : undefined;
+}
 
 interface ContactFields {
   email: string;
@@ -217,6 +228,22 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       const sid = sessionJson.sessionId as string;
       setSessionId(sid);
 
+      // Pull UTM/click-id attribution from session+local storage. Without
+      // this the Stripe PaymentIntent metadata is missing utm_*/gclid/fbclid
+      // ~99% of the time (the ML notebook flagged this as a primary
+      // attribution gap on 2026-05-02).
+      const utm = typeof window !== "undefined" ? getUTMParams() : {};
+      const persistedGclid =
+        typeof window !== "undefined"
+          ? localStorage.getItem("unc-gclid") || undefined
+          : undefined;
+      const persistedFbclid =
+        typeof window !== "undefined"
+          ? localStorage.getItem("unc-fbclid") || undefined
+          : undefined;
+      const fbc = readCookie("_fbc");
+      const fbp = readCookie("_fbp");
+
       const intentRes = await fetch("/api/checkout/intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -241,6 +268,15 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
           shippingZip: address.zip || cartShippingZip,
           promo: promoCode,
           checkoutSessionId: sid,
+          utm_source: utm.utm_source,
+          utm_medium: utm.utm_medium,
+          utm_campaign: utm.utm_campaign,
+          utm_content: utm.utm_content,
+          utm_term: utm.utm_term,
+          gclid: utm.gclid || persistedGclid,
+          fbclid: utm.fbclid || persistedFbclid,
+          fbc,
+          fbp,
         }),
       });
       const intentJson = await intentRes.json();
