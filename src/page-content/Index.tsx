@@ -63,8 +63,8 @@ const Index = ({ productSection }: { productSection: ReactNode }) => {
       {/* Customer voice — real, attributed quotes only (see src/lib/testimonials.ts) */}
       {TESTIMONIALS.length > 0 ? (
         <section className="py-12 bg-muted/20">
-          <div className="container px-6 max-w-3xl mx-auto">
-            <div className="grid gap-6">
+          <div className="container px-6 max-w-5xl mx-auto">
+            <div className="grid gap-6 md:grid-cols-2">
               {TESTIMONIALS.map((t) => (
                 <motion.figure
                   key={t.name}

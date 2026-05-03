@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Loader2, Lock, Phone, ShieldCheck } from "lucide-react";
-import { useHydratedCart, useCartStore } from "@/lib/cart/store";
+import { useHydratedCart, useCartStore, useCartHydrated } from "@/lib/cart/store";
 import { useAddressAutocomplete } from "@/hooks/use-address-autocomplete";
 import { formatCents } from "@/lib/format";
 import { MIN_SUBTOTAL_CENTS } from "@/lib/cart-pricing-constants";
@@ -52,6 +52,7 @@ const EMPTY_ADDRESS: AddressFields = {
 
 export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
   const router = useRouter();
+  const cartHydrated = useCartHydrated();
   const lines = useHydratedCart((s) => s.lines) ?? [];
   const cartFulfillment = useHydratedCart((s) => s.fulfillmentMode);
   const cartPickupSlot = useHydratedCart((s) => s.pickupSlotId);
@@ -154,6 +155,15 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
     (fulfillmentMode === "pickup"
       ? Boolean(cartPickupSlot)
       : address.street.trim() && /^\d{5}$/.test(address.zip));
+
+  if (!cartHydrated) {
+    return (
+      <div className="mx-auto mt-16 flex max-w-md items-center justify-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Loading your cart…
+      </div>
+    );
+  }
 
   if (lines.length === 0) {
     return <EmptyCheckout />;

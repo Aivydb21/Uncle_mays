@@ -88,12 +88,24 @@ export const useCartStore = create<CartState>()(
   )
 );
 
-export function useHydratedCart<T>(selector: (state: CartState) => T): T | null {
-  const [hydrated, setHydrated] = useState(false);
-  const value = useCartStore(selector);
+export function useCartHydrated(): boolean {
+  const [hydrated, setHydrated] = useState(() =>
+    typeof window !== "undefined" && useCartStore.persist.hasHydrated()
+  );
   useEffect(() => {
-    setHydrated(true);
+    if (useCartStore.persist.hasHydrated()) {
+      setHydrated(true);
+      return;
+    }
+    const unsub = useCartStore.persist.onFinishHydration(() => setHydrated(true));
+    return unsub;
   }, []);
+  return hydrated;
+}
+
+export function useHydratedCart<T>(selector: (state: CartState) => T): T | null {
+  const hydrated = useCartHydrated();
+  const value = useCartStore(selector);
   return hydrated ? value : null;
 }
 
