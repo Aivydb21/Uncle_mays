@@ -11,7 +11,6 @@ import { useAddressAutocomplete, type ParsedAddress } from "@/hooks/use-address-
 import { WaitlistCapture } from "@/components/WaitlistCapture";
 import { isInServiceArea, OUT_OF_AREA_MESSAGE } from "@/lib/service-area";
 import { TESTIMONIALS } from "@/lib/testimonials";
-import { CheckoutExitSurvey } from "@/components/CheckoutExitSurvey";
 import { CART_ENABLED } from "@/lib/feature-flags";
 
 declare global {
@@ -490,7 +489,6 @@ export default function CheckoutPage() {
 
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
-      <CheckoutExitSurvey productSlug={slug} />
       <div className="container px-4 max-w-3xl mx-auto">
         {/* "Back to boxes" link removed 2026-04-28: Clarity heatmap showed
             zero clicks on it; users back out via browser back instead. */}

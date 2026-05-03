@@ -6,7 +6,6 @@ import { ShoppingBag, Bell, Package, ChevronDown } from "lucide-react";
 import { Hero } from "@/components/Hero";
 import { Pricing } from "@/components/Pricing";
 import { HomeEmailCapture } from "@/components/HomeEmailCapture";
-import { AskCapture } from "@/components/AskCapture";
 import { TESTIMONIALS } from "@/lib/testimonials";
 
 const faqs = [
@@ -62,10 +61,6 @@ const Index = ({ productSection }: { productSection?: ReactNode } = {}) => {
           page passes <ShopCTA/>; otherwise we fall back to the legacy
           <Pricing/> tier card. */}
       <Suspense>{productSection ?? <Pricing />}</Suspense>
-
-      {/* CUSTOMER FEEDBACK — Source B of the feedback program. Captures
-          top-of-funnel visitors who never reach checkout. */}
-      <AskCapture />
 
       {/* 2. HOW IT WORKS — compact 3-step strip */}
       <section className="py-10 bg-background border-t border-border/40">

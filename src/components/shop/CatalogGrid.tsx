@@ -42,12 +42,16 @@ export function CatalogGrid({
 
   if (grouped.length === 0) return null;
 
+  // Card density per Baymard grocery-ecommerce research: 5–8 columns on
+  // wide screens is the sweet spot before scan-fatigue sets in. We ramp
+  // 2 → 3 → 4 → 5 → 6 across breakpoints so customers see ~6 items per row
+  // on a 1440+ display without overwhelming smaller viewports.
   return (
-    <div className="space-y-12">
+    <div className="space-y-10">
       {grouped.map(({ category, items }) => (
         <section key={category}>
-          <h2 className="mb-4 text-2xl font-bold text-foreground">{category}</h2>
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <h2 className="mb-3 text-xl font-bold text-foreground">{category}</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {items.map((item) => (
               <CatalogCard key={item.sku} item={item} />
             ))}
@@ -60,40 +64,35 @@ export function CatalogGrid({
 
 function CatalogCard({ item }: { item: CatalogItem }) {
   return (
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-soft">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-soft transition-shadow hover:shadow-medium">
       <div className="relative aspect-square w-full bg-muted">
         {item.imageUrl ? (
           <Image
             src={item.imageUrl}
             alt={item.name}
             fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 16vw"
             className="object-cover"
             unoptimized
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-sm text-muted-foreground">
+          <div className="flex h-full w-full items-center justify-center px-2 text-center text-xs text-muted-foreground">
             {item.name}
           </div>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-base font-semibold leading-tight text-foreground">
-            {item.name}
-          </h3>
-          <p className="whitespace-nowrap text-base font-bold text-primary">
-            {formatCents(item.priceCents)}
-          </p>
-        </div>
-        <p className="text-xs text-muted-foreground">per {item.unit}</p>
-        {item.description && (
-          <p className="line-clamp-3 text-sm text-muted-foreground">
-            {item.description}
-          </p>
-        )}
-        <div className="mt-auto pt-3">
-          <AddToCartButton item={item} />
+      <div className="flex flex-1 flex-col gap-1 p-3">
+        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground">
+          {item.name}
+        </h3>
+        <p className="text-sm font-bold text-primary">
+          {formatCents(item.priceCents)}
+          <span className="ml-1 text-xs font-normal text-muted-foreground">
+            / {item.unit}
+          </span>
+        </p>
+        <div className="mt-auto pt-2">
+          <AddToCartButton item={item} variant="compact" />
         </div>
       </div>
     </div>

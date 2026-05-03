@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShieldCheck, Truck, Leaf } from "lucide-react";
 import { ACTIVE_PROMOS, getDiscountCents, normalizePromo } from "@/lib/promo";
-import { CheckoutExitSurvey } from "@/components/CheckoutExitSurvey";
 import { CART_ENABLED } from "@/lib/feature-flags";
 
 function SubscriptionsPausedBanner() {
@@ -242,7 +241,6 @@ export default function SubscribeSummaryPage() {
 
   return (
     <section className="py-10 md:py-16 bg-muted/30 min-h-screen">
-      <CheckoutExitSurvey productSlug={slug} />
       <div className="container px-4 max-w-2xl mx-auto">
         <div className="mb-6">
           <Link
