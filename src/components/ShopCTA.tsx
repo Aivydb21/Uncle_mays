@@ -63,7 +63,7 @@ export async function ShopCTA() {
                   {item.name}
                 </p>
                 <p className="text-sm text-primary">
-                  {formatCents(item.priceCents)} / {item.unit}
+                  {formatCents(item.priceCents)} / {item.unitLabel || item.unit}
                 </p>
               </Link>
             ))}

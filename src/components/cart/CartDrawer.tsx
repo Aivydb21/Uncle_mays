@@ -151,7 +151,7 @@ export function CartDrawer() {
                   <div className="flex-1">
                     <p className="font-semibold text-foreground">{item.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {formatCents(item.unitPriceCents)} / {item.unit}
+                      {formatCents(item.unitPriceCents)} / {item.unitLabel || item.unit}
                     </p>
                     <div className="mt-2 flex items-center gap-2">
                       <button

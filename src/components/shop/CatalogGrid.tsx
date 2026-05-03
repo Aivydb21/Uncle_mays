@@ -262,7 +262,7 @@ function CatalogCard({ item }: { item: CatalogItem }) {
         <p className="text-sm font-bold text-primary">
           {formatCents(item.priceCents)}
           <span className="ml-1 text-xs font-normal text-muted-foreground">
-            / {item.unit}
+            / {item.unitLabel || item.unit}
           </span>
         </p>
         <div className="mt-auto pt-2">

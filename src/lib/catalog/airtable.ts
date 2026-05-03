@@ -86,10 +86,16 @@ function mapRecord(record: AirtableRecord): CatalogItemInternal | null {
   const taxCategoryRaw = asString(f.TaxCategory);
   const taxCategory: TaxCategory =
     taxCategoryRaw === "prepared" ? "prepared" : "grocery";
-  // Markup multiplier (single source of truth) — Airtable holds CostCents
-  // only; we compute customer-facing PriceCents in code so the markup is
-  // tunable in one place without touching every Airtable row.
-  const priceCents = Math.round(costCents * 1.25);
+  // Pricing: PriceOverrideCents wins when set (right-sized portions where
+  // the supplier per-lb cost doesn't translate cleanly to a customer unit,
+  // e.g. selling asparagus by ½ lb or chicken by the bird). Otherwise fall
+  // back to the standard 1.25× markup of CostCents.
+  const priceOverride = asNumber(f.PriceOverrideCents);
+  const priceCents =
+    priceOverride != null
+      ? Math.round(priceOverride)
+      : Math.round(costCents * 1.25);
+  const defaultAddQty = asNumber(f.DefaultAddQty);
   return {
     sku,
     name,
@@ -105,6 +111,11 @@ function mapRecord(record: AirtableRecord): CatalogItemInternal | null {
     taxCategory,
     freshnessLabel: asString(f.FreshnessLabel),
     scarcityNote: asString(f.ScarcityNote),
+    unitLabel: asString(f.UnitLabel),
+    defaultAddQty:
+      defaultAddQty != null && defaultAddQty > 0
+        ? Math.floor(defaultAddQty)
+        : 1,
   };
 }
 

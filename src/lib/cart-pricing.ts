@@ -80,6 +80,7 @@ export async function priceCart(input: PriceCartInput): Promise<PricingResponse>
       sku: item.sku,
       name: item.name,
       unit: item.unit,
+      unitLabel: item.unitLabel,
       quantity: line.quantity,
       unitPriceCents: item.priceCents,
       lineTotalCents,

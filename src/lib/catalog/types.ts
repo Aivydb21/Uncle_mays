@@ -24,6 +24,15 @@ export interface CatalogItem {
   // Optional badges (operator-set in Airtable). Empty/null = no badge.
   freshnessLabel: string | null;
   scarcityNote: string | null;
+  // Customer-facing display override for the unit. When null, the cart and
+  // catalog card show the bare `unit` (e.g. "lb"). When set, it overrides
+  // the displayed text only — internal accounting still uses `unit`.
+  // Examples: "½ lb", "bunch", "head", "pair (2 chops)", "bird (~4.5 lb)".
+  unitLabel: string | null;
+  // How many units the "Add to cart" button adds on first click. Lets us
+  // default sweet potatoes to 2, smalls to 4, etc., without forcing the
+  // shopper to bump quantity manually for the typical purchase.
+  defaultAddQty: number;
 }
 
 export interface CatalogItemInternal extends CatalogItem {
@@ -39,6 +48,7 @@ export interface PricedLine {
   sku: string;
   name: string;
   unit: CatalogUnit;
+  unitLabel: string | null;
   quantity: number;
   unitPriceCents: number;
   lineTotalCents: number;

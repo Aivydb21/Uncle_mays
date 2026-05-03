@@ -38,10 +38,11 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
   }
 
   function handleAdd() {
-    addLine(item.sku, 1);
+    const addQty = Math.max(1, Math.floor(item.defaultAddQty || 1));
+    addLine(item.sku, addQty);
     bump();
     cachePrice();
-    fireAnalytics(item, qty + 1);
+    fireAnalytics(item, qty + addQty);
   }
 
   if (qty > 0) {
