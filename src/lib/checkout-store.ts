@@ -4,6 +4,15 @@ import crypto from "crypto";
 
 const STORE_PATH = path.join(process.cwd(), "data", "checkout-sessions.json");
 
+export interface CheckoutSessionCartLine {
+  sku: string;
+  name: string;
+  unit: string;
+  quantity: number;
+  unitPriceCents: number;
+  lineTotalCents: number;
+}
+
 export interface CheckoutSession {
   id: string;
   product: string;
@@ -26,6 +35,18 @@ export interface CheckoutSession {
   proteins?: string[];
   additionalProteins?: string[];
   beanChoice?: string;
+  // Custom cart fields (UNC custom-cart launch). Present on every order
+  // created via the new /shop + /checkout flow; absent on legacy single-box
+  // sessions still in flight at cutover.
+  cart?: CheckoutSessionCartLine[];
+  subtotalCents?: number;
+  discountCents?: number;
+  shippingCents?: number;
+  taxCents?: number;
+  totalCents?: number;
+  fulfillmentMode?: "delivery" | "pickup";
+  pickupSlotId?: string;
+  pickupSlotLabel?: string;
   paymentIntentId?: string;
   completedAt?: string;
   recoveryEmailSent?: boolean; // Legacy field, use recoveryEmail1SentAt instead

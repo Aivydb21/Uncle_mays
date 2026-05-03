@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { CART_ENABLED } from "@/lib/feature-flags";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 
 
 export const Navigation = () => {
@@ -17,6 +19,9 @@ export const Navigation = () => {
     { path: "/faq", label: "FAQ" },
     { path: "/about", label: "About" },
   ];
+
+  const orderHref = CART_ENABLED ? "/shop" : "/#boxes";
+  const orderLabel = CART_ENABLED ? "Shop" : "Order Now";
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -52,23 +57,26 @@ export const Navigation = () => {
               </Link>
             );
           })}
-          <a
-            href="/#boxes"
+          <Link
+            href={orderHref}
             className="text-sm font-semibold px-6 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            Order Now
-          </a>
+            {orderLabel}
+          </Link>
+          {CART_ENABLED && <CartDrawer />}
         </div>
 
         {/* Mobile Menu Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
+        <div className="flex items-center gap-2 md:hidden">
+          {CART_ENABLED && <CartDrawer />}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsOpen(!isOpen)}
+          >
+            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Navigation */}
@@ -97,13 +105,13 @@ export const Navigation = () => {
                   </Link>
                 );
               })}
-              <a
-                href="/#boxes"
+              <Link
+                href={orderHref}
                 onClick={() => setIsOpen(false)}
                 className="block w-full mt-4 font-semibold px-4 py-2 text-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
               >
-                Order Now
-              </a>
+                {orderLabel}
+              </Link>
             </div>
           </motion.div>
         )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useParams, notFound, useRouter } from "next/navigation";
+import { useParams, notFound, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { PRODUCTS, type ProductSlug, type ProteinId } from "@/lib/products";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { ACTIVE_PROMOS, getDiscountCents, normalizePromo } from "@/lib/promo";
 import { useAddressAutocomplete, type ParsedAddress } from "@/hooks/use-address-autocomplete";
 import { WaitlistCapture } from "@/components/WaitlistCapture";
 import { isInServiceArea, OUT_OF_AREA_MESSAGE } from "@/lib/service-area";
+import { CART_ENABLED } from "@/lib/feature-flags";
 
 declare global {
   interface Window {
@@ -97,7 +98,16 @@ function validate(fields: FormFields): FormErrors {
 export default function DeliveryPage() {
   const params = useParams<{ product: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const slug = params.product as ProductSlug;
+
+  useEffect(() => {
+    if (!CART_ENABLED) return;
+    const promo = searchParams?.get("promo");
+    router.replace(promo ? `/shop?promo=${encodeURIComponent(promo)}` : "/shop");
+  }, [router, searchParams]);
+
+  if (CART_ENABLED) return null;
 
   if (!PRODUCTS[slug]) {
     notFound();

@@ -9,6 +9,56 @@ const TRIGGER_API_BASE = "https://api.trigger.dev/api/v1/tasks";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
 
+interface CartLineItemForEmail {
+  sku: string;
+  name: string;
+  quantity: number;
+  unitPriceCents: number;
+  lineTotalCents: number;
+}
+
+// Custom-cart orders (intent.metadata.product === "custom_cart") store a
+// compact cart array in intent.metadata.cart_json as
+//   [[sku, qty, unitPriceCents], ...]
+// We don't have item names in metadata (size cap); we reconstruct a
+// human-readable name from line_items_summary if present, otherwise fall
+// back to the SKU.
+function parseCartLineItems(
+  cartJson: string | undefined | null
+): CartLineItemForEmail[] | undefined {
+  if (!cartJson) return undefined;
+  try {
+    const parsed = JSON.parse(cartJson);
+    if (!Array.isArray(parsed)) return undefined;
+    const lines: CartLineItemForEmail[] = [];
+    for (const entry of parsed) {
+      if (!Array.isArray(entry) || entry.length < 3) continue;
+      const sku = String(entry[0]);
+      const quantity = Number(entry[1]);
+      const unitPriceCents = Number(entry[2]);
+      if (!sku || !Number.isFinite(quantity) || !Number.isFinite(unitPriceCents)) {
+        continue;
+      }
+      lines.push({
+        sku,
+        name: sku,
+        quantity,
+        unitPriceCents,
+        lineTotalCents: unitPriceCents * quantity,
+      });
+    }
+    return lines.length > 0 ? lines : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function numberOrNull(s: string | undefined | null): number | null {
+  if (s == null) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
 // GA4 Measurement Protocol for server-side conversion tracking
 async function trackGA4Purchase(params: {
   transactionId: string;
@@ -411,6 +461,12 @@ export async function POST(req: NextRequest) {
       // and this is not already covered by the firstPayment branch.
       if (confirmEmail && !intentInvoice && intent.metadata?.firstPayment !== "true") {
         const otProduct = intent.metadata?.product || "produce_box";
+        const otCart = parseCartLineItems(intent.metadata?.cart_json);
+        const otContentIds =
+          otCart && otCart.length > 0 ? otCart.map((l) => l.sku) : [otProduct];
+        const otContentName =
+          intent.metadata?.line_items_summary || otProduct;
+
         if (!isSuppressed(confirmEmail)) {
           sendCapiEvent({
             eventName: "Purchase",
@@ -426,8 +482,8 @@ export async function POST(req: NextRequest) {
             customData: {
               value: intent.amount / 100,
               currency: "USD",
-              content_ids: [otProduct],
-              content_name: otProduct,
+              content_ids: otContentIds,
+              content_name: otContentName,
               content_type: "product",
               order_id: intent.id,
             },
@@ -437,20 +493,28 @@ export async function POST(req: NextRequest) {
           console.log(`[CAPI] Skipped Purchase (one-time) for suppressed email: ${confirmEmail}`);
         }
 
-        // Fire server-side GA4 purchase event (one-time embedded checkout).
-        // Covers the primary flow that previously only relied on client-side
-        // gtag on /order-success, which loses ~80% of conversions to 3DS
-        // redirects, ad blockers, and script load races.
+        const ga4Items =
+          otCart && otCart.length > 0
+            ? otCart.map((l) => ({
+                item_id: l.sku,
+                item_name: l.name,
+                price: l.unitPriceCents / 100,
+                quantity: l.quantity,
+              }))
+            : [
+                {
+                  item_id: otProduct,
+                  item_name: intent.metadata?.productName || otProduct,
+                  price: intent.amount / 100,
+                  quantity: 1,
+                },
+              ];
+
         trackGA4Purchase({
           transactionId: intent.id,
           value: intent.amount / 100,
           currency: "USD",
-          items: [{
-            item_id: otProduct,
-            item_name: intent.metadata?.productName || otProduct,
-            price: intent.amount / 100,
-            quantity: 1,
-          }],
+          items: ga4Items,
         }).catch((err) => console.error("[GA4] Purchase (one-time) error:", err));
       }
 
@@ -461,8 +525,17 @@ export async function POST(req: NextRequest) {
           const PRODUCT_NAMES: Record<string, string> = {
             starter: "Spring Box",
             family: "Full Harvest Box",
+            custom_cart: "Custom cart",
           };
           const productName = productKey ? (PRODUCT_NAMES[productKey] ?? productKey) : "Produce Box";
+
+          // Custom-cart orders carry itemized data in metadata. Parse and
+          // pass through so the order-confirmation email can render line
+          // items rather than a single product line.
+          const cartLineItems = parseCartLineItems(intent.metadata?.cart_json);
+          const fulfillmentMode =
+            intent.metadata?.fulfillment_mode === "pickup" ? "pickup" : "delivery";
+          const pickupSlotLabel = intent.metadata?.pickup_slot_label ?? null;
 
           fetch(`${TRIGGER_API_BASE}/send-order-confirmation-email/trigger`, {
             method: "POST",
@@ -480,6 +553,14 @@ export async function POST(req: NextRequest) {
                 isSubscription: false,
                 billingInterval: null,
                 subscriptionId: null,
+                lineItems: cartLineItems,
+                subtotalCents: numberOrNull(intent.metadata?.subtotal_cents),
+                discountCents: numberOrNull(intent.metadata?.discount_cents),
+                shippingCents: numberOrNull(intent.metadata?.shipping_cents),
+                taxCents: numberOrNull(intent.metadata?.tax_cents),
+                totalCents: numberOrNull(intent.metadata?.total_cents) ?? intent.amount,
+                fulfillmentMode,
+                pickupSlotLabel,
               },
               options: {
                 idempotencyKey: `order-confirmation-pi-${intent.id}`,

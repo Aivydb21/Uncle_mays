@@ -11,6 +11,32 @@ import { Label } from "@/components/ui/label";
 import { ShieldCheck, Truck, Leaf } from "lucide-react";
 import { ACTIVE_PROMOS, getDiscountCents, normalizePromo } from "@/lib/promo";
 import { CheckoutExitSurvey } from "@/components/CheckoutExitSurvey";
+import { CART_ENABLED } from "@/lib/feature-flags";
+
+function SubscriptionsPausedBanner() {
+  return (
+    <div className="container mx-auto max-w-2xl px-6 py-16">
+      <div className="rounded-2xl border border-amber-300 bg-amber-50 p-6 text-amber-900">
+        <h1 className="text-2xl font-bold">Subscriptions are paused</h1>
+        <p className="mt-2 text-base">
+          We&rsquo;re focused on one-time orders right now. You can still build a
+          custom order from the catalog and pick delivery or Polsky Center
+          pickup.
+        </p>
+        <Link
+          href="/shop"
+          className="mt-5 inline-flex h-12 items-center justify-center rounded-xl bg-primary px-6 font-semibold text-primary-foreground hover:bg-primary/90"
+        >
+          Shop the catalog →
+        </Link>
+        <p className="mt-4 text-xs text-amber-800">
+          Existing subscribers continue to be billed and delivered as scheduled.
+          Questions: info@unclemays.com or (312) 972-2595.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 // Passive progress bar (see /checkout/[product]/page.tsx for rationale).
 function StepIndicator({ current }: { current: 1 | 2 | 3 }) {
@@ -36,6 +62,10 @@ export default function SubscribeSummaryPage() {
   const params = useParams<{ product: string }>();
   const router = useRouter();
   const slug = params.product as ProductSlug;
+
+  if (CART_ENABLED) {
+    return <SubscriptionsPausedBanner />;
+  }
 
   if (!PRODUCTS[slug]) {
     notFound();

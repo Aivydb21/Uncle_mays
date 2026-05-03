@@ -1,129 +1,153 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { getDiscountCents, validatePromo } from "@/lib/promo";
+import {
+  priceCart,
+  serializeCartForMetadata,
+  summarizeLineItems,
+} from "@/lib/cart-pricing";
+import { getSlot } from "@/lib/catalog/pickup-slots";
+import type { CartLine, FulfillmentMode } from "@/lib/catalog/types";
 
-// Map product slugs to amounts in cents (one-time price).
-// MUST match src/lib/products.ts PRODUCTS[slug].price * 100.
-const AMOUNT_MAP: Record<string, number> = {
-  starter: 4000,
-  family: 7000,
-};
-
-// Optional protein add-on prices in cents.
-// MUST match src/lib/products.ts PROTEIN_OPTIONS[].price * 100.
-const PROTEIN_ADD_ON_PRICING: Record<string, number> = {
-  chicken: 1200,
-  "beef-short-ribs": 1200,
-  "lamb-chops": 1200,
-};
+const STRIPE_METADATA_VALUE_LIMIT = 500;
 
 export async function POST(req: NextRequest) {
   try {
     if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Stripe not configured" },
+        { status: 500 }
+      );
     }
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-    const { product, email, firstName, lastName, phone, address, proteins, additionalProteins, beanChoice, utm_source, utm_medium, utm_campaign, utm_content, utm_term, gclid, fbclid, fbc, fbp, promo } = await req.json();
+    const body = await req.json();
+    const cart = sanitizeCart(body?.cart);
+    const fulfillmentMode: FulfillmentMode =
+      body?.fulfillmentMode === "pickup" ? "pickup" : "delivery";
+    const pickupSlotId =
+      typeof body?.pickupSlotId === "string" ? body.pickupSlotId : null;
+    const shippingZip =
+      typeof body?.shippingZip === "string"
+        ? body.shippingZip
+        : body?.address?.zip || null;
 
-    // Capture client IP + user agent for Meta CAPI match quality. These add
-    // strong signals on top of email/phone hashes and meaningfully improve
-    // the share of CAPI Purchase events that get attributed back to ad clicks.
+    const promoCode =
+      typeof body?.promo === "string" ? body.promo : null;
+
+    const pricing = await priceCart({
+      cart,
+      fulfillmentMode,
+      promoCode,
+      shippingZip,
+    });
+    if (!pricing.ok) {
+      return NextResponse.json({ error: pricing.code, detail: pricing.message }, { status: 400 });
+    }
+
+    let pickupSlotLabel: string | null = null;
+    if (fulfillmentMode === "pickup") {
+      if (!pickupSlotId) {
+        return NextResponse.json(
+          { error: "missing_pickup_slot" },
+          { status: 400 }
+        );
+      }
+      const slot = await getSlot(pickupSlotId);
+      if (!slot || !slot.active || slot.booked >= slot.capacity) {
+        return NextResponse.json(
+          { error: "slot_unavailable" },
+          { status: 409 }
+        );
+      }
+      pickupSlotLabel = `${slot.locationLabel} | ${formatSlotWindow(
+        slot.startsAt,
+        slot.endsAt
+      )}`;
+    }
+
+    const {
+      email,
+      firstName,
+      lastName,
+      phone,
+      address,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      utm_term,
+      gclid,
+      fbclid,
+      fbc,
+      fbp,
+      checkoutSessionId,
+    } = body || {};
+
     const fwd = req.headers.get("x-forwarded-for") || "";
-    const clientIp = (fwd.split(",")[0] || req.headers.get("x-real-ip") || "").trim() || undefined;
+    const clientIp =
+      (fwd.split(",")[0] || req.headers.get("x-real-ip") || "").trim() ||
+      undefined;
     const clientUa = req.headers.get("user-agent") || undefined;
 
-    let amount = AMOUNT_MAP[product];
-
-    if (!amount) {
-      return NextResponse.json({ error: "Unknown product" }, { status: 400 });
-    }
-
-    // Proteins are optional paid add-ons (no protein is ever "included").
-    // Charge for every entry in either `proteins` or `additionalProteins` —
-    // both arrays are treated identically and may come from legacy callers.
-    const allProteins: unknown[] = [
-      ...(Array.isArray(proteins) ? proteins : []),
-      ...(Array.isArray(additionalProteins) ? additionalProteins : []),
-    ];
-    for (const proteinId of allProteins) {
-      if (typeof proteinId === "string") {
-        const proteinCost = PROTEIN_ADD_ON_PRICING[proteinId];
-        if (proteinCost) amount += proteinCost;
-      }
-    }
-
-    // Look up or create Stripe customer with shipping address and phone
     let customerId: string | undefined;
     if (email) {
-      const existingCustomers = await stripe.customers.list({ email, limit: 1 });
-      if (existingCustomers.data.length > 0) {
-        customerId = existingCustomers.data[0].id;
-        // Update existing customer with latest address/phone if provided
-        if (address || phone) {
-          await stripe.customers.update(customerId, {
-            name: `${firstName} ${lastName}`.trim(),
-            phone: phone || undefined,
-            address: address
-              ? {
-                  line1: address.street,
-                  line2: address.apt || undefined,
-                  city: address.city,
-                  state: address.state,
-                  postal_code: address.zip,
-                  country: "US",
-                }
-              : undefined,
-          });
-        }
-      } else {
-        const customer = await stripe.customers.create({
-          email,
-          name: `${firstName} ${lastName}`.trim(),
+      const existing = await stripe.customers.list({ email, limit: 1 });
+      const name = `${firstName || ""} ${lastName || ""}`.trim() || undefined;
+      const stripeAddress =
+        address && fulfillmentMode === "delivery"
+          ? {
+              line1: address.street,
+              line2: address.apt || undefined,
+              city: address.city,
+              state: address.state,
+              postal_code: address.zip,
+              country: "US",
+            }
+          : undefined;
+      if (existing.data.length > 0) {
+        customerId = existing.data[0].id;
+        await stripe.customers.update(customerId, {
+          name,
           phone: phone || undefined,
-          address: address
-            ? {
-                line1: address.street,
-                line2: address.apt || undefined,
-                city: address.city,
-                state: address.state,
-                postal_code: address.zip,
-                country: "US",
-              }
-            : undefined,
+          address: stripeAddress,
         });
-        customerId = customer.id;
+      } else {
+        const created = await stripe.customers.create({
+          email,
+          name,
+          phone: phone || undefined,
+          address: stripeAddress,
+        });
+        customerId = created.id;
       }
     }
 
-    const isTestKey = process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ?? false;
+    const isTestKey =
+      process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ?? false;
 
-    // Apply promo discount to the amount. PaymentIntents do not support Stripe
-    // coupons directly, so we subtract the amount_off server-side and record
-    // the promo code in metadata so the webhook + CAPI Purchase events reflect
-    // the discounted value. Only codes in ACTIVE_PROMOS apply; unknown codes
-    // are silently ignored (client already validated & displayed the banner).
-    let appliedPromoCode: string | null = null;
-    let appliedPromoDiscount = 0;
-    const validPromo = validatePromo(promo, "one-time");
-    if (validPromo) {
-      appliedPromoCode = validPromo.code;
-      appliedPromoDiscount = Math.min(getDiscountCents(validPromo.entry, amount), Math.max(0, amount - 100));
-      amount -= appliedPromoDiscount;
+    const cartJson = serializeCartForMetadata(pricing.lineItems);
+    const summary = summarizeLineItems(pricing.lineItems);
+
+    const cartMetadata: Record<string, string> = {};
+    if (cartJson.length <= STRIPE_METADATA_VALUE_LIMIT) {
+      cartMetadata.cart_json = cartJson;
+    } else if (checkoutSessionId) {
+      cartMetadata.cart_ref = String(checkoutSessionId);
     }
 
     const paymentIntent = await stripe.paymentIntents.create({
-      amount,
+      amount: pricing.totalCents,
       currency: "usd",
       customer: customerId,
       receipt_email: email || undefined,
       metadata: {
-        product,
+        product: "custom_cart",
+        firstPayment: "true",
         ...(isTestKey ? { is_test: "true" } : {}),
         customer_name: `${firstName || ""} ${lastName || ""}`.trim(),
         customer_email: email || "",
         ...(phone ? { customer_phone: phone } : {}),
-        ...(address
+        ...(address && fulfillmentMode === "delivery"
           ? {
               shipping_street: address.street,
               shipping_apt: address.apt || "",
@@ -132,14 +156,25 @@ export async function POST(req: NextRequest) {
               shipping_zip: address.zip,
             }
           : {}),
-        ...(Array.isArray(proteins) && proteins.length > 0
-          ? { protein_selections: proteins.join(", ") }
+        fulfillment_mode: fulfillmentMode,
+        ...(pickupSlotId ? { pickup_slot: pickupSlotId } : {}),
+        ...(pickupSlotLabel ? { pickup_slot_label: pickupSlotLabel } : {}),
+        line_count: String(pricing.lineItems.length),
+        line_items_summary: summary,
+        subtotal_cents: String(pricing.subtotalCents),
+        discount_cents: String(pricing.discountCents),
+        shipping_cents: String(pricing.shippingCents),
+        tax_cents: String(pricing.taxCents),
+        total_cents: String(pricing.totalCents),
+        ...cartMetadata,
+        ...(pricing.appliedPromoCode
+          ? {
+              promo_code: pricing.appliedPromoCode,
+              promo_discount_cents: String(pricing.discountCents),
+            }
           : {}),
-        ...(Array.isArray(additionalProteins) && additionalProteins.length > 0
-          ? { additional_protein_selections: additionalProteins.join(", ") }
-          : {}),
-        ...(typeof beanChoice === "string" && beanChoice
-          ? { bean_choice: beanChoice }
+        ...(checkoutSessionId
+          ? { checkoutSessionId: String(checkoutSessionId) }
           : {}),
         ...(utm_source ? { utm_source } : {}),
         ...(utm_medium ? { utm_medium } : {}),
@@ -152,20 +187,54 @@ export async function POST(req: NextRequest) {
         ...(fbp ? { fbp } : {}),
         ...(clientIp ? { client_ip: clientIp } : {}),
         ...(clientUa ? { client_user_agent: clientUa.slice(0, 500) } : {}),
-        ...(appliedPromoCode ? { promo_code: appliedPromoCode, promo_discount_cents: String(appliedPromoDiscount) } : {}),
       },
       automatic_payment_methods: { enabled: true },
     });
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,
-      appliedAmount: amount,
-      appliedPromoCode,
-      appliedPromoDiscount,
+      paymentIntentId: paymentIntent.id,
+      pricing,
+      pickupSlotLabel,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Unknown error";
     console.error("checkout/intent error:", message);
     return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+function sanitizeCart(raw: unknown): CartLine[] {
+  if (!Array.isArray(raw)) return [];
+  const out: CartLine[] = [];
+  for (const entry of raw) {
+    if (!entry || typeof entry !== "object") continue;
+    const e = entry as Record<string, unknown>;
+    const sku = typeof e.sku === "string" ? e.sku.trim() : "";
+    const quantity = Math.floor(Number(e.quantity) || 0);
+    if (sku && quantity > 0) out.push({ sku, quantity });
+  }
+  return out;
+}
+
+function formatSlotWindow(startsAtIso: string, endsAtIso: string): string {
+  try {
+    const start = new Date(startsAtIso);
+    const end = new Date(endsAtIso);
+    const dateFmt = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Chicago",
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+    const timeFmt = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Chicago",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+    return `${dateFmt.format(start)}, ${timeFmt.format(start)}-${timeFmt.format(end)}`;
+  } catch {
+    return `${startsAtIso}-${endsAtIso}`;
   }
 }

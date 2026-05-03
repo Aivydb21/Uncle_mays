@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, notFound } from "next/navigation";
+import { useParams, notFound, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { PRODUCTS, PROTEIN_OPTIONS, PROTEIN_TAGLINE, BEAN_OPTIONS, DEFAULT_BEAN, type ProductSlug, type ProteinId, type BeanId } from "@/lib/products";
@@ -12,6 +12,7 @@ import { WaitlistCapture } from "@/components/WaitlistCapture";
 import { isInServiceArea, OUT_OF_AREA_MESSAGE } from "@/lib/service-area";
 import { TESTIMONIALS } from "@/lib/testimonials";
 import { CheckoutExitSurvey } from "@/components/CheckoutExitSurvey";
+import { CART_ENABLED } from "@/lib/feature-flags";
 
 declare global {
   interface Window {
@@ -98,7 +99,22 @@ function validate(fields: FormFields): FormErrors {
 export default function CheckoutPage() {
   const params = useParams<{ product: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const slug = params.product as ProductSlug;
+
+  // When the custom-cart flag is on, the legacy per-product checkout is
+  // retired. Preserve any ?promo= attached by Meta ads so the new /shop
+  // page can pick it up and apply at checkout.
+  useEffect(() => {
+    if (!CART_ENABLED) return;
+    const promo = searchParams?.get("promo");
+    const target = promo ? `/shop?promo=${encodeURIComponent(promo)}` : "/shop";
+    router.replace(target);
+  }, [router, searchParams]);
+
+  if (CART_ENABLED) {
+    return null;
+  }
 
   if (!PRODUCTS[slug]) {
     notFound();

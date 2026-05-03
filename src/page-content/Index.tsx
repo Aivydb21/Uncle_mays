@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { ShoppingBag, Bell, Package, ChevronDown } from "lucide-react";
 import { Hero } from "@/components/Hero";
@@ -53,15 +53,15 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
-const Index = () => {
+const Index = ({ productSection }: { productSection?: ReactNode } = {}) => {
   return (
     <>
       <Hero />
 
-      {/* 6. PRODUCT / BOXES — moved above fold to reduce scroll-to-order distance */}
-      <Suspense>
-        <Pricing />
-      </Suspense>
+      {/* PRODUCT section. When the custom-cart flag is on, the parent server
+          page passes <ShopCTA/>; otherwise we fall back to the legacy
+          <Pricing/> tier card. */}
+      <Suspense>{productSection ?? <Pricing />}</Suspense>
 
       {/* CUSTOMER FEEDBACK — Source B of the feedback program. Captures
           top-of-funnel visitors who never reach checkout. */}

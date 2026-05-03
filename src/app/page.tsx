@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import HomePageContent from "@/page-content/Index";
+import { CART_ENABLED } from "@/lib/feature-flags";
+import { ShopCTA } from "@/components/ShopCTA";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -185,7 +187,7 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <HomePageContent />
+      <HomePageContent productSection={CART_ENABLED ? <ShopCTA /> : undefined} />
     </>
   );
 }

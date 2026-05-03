@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useParams, notFound, useRouter } from "next/navigation";
+import { useParams, notFound, useRouter, useSearchParams } from "next/navigation";
+import { CART_ENABLED } from "@/lib/feature-flags";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
 import {
@@ -179,6 +180,15 @@ export default function PaymentPage() {
   const params = useParams<{ product: string }>();
   const slug = params.product as ProductSlug;
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!CART_ENABLED) return;
+    const promo = searchParams?.get("promo");
+    router.replace(promo ? `/shop?promo=${encodeURIComponent(promo)}` : "/shop");
+  }, [router, searchParams]);
+
+  if (CART_ENABLED) return null;
 
   if (!PRODUCTS[slug]) {
     notFound();
