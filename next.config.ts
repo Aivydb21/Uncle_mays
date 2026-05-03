@@ -12,10 +12,10 @@ const nextConfig: NextConfig = {
       // /products/weekly-produce-box: never existed as a route but was
       // referenced by older Meta ad creatives that are now paused.
       { source: "/products/:slug*", destination: "/#boxes", permanent: false },
-      // /shop and /starter-box: legacy landing pages superseded by
-      // /get-started for cold traffic and /#boxes for warm traffic.
-      { source: "/shop", destination: "/#boxes", permanent: false },
+      // /starter-box: legacy landing page superseded by /get-started.
       { source: "/starter-box", destination: "/get-started", permanent: false },
+      // (/shop redirect removed 2026-05-02: /shop is now the live custom-cart
+      //  catalog page. Re-enable only if /shop is retired again.)
     ];
   },
 };
