@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { fetchCatalog } from "@/lib/catalog/airtable";
-import { CART_ENABLED } from "@/lib/feature-flags";
 import { CatalogGrid } from "@/components/shop/CatalogGrid";
 import { ShopHeader } from "@/components/shop/ShopHeader";
 import { PromoBanner } from "@/components/shop/PromoBanner";
@@ -27,10 +25,6 @@ export default async function ShopPage({
 }: {
   searchParams: Promise<ShopPageSearchParams>;
 }) {
-  if (!CART_ENABLED) {
-    notFound();
-  }
-
   let catalog: CatalogItem[] = [];
   let unavailable = false;
   try {

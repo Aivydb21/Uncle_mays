@@ -11,11 +11,22 @@ const nextConfig: NextConfig = {
     return [
       // /products/weekly-produce-box: never existed as a route but was
       // referenced by older Meta ad creatives that are now paused.
-      { source: "/products/:slug*", destination: "/#boxes", permanent: false },
+      { source: "/products/:slug*", destination: "/shop", permanent: false },
       // /starter-box: legacy landing page superseded by /get-started.
       { source: "/starter-box", destination: "/get-started", permanent: false },
-      // (/shop redirect removed 2026-05-02: /shop is now the live custom-cart
-      //  catalog page. Re-enable only if /shop is retired again.)
+      // Legacy /checkout/[product]/** routes (the pre-cart 2-step flow) were
+      // deleted 2026-05-02. Old Meta/Google ad URLs and customer bookmarks
+      // still reference these paths; route them to the new catalog.
+      { source: "/checkout/starter", destination: "/shop", permanent: false },
+      { source: "/checkout/family", destination: "/shop", permanent: false },
+      { source: "/checkout/community", destination: "/shop", permanent: false },
+      { source: "/checkout/:product/delivery", destination: "/shop", permanent: false },
+      { source: "/checkout/:product/payment", destination: "/shop", permanent: false },
+      // Legacy /subscribe/[product]/{delivery,payment} subroutes were deleted
+      // 2026-05-02. Parent /subscribe/[product] still serves the "paused"
+      // banner so deep-linked confirmation emails still resolve.
+      { source: "/subscribe/:product/delivery", destination: "/subscribe/:product", permanent: false },
+      { source: "/subscribe/:product/payment", destination: "/subscribe/:product", permanent: false },
     ];
   },
 };

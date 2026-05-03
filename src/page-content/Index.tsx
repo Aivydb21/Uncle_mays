@@ -2,27 +2,26 @@
 
 import { Suspense, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, Bell, Package, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Hero } from "@/components/Hero";
-import { Pricing } from "@/components/Pricing";
 import { HomeEmailCapture } from "@/components/HomeEmailCapture";
 import { TESTIMONIALS } from "@/lib/testimonials";
 
 const faqs = [
   {
-    question: "Is this a subscription? Will my card be auto-charged?",
+    question: "How does ordering work?",
     answer:
-      "No. Every box is a one-time purchase. You order, you get charged once for that one box, that's it. No recurring billing, no auto-renewal, no card on file. The next time you want a box, you come back and order again.",
+      "Browse the catalog, fill your cart with the items you want (any quantity), and check out. $25 minimum. Pay once per order. No subscription, no auto-renewal, no card on file.",
   },
   {
     question: "How does delivery work?",
     answer:
-      "We deliver directly to your door across the Chicago metro area (city plus south suburbs) every Wednesday. Order by Sunday 11:59 PM CT and your box ships that Wednesday. After placing your order, you'll receive a confirmation email with your estimated delivery window.",
+      "Choose Chicago delivery ($7.99 flat to most Chicago and south-suburb ZIPs) or free pickup at the Polsky Center, 1452 E 53rd St in Hyde Park. Delivery and pickup windows are picked at checkout.",
   },
   {
     question: "What if I have an issue with my order?",
     answer:
-      "We stand behind every box. If anything is wrong with your delivery (missing items, quality issues, anything), email us at info@unclemays.com and we'll make it right, no questions asked.",
+      "We stand behind every order. If anything is wrong (missing items, quality issues, anything), email us at info@unclemays.com and we'll make it right, no questions asked.",
   },
 ];
 
@@ -52,35 +51,14 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
-const Index = ({ productSection }: { productSection?: ReactNode } = {}) => {
+const Index = ({ productSection }: { productSection: ReactNode }) => {
   return (
     <>
       <Hero />
 
-      {/* PRODUCT section. When the custom-cart flag is on, the parent server
-          page passes <ShopCTA/>; otherwise we fall back to the legacy
-          <Pricing/> tier card. */}
-      <Suspense>{productSection ?? <Pricing />}</Suspense>
-
-      {/* 2. HOW IT WORKS — compact 3-step strip */}
-      <section className="py-10 bg-background border-t border-border/40">
-        <div className="container px-6">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto text-center">
-            {[
-              { icon: ShoppingBag, title: "Order by Sunday 11:59 PM" },
-              { icon: Package, title: "We pack it fresh Wednesday" },
-              { icon: Bell, title: "At your door Wednesday" },
-            ].map((step) => (
-              <div key={step.title} className="flex items-center justify-center sm:justify-start gap-3">
-                <div className="bg-primary/10 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
-                  <step.icon className="h-5 w-5 text-primary" />
-                </div>
-                <span className="text-sm font-medium text-foreground/80">{step.title}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Shop CTA + 4-tile catalog preview. Provided by the parent server
+          page (src/app/page.tsx) so the catalog fetch happens server-side. */}
+      <Suspense>{productSection}</Suspense>
 
       {/* Customer voice — real, attributed quotes only (see src/lib/testimonials.ts) */}
       {TESTIMONIALS.length > 0 ? (

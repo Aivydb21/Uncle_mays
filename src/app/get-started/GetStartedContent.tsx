@@ -1,6 +1,5 @@
 "use client";
 
-import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -11,7 +10,6 @@ import {
   Clock,
   Check,
 } from "lucide-react";
-import { Pricing } from "@/components/Pricing";
 import { TESTIMONIALS } from "@/lib/testimonials";
 
 const HERO_IMAGE = "/images/hero-produce.jpg";
@@ -153,12 +151,24 @@ export function GetStartedContent() {
         </div>
       </section>
 
-      {/* CHOOSE YOUR BOX — reuse the canonical Pricing component */}
-      <div id="choose">
-        <Suspense>
-          <Pricing />
-        </Suspense>
-      </div>
+      {/* SHOP CTA — sends visitors into the catalog. */}
+      <section id="choose" className="py-16 bg-muted/30">
+        <div className="container px-6 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+            Build your box
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-6">
+            Pick the produce, pantry items, and protein you actually want.
+            $25 minimum. Use FRESH10 for $10 off your first order.
+          </p>
+          <Link
+            href="/shop"
+            className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-8 text-base font-semibold text-primary-foreground shadow-medium hover:bg-primary/90 transition-colors"
+          >
+            Shop the catalog →
+          </Link>
+        </div>
+      </section>
 
       {/* CUTOFF + GUARANTEE — last reassurance before the next click */}
       <section className="py-12 bg-background">

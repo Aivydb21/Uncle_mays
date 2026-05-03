@@ -79,9 +79,6 @@ export async function ShopCTA() {
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <p className="mt-3 text-center text-sm text-muted-foreground">
-          Chicago delivery $7.99 · Polsky Center pickup free · 1% IL grocery tax
-        </p>
       </div>
     </section>
   );

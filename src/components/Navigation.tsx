@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CART_ENABLED } from "@/lib/feature-flags";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 
 
@@ -19,9 +18,6 @@ export const Navigation = () => {
     { path: "/faq", label: "FAQ" },
     { path: "/about", label: "About" },
   ];
-
-  const orderHref = CART_ENABLED ? "/shop" : "/#boxes";
-  const orderLabel = CART_ENABLED ? "Shop" : "Order Now";
 
   const isActive = (path: string) => {
     if (path === "/") {
@@ -58,17 +54,17 @@ export const Navigation = () => {
             );
           })}
           <Link
-            href={orderHref}
+            href="/shop"
             className="text-sm font-semibold px-6 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
           >
-            {orderLabel}
+            Shop
           </Link>
-          {CART_ENABLED && <CartDrawer />}
+          <CartDrawer />
         </div>
 
         {/* Mobile Menu Button */}
         <div className="flex items-center gap-2 md:hidden">
-          {CART_ENABLED && <CartDrawer />}
+          <CartDrawer />
           <Button
             variant="ghost"
             size="icon"
@@ -106,11 +102,11 @@ export const Navigation = () => {
                 );
               })}
               <Link
-                href={orderHref}
+                href="/shop"
                 onClick={() => setIsOpen(false)}
                 className="block w-full mt-4 font-semibold px-4 py-2 text-center rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
               >
-                {orderLabel}
+                Shop
               </Link>
             </div>
           </motion.div>
