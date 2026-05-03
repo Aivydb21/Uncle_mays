@@ -243,6 +243,19 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
           : undefined;
       const fbc = readCookie("_fbc");
       const fbp = readCookie("_fbp");
+      // GA4 client_id (user_pseudo_id) lives in the _ga cookie. Format:
+      //   GA1.1.<random>.<random>  → drop the GA1.1. prefix; the remainder is
+      // the value that BigQuery exports as user_pseudo_id. Capturing it on
+      // the PaymentIntent lets the ML pipeline join GA4 session-summary rows
+      // (browse behavior, traffic source, scroll depth) to checkout
+      // attempts. Without this, the join only works for purchase events,
+      // which is why the 2026-05-02 notebook saw GA4 data on 1/305 rows.
+      const gaClientId = (() => {
+        const raw = readCookie("_ga");
+        if (!raw) return undefined;
+        const parts = raw.split(".");
+        return parts.length >= 4 ? parts.slice(2).join(".") : raw;
+      })();
 
       const intentRes = await fetch("/api/checkout/intent", {
         method: "POST",
@@ -277,6 +290,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
           fbclid: utm.fbclid || persistedFbclid,
           fbc,
           fbp,
+          ga_client_id: gaClientId,
         }),
       });
       const intentJson = await intentRes.json();

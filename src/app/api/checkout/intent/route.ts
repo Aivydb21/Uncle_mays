@@ -80,6 +80,7 @@ export async function POST(req: NextRequest) {
       fbclid,
       fbc,
       fbp,
+      ga_client_id,
       checkoutSessionId,
     } = body || {};
 
@@ -185,6 +186,7 @@ export async function POST(req: NextRequest) {
         ...(fbclid ? { fbclid } : {}),
         ...(fbc ? { fbc } : {}),
         ...(fbp ? { fbp } : {}),
+        ...(ga_client_id ? { ga_client_id } : {}),
         ...(clientIp ? { client_ip: clientIp } : {}),
         ...(clientUa ? { client_user_agent: clientUa.slice(0, 500) } : {}),
       },
