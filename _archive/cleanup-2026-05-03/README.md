@@ -44,6 +44,17 @@ Folders the user explicitly green-lit for archival:
 - `notes/`, `legal/`, `ml/`, `_airtable_dump/`
 - `scripts/sync-paperclip-context.py` and `scripts/generate_catalog_images.py`
 
+## Round 2 (later same day)
+
+After the first round shipped, the user flagged additional stale items moved to `round-2/`:
+
+- `round-2/1871/` — `1871-application.md`, `1871-application-deck.md`, `bd/investor-prep/1871-foodtech-2026-04-24.md`, `investor-outreach/contacts/membership-1871-com.md`. The 1871 Foodtech opportunity is no longer being pursued.
+- `round-2/strategy/` — `revenue-strategy-paid-acquisition-plan.md` (root). Pre-launch CRO paid-acquisition plan, superseded by the catalog-launch reality. (`bd/STRATEGY.md` kept; that's the BD agent's living strategy doc.)
+- `round-2/scripts/` — every script in `scripts/` except the two active utilities `generate_catalog_images.py` (catalog AI image regen) and `sync-paperclip-context.py` (CLAUDE.md → agent context sync). 40+ ad-platform automation scripts that are not safe to run anyway (the standing order on marketing/advertising changes blocks autonomous ad-account writes).
+- `round-2/ops/` — every file in `ops/` except `start-paperclip.cmd` and `stop-paperclip.cmd`. The remaining ops docs (campaign monitoring, fulfillment procedures, conversion-lift snapshot, weekly revenue report template, etc.) are stale or unneeded.
+
+After round 2, `scripts/` contains only 2 files and `ops/` contains only 2 files.
+
 ## How to undo
 
 If anything in here turns out to still be needed, `git log --diff-filter=R --follow -- <path>` will show the rename, and you can `git mv` it back. Or just copy out of this folder.
