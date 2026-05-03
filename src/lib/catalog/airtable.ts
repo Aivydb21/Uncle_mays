@@ -188,7 +188,7 @@ async function fetchInternalCatalogUncached(): Promise<CatalogItemInternal[]> {
 
 const getInternalCatalogCached = unstable_cache(
   fetchInternalCatalogUncached,
-  ["catalog-internal-v4-final-pricing"],
+  ["catalog-internal-v5-with-images"],
   { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_TAG] }
 );
 
