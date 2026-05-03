@@ -16,16 +16,16 @@ const HERO_IMAGE = "/images/hero-produce.jpg";
 
 const STEPS = [
   {
-    title: "Pick your box",
-    body: "Spring Box for 1 to 2 people, or Full Harvest Box for 3 to 4.",
+    title: "Build your order",
+    body: "Browse the catalog and fill your cart with what you actually want. $25 minimum.",
   },
   {
-    title: "We pack it Tuesday",
-    body: "Seasonal greens, roots, and pantry staples, fresh that morning.",
+    title: "Choose delivery or pickup",
+    body: "Chicago delivery $7.99 flat, or free pickup at the Polsky Center in Hyde Park.",
   },
   {
-    title: "Delivered Wednesday",
-    body: "Free Chicago metro delivery. We text you a window.",
+    title: "We pack it fresh",
+    body: "Hand-packed with what was harvested that week. Confirmation email with your window.",
   },
 ];
 
@@ -59,24 +59,25 @@ export function GetStartedContent() {
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold mb-5 leading-tight">
-              $10 off your first box
+              $10 off your first order
               <span className="block text-primary">with code FRESH10</span>
             </h1>
 
             <p className="text-lg md:text-xl text-foreground/80 mb-7 leading-relaxed">
-              Fresh seasonal produce, delivered across the Chicago metro area every
-              Wednesday. Boxes from $40. Free delivery.
+              Premium produce, pantry staples, and pasture-raised protein from
+              Black farmers. Build your own grocery order. $25 minimum, no
+              subscription.
             </p>
 
             <Link
-              href="#choose"
+              href="/shop?promo=FRESH10"
               className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground font-bold text-lg rounded-xl px-10 py-5 shadow-lg hover:bg-primary/90 transition-all duration-200 active:scale-95"
             >
-              See the boxes →
+              Shop the catalog →
             </Link>
 
             <p className="mt-4 text-sm text-muted-foreground">
-              FRESH10 auto-applies on the next page
+              FRESH10 applies automatically at checkout
             </p>
           </motion.div>
         </div>
@@ -92,7 +93,7 @@ export function GetStartedContent() {
             </div>
             <div className="flex items-center gap-2 text-sm text-foreground/80 justify-center">
               <Truck className="h-5 w-5 text-primary shrink-0" />
-              <span>Free Chicago metro delivery</span>
+              <span>Chicago delivery or free Hyde Park pickup</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-foreground/80 justify-center sm:justify-end">
               <Leaf className="h-5 w-5 text-primary shrink-0" />
@@ -176,25 +177,25 @@ export function GetStartedContent() {
           <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center">
             <div className="inline-flex items-center gap-2 text-amber-800 font-semibold mb-2">
               <Clock className="h-4 w-4" />
-              Order by Sunday 11:59 PM CT for Wednesday delivery
+              Pick your delivery or pickup window at checkout
             </div>
             <p className="text-sm text-amber-700">
-              First box not perfect? We&apos;ll refund it, no questions asked.
+              First order not perfect? We&apos;ll refund it, no questions asked.
             </p>
           </div>
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-foreground/80">
             <div className="flex items-start gap-2">
               <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-              <span>One-time orders or weekly subscription</span>
+              <span>One-time orders, no subscription</span>
             </div>
             <div className="flex items-start gap-2">
               <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-              <span>Skip a week or cancel any time</span>
+              <span>$25 minimum, no upper limit</span>
             </div>
             <div className="flex items-start gap-2">
               <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
-              <span>Add a protein at checkout (optional)</span>
+              <span>Free pickup at Polsky Center, Hyde Park</span>
             </div>
             <div className="flex items-start gap-2">
               <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />

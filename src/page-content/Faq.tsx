@@ -5,12 +5,12 @@ import {
   HelpCircle,
   Leaf,
   MapPin,
-  RotateCcw,
   ShieldCheck,
   ShoppingBag,
   Package,
-  Bell,
+  Truck,
 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const features = [
@@ -22,21 +22,21 @@ const features = [
   },
   {
     icon: MapPin,
-    title: "Chicago Metro Delivery",
+    title: "Chicago Delivery or Pickup",
     description:
-      "We deliver across the Chicago metro area, city and south suburbs. No pickup required. Fresh produce arrives at your door every Wednesday.",
+      "Flat $7.99 delivery to most Chicago and south-suburb ZIPs, or free pickup at the Polsky Center in Hyde Park.",
   },
   {
-    icon: RotateCcw,
-    title: "Seasonal & Rotating",
+    icon: ShoppingBag,
+    title: "Build Your Own Order",
     description:
-      "You'll never get the same box twice. Always what's freshest, always what's in season.",
+      "Pick exactly what you want, in any quantity. Greens, roots, microgreens, pantry staples, and pasture-raised protein. $25 minimum.",
   },
   {
     icon: ShieldCheck,
     title: "One-Time Orders",
     description:
-      "Every box is a one-time purchase. No subscription, no auto-renewal, no card on file. Order when you want a box.",
+      "Every order is a one-time purchase. No subscription, no auto-renewal, no card on file.",
   },
 ];
 
@@ -44,61 +44,55 @@ const steps = [
   {
     icon: ShoppingBag,
     step: "01",
-    title: "Choose Your Box",
+    title: "Browse the Catalog",
     description:
-      "Pick the box size that works for your household: Small or Family. One-time order, no subscription, no auto-renewal.",
+      "Open the shop, scroll through fresh produce, pantry staples, and pasture-raised protein. Add what you want to your cart in any quantity.",
   },
   {
     icon: Package,
     step: "02",
-    title: "We Pack It Fresh",
+    title: "Choose Delivery or Pickup",
     description:
-      "Your box is packed with seasonal produce sourced directly from Black farmers. Every item is selected for freshness at time of packing.",
+      "Chicago delivery for $7.99 flat to most local ZIPs, or free pickup at the Polsky Center in Hyde Park. Pick a window that works for you.",
   },
   {
-    icon: Bell,
+    icon: Truck,
     step: "03",
-    title: "Delivered to Your Door",
+    title: "We Pack It Fresh",
     description:
-      "We deliver straight to your door across the Chicago metro area every Wednesday. You'll get a confirmation and delivery window by email as soon as your order is placed.",
+      "Your order is hand-packed with what was harvested that week. You get a confirmation email with the details and your scheduled window.",
   },
 ];
 
 const faqs = [
   {
     q: "Is this a subscription? Will my card be auto-charged?",
-    a: "No. Every box is a one-time purchase. You order, you get charged once for that one box, that's it. No recurring billing, no auto-renewal, no card kept on file. The next time you want a box, you come back and order again.",
+    a: "No. Every order is a one-time purchase. You order, you get charged once for that order, that's it. No recurring billing, no auto-renewal, no card kept on file. The next time you want groceries, you come back and order again.",
   },
   {
-    q: "What if I have an issue with my order?",
-    a: "We stand behind every box. If anything is wrong with your delivery (missing items, quality issues, anything), email us at info@unclemays.com and we'll make it right, no questions asked.",
+    q: "How does ordering work?",
+    a: "Browse the catalog at unclemays.com/shop, fill your cart with the items you want (any quantity), and check out. $25 minimum. Use code FRESH10 for $10 off your first order.",
   },
   {
     q: "How does delivery work?",
-    a: "We deliver directly to your door across the Chicago metro area (city plus south suburbs) every Wednesday. Place your order any day of the week and it will be delivered the following Wednesday. You'll receive a confirmation email with your delivery window as soon as your order is placed.",
+    a: "We deliver to most Chicago and south-suburb ZIPs for a flat $7.99 fee. You can also pick up for free at the Polsky Center, 1452 E 53rd St in Hyde Park, during one of the available pickup windows. Both options are picked at checkout.",
   },
   {
-    q: "What's actually in the box?",
-    a: "Every box is sourced from our Black-owned farm partners and packed with what's freshest that week. The Spring Box includes salad mix, kale, candy orange carrots, sweet potatoes, potatoes, broccoli, and organic black beans, about 6 lbs of fresh food, built for 1 to 2 people. The Full Harvest Box includes everything in the Spring Box plus pea shoots, radishes, a customer choice of bean (black, pinto, or kidney), and pasture-raised chicken thighs, about 10 lbs of fresh food, built for 3 to 4 people. Contents rotate each delivery based on what's in season.",
+    q: "What's in the catalog?",
+    a: "A rotating selection of premium produce (greens like kale, chard, lettuces, mustards, ramps; roots like sweet potatoes, candy carrots, daikon radishes), microgreens (broccoli, sunflower, pea shoot, spicy mix), pantry staples (organic beans), and pasture-raised protein (whole chicken, beef short ribs, lamb chops, farm-fresh eggs). Items rotate seasonally based on what's harvesting that week.",
   },
   {
-    q: "How much does a box cost?",
-    a: "The Spring Box is $40 and the Full Harvest Box is $70, one-time and no subscription. The Full Harvest Box includes pasture-raised chicken thighs at no extra charge. Additional proteins (chicken, beef short ribs, or lamb chops) can be added at checkout for $12 each.",
+    q: "What's the minimum order?",
+    a: "$25. Most customers fill a cart of $40-80. There's no upper limit.",
+  },
+  {
+    q: "What if I have an issue with my order?",
+    a: "We stand behind every order. If anything is wrong (missing items, quality issues, anything), email us at info@unclemays.com or text (312) 972-2595 and we'll make it right, no questions asked.",
   },
   {
     q: "How do I cancel an order?",
     a: "There's nothing recurring to cancel. If you need to modify or cancel a one-time order you've already placed, email info@unclemays.com as soon as possible and we'll take care of it.",
   },
-];
-
-const sampleStarterBox = [
-  "Salad mix",
-  "Kale",
-  "Candy orange carrots",
-  "Sweet potatoes",
-  "Potatoes",
-  "Broccoli",
-  "Organic black beans",
 ];
 
 const FaqContent = () => {
@@ -118,7 +112,7 @@ const FaqContent = () => {
             </h1>
             <p className="text-xl text-muted-foreground">
               Everything you need to know about ordering, delivery, and what
-              makes our produce boxes different.
+              makes our catalog different.
             </p>
           </motion.div>
         </div>
@@ -135,15 +129,15 @@ const FaqContent = () => {
             className="text-center mb-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-3">
-              What You're Getting
+              What You&rsquo;re Getting
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Every box is different. Always seasonal, always sourced from Black
-              farmers, always fresh.
+              Build your own order from a rotating catalog of seasonal produce,
+              pantry staples, and pasture-raised protein from Black farmers.
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {features.map((feature, idx) => (
               <motion.div
                 key={feature.title}
@@ -163,34 +157,6 @@ const FaqContent = () => {
               </motion.div>
             ))}
           </div>
-
-          {/* Sample box */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="bg-card rounded-2xl p-8 shadow-soft border border-border/50 max-w-3xl mx-auto"
-          >
-            <h3 className="text-2xl font-bold mb-2 text-center">
-              Sample Spring Box
-            </h3>
-            <p className="text-muted-foreground text-center mb-6">
-              Contents rotate each delivery based on what's freshest. Here's a
-              sample.
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {sampleStarterBox.map((item) => (
-                <div
-                  key={item}
-                  className="flex items-center gap-2 text-sm text-foreground/80"
-                >
-                  <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
-                  {item}
-                </div>
-              ))}
-            </div>
-          </motion.div>
         </div>
       </section>
 
@@ -208,7 +174,7 @@ const FaqContent = () => {
               Three Simple Steps
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              From order to your door.
+              From cart to your kitchen.
             </p>
           </motion.div>
 
@@ -282,7 +248,7 @@ const FaqContent = () => {
               className="text-base font-semibold px-8 py-5 rounded-xl"
               asChild
             >
-              <a href="/#boxes">Shop Produce Boxes</a>
+              <Link href="/shop">Shop the catalog</Link>
             </Button>
           </div>
         </div>

@@ -21,6 +21,9 @@ export interface CatalogItem {
   imageUrl: string | null;
   sortOrder: number;
   taxCategory: TaxCategory;
+  // Optional badges (operator-set in Airtable). Empty/null = no badge.
+  freshnessLabel: string | null;
+  scarcityNote: string | null;
 }
 
 export interface CatalogItemInternal extends CatalogItem {

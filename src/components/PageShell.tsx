@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { MobileCTA } from "@/components/MobileCTA";
+import { PromoStrip } from "@/components/PromoStrip";
 
 // Routes that suppress global navigation and footer (dedicated ad landing
 // pages). Currently empty: /shop and /starter-box used to be here but are
@@ -27,6 +28,7 @@ export function PageShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
+      {!isLandingPage && <PromoStrip />}
       {!isLandingPage && <Navigation />}
       <main className="flex-1">{children}</main>
       {!isLandingPage && (

@@ -103,6 +103,8 @@ function mapRecord(record: AirtableRecord): CatalogItemInternal | null {
     imageUrl: asString(f.ImageURL),
     sortOrder: asNumber(f.SortOrder) ?? 999,
     taxCategory,
+    freshnessLabel: asString(f.FreshnessLabel),
+    scarcityNote: asString(f.ScarcityNote),
   };
 }
 

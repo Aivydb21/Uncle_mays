@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const About = () => {
@@ -61,8 +62,9 @@ const About = () => {
               <p className="text-foreground/80 leading-relaxed mb-4">
                 Uncle May&apos;s Produce began with a simple question. Why is it still hard for many Chicago families to
                 get truly fresh produce while Black farmers are still fighting for consistent market access? We built a
-                direct path between both sides. Families get seasonal produce boxes delivered every Wednesday. Farmers get
-                fairer demand and more predictable income.
+                direct path between both sides. Families build their own grocery order from a rotating catalog of
+                seasonal produce, pantry staples, and pasture-raised protein. Farmers get fairer demand and more
+                predictable income.
               </p>
               <p className="text-foreground/80 leading-relaxed mb-4">
                 We are not trying to be the biggest food company. We are building the most trusted local one.
@@ -76,7 +78,7 @@ const About = () => {
 
               <div className="mt-8">
                 <Button asChild size="lg" className="font-semibold">
-                  <a href="/#boxes">Shop Produce Boxes</a>
+                  <Link href="/shop">Shop the catalog</Link>
                 </Button>
               </div>
             </motion.div>

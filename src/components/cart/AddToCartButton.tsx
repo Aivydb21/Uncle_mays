@@ -24,15 +24,29 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
     window.setTimeout(() => setPulse(false), 200);
   }
 
+  // Cache unit price in sessionStorage so MobileCartTotal can show a running
+  // tally without re-fetching the catalog. Server is still the authority on
+  // price (priceCart re-resolves on every quote).
+  function cachePrice() {
+    try {
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem(`um-price-${item.sku}`, String(item.priceCents));
+      }
+    } catch {
+      // ignore quota / disabled-storage
+    }
+  }
+
   function handleAdd() {
     addLine(item.sku, 1);
     bump();
+    cachePrice();
     fireAnalytics(item, qty + 1);
   }
 
   if (qty > 0) {
     return (
-      <div className="flex items-center justify-between gap-2 rounded-xl border border-primary/30 bg-primary/5 p-1">
+      <div className="flex items-center justify-between gap-1 rounded-xl border border-primary/30 bg-primary/5 p-1">
         <button
           type="button"
           onClick={() => {
@@ -40,12 +54,13 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
             bump();
           }}
           aria-label={`Decrease ${item.name}`}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-primary hover:bg-primary/10"
+          // 44x44 minimum touch target on mobile (Apple HIG / Google Material).
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-primary active:bg-primary/15 hover:bg-primary/10 sm:h-9 sm:w-9"
         >
           <Minus className="h-4 w-4" />
         </button>
         <span
-          className={`min-w-[2ch] text-center font-semibold text-foreground transition-transform ${
+          className={`min-w-[2ch] text-center text-base font-semibold text-foreground transition-transform sm:text-sm ${
             pulse ? "scale-110" : ""
           }`}
         >
@@ -56,10 +71,11 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
           onClick={() => {
             setQuantity(item.sku, qty + 1);
             bump();
+            cachePrice();
             fireAnalytics(item, qty + 1);
           }}
           aria-label={`Increase ${item.name}`}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-primary hover:bg-primary/10"
+          className="flex h-11 w-11 items-center justify-center rounded-lg text-primary active:bg-primary/15 hover:bg-primary/10 sm:h-9 sm:w-9"
         >
           <Plus className="h-4 w-4" />
         </button>

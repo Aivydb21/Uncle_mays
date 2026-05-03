@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { Loader2 } from "lucide-react";
+import { Loader2, Lock, Phone, ShieldCheck } from "lucide-react";
 import { useHydratedCart, useCartStore } from "@/lib/cart/store";
 import { useAddressAutocomplete } from "@/hooks/use-address-autocomplete";
 import { formatCents } from "@/lib/format";
@@ -252,6 +252,13 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       <div>
         <h1 className="mb-6 text-3xl font-bold">Checkout</h1>
 
+        {/* Mobile-only collapsible summary at the top so the customer
+            sees the total before investing time in the form. Desktop
+            uses the right-rail summary instead. */}
+        <div className="lg:hidden mb-6">
+          <MobileCollapsibleSummary pricing={pricing} loading={pricingLoading} />
+        </div>
+
         {stage === "form" && (
           <div className="space-y-8">
             <ContactSection contact={contact} setContact={setContact} />
@@ -326,9 +333,53 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
         )}
       </div>
 
-      <aside className="lg:sticky lg:top-24 lg:self-start">
+      <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
         <OrderSummary pricing={pricing} loading={pricingLoading} />
       </aside>
+    </div>
+  );
+}
+
+function MobileCollapsibleSummary({
+  pricing,
+  loading,
+}: {
+  pricing: PricingResponse | null;
+  loading: boolean;
+}) {
+  const [open, setOpen] = useState(true);
+  const total =
+    pricing && pricing.ok ? formatCents(pricing.totalCents) : "—";
+  const lineCount =
+    pricing && pricing.ok
+      ? pricing.lineItems.reduce((s, l) => s + l.quantity, 0)
+      : 0;
+
+  return (
+    <div className="rounded-xl border border-border bg-card shadow-soft">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-3 p-4 text-left"
+        aria-expanded={open}
+      >
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Order summary
+          </p>
+          <p className="text-base font-bold text-foreground">
+            {lineCount > 0 ? `${lineCount} ${lineCount === 1 ? "item" : "items"} · ${total}` : "Calculating…"}
+          </p>
+        </div>
+        <span className="text-sm font-semibold text-primary">
+          {open ? "Hide" : "Show details"}
+        </span>
+      </button>
+      {open && (
+        <div className="border-t border-border p-4">
+          <OrderSummary pricing={pricing} loading={loading} compact />
+        </div>
+      )}
     </div>
   );
 }
@@ -478,6 +529,7 @@ function DeliverySection({
               value={address.street}
               onChange={(e) => setAddress({ ...address, street: e.target.value })}
               autoComplete="address-line1"
+              placeholder="Start typing — we'll fill in city, state, ZIP"
               className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
             />
           </Field>
@@ -546,11 +598,14 @@ function PickupSection({
     return (
       <section className="rounded-xl border border-amber-300 bg-amber-50 p-4">
         <h2 className="mb-1 text-base font-semibold text-amber-900">
-          No pickup slots open right now
+          Pickup unavailable right now
         </h2>
         <p className="text-sm text-amber-800">
-          We&rsquo;ll add more shortly. Use Chicago delivery for this order, or
-          email info@unclemays.com to request a slot.
+          No pickup windows are open. Switch to Chicago delivery above, or email{" "}
+          <a href="mailto:info@unclemays.com" className="underline">
+            info@unclemays.com
+          </a>{" "}
+          / call (312) 972-2595 to request a custom pickup time.
         </p>
       </section>
     );
@@ -628,15 +683,20 @@ function formatSlotLabel(slot: PickupSlot): string {
 function OrderSummary({
   pricing,
   loading,
+  compact,
 }: {
   pricing: PricingResponse | null;
   loading: boolean;
+  compact?: boolean;
 }) {
+  const wrapperClass = compact
+    ? ""
+    : "rounded-2xl border border-border bg-card p-6 shadow-soft";
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-soft">
-      <h2 className="mb-4 text-base font-semibold">Order summary</h2>
+    <div className={wrapperClass}>
+      {!compact && <h2 className="mb-4 text-base font-semibold">Order summary</h2>}
       {loading && !pricing && (
-        <p className="text-sm text-muted-foreground">Calculating…</p>
+        <SummarySkeleton />
       )}
       {pricing && pricing.ok && (
         <>
@@ -696,6 +756,23 @@ function OrderSummary({
             )}
         </div>
       )}
+    </div>
+  );
+}
+
+function SummarySkeleton() {
+  return (
+    <div className="space-y-3">
+      {[0, 1, 2].map((i) => (
+        <div key={i} className="flex items-center justify-between">
+          <div className="h-3 w-32 animate-pulse rounded bg-muted" />
+          <div className="h-3 w-12 animate-pulse rounded bg-muted" />
+        </div>
+      ))}
+      <div className="border-t border-border pt-3 flex items-center justify-between">
+        <div className="h-4 w-12 animate-pulse rounded bg-muted" />
+        <div className="h-4 w-16 animate-pulse rounded bg-muted" />
+      </div>
     </div>
   );
 }
@@ -779,6 +856,25 @@ function PaymentSection({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <h2 className="text-xl font-semibold">Payment</h2>
+
+      {/* Trust strip — three signals reduce abandonment at the last step. */}
+      <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
+        <ul className="grid grid-cols-1 gap-2 text-xs text-foreground/80 sm:grid-cols-3 sm:gap-3">
+          <li className="flex items-center gap-2">
+            <Lock className="h-3.5 w-3.5 text-primary shrink-0" />
+            <span>Secure checkout via Stripe</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
+            <span>100% fresh or refunded</span>
+          </li>
+          <li className="flex items-center gap-2">
+            <Phone className="h-3.5 w-3.5 text-primary shrink-0" />
+            <span>(312) 972-2595 if anything&rsquo;s off</span>
+          </li>
+        </ul>
+      </div>
+
       <PaymentElement />
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="flex items-center gap-3">

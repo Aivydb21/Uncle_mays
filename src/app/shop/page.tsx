@@ -3,9 +3,11 @@ import { fetchCatalog } from "@/lib/catalog/airtable";
 import { CatalogGrid } from "@/components/shop/CatalogGrid";
 import { ShopHeader } from "@/components/shop/ShopHeader";
 import { PromoBanner } from "@/components/shop/PromoBanner";
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
 import type { CatalogItem } from "@/lib/catalog/types";
+
+// Note: <Navigation /> and <Footer /> are rendered by PageShell at the
+// app root (src/components/PageShell.tsx). Do NOT render them again here
+// or the page gets a doubled-up sticky nav.
 
 export const metadata: Metadata = {
   title: "Shop fresh produce, pantry, and protein | Uncle May's",
@@ -37,20 +39,16 @@ export default async function ShopPage({
   const promo = sp?.promo || null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      <main className="container mx-auto px-6 py-10">
-        <ShopHeader />
-        {promo && <PromoBanner code={promo} />}
-        {unavailable ? (
-          <UnavailableMessage />
-        ) : catalog.length === 0 ? (
-          <EmptyMessage />
-        ) : (
-          <CatalogGrid items={catalog} initialPromo={promo} />
-        )}
-      </main>
-      <Footer />
+    <div className="container mx-auto px-6 py-10">
+      <ShopHeader />
+      {promo && <PromoBanner code={promo} />}
+      {unavailable ? (
+        <UnavailableMessage />
+      ) : catalog.length === 0 ? (
+        <EmptyMessage />
+      ) : (
+        <CatalogGrid items={catalog} initialPromo={promo} />
+      )}
     </div>
   );
 }

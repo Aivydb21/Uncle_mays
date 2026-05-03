@@ -209,8 +209,8 @@ export default function OrderSuccessContent() {
   const handleShare = async () => {
     const shareData = {
       title: "Uncle May's Produce",
-      text: "Just ordered fresh produce delivered weekly across the Chicago metro area from Uncle May's. Use code FRESH10 for $10 off your first box.",
-      url: "https://unclemays.com/get-started?utm_source=share&utm_medium=organic&utm_campaign=order_success",
+      text: "Just ordered fresh produce, pantry, and protein from Black farmers via Uncle May's, here in Chicago. Use code FRESH10 for $10 off your first order.",
+      url: "https://unclemays.com/shop?promo=FRESH10&utm_source=share&utm_medium=organic&utm_campaign=order_success",
     };
     try {
       if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
@@ -226,9 +226,9 @@ export default function OrderSuccessContent() {
 
   // Pre-filled mailto for the lightweight referral teaser.
   const referralBody = encodeURIComponent(
-    `Hey,\n\nI just started getting weekly produce delivered from Uncle May's here in Chicago. Fresh greens, roots, and pantry staples — packed Tuesday, delivered Wednesday.\n\nUse code FRESH10 to get $10 off your first box: https://unclemays.com/get-started?utm_source=share&utm_medium=email&utm_campaign=referral\n\n— sent from a happy customer`
+    `Hey,\n\nI just ordered groceries from Uncle May's, a Black-owned outfit here in Chicago that delivers fresh produce, pantry, and pasture-raised protein straight from Black farmers. You can build your own order from the catalog.\n\nUse code FRESH10 to get $10 off your first order: https://unclemays.com/shop?promo=FRESH10\n\n— sent from a happy customer`
   );
-  const referralSubject = encodeURIComponent("Try Uncle May's — $10 off your first box");
+  const referralSubject = encodeURIComponent("Try Uncle May's — $10 off your first order");
   const referralMailto = `mailto:?subject=${referralSubject}&body=${referralBody}`;
 
   return (
@@ -242,8 +242,8 @@ export default function OrderSuccessContent() {
           <h1 className="text-3xl font-bold mb-2">Thank you for your order</h1>
           <p className="text-muted-foreground leading-relaxed">
             {isSubscription
-              ? "Your subscription is active. We'll pack and deliver your first box this Wednesday."
-              : "Your box is confirmed. We pack from what's freshest and deliver across the Chicago metro area on Wednesdays."}
+              ? "Your subscription is active. We'll pack and deliver your first order at the next scheduled window."
+              : "Your order is confirmed. Check your email for the receipt and details — we'll have everything ready for the window you picked."}
           </p>
           {ref ? (
             <p className="mt-4 text-xs text-muted-foreground break-all">
@@ -265,7 +265,8 @@ export default function OrderSuccessContent() {
               <div>
                 <p className="font-semibold">Confirmation email on the way</p>
                 <p className="text-sm text-foreground/70">
-                  Check your inbox now for your order details and delivery window.
+                  Check your inbox now for your itemized receipt and the window
+                  you picked.
                 </p>
               </div>
             </li>
@@ -274,9 +275,10 @@ export default function OrderSuccessContent() {
                 <Package className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <p className="font-semibold">We pack Tuesday morning</p>
+                <p className="font-semibold">We pack the day before</p>
                 <p className="text-sm text-foreground/70">
-                  Seasonal greens, roots, and pantry staples, fresh that day.
+                  Hand-packed with what was harvested that week. Greens, roots,
+                  pantry staples, and pasture-raised protein from Black farmers.
                 </p>
               </div>
             </li>
@@ -285,9 +287,22 @@ export default function OrderSuccessContent() {
                 <Truck className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <p className="font-semibold">Delivered Wednesday, 5pm&ndash;8pm</p>
+                <p className="font-semibold">Ready at your scheduled window</p>
                 <p className="text-sm text-foreground/70">
-                  Free Chicago metro delivery. We&apos;ll text you a tighter window the morning of.
+                  Chicago delivery to your door, or pickup at the Polsky Center
+                  in Hyde Park. We&apos;ll text or email if anything changes.
+                </p>
+              </div>
+            </li>
+            <li className="flex gap-4">
+              <div className="shrink-0 w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+                <CheckCircle2 className="h-4 w-4 text-primary" />
+              </div>
+              <div>
+                <p className="font-semibold">100% fresh or refunded</p>
+                <p className="text-sm text-foreground/70">
+                  If anything&rsquo;s off, text us at <strong>(312) 972-2595</strong>{" "}
+                  and we&rsquo;ll make it right — no questions asked.
                 </p>
               </div>
             </li>
@@ -315,7 +330,7 @@ export default function OrderSuccessContent() {
         <div className="rounded-2xl border border-primary/30 bg-primary/5 p-7 md:p-8 text-center">
           <h2 className="text-xl font-bold mb-2">Tell a friend, save them $10</h2>
           <p className="text-sm text-foreground/75 mb-5">
-            They get $10 off their first box with code FRESH10. We get to feed another Chicago household. Everyone wins.
+            They get $10 off their first order with code FRESH10. We get to feed another Chicago household. Everyone wins.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button asChild size="lg" className="rounded-xl">
