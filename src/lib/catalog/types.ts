@@ -85,6 +85,11 @@ export interface PricingError {
   message: string;
   shortfallCents?: number;
   unknownSkus?: string[];
+  // Soft errors (below_minimum, missing_zip, out_of_zone) still include the
+  // resolved line items + subtotal so the cart drawer can render its contents
+  // while the customer fixes the issue.
+  lineItems?: PricedLine[];
+  subtotalCents?: number;
 }
 
 export type PricingResponse = PricingResult | PricingError;

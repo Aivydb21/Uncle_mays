@@ -102,6 +102,8 @@ export async function priceCart(input: PriceCartInput): Promise<PricingResponse>
       code: "below_minimum",
       message: "Add a few more items to reach the $25 minimum.",
       shortfallCents: MIN_SUBTOTAL_CENTS - subtotalCents,
+      lineItems,
+      subtotalCents,
     };
   }
 
@@ -124,6 +126,8 @@ export async function priceCart(input: PriceCartInput): Promise<PricingResponse>
         ok: false,
         code: "missing_zip",
         message: "Enter a valid ZIP to see delivery cost.",
+        lineItems,
+        subtotalCents,
       };
     }
     if (!SERVICE_ZIP_SET.has(zip)) {
@@ -131,6 +135,8 @@ export async function priceCart(input: PriceCartInput): Promise<PricingResponse>
         ok: false,
         code: "out_of_zone",
         message: "We don't deliver there yet. Pick Polsky Center pickup or join the waitlist.",
+        lineItems,
+        subtotalCents,
       };
     }
     shippingCents = SHIPPING_CHICAGO_CENTS;

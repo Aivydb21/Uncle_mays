@@ -87,9 +87,21 @@ export function CartDrawer() {
       .catch(() => {});
   }, [open, lines, popular]);
 
-  const subtotalCents = pricing && pricing.ok ? pricing.subtotalCents : 0;
+  const subtotalCents = pricing
+    ? pricing.ok
+      ? pricing.subtotalCents
+      : pricing.subtotalCents ?? 0
+    : 0;
   const meetsMin = subtotalCents >= MIN_SUBTOTAL_CENTS;
   const isEmpty = !lines || lines.length === 0;
+  // Items resolved by the server, available on success AND on soft errors
+  // (below_minimum, missing_zip, out_of_zone) so the drawer always shows
+  // what's in the cart even when totals can't be finalized.
+  const resolvedLineItems = pricing
+    ? pricing.ok
+      ? pricing.lineItems
+      : pricing.lineItems ?? null
+    : null;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -129,9 +141,9 @@ export function CartDrawer() {
             />
           )}
 
-          {!isEmpty && pricing && pricing.ok && (
+          {!isEmpty && resolvedLineItems && (
             <ul className="space-y-4">
-              {pricing.lineItems.map((item) => (
+              {resolvedLineItems.map((item) => (
                 <li
                   key={item.sku}
                   className="flex items-start gap-3 border-b border-border pb-4 last:border-b-0"
@@ -179,7 +191,9 @@ export function CartDrawer() {
             </ul>
           )}
 
-          {!isEmpty && (!pricing || loading) && <CartLineSkeleton lines={lines.length} />}
+          {!isEmpty && !resolvedLineItems && (!pricing || loading) && (
+            <CartLineSkeleton lines={lines.length} />
+          )}
         </div>
 
         {!isEmpty && (
@@ -407,7 +421,15 @@ function Totals({
   if (!pricing) return null;
   if (!pricing.ok) {
     return (
-      <p className="text-sm text-muted-foreground">{pricing.message}</p>
+      <div className="space-y-1 text-sm">
+        {typeof pricing.subtotalCents === "number" && (
+          <div className="flex justify-between">
+            <dt className="text-muted-foreground">Subtotal</dt>
+            <dd>{formatCents(pricing.subtotalCents)}</dd>
+          </div>
+        )}
+        <p className="text-muted-foreground">{pricing.message}</p>
+      </div>
     );
   }
   return (
