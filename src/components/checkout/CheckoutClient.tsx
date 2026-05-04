@@ -61,6 +61,56 @@ const EMPTY_ADDRESS: AddressFields = {
   zip: "",
 };
 
+/**
+ * Fire GA4 begin_checkout event with retry. gtag loads via lazyOnload
+ * strategy so may not be ready when the user clicks "Continue to payment".
+ * Retry up to 8s to match add_to_cart + purchase event reliability.
+ */
+function fireBeginCheckout(value: number, items: { sku: string; name: string; quantity: number; unitPriceCents: number }[]) {
+  try {
+    if (typeof window === "undefined") return;
+    const w = window as unknown as {
+      fbq?: (...args: unknown[]) => void;
+      gtag?: (...args: unknown[]) => void;
+    };
+
+    // Meta Pixel
+    if (w.fbq) {
+      w.fbq("track", "InitiateCheckout", {
+        value,
+        currency: "USD",
+        content_type: "product",
+        content_ids: items.map((i) => i.sku),
+      });
+    }
+
+    // GA4 with retry
+    let attempts = 0;
+    const maxAttempts = 8;
+    const tryGtag = () => {
+      if (typeof w.gtag === "function") {
+        w.gtag("event", "begin_checkout", {
+          currency: "USD",
+          value,
+          items: items.map((item) => ({
+            item_id: item.sku,
+            item_name: item.name,
+            price: item.unitPriceCents / 100,
+            quantity: item.quantity,
+          })),
+        });
+        return;
+      }
+      if (++attempts < maxAttempts) {
+        setTimeout(tryGtag, 1000);
+      }
+    };
+    tryGtag();
+  } catch {
+    // analytics never blocks
+  }
+}
+
 export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
   const router = useRouter();
   const cartHydrated = useCartHydrated();
@@ -251,6 +301,13 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       // attempts. Without this, the join only works for purchase events,
       // which is why the 2026-05-02 notebook saw GA4 data on 1/305 rows.
       const gaClientId = (() => {
+        // Primary: value persisted to localStorage by gtag('get') in layout.tsx.
+        // This survives lazyOnload race conditions where GA4 hasn't set _ga yet.
+        try {
+          const stored = localStorage.getItem("unc-ga-client-id");
+          if (stored) return stored;
+        } catch (_) {}
+        // Fallback: parse _ga cookie directly (works for returning users).
         const raw = readCookie("_ga");
         if (!raw) return undefined;
         const parts = raw.split(".");
@@ -299,6 +356,10 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       }
       setClientSecret(intentJson.clientSecret as string);
       setPaymentIntentId(intentJson.paymentIntentId as string);
+
+      // Fire begin_checkout before transitioning to payment stage
+      fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems);
+
       setStage("payment");
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Unknown error");

@@ -106,6 +106,8 @@ function fireAnalytics(item: CatalogItem, newQty: number) {
       gtag?: (...args: unknown[]) => void;
     };
     const value = (item.priceCents * newQty) / 100;
+
+    // Meta Pixel fires immediately (loaded synchronously earlier in page lifecycle)
     if (w.fbq) {
       w.fbq("track", "AddToCart", {
         content_name: item.name,
@@ -115,20 +117,31 @@ function fireAnalytics(item: CatalogItem, newQty: number) {
         currency: "USD",
       });
     }
-    if (w.gtag) {
-      w.gtag("event", "add_to_cart", {
-        currency: "USD",
-        value,
-        items: [
-          {
-            item_id: item.sku,
-            item_name: item.name,
-            price: item.priceCents / 100,
-            quantity: 1,
-          },
-        ],
-      });
-    }
+
+    // GA4 gtag uses lazyOnload strategy, so retry up to 8s for early cart adds
+    let attempts = 0;
+    const maxAttempts = 8;
+    const tryGtag = () => {
+      if (typeof w.gtag === "function") {
+        w.gtag("event", "add_to_cart", {
+          currency: "USD",
+          value,
+          items: [
+            {
+              item_id: item.sku,
+              item_name: item.name,
+              price: item.priceCents / 100,
+              quantity: newQty,
+            },
+          ],
+        });
+        return;
+      }
+      if (++attempts < maxAttempts) {
+        setTimeout(tryGtag, 1000);
+      }
+    };
+    tryGtag();
   } catch {
     // analytics never blocks
   }
