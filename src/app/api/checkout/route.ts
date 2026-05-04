@@ -30,6 +30,10 @@ export async function POST(req: NextRequest) {
 
     const isTestKey = process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ?? false;
 
+    // Legacy one-time prices (cents). Used for synthetic cart_json (UNC-787).
+    const ONE_TIME_PRICES: Record<string, number> = { starter: 4000, family: 7000 };
+    const priceInCents = ONE_TIME_PRICES[product] ?? 0;
+
     const session = await stripe.checkout.sessions.create({
       ui_mode: "embedded_page",
       mode: "payment",
@@ -40,6 +44,14 @@ export async function POST(req: NextRequest) {
       phone_number_collection: { enabled: true },
       shipping_address_collection: { allowed_countries: ["US"] },
       ...(isTestKey ? { metadata: { is_test: "true" } } : {}),
+      payment_intent_data: {
+        metadata: {
+          product,
+          // Synthetic cart_json for analytics (UNC-787) — single fixed-price product
+          cart_json: JSON.stringify([[product, 1, priceInCents]]),
+          ...(isTestKey ? { is_test: "true" } : {}),
+        },
+      },
       custom_fields: [
         {
           key: "delivery_zip",
@@ -63,8 +75,7 @@ export async function POST(req: NextRequest) {
       "";
     const userAgent = req.headers.get("user-agent") || "";
     const referer = req.headers.get("referer") || "";
-    const ONE_TIME_PRICES: Record<string, number> = { starter: 40, family: 70 };
-    const priceInDollars = ONE_TIME_PRICES[product] ?? 0;
+    const priceInDollars = priceInCents / 100;
     sendCapiEvent({
       eventName: "InitiateCheckout",
       eventSourceUrl: referer || `${origin}/checkout/${product}`,

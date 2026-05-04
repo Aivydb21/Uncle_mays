@@ -157,6 +157,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Synthetic cart_json for analytics — single fixed-price product.
+    // This will be populated with the actual amount after PaymentIntent creation.
+    // Format: [[product, quantity, unitPriceCents]]
+
     // --- Idempotency: reuse an existing incomplete subscription if one exists ---
     // Without this, every page mount creates a NEW subscription. When a second
     // subscription is created for the same customer+price, Stripe voids the
@@ -270,11 +274,14 @@ export async function POST(req: NextRequest) {
 
     // Stamp the PaymentIntent with subscription metadata so the
     // payment_intent.succeeded webhook can fire CAPI Purchase and Mailchimp cleanup.
+    // Also add synthetic cart_json for analytics (UNC-787).
     await stripe.paymentIntents.update(paymentIntent.id, {
       metadata: {
         ...metadata,
         firstPayment: "true",
         subscriptionId: subscription.id,
+        // Synthetic cart_json for analytics — single fixed-price product
+        cart_json: JSON.stringify([[product, 1, paymentIntent.amount]]),
       },
     });
 
