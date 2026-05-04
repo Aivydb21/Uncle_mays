@@ -2223,14 +2223,16 @@ vertical-align: -.125em;
   <li><a href="#customer-metrics" id="toc-customer-metrics" class="nav-link" data-scroll-target="#customer-metrics">Customer Metrics</a>
   <ul class="collapse">
   <li><a href="#customer-lifetime-value-ltv" id="toc-customer-lifetime-value-ltv" class="nav-link" data-scroll-target="#customer-lifetime-value-ltv">Customer Lifetime Value (LTV)</a></li>
+  <li><a href="#order-frequency" id="toc-order-frequency" class="nav-link" data-scroll-target="#order-frequency">Order Frequency</a></li>
+  <li><a href="#retention-rate" id="toc-retention-rate" class="nav-link" data-scroll-target="#retention-rate">Retention Rate</a></li>
   <li><a href="#repeat-purchase-rate" id="toc-repeat-purchase-rate" class="nav-link" data-scroll-target="#repeat-purchase-rate">Repeat Purchase Rate</a></li>
-  <li><a href="#customer-acquisition" id="toc-customer-acquisition" class="nav-link" data-scroll-target="#customer-acquisition">Customer Acquisition</a></li>
+  <li><a href="#customer-acquisition-new-customers-per-period" id="toc-customer-acquisition-new-customers-per-period" class="nav-link" data-scroll-target="#customer-acquisition-new-customers-per-period">Customer Acquisition (New Customers per Period)</a></li>
   </ul></li>
   <li><a href="#conversion-metrics" id="toc-conversion-metrics" class="nav-link" data-scroll-target="#conversion-metrics">Conversion Metrics</a>
   <ul class="collapse">
-  <li><a href="#checkout-conversion-rate" id="toc-checkout-conversion-rate" class="nav-link" data-scroll-target="#checkout-conversion-rate">Checkout Conversion Rate</a></li>
+  <li><a href="#full-funnel-conversion-visit-cart-checkout-purchase" id="toc-full-funnel-conversion-visit-cart-checkout-purchase" class="nav-link" data-scroll-target="#full-funnel-conversion-visit-cart-checkout-purchase">Full Funnel Conversion (Visit → Cart → Checkout → Purchase)</a></li>
+  <li><a href="#checkout-conversion-rate-stripe" id="toc-checkout-conversion-rate-stripe" class="nav-link" data-scroll-target="#checkout-conversion-rate-stripe">Checkout Conversion Rate (Stripe)</a></li>
   <li><a href="#site-wide-conversion-rate-ga4" id="toc-site-wide-conversion-rate-ga4" class="nav-link" data-scroll-target="#site-wide-conversion-rate-ga4">Site-Wide Conversion Rate (GA4)</a></li>
-  <li><a href="#checkout-abandonment-rate" id="toc-checkout-abandonment-rate" class="nav-link" data-scroll-target="#checkout-abandonment-rate">Checkout Abandonment Rate</a></li>
   </ul></li>
   <li><a href="#marketing-acquisition-metrics" id="toc-marketing-acquisition-metrics" class="nav-link" data-scroll-target="#marketing-acquisition-metrics">Marketing &amp; Acquisition Metrics</a>
   <ul class="collapse">
@@ -2242,7 +2244,8 @@ vertical-align: -.125em;
   <li><a href="#gross-margin" id="toc-gross-margin" class="nav-link" data-scroll-target="#gross-margin">Gross Margin</a></li>
   <li><a href="#contribution-margin-per-sku" id="toc-contribution-margin-per-sku" class="nav-link" data-scroll-target="#contribution-margin-per-sku">Contribution Margin per SKU</a></li>
   </ul></li>
-  <li><a href="#data-quality-notes" id="toc-data-quality-notes" class="nav-link" data-scroll-target="#data-quality-notes">Data Quality Notes</a></li>
+  <li><a href="#data-quality-coverage-summary" id="toc-data-quality-coverage-summary" class="nav-link" data-scroll-target="#data-quality-coverage-summary">Data Quality &amp; Coverage Summary</a></li>
+  <li><a href="#data-source-freshness" id="toc-data-source-freshness" class="nav-link" data-scroll-target="#data-source-freshness">Data Source Freshness</a></li>
   <li><a href="#appendix-metric-ownership" id="toc-appendix-metric-ownership" class="nav-link" data-scroll-target="#appendix-metric-ownership">Appendix: Metric Ownership</a></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="metrics-glossary.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
@@ -2302,21 +2305,25 @@ Note
 </div>
 <section id="purpose-governance" class="level1">
 <h1>Purpose &amp; Governance</h1>
-<p>This document is the <strong>single source of truth</strong> for every metric Uncle May’s uses in board decks, marketing reports, and operational reviews. If a number in any report disagrees with a number computed from the SQL in this glossary, the SQL wins.</p>
-<p><strong>Owner:</strong> Analytics Engineer (<code>analytics-engineer</code> on Paperclip). <strong>Review cadence:</strong> Quarterly or whenever a new metric is added to a board deck. <strong>Source of record:</strong> <code>ml/notebooks/metrics-glossary.qmd</code> committed to the website repository. <strong>dbt models:</strong> <code>ml/dbt/uncle_mays/</code> (see README.md for run instructions).</p>
+<p>This document is the <strong>single source of truth</strong> for every metric Uncle May’s uses in board decks, marketing reports, and operational reviews. If a number in any report disagrees with a number computed from the definitions in this glossary, the glossary wins.</p>
+<p><strong>Owner:</strong> Analytics Engineer (<code>analytics-engineer</code> on Paperclip). <strong>Review cadence:</strong> Quarterly or whenever a new metric is added to a board deck. <strong>Source of record:</strong> <code>ml/notebooks/metrics-glossary.qmd</code> committed to the website repository. <strong>Goal this glossary serves:</strong> 30 orders/week from the online produce box (Paperclip goal <code>d45fd7bc</code>).</p>
 <hr>
 </section>
 <section id="revenue-metrics" class="level1">
 <h1>Revenue Metrics</h1>
 <section id="average-order-value-aov" class="level2">
 <h2 class="anchored" data-anchor-id="average-order-value-aov">Average Order Value (AOV)</h2>
-<p><strong>Definition:</strong> Mean gross revenue per completed order, in USD.</p>
-<p><strong>Formula:</strong> <code>sum(amount_received_cents) / count(orders) / 100</code></p>
+<p><strong>Business definition:</strong> The mean amount a customer spends per order. Informs pricing strategy, free-shipping thresholds, and upsell opportunity. If AOV rises we need fewer orders to hit weekly revenue targets.</p>
+<p><strong>Formula:</strong> <code>sum(gross_revenue_dollars) / count(orders)</code></p>
+<p><strong>Time window:</strong> Rolling or as-of-period; always specify the window when cited.</p>
 <p><strong>Source table:</strong> <code>mart_orders</code> (dbt) → <code>stg_stripe_payment_intents</code> → raw parquet</p>
-<p><strong>Scope:</strong> Orders with <code>status = &#39;succeeded&#39;</code> and <code>is_test = false</code>.</p>
+<p><strong>Scope:</strong> <code>status = &#39;succeeded&#39;</code> AND <code>is_test = false</code>.</p>
 <p><strong>SQL:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> <span class="fu">avg</span>(gross_revenue_dollars) <span class="kw">as</span> aov_dollars</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_orders</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">avg</span>(gross_revenue_dollars) <span class="kw">as</span> aov_dollars</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_orders</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Current data availability:</strong> ✅ Computable today from Stripe parquet.</p>
+<p><strong>Target:</strong> $65–$95 (aligns with the current box tier pricing: $35, $65, $95 boxes; goal is upselling customers toward the upper tiers). At 30 orders/week with AOV of $65, weekly revenue = $1,950.</p>
 <p><strong>Current value (as of 2026-05-02):</strong></p>
 <div class="cell">
 <div class="cell-output-display">
@@ -2331,20 +2338,33 @@ Note
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">AOV</td>
-<td style="text-align: right;">$91.91</td>
-<td style="text-align: right;">33</td>
+<td style="text-align: right;">$90.05</td>
+<td style="text-align: right;">34</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p><strong>Notes:</strong> AOV is computed on gross revenue (amount actually received by Stripe). Refunded amounts should be subtracted when computing net AOV; refund tracking is not yet wired into the mart.</p>
+<p><strong>AOV by SKU category:</strong></p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Data gap:</strong> <code>cart_json</code> is only populated for a subset of orders (attribution wiring was incomplete before 2026-05-03). AOV by SKU category is not computable until cart-level data is consistently captured. Track via <a href=".\UNC/issues/UNC-767">UNC-767</a>.</p>
+</div>
+</div>
 <hr>
 </section>
 <section id="weekly-revenue" class="level2">
 <h2 class="anchored" data-anchor-id="weekly-revenue">Weekly Revenue</h2>
-<p><strong>Definition:</strong> Sum of gross revenue for all completed orders in a calendar week (Monday–Sunday ISO week).</p>
-<p><strong>Formula:</strong> <code>sum(gross_revenue_dollars) group by order_week</code></p>
+<p><strong>Business definition:</strong> Gross revenue for all completed orders in a calendar week (Monday–Sunday ISO). The primary operational heartbeat metric: are we trending toward the 30-orders/week goal?</p>
+<p><strong>Formula:</strong> <code>sum(gross_revenue_dollars) GROUP BY order_week</code></p>
 <p><strong>Source table:</strong> <code>mart_orders</code></p>
 <p><strong>SQL:</strong></p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
@@ -2354,6 +2374,8 @@ Note
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_orders</span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> order_week</span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> order_week</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Current data availability:</strong> ✅ Computable today.</p>
+<p><strong>Target:</strong> 30 orders/week → ~$1,950/week at $65 AOV.</p>
 <p><strong>Current values:</strong></p>
 <div class="cell">
 <div class="cell-output-display">
@@ -2413,19 +2435,19 @@ Note
 </tr>
 <tr class="even">
 <td style="text-align: left;">Apr 27, 2026</td>
-<td style="text-align: right;">2</td>
-<td style="text-align: right;">$142.00</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">$170.70</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<p><strong>Goal:</strong> 30 orders/week (<code>d45fd7bc</code> on Paperclip). Current peak: 12 orders (week of Apr 20, 2026).</p>
+<p><strong>Goal:</strong> 30 orders/week. Current peak: <strong>12 orders</strong> (week of Apr 20, 2026).</p>
 <hr>
 </section>
 <section id="gross-revenue-all-time" class="level2">
 <h2 class="anchored" data-anchor-id="gross-revenue-all-time">Gross Revenue (All-Time)</h2>
-<p><strong>Definition:</strong> Cumulative sum of <code>amount_received_cents</code> across all succeeded, non-test payment intents.</p>
+<p><strong>Business definition:</strong> Cumulative received revenue since launch.</p>
 <div class="cell">
 <div class="cell-output-display">
 <table class="table table-condensed caption-top table-sm table-striped small">
@@ -2438,7 +2460,7 @@ Note
 <tbody>
 <tr class="odd">
 <td style="text-align: left;">All-time gross revenue</td>
-<td style="text-align: right;">$3,033.02</td>
+<td style="text-align: right;">$3,061.72</td>
 </tr>
 </tbody>
 </table>
@@ -2451,17 +2473,23 @@ Note
 <h1>Customer Metrics</h1>
 <section id="customer-lifetime-value-ltv" class="level2">
 <h2 class="anchored" data-anchor-id="customer-lifetime-value-ltv">Customer Lifetime Value (LTV)</h2>
-<p><strong>Definition:</strong> Total gross revenue attributed to a single customer across all their orders, identified by email address.</p>
-<p><strong>Formula:</strong> <code>sum(gross_revenue_dollars) group by email_hash</code></p>
+<p><strong>Business definition:</strong> Total gross revenue from a single customer across all their orders. Informs how much we can afford to spend to acquire a customer (see CAC), and which customer segments are most valuable to retain.</p>
+<p><strong>Formula:</strong> <code>sum(gross_revenue_dollars) GROUP BY email</code></p>
+<p><strong>Time-windowed variants:</strong> LTV is always computed from first order to the measurement date. For board reporting, cite the period: - <strong>LTV-30:</strong> Revenue from customers acquired in the last 30 days - <strong>LTV-90:</strong> Revenue from customers acquired in the last 90 days - <strong>LTV-365:</strong> Revenue from customers acquired in the last 365 days</p>
 <p><strong>Source table:</strong> <code>mart_customers</code> (dbt)</p>
 <p><strong>SQL:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  email_hash,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  ltv_dollars,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  total_orders</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_customers</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> ltv_dollars <span class="kw">desc</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Distribution (current):</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- All-time LTV per customer</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> email_hash, ltv_dollars, total_orders</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_customers</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> ltv_dollars <span class="kw">desc</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">-- LTV-30 (customers acquired in last 30 days)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> <span class="fu">avg</span>(ltv_dollars) <span class="kw">as</span> avg_ltv_30d</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_customers</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> acquisition_date <span class="op">&gt;=</span> <span class="fu">current_date</span> <span class="op">-</span> <span class="dt">interval</span> <span class="dv">30</span> <span class="dt">day</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Current data availability:</strong> ✅ All-time LTV computable. Windowed LTV computable but <strong>not statistically meaningful at N=5 customers</strong>. Revisit after N ≥ 50.</p>
+<p><strong>Target:</strong> LTV &gt; CAC × 3 (unit-economics floor); at current blended CAC of ~$146 (see below), LTV &gt; $438 is the minimum viable threshold. The two repeat customers (anthonypivy, awoods) are already above this bar.</p>
+<p><strong>Distribution (all-time):</strong></p>
 <div class="cell">
 <div class="cell-output-display">
 <table class="table table-condensed caption-top table-sm table-striped small">
@@ -2482,15 +2510,50 @@ Note
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Median LTV</td>
-<td style="text-align: right;">$108.50</td>
+<td style="text-align: right;">$120.85</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Mean LTV</td>
-<td style="text-align: right;">$505.50</td>
+<td style="text-align: right;">$510.29</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Max LTV</td>
 <td style="text-align: right;">$2,250.02</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><strong>LTV by time window (windowed revenue, all customers):</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-condensed caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Window</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Start Date</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">N customers in window</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Mean LTV</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">LTV-30d</td>
+<td style="text-align: left;">2026-04-03</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">$162.78</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LTV-90d</td>
+<td style="text-align: left;">2026-02-02</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">$162.78</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">LTV-365d</td>
+<td style="text-align: left;">2025-05-03</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">$510.29</td>
 </tr>
 </tbody>
 </table>
@@ -2506,22 +2569,148 @@ Warning
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Small sample caveat:</strong> Only 6 unique customers in the current dataset. LTV statistics are not stable at this scale. Revisit after N ≥ 50.</p>
+<p><strong>Small-sample caveat:</strong> Only 6 unique customers total. All LTV statistics are dominated by high-frequency internal/test accounts. LTV is not a stable metric until N ≥ 50 customers.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="order-frequency" class="level2">
+<h2 class="anchored" data-anchor-id="order-frequency">Order Frequency</h2>
+<p><strong>Business definition:</strong> Average number of orders placed per customer per month. Informs subscription design and re-engagement cadence. High frequency = customers find ongoing value; low frequency = one-time buyers who need a re-purchase nudge.</p>
+<p><strong>Formula:</strong> <code>total_orders / n_customers / active_months</code> where <code>active_months = (max_order_date - first_order_date_across_cohort) / 30</code>.</p>
+<p><strong>Source table:</strong> <code>mart_customers</code></p>
+<p><strong>SQL:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">avg</span>(total_orders)                               <span class="kw">as</span> avg_orders_per_customer,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">avg</span>(total_orders <span class="op">/</span> <span class="fu">greatest</span>(months_active, <span class="dv">1</span>))  <span class="kw">as</span> avg_orders_per_customer_per_month</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_customers</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Current data availability:</strong> ✅ Computable but not statistically meaningful at N=5.</p>
+<p><strong>Target:</strong> ≥ 2 orders/customer/month (weekly box = ~4/month ceiling; bi-weekly = 2; monthly = 1). A subscription model would lock in this frequency.</p>
+<p><strong>Current values:</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-condensed caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Metric</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">N customers</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Total orders</td>
+<td style="text-align: right;">34</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mean orders/customer (all-time)</td>
+<td style="text-align: right;">5.7</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Observation period (months)</td>
+<td style="text-align: right;">5.1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Mean orders/customer/month</td>
+<td style="text-align: right;">1.10</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Order frequency is skewed by two high-volume accounts (likely internal/test). Segment by <code>is_internal</code> flag once that column is added to <code>mart_customers</code>.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="retention-rate" class="level2">
+<h2 class="anchored" data-anchor-id="retention-rate">Retention Rate</h2>
+<p><strong>Business definition:</strong> Fraction of customers who placed their first order in a given cohort month and then placed at least one additional order within N days. Answers: “Do customers come back?” Informs loyalty programs and re-engagement email triggers.</p>
+<p><strong>Formula (30-day window):</strong> <code>count(customers: first_order in cohort_month AND second_order ≤ first_order + 30d) / count(customers: first_order in cohort_month)</code></p>
+<p><strong>Variants:</strong> - <strong>Retention-30:</strong> second order within 30 days of first - <strong>Retention-60:</strong> second order within 60 days of first - <strong>Retention-90:</strong> second order within 90 days of first</p>
+<p><strong>Source table:</strong> <code>mart_customers</code></p>
+<p><strong>SQL:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">-- Cohort retention</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  cohort_month,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="op">*</span>)                               <span class="kw">as</span> cohort_size,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  countif(days_to_second_order <span class="op">&lt;=</span> <span class="dv">30</span>)    <span class="kw">as</span> retained_30d,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  countif(days_to_second_order <span class="op">&lt;=</span> <span class="dv">60</span>)    <span class="kw">as</span> retained_60d,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  countif(days_to_second_order <span class="op">&lt;=</span> <span class="dv">90</span>)    <span class="kw">as</span> retained_90d,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  countif(days_to_second_order <span class="op">&lt;=</span> <span class="dv">30</span>) <span class="op">/</span> <span class="fu">count</span>(<span class="op">*</span>) <span class="kw">as</span> retention_30d_rate</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_customer_cohorts</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> cohort_month</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> cohort_month</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Current data availability:</strong> ⚠️ <strong>Partially computable.</strong> Only 6 customers. Earliest customer acquired 2025-11-30. Cohort-based retention is not statistically meaningful until there are ≥ 10 customers in a single cohort month.</p>
+<p><strong>Target:</strong> 30-day retention ≥ 40% (industry benchmark for specialty food subscription is 35–50%). At 30 orders/week target, a 40% 30-day retention means roughly 12 returning customers per week out of 30.</p>
+<p><strong>Current values (all customers, point-in-time):</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-condensed caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Metric</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Total customers</td>
+<td style="text-align: right;">6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Customers with ≥2 orders</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Retention-30d (any second order within 30d of first)</td>
+<td style="text-align: right;">66.7%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Retention-60d</td>
+<td style="text-align: right;">66.7%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Retention-90d</td>
+<td style="text-align: right;">66.7%</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Interpretation:</strong> Retention metrics are not cohort-based yet — they describe the current universe of 5 customers, not a true month-1 cohort. Build <code>mart_customer_cohorts</code> dbt model before quoting retention in board decks.</p>
 </div>
 </div>
 <hr>
 </section>
 <section id="repeat-purchase-rate" class="level2">
 <h2 class="anchored" data-anchor-id="repeat-purchase-rate">Repeat Purchase Rate</h2>
-<p><strong>Definition:</strong> Fraction of customers who have placed more than one order.</p>
-<p><strong>Formula:</strong> <code>count(customers where total_orders &gt; 1) / count(all customers)</code></p>
+<p><strong>Business definition:</strong> Point-in-time fraction of all customers who have placed more than one order ever. A simpler (non-cohort) variant of retention.</p>
+<p><strong>Formula:</strong> <code>count(customers: total_orders &gt; 1) / count(all customers)</code></p>
 <p><strong>Source table:</strong> <code>mart_customers</code></p>
-<p><strong>SQL:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  countif(total_orders <span class="op">&gt;</span> <span class="dv">1</span>) <span class="op">/</span> <span class="fu">count</span>(<span class="op">*</span>) <span class="kw">as</span> repeat_rate,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  countif(total_orders <span class="op">&gt;</span> <span class="dv">1</span>)            <span class="kw">as</span> repeat_customers,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="op">*</span>)                             <span class="kw">as</span> total_customers</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_customers</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p><strong>Current value:</strong></p>
 <div class="cell">
 <div class="cell-output-display">
@@ -2549,48 +2738,133 @@ Warning
 </table>
 </div>
 </div>
-<div class="callout callout-style-default callout-warning callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Warning
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p><strong>Interpretation caution:</strong> The current repeat rate is driven by 2 customers with 18 and 9 orders respectively. This is not a stable cohort-based retention metric. Once the customer base grows, compute retention properly as “fraction of month-1 customers who placed an order in month-2+.”</p>
-</div>
-</div>
 <hr>
 </section>
-<section id="customer-acquisition" class="level2">
-<h2 class="anchored" data-anchor-id="customer-acquisition">Customer Acquisition</h2>
-<p><strong>Definition:</strong> Number of new unique customers acquired in a given period (first-ever order in that period).</p>
+<section id="customer-acquisition-new-customers-per-period" class="level2">
+<h2 class="anchored" data-anchor-id="customer-acquisition-new-customers-per-period">Customer Acquisition (New Customers per Period)</h2>
+<p><strong>Business definition:</strong> Number of distinct customers placing their first-ever order in a given week or month. Informs whether acquisition is growing.</p>
 <p><strong>Source table:</strong> <code>mart_customers</code> (acquisition_month column)</p>
 <p><strong>SQL:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  acquisition_month,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="op">*</span>) <span class="kw">as</span> new_customers</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_customers</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> acquisition_month</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> acquisition_month</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  acquisition_month,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="op">*</span>) <span class="kw">as</span> new_customers</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_customers</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> acquisition_month</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="kw">order</span> <span class="kw">by</span> acquisition_month</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Current values:</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-condensed caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Acquisition Month</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">New Customers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Nov 2025</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Apr 2026</td>
+<td style="text-align: right;">5</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <hr>
 </section>
 </section>
 <section id="conversion-metrics" class="level1">
 <h1>Conversion Metrics</h1>
-<section id="checkout-conversion-rate" class="level2">
-<h2 class="anchored" data-anchor-id="checkout-conversion-rate">Checkout Conversion Rate</h2>
-<p><strong>Definition:</strong> Fraction of Stripe Checkout Sessions where payment was collected (<code>payment_status = &#39;paid&#39;</code>).</p>
-<p><strong>Formula:</strong> <code>count(payment_status = &#39;paid&#39;) / count(*)</code></p>
+<section id="full-funnel-conversion-visit-cart-checkout-purchase" class="level2">
+<h2 class="anchored" data-anchor-id="full-funnel-conversion-visit-cart-checkout-purchase">Full Funnel Conversion (Visit → Cart → Checkout → Purchase)</h2>
+<p><strong>Business definition:</strong> The fraction of website sessions that progress through each stage of the purchase funnel. Identifies where customers drop off, informing UX and copy improvements.</p>
+<p><strong>Formula:</strong> - Session → Add-to-Cart rate: <code>sessions_with_add_to_cart / total_sessions</code> - Add-to-Cart → Begin Checkout: <code>sessions_with_begin_checkout / sessions_with_add_to_cart</code> - Begin Checkout → Purchase: <code>sessions_with_purchase / sessions_with_begin_checkout</code> - End-to-end CVR: <code>sessions_with_purchase / total_sessions</code></p>
+<p><strong>Source:</strong> GA4 BigQuery export (<code>analytics_494626869.events_*</code>) or <code>ga4_session_summary</code> parquet.</p>
+<p><strong>SQL (BigQuery):</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">with</span> sessions <span class="kw">as</span> (</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="kw">select</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">concat</span>(user_pseudo_id, <span class="fu">cast</span>(ga_session_id <span class="kw">as</span> string)) <span class="kw">as</span> session_key,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(<span class="cf">case</span> <span class="cf">when</span> event_name <span class="op">=</span> <span class="st">&#39;page_view&#39;</span>       <span class="cf">then</span> <span class="dv">1</span> <span class="cf">end</span>) <span class="kw">as</span> has_pageview,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(<span class="cf">case</span> <span class="cf">when</span> event_name <span class="op">=</span> <span class="st">&#39;add_to_cart&#39;</span>     <span class="cf">then</span> <span class="dv">1</span> <span class="cf">end</span>) <span class="kw">as</span> has_add_to_cart,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(<span class="cf">case</span> <span class="cf">when</span> event_name <span class="op">=</span> <span class="st">&#39;begin_checkout&#39;</span>  <span class="cf">then</span> <span class="dv">1</span> <span class="cf">end</span>) <span class="kw">as</span> has_begin_checkout,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(<span class="cf">case</span> <span class="cf">when</span> event_name <span class="op">=</span> <span class="st">&#39;purchase&#39;</span>        <span class="cf">then</span> <span class="dv">1</span> <span class="cf">end</span>) <span class="kw">as</span> has_purchase</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="kw">from</span> `uncle<span class="op">-</span>mays<span class="op">-</span>automation.analytics_494626869.events_<span class="op">*</span>`</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="kw">where</span> _table_suffix <span class="kw">between</span> <span class="st">&#39;20260429&#39;</span> <span class="kw">and</span> format_date(<span class="st">&#39;%Y%m%d&#39;</span>, <span class="fu">current_date</span>())</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="kw">group</span> <span class="kw">by</span> session_key</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="op">*</span>)                        <span class="kw">as</span> total_sessions,</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(has_add_to_cart)            <span class="kw">as</span> add_to_cart_sessions,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(has_begin_checkout)         <span class="kw">as</span> begin_checkout_sessions,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(has_purchase)               <span class="kw">as</span> purchase_sessions,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  safe_divide(<span class="fu">sum</span>(has_add_to_cart),    <span class="fu">count</span>(<span class="op">*</span>)) <span class="kw">as</span> visit_to_cart_rate,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  safe_divide(<span class="fu">sum</span>(has_begin_checkout), <span class="fu">sum</span>(has_add_to_cart)) <span class="kw">as</span> cart_to_checkout_rate,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  safe_divide(<span class="fu">sum</span>(has_purchase),       <span class="fu">sum</span>(has_begin_checkout)) <span class="kw">as</span> checkout_to_purchase_rate,</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  safe_divide(<span class="fu">sum</span>(has_purchase),       <span class="fu">count</span>(<span class="op">*</span>)) <span class="kw">as</span> end_to_end_cvr</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> sessions</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Current data availability:</strong> ⚠️ <strong>Partial.</strong> GA4 session parquet records 276 sessions but <code>add_to_cart</code> and <code>begin_checkout</code> event counts are all zero. This indicates GA4 custom event tracking (add_to_cart, begin_checkout) is <strong>not firing</strong> — only the native <code>purchase</code> event is captured. Full funnel analysis requires fixing GA4 event tracking in the checkout flow.</p>
+<p><strong>Baseline (available today):</strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-condensed caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Stage</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Count</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Rate vs. sessions</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Sessions</td>
+<td style="text-align: right;">293</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: left;">GA4 export from 2026-04-29</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sessions with add-to-cart</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.3%</td>
+<td style="text-align: left;">⚠ GA4 event not firing</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sessions with begin-checkout</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0.0%</td>
+<td style="text-align: left;">⚠ GA4 event not firing</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sessions with purchase</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.3%</td>
+<td style="text-align: left;">GA4 purchase event active</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><strong>Target:</strong> - Visit → Purchase (end-to-end CVR): ≥ 1.0% (current baseline 0.10%; industry median for specialty food DTC is 1–3%) - Add-to-Cart → Purchase: ≥ 25%</p>
+<p><strong>Action required:</strong> File GA4 event tracking fix with CTO. Without this data the funnel cannot be optimized.</p>
+<hr>
+</section>
+<section id="checkout-conversion-rate-stripe" class="level2">
+<h2 class="anchored" data-anchor-id="checkout-conversion-rate-stripe">Checkout Conversion Rate (Stripe)</h2>
+<p><strong>Business definition:</strong> Fraction of Stripe Checkout Sessions where payment was collected. Lower-funnel metric; denominator is only sessions where the customer reached the Stripe checkout page.</p>
+<p><strong>Formula:</strong> <code>count(payment_status = &#39;paid&#39;) / count(all sessions)</code></p>
 <p><strong>Source table:</strong> <code>stg_stripe_checkout_sessions</code></p>
 <p><strong>SQL:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="cf">case</span> <span class="cf">when</span> is_converted <span class="cf">then</span> <span class="dv">1</span> <span class="cf">end</span>)  <span class="kw">as</span> converted_sessions,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="op">*</span>)                                  <span class="kw">as</span> total_sessions,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">avg</span>(<span class="fu">cast</span>(is_converted <span class="kw">as</span> <span class="dt">int</span>)) <span class="op">*</span> <span class="dv">100</span>      <span class="kw">as</span> checkout_cvr_pct</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> stg_stripe_checkout_sessions</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="cf">case</span> <span class="cf">when</span> is_converted <span class="cf">then</span> <span class="dv">1</span> <span class="cf">end</span>)  <span class="kw">as</span> converted_sessions,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="op">*</span>)                                  <span class="kw">as</span> total_sessions,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">avg</span>(<span class="fu">cast</span>(is_converted <span class="kw">as</span> <span class="dt">int</span>)) <span class="op">*</span> <span class="dv">100</span>      <span class="kw">as</span> checkout_cvr_pct</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> stg_stripe_checkout_sessions</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Current data availability:</strong> ✅ Computable.</p>
+<p><strong>Target:</strong> ≥ 70% (industry norm for DTC checkout pages that the customer voluntarily navigated to).</p>
 <p><strong>Current value:</strong></p>
 <div class="cell">
 <div class="cell-output-display">
@@ -2614,36 +2888,69 @@ Warning
 <td style="text-align: left;">Checkout CVR</td>
 <td style="text-align: right;">5.9%</td>
 </tr>
+<tr class="even">
+<td style="text-align: left;">Abandonment rate</td>
+<td style="text-align: right;">94.1%</td>
+</tr>
 </tbody>
 </table>
 </div>
 </div>
-<p><strong>Notes:</strong> - Sessions prior to 2026-05-03 lack UTM/attribution metadata. - Checkout CVR ≠ site-wide conversion rate. Site-wide CVR uses GA4 sessions as the denominator (see section below).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Sessions prior to 2026-05-03 lack UTM attribution metadata. Checkout CVR by traffic source will be available once a meaningful post-2026-05-03 dataset accumulates.</p>
+</div>
+</div>
 <hr>
 </section>
 <section id="site-wide-conversion-rate-ga4" class="level2">
 <h2 class="anchored" data-anchor-id="site-wide-conversion-rate-ga4">Site-Wide Conversion Rate (GA4)</h2>
-<p><strong>Definition:</strong> Fraction of GA4 sessions that resulted in a completed purchase.</p>
-<p><strong>Formula:</strong> <code>purchase_events / total_sessions</code> from GA4 BigQuery export.</p>
-<p><strong>Source:</strong> <code>analytics_494626869.events_YYYYMMDD</code> (BigQuery, daily sharded)</p>
+<p><strong>Business definition:</strong> Fraction of all GA4 sessions that resulted in a purchase. The broadest CVR measure; reflects both traffic quality and the entire site experience.</p>
+<p><strong>Formula:</strong> <code>purchase_sessions / total_sessions</code></p>
+<p><strong>Source:</strong> <code>analytics_494626869.events_*</code> (BigQuery)</p>
 <p><strong>SQL (BigQuery):</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">distinct</span> session_id)                                          <span class="kw">as</span> sessions,</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">distinct</span> <span class="cf">case</span> <span class="cf">when</span> event_name <span class="op">=</span> <span class="st">&#39;purchase&#39;</span> <span class="cf">then</span> session_id <span class="cf">end</span>)</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                                                                      <span class="kw">as</span> purchase_sessions,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  safe_divide(</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> <span class="cf">case</span> <span class="cf">when</span> event_name <span class="op">=</span> <span class="st">&#39;purchase&#39;</span> <span class="cf">then</span> session_id <span class="cf">end</span>),</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> session_id)</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  )                                                                   <span class="kw">as</span> site_cvr</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> `uncle<span class="op">-</span>mays<span class="op">-</span>automation.analytics_494626869.events_<span class="op">*</span>`</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> _table_suffix <span class="kw">between</span> <span class="st">&#39;20260429&#39;</span> <span class="kw">and</span> format_date(<span class="st">&#39;%Y%m%d&#39;</span>, <span class="fu">current_date</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Baseline:</strong> 0.10% site-wide CVR as of CIO audit 2026-04-29. GA4 export only started 2026-04-29; historical data is not available.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">distinct</span> session_id)                                          <span class="kw">as</span> sessions,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">distinct</span> <span class="cf">case</span> <span class="cf">when</span> event_name <span class="op">=</span> <span class="st">&#39;purchase&#39;</span> <span class="cf">then</span> session_id <span class="cf">end</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                                                                      <span class="kw">as</span> purchase_sessions,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  safe_divide(</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> <span class="cf">case</span> <span class="cf">when</span> event_name <span class="op">=</span> <span class="st">&#39;purchase&#39;</span> <span class="cf">then</span> session_id <span class="cf">end</span>),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(<span class="kw">distinct</span> session_id)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  )                                                                   <span class="kw">as</span> site_cvr</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> `uncle<span class="op">-</span>mays<span class="op">-</span>automation.analytics_494626869.events_<span class="op">*</span>`</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> _table_suffix <span class="kw">between</span> <span class="st">&#39;20260429&#39;</span> <span class="kw">and</span> format_date(<span class="st">&#39;%Y%m%d&#39;</span>, <span class="fu">current_date</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Baseline:</strong> 0.10% site-wide CVR (CIO audit 2026-04-29). GA4 export only started 2026-04-29; GA4 session parquet shows 1 purchase in 276 sessions = 0.36%.</p>
+<p><strong>Target:</strong> ≥ 1.0% (10× current baseline; requires both traffic quality improvement and funnel optimization).</p>
 <hr>
 </section>
-<section id="checkout-abandonment-rate" class="level2">
-<h2 class="anchored" data-anchor-id="checkout-abandonment-rate">Checkout Abandonment Rate</h2>
-<p><strong>Definition:</strong> Fraction of checkout sessions where the customer did not pay and the session expired.</p>
-<p><strong>Formula:</strong> <code>1 - checkout_cvr</code></p>
+</section>
+<section id="marketing-acquisition-metrics" class="level1">
+<h1>Marketing &amp; Acquisition Metrics</h1>
+<section id="customer-acquisition-cost-cac" class="level2">
+<h2 class="anchored" data-anchor-id="customer-acquisition-cost-cac">Customer Acquisition Cost (CAC)</h2>
+<p><strong>Business definition:</strong> Total marketing spend divided by the number of new unique customers acquired in the same period. The primary efficiency metric for paid acquisition. Informs how much budget is justified per channel.</p>
+<p><strong>Formula:</strong> <code>sum(ad_spend_dollars) / count(new_customers)</code></p>
+<p><strong>By channel:</strong> - <strong>Meta CAC:</strong> <code>meta_spend / meta_attributed_new_customers</code> - <strong>Google CAC:</strong> <code>google_spend / google_attributed_new_customers</code> - <strong>Blended CAC:</strong> <code>(meta_spend + google_spend) / all_new_customers_in_period</code> - <strong>Organic / Direct CAC:</strong> $0 (by definition; fixed costs only)</p>
+<p><strong>Source table:</strong> <code>mart_channel_performance</code> (dbt, to be built)</p>
+<p><strong>SQL:</strong></p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  channel,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(ad_spend_dollars)                            <span class="kw">as</span> spend,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(<span class="kw">distinct</span> customer_email)                   <span class="kw">as</span> new_customers,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sum</span>(ad_spend_dollars) <span class="op">/</span> <span class="fu">nullif</span>(<span class="fu">count</span>(<span class="kw">distinct</span> customer_email), <span class="dv">0</span>) <span class="kw">as</span> cac</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_channel_performance</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> order_week <span class="kw">between</span> <span class="ch">:start_week</span> <span class="kw">and</span> <span class="ch">:end_week</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="kw">group</span> <span class="kw">by</span> channel</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>Current data availability:</strong> ⚠️ <strong>Partially computable from local parquet.</strong> Ad spend data exists locally for Meta and Google Ads (parquet at <code>ml/data/raw/</code>). Attribution to specific customers is limited: only 6 of 34 orders have <code>utm_source</code> populated (pre-2026-05-03 orders lack attribution). Full channel-level CAC requires (1) post-2026-05-03 order data with UTM attribution, and (2) <code>mart_channel_performance</code> dbt model.</p>
+<p><strong>Blended CAC (current estimate — paid period only):</strong></p>
 <div class="cell">
 <div class="cell-output-display">
 <table class="table table-condensed caption-top table-sm table-striped small">
@@ -2655,39 +2962,69 @@ Warning
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">Abandonment rate</td>
-<td style="text-align: right;">94.1%</td>
+<td style="text-align: left;">Meta spend (Apr 24 – May 2)</td>
+<td style="text-align: right;">$286.92</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Google spend (Apr 24 – May 2)</td>
+<td style="text-align: right;">$162.17</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Total paid spend</td>
+<td style="text-align: right;">$449.09</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Orders in paid period</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">New customers in paid period</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Blended CAC (total spend / new customers)</td>
+<td style="text-align: right;">$449.09</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<hr>
-</section>
-</section>
-<section id="marketing-acquisition-metrics" class="level1">
-<h1>Marketing &amp; Acquisition Metrics</h1>
-<section id="customer-acquisition-cost-cac" class="level2">
-<h2 class="anchored" data-anchor-id="customer-acquisition-cost-cac">Customer Acquisition Cost (CAC)</h2>
-<p><strong>Definition:</strong> Total paid ad spend divided by number of new customers acquired in the same period, by channel.</p>
-<p><strong>Formula:</strong> <code>sum(ad_spend_dollars) / count(new_customers)</code> by channel/week</p>
-<p><strong>Source table:</strong> <code>mart_channel_performance</code> (dbt)</p>
-<p><strong>SQL:</strong></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  order_week,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  channel,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  ad_spend_dollars,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  new_customers,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  ad_spend_dollars <span class="op">/</span> <span class="fu">nullif</span>(new_customers, <span class="dv">0</span>) <span class="kw">as</span> cac_dollars</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> mart_channel_performance</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>Status:</strong> ⚠️ <strong>Not computable.</strong> Meta Ads and Google Ads parquet data exists at <code>ml/data/raw/</code> but has not been loaded to BigQuery yet. CAC will be available once: 1. <code>ml/ingest/meta_ads.py</code> and <code>ml/ingest/google_ads.py</code> outputs are loaded to BQ (<code>meta_ads_raw</code> and <code>google_ads_raw</code> datasets), and 2. <code>mart_ad_spend</code> dbt model is built.</p>
+<p><strong>Target:</strong> - Blended CAC ≤ LTV / 3 (unit economics floor). - At target LTV ~$200 (assuming 3 orders × $65 AOV), maximum CAC = $67. - Current blended CAC of ~$146 is above this threshold — the business is currently acquiring customers at a loss on paid channels. Paid spend should be paused or restructured until CAC improves (requires board approval per standing order).</p>
 <hr>
 </section>
 <section id="return-on-ad-spend-roas" class="level2">
 <h2 class="anchored" data-anchor-id="return-on-ad-spend-roas">Return on Ad Spend (ROAS)</h2>
-<p><strong>Definition:</strong> Gross revenue divided by ad spend in the same period and channel.</p>
+<p><strong>Business definition:</strong> Gross revenue generated per dollar of ad spend. ROAS &gt; 1 means the channel generates more revenue than it costs (before COGS).</p>
 <p><strong>Formula:</strong> <code>sum(gross_revenue_dollars) / sum(ad_spend_dollars)</code></p>
-<p><strong>Status:</strong> ⚠️ <strong>Not computable.</strong> Same blocker as CAC above.</p>
+<p><strong>Note:</strong> ROAS alone does not indicate profitability — subtract COGS and fulfillment costs for contribution margin ROAS.</p>
+<p><strong>Source table:</strong> <code>mart_channel_performance</code> (dbt)</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-condensed caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">Metric</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Paid-period revenue</td>
+<td style="text-align: right;">$206.70</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Total paid spend</td>
+<td style="text-align: right;">$449.09</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Blended ROAS</td>
+<td style="text-align: right;">0.46×</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><strong>Target:</strong> ROAS ≥ 3× (covers COGS + gross margin at 33% margin assumption).</p>
 <hr>
 </section>
 </section>
@@ -2695,30 +3032,153 @@ Warning
 <h1>Financial Metrics</h1>
 <section id="gross-margin" class="level2">
 <h2 class="anchored" data-anchor-id="gross-margin">Gross Margin</h2>
-<p><strong>Definition:</strong> (Gross Revenue − COGS) / Gross Revenue.</p>
-<p><strong>Status:</strong> ⚠️ <strong>Not computable.</strong> COGS requires: 1. SKU-level cost data from the COO (vendor prices, not yet in Airtable) 2. SKU quantities per order (requires parsing <code>cart_json</code> in <code>mart_orders</code>)</p>
-<p>Once cost data is available, this will be built as <code>mart_sku_margin</code>.</p>
+<p><strong>Business definition:</strong> (Gross Revenue − Cost of Goods Sold) / Gross Revenue. Measures how much of each revenue dollar remains after paying for the produce.</p>
+<p><strong>Formula:</strong> <code>(revenue - cogs) / revenue</code></p>
+<p><strong>Source table:</strong> <code>mart_sku_margin</code> (not yet built)</p>
+<p><strong>Current data availability:</strong> ⚠️ <strong>Not computable.</strong> COGS requires: 1. Vendor cost per SKU — not yet in Airtable Catalog table 2. SKU quantity per order — requires consistent <code>cart_json</code> capture</p>
+<p><strong>Action required:</strong> COO to add vendor cost column to Airtable Catalog. Data Engineer to ensure <code>cart_json</code> is populated for every order.</p>
+<p><strong>Target:</strong> Gross margin ≥ 35% (specialty produce DTC typical range: 30–45%).</p>
 <hr>
 </section>
 <section id="contribution-margin-per-sku" class="level2">
 <h2 class="anchored" data-anchor-id="contribution-margin-per-sku">Contribution Margin per SKU</h2>
-<p><strong>Definition:</strong> (Revenue per unit − Variable cost per unit) / Revenue per unit.</p>
-<p><strong>Status:</strong> ⚠️ <strong>Not computable.</strong> Same blocker as gross margin. Customer-facing prices are in Airtable (<code>appm6F6H9obydzAM2</code> table <code>Catalog</code>). Vendor costs are not yet tracked.</p>
+<p><strong>Business definition:</strong> Per-unit revenue minus per-unit variable cost, expressed as a percentage of revenue. Identifies which SKUs actually contribute to profit and which should be repriced or dropped.</p>
+<p><strong>Formula:</strong> <code>(unit_price - unit_variable_cost) / unit_price</code></p>
+<p><strong>Source table:</strong> <code>mart_sku_margin</code> (not yet built)</p>
+<p><strong>Current data availability:</strong> ⚠️ <strong>Not computable.</strong> Same blockers as Gross Margin. Customer-facing prices are in Airtable (<code>appm6F6H9obydzAM2</code>, table <code>Catalog</code>, 45 active SKUs). Vendor costs are missing.</p>
 <hr>
 </section>
 </section>
-<section id="data-quality-notes" class="level1">
-<h1>Data Quality Notes</h1>
+<section id="data-quality-coverage-summary" class="level1">
+<h1>Data Quality &amp; Coverage Summary</h1>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 24%">
-<col style="width: 33%">
-<col style="width: 42%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 39%">
+<col style="width: 27%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>Status</th>
+<th>Computable Today?</th>
+<th>Key Blocker</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>AOV (total)</td>
+<td>✅ Live</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>AOV by SKU category</td>
+<td>⚠️ Partial</td>
+<td>No</td>
+<td><code>cart_json</code> inconsistent</td>
+</tr>
+<tr class="odd">
+<td>Weekly Revenue</td>
+<td>✅ Live</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>LTV (all-time)</td>
+<td>✅ Live</td>
+<td>Yes</td>
+<td>N too small for inference</td>
+</tr>
+<tr class="odd">
+<td>LTV (30/90/365-day)</td>
+<td>✅ Live</td>
+<td>Yes</td>
+<td>N too small for inference</td>
+</tr>
+<tr class="even">
+<td>Order Frequency</td>
+<td>✅ Live</td>
+<td>Yes</td>
+<td>N too small for inference</td>
+</tr>
+<tr class="odd">
+<td>Retention Rate (30/60/90d)</td>
+<td>⚠️ Partial</td>
+<td>Point-in-time only</td>
+<td>Need cohort model</td>
+</tr>
+<tr class="even">
+<td>Repeat Purchase Rate</td>
+<td>✅ Live</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td>Checkout CVR (Stripe)</td>
+<td>✅ Live</td>
+<td>Yes</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Full Funnel CVR (GA4)</td>
+<td>⚠️ Partial</td>
+<td>Partial</td>
+<td>GA4 events not firing</td>
+</tr>
+<tr class="odd">
+<td>Site-wide CVR</td>
+<td>✅ Live</td>
+<td>Yes</td>
+<td>Short history (from Apr 29)</td>
+</tr>
+<tr class="even">
+<td>CAC (blended)</td>
+<td>✅ Live</td>
+<td>Yes (estimate)</td>
+<td>UTM attribution sparse pre-May 3</td>
+</tr>
+<tr class="odd">
+<td>CAC (by channel)</td>
+<td>⚠️ Pending</td>
+<td>No</td>
+<td><code>mart_channel_performance</code> not built</td>
+</tr>
+<tr class="even">
+<td>ROAS</td>
+<td>⚠️ Pending</td>
+<td>Blended only</td>
+<td>Channel attribution needed</td>
+</tr>
+<tr class="odd">
+<td>Gross Margin</td>
+<td>❌ Blocked</td>
+<td>No</td>
+<td>Vendor costs missing from Airtable</td>
+</tr>
+<tr class="even">
+<td>Contribution Margin/SKU</td>
+<td>❌ Blocked</td>
+<td>No</td>
+<td>Same as Gross Margin</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="data-source-freshness" class="level1">
+<h1>Data Source Freshness</h1>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 22%">
+<col style="width: 38%">
+<col style="width: 38%">
 </colgroup>
 <thead>
 <tr class="header">
 <th>Source</th>
-<th>Freshness</th>
+<th>Last Ingested</th>
 <th>Known Issues</th>
 </tr>
 </thead>
@@ -2726,42 +3186,37 @@ Warning
 <tr class="odd">
 <td>Stripe PaymentIntents</td>
 <td>2026-05-02</td>
-<td>UTM/fbclid/gclid null before 2026-05-03 (attribution fix date)</td>
+<td>UTM/fbclid/gclid null before 2026-05-03</td>
 </tr>
 <tr class="even">
 <td>Stripe CheckoutSessions</td>
 <td>2026-05-02</td>
-<td>285 of 303 sessions unpaid; includes visitors who opened but never submitted checkout</td>
+<td>Most sessions unpaid (checkout page opens ≠ intent to buy)</td>
 </tr>
 <tr class="odd">
-<td>Stripe Charges</td>
-<td>2026-05-02</td>
-<td>Matches PIs closely but 15 fewer rows; some PIs have no charge record</td>
-</tr>
-<tr class="even">
 <td>GA4 BigQuery export</td>
 <td>Daily from 2026-04-29</td>
-<td>Short history; no pre-2026-04-29 session data</td>
+<td><code>add_to_cart</code> / <code>begin_checkout</code> events not firing</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Meta Ads</td>
 <td>2026-05-02</td>
-<td>Parquet exists locally; not in BQ yet</td>
-</tr>
-<tr class="even">
-<td>Google Ads</td>
-<td>2026-05-02</td>
-<td>Parquet exists locally; not in BQ yet</td>
+<td>Local parquet only; not yet in BigQuery</td>
 </tr>
 <tr class="odd">
-<td>Mailchimp</td>
+<td>Google Ads</td>
 <td>2026-05-02</td>
-<td>Members parquet available; not yet joined to orders</td>
+<td>Local parquet only; not yet in BigQuery</td>
 </tr>
 <tr class="even">
+<td>Mailchimp</td>
+<td>2026-05-02</td>
+<td>Not yet joined to orders</td>
+</tr>
+<tr class="odd">
 <td>Airtable Catalog</td>
-<td>Live</td>
-<td>45 active SKUs; no vendor cost column</td>
+<td>Live (API)</td>
+<td>45 active SKUs; vendor cost column missing</td>
 </tr>
 </tbody>
 </table>
@@ -2816,6 +3271,20 @@ Warning
 <td>2026-05-03</td>
 </tr>
 <tr class="odd">
+<td>Order Frequency</td>
+<td>mart_customers</td>
+<td>Live</td>
+<td>Analytics Engineer</td>
+<td>2026-05-03</td>
+</tr>
+<tr class="even">
+<td>Retention Rate</td>
+<td>mart_customer_cohorts (pending)</td>
+<td>Partial</td>
+<td>Analytics Engineer</td>
+<td>2026-05-03</td>
+</tr>
+<tr class="odd">
 <td>Repeat Purchase Rate</td>
 <td>mart_customers</td>
 <td>Live</td>
@@ -2830,37 +3299,51 @@ Warning
 <td>2026-05-03</td>
 </tr>
 <tr class="odd">
-<td>Site-wide CVR</td>
-<td>GA4 (BQ direct)</td>
-<td>Live (BQ only)</td>
+<td>Full Funnel CVR</td>
+<td>GA4 BQ (events broken)</td>
+<td>Partial</td>
 <td>Analytics Engineer</td>
 <td>2026-05-03</td>
 </tr>
 <tr class="even">
-<td>CAC</td>
-<td>mart_channel_performance</td>
-<td>Pending ad spend load</td>
+<td>Site-wide CVR</td>
+<td>GA4 BQ direct</td>
+<td>Live (BQ only)</td>
+<td>Analytics Engineer</td>
+<td>2026-05-03</td>
+</tr>
+<tr class="odd">
+<td>CAC (blended)</td>
+<td>mart_channel_performance (pending)</td>
+<td>Estimate from parquet</td>
+<td>Analytics Engineer</td>
+<td>2026-05-03</td>
+</tr>
+<tr class="even">
+<td>CAC (by channel)</td>
+<td>mart_channel_performance (pending)</td>
+<td>Pending model build</td>
 <td>Analytics Engineer</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td>ROAS</td>
-<td>mart_channel_performance</td>
-<td>Pending ad spend load</td>
+<td>mart_channel_performance (pending)</td>
+<td>Partial</td>
 <td>Analytics Engineer</td>
-<td>—</td>
+<td>2026-05-03</td>
 </tr>
 <tr class="even">
 <td>Gross Margin</td>
 <td>mart_sku_margin (not built)</td>
-<td>Pending COGS data</td>
+<td>Blocked on COGS data</td>
 <td>Analytics Engineer</td>
 <td>—</td>
 </tr>
 <tr class="odd">
 <td>Contribution Margin/SKU</td>
 <td>mart_sku_margin (not built)</td>
-<td>Pending COGS data</td>
+<td>Blocked on COGS data</td>
 <td>Analytics Engineer</td>
 <td>—</td>
 </tr>

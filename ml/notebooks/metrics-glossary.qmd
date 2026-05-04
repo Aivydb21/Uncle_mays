@@ -31,6 +31,7 @@ library(lubridate)
 library(scales)
 library(knitr)
 library(kableExtra)
+library(tidyr)
 
 # Load raw parquet data — path relative to notebooks/ directory
 raw_dir <- normalizePath("../data/raw", mustWork = FALSE)
@@ -42,26 +43,46 @@ latest_parquet <- function(pattern) {
   files[which.max(file.mtime(files))]
 }
 
-pi_path  <- latest_parquet("stripe_payment_intents")
-cs_path  <- latest_parquet("stripe_checkout_sessions")
-chg_path <- latest_parquet("stripe_charges")
+pi_path   <- latest_parquet("stripe_payment_intents")
+cs_path   <- latest_parquet("stripe_checkout_sessions")
+chg_path  <- latest_parquet("stripe_charges")
 cust_path <- latest_parquet("stripe_customers")
+ga4_path  <- latest_parquet("ga4_session_summary")
+meta_path <- latest_parquet("meta_campaign_insights")
+gads_path <- latest_parquet("google_ads_campaign_insights")
 
 pi   <- if (!is.null(pi_path))   read_parquet(pi_path)   else tibble()
 cs   <- if (!is.null(cs_path))   read_parquet(cs_path)   else tibble()
 chg  <- if (!is.null(chg_path))  read_parquet(chg_path)  else tibble()
 cust <- if (!is.null(cust_path)) read_parquet(cust_path) else tibble()
+ga4  <- if (!is.null(ga4_path))  read_parquet(ga4_path)  else tibble()
+meta <- if (!is.null(meta_path)) read_parquet(meta_path) else tibble()
+gads <- if (!is.null(gads_path)) read_parquet(gads_path) else tibble()
 
 # Orders = succeeded, non-test payment intents
 orders <- pi |>
   filter(status == "succeeded", !isTRUE(is_test)) |>
   mutate(
     amount_dollars = amount_received_cents / 100,
-    order_week  = floor_date(as.Date(created_at), "week", week_start = 1),
-    order_month = floor_date(as.Date(created_at), "month")
+    created_at_dt  = as_datetime(created_at),
+    order_date     = as.Date(created_at_dt),
+    order_week     = floor_date(order_date, "week", week_start = 1),
+    order_month    = floor_date(order_date, "month")
   )
 
+ref_date   <- as.Date("2026-05-03")
 ingest_date <- "2026-05-02"
+
+# Customer-level aggregation
+customers <- orders |>
+  group_by(email) |>
+  summarise(
+    first_order   = min(order_date),
+    last_order    = max(order_date),
+    total_orders  = n(),
+    ltv_dollars   = sum(amount_dollars),
+    .groups = "drop"
+  )
 ```
 
 ::: {.callout-note}
@@ -74,14 +95,15 @@ re-render this document to refresh all numbers.
 
 This document is the **single source of truth** for every metric Uncle May's uses
 in board decks, marketing reports, and operational reviews. If a number in any
-report disagrees with a number computed from the SQL in this glossary, the SQL
-wins.
+report disagrees with a number computed from the definitions in this glossary,
+the glossary wins.
 
 **Owner:** Analytics Engineer (`analytics-engineer` on Paperclip).
 **Review cadence:** Quarterly or whenever a new metric is added to a board deck.
 **Source of record:** `ml/notebooks/metrics-glossary.qmd` committed to the
 website repository.
-**dbt models:** `ml/dbt/uncle_mays/` (see README.md for run instructions).
+**Goal this glossary serves:** 30 orders/week from the online produce box
+(Paperclip goal `d45fd7bc`).
 
 ---
 
@@ -89,46 +111,62 @@ website repository.
 
 ## Average Order Value (AOV)
 
-**Definition:** Mean gross revenue per completed order, in USD.
+**Business definition:** The mean amount a customer spends per order. Informs
+pricing strategy, free-shipping thresholds, and upsell opportunity. If AOV
+rises we need fewer orders to hit weekly revenue targets.
 
-**Formula:** `sum(amount_received_cents) / count(orders) / 100`
+**Formula:** `sum(gross_revenue_dollars) / count(orders)`
+
+**Time window:** Rolling or as-of-period; always specify the window when cited.
 
 **Source table:** `mart_orders` (dbt) → `stg_stripe_payment_intents` → raw parquet
 
-**Scope:** Orders with `status = 'succeeded'` and `is_test = false`.
+**Scope:** `status = 'succeeded'` AND `is_test = false`.
 
 **SQL:**
 ```sql
-select avg(gross_revenue_dollars) as aov_dollars
+select
+  avg(gross_revenue_dollars) as aov_dollars
 from mart_orders
 ```
+
+**Current data availability:** ✅ Computable today from Stripe parquet.
+
+**Target:** $65–$95 (aligns with the current box tier pricing: $35, $65, $95 boxes;
+goal is upselling customers toward the upper tiers). At 30 orders/week with AOV
+of $65, weekly revenue = $1,950.
 
 **Current value (as of `r ingest_date`):**
 
 ```{r aov}
-aov_val <- mean(orders$amount_dollars)
+aov_val  <- mean(orders$amount_dollars)
 n_orders <- nrow(orders)
 tibble(
-  Metric = "AOV",
-  Value = dollar(aov_val),
+  Metric   = "AOV",
+  Value    = dollar(aov_val),
   `N Orders` = n_orders
 ) |>
   kable(align = c("l","r","r")) |>
   kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
 ```
 
-**Notes:** AOV is computed on gross revenue (amount actually received by Stripe).
-Refunded amounts should be subtracted when computing net AOV; refund tracking
-is not yet wired into the mart.
+**AOV by SKU category:**
+
+::: {.callout-warning}
+**Data gap:** `cart_json` is only populated for a subset of orders (attribution
+wiring was incomplete before 2026-05-03). AOV by SKU category is not computable
+until cart-level data is consistently captured. Track via [UNC-767](/UNC/issues/UNC-767).
+:::
 
 ---
 
 ## Weekly Revenue
 
-**Definition:** Sum of gross revenue for all completed orders in a calendar week
-(Monday–Sunday ISO week).
+**Business definition:** Gross revenue for all completed orders in a calendar week
+(Monday–Sunday ISO). The primary operational heartbeat metric: are we trending
+toward the 30-orders/week goal?
 
-**Formula:** `sum(gross_revenue_dollars) group by order_week`
+**Formula:** `sum(gross_revenue_dollars) GROUP BY order_week`
 
 **Source table:** `mart_orders`
 
@@ -143,6 +181,10 @@ group by order_week
 order by order_week
 ```
 
+**Current data availability:** ✅ Computable today.
+
+**Target:** 30 orders/week → ~$1,950/week at $65 AOV.
+
 **Current values:**
 
 ```{r weekly_revenue}
@@ -154,26 +196,24 @@ weekly <- orders |>
     .groups = "drop"
   ) |>
   mutate(
-    revenue_fmt  = dollar(revenue),
-    week_label   = format(order_week, "%b %d, %Y")
+    revenue_fmt = dollar(revenue),
+    week_label  = format(order_week, "%b %d, %Y")
   )
 
 weekly |>
   select(`Week of` = week_label, Orders = orders, Revenue = revenue_fmt) |>
-  kable(align = c("l", "r", "r")) |>
-  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE)
+  kable(align = c("l","r","r")) |>
+  kable_styling(bootstrap_options = c("striped","condensed"), full_width = FALSE)
 ```
 
-**Goal:** 30 orders/week (`d45fd7bc` on Paperclip). Current peak:
-`r max(weekly$orders)` orders (week of
-`r format(weekly$order_week[which.max(weekly$orders)], "%b %d, %Y")`).
+**Goal:** 30 orders/week. Current peak: **`r max(weekly$orders)` orders**
+(week of `r format(weekly$order_week[which.max(weekly$orders)], "%b %d, %Y")`).
 
 ---
 
 ## Gross Revenue (All-Time)
 
-**Definition:** Cumulative sum of `amount_received_cents` across all succeeded,
-non-test payment intents.
+**Business definition:** Cumulative received revenue since launch.
 
 ```{r total_revenue}
 tibble(
@@ -190,42 +230,134 @@ tibble(
 
 ## Customer Lifetime Value (LTV)
 
-**Definition:** Total gross revenue attributed to a single customer across all
-their orders, identified by email address.
+**Business definition:** Total gross revenue from a single customer across all their
+orders. Informs how much we can afford to spend to acquire a customer (see CAC),
+and which customer segments are most valuable to retain.
 
-**Formula:** `sum(gross_revenue_dollars) group by email_hash`
+**Formula:** `sum(gross_revenue_dollars) GROUP BY email`
+
+**Time-windowed variants:** LTV is always computed from first order to the
+measurement date. For board reporting, cite the period:
+- **LTV-30:** Revenue from customers acquired in the last 30 days
+- **LTV-90:** Revenue from customers acquired in the last 90 days
+- **LTV-365:** Revenue from customers acquired in the last 365 days
 
 **Source table:** `mart_customers` (dbt)
 
 **SQL:**
 ```sql
-select
-  email_hash,
-  ltv_dollars,
-  total_orders
+-- All-time LTV per customer
+select email_hash, ltv_dollars, total_orders
 from mart_customers
 order by ltv_dollars desc
+
+-- LTV-30 (customers acquired in last 30 days)
+select avg(ltv_dollars) as avg_ltv_30d
+from mart_customers
+where acquisition_date >= current_date - interval 30 day
 ```
 
-**Distribution (current):**
+**Current data availability:** ✅ All-time LTV computable. Windowed LTV computable
+but **not statistically meaningful at N=5 customers**. Revisit after N ≥ 50.
+
+**Target:** LTV > CAC × 3 (unit-economics floor); at current blended CAC of ~$146
+(see below), LTV > $438 is the minimum viable threshold. The two repeat customers
+(anthonypivy, awoods) are already above this bar.
+
+**Distribution (all-time):**
 
 ```{r ltv}
-ltv <- orders |>
-  group_by(email) |>
-  summarise(
-    ltv    = sum(amount_dollars),
-    orders = n(),
-    .groups = "drop"
+tibble(
+  Statistic  = c("N customers","Min LTV","Median LTV","Mean LTV","Max LTV"),
+  Value      = c(
+    as.character(nrow(customers)),
+    dollar(min(customers$ltv_dollars)),
+    dollar(median(customers$ltv_dollars)),
+    dollar(mean(customers$ltv_dollars)),
+    dollar(max(customers$ltv_dollars))
   )
+) |>
+  kable(align = c("l","r")) |>
+  kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+```
+
+**LTV by time window (windowed revenue, all customers):**
+
+```{r ltv_windows}
+windows <- tibble(
+  Window       = c("LTV-30d","LTV-90d","LTV-365d"),
+  `Start Date` = as.character(c(ref_date - 30, ref_date - 90, ref_date - 365)),
+  `N customers in window` = NA_integer_,
+  `Mean LTV`   = NA_character_
+)
+
+for (i in seq_along(c(30L, 90L, 365L))) {
+  days <- c(30L, 90L, 365L)[i]
+  w <- orders |>
+    filter(order_date >= ref_date - days) |>
+    group_by(email) |>
+    summarise(ltv = sum(amount_dollars), .groups = "drop")
+  windows$`N customers in window`[i] <- nrow(w)
+  windows$`Mean LTV`[i] <- if (nrow(w) > 0) dollar(mean(w$ltv)) else "—"
+}
+
+windows |>
+  kable(align = c("l","l","r","r")) |>
+  kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+```
+
+::: {.callout-warning}
+**Small-sample caveat:** Only `r nrow(customers)` unique customers total.
+All LTV statistics are dominated by high-frequency internal/test accounts.
+LTV is not a stable metric until N ≥ 50 customers.
+:::
+
+---
+
+## Order Frequency
+
+**Business definition:** Average number of orders placed per customer per month.
+Informs subscription design and re-engagement cadence. High frequency = customers
+find ongoing value; low frequency = one-time buyers who need a re-purchase nudge.
+
+**Formula:**
+`total_orders / n_customers / active_months`
+where `active_months = (max_order_date - first_order_date_across_cohort) / 30`.
+
+**Source table:** `mart_customers`
+
+**SQL:**
+```sql
+select
+  avg(total_orders)                               as avg_orders_per_customer,
+  avg(total_orders / greatest(months_active, 1))  as avg_orders_per_customer_per_month
+from mart_customers
+```
+
+**Current data availability:** ✅ Computable but not statistically meaningful at N=5.
+
+**Target:** ≥ 2 orders/customer/month (weekly box = ~4/month ceiling; bi-weekly = 2;
+monthly = 1). A subscription model would lock in this frequency.
+
+**Current values:**
+
+```{r order_frequency}
+n_months_active <- as.numeric(max(customers$last_order) - min(customers$first_order)) / 30
 
 tibble(
-  Statistic  = c("N customers", "Min LTV", "Median LTV", "Mean LTV", "Max LTV"),
-  Value      = c(
-    as.character(nrow(ltv)),
-    dollar(min(ltv$ltv)),
-    dollar(median(ltv$ltv)),
-    dollar(mean(ltv$ltv)),
-    dollar(max(ltv$ltv))
+  Metric = c(
+    "N customers",
+    "Total orders",
+    "Mean orders/customer (all-time)",
+    "Observation period (months)",
+    "Mean orders/customer/month"
+  ),
+  Value = c(
+    as.character(nrow(customers)),
+    as.character(nrow(orders)),
+    sprintf("%.1f", mean(customers$total_orders)),
+    sprintf("%.1f", n_months_active),
+    sprintf("%.2f", mean(customers$total_orders) / max(n_months_active, 1))
   )
 ) |>
   kable(align = c("l","r")) |>
@@ -233,36 +365,121 @@ tibble(
 ```
 
 ::: {.callout-warning}
-**Small sample caveat:** Only `r nrow(ltv)` unique customers in the current
-dataset. LTV statistics are not stable at this scale. Revisit after N ≥ 50.
+Order frequency is skewed by two high-volume accounts (likely internal/test).
+Segment by `is_internal` flag once that column is added to `mart_customers`.
+:::
+
+---
+
+## Retention Rate
+
+**Business definition:** Fraction of customers who placed their first order in a
+given cohort month and then placed at least one additional order within N days.
+Answers: "Do customers come back?" Informs loyalty programs and re-engagement
+email triggers.
+
+**Formula (30-day window):**
+`count(customers: first_order in cohort_month AND second_order ≤ first_order + 30d) /
+count(customers: first_order in cohort_month)`
+
+**Variants:**
+- **Retention-30:** second order within 30 days of first
+- **Retention-60:** second order within 60 days of first
+- **Retention-90:** second order within 90 days of first
+
+**Source table:** `mart_customers`
+
+**SQL:**
+```sql
+-- Cohort retention
+select
+  cohort_month,
+  count(*)                               as cohort_size,
+  countif(days_to_second_order <= 30)    as retained_30d,
+  countif(days_to_second_order <= 60)    as retained_60d,
+  countif(days_to_second_order <= 90)    as retained_90d,
+  countif(days_to_second_order <= 30) / count(*) as retention_30d_rate
+from mart_customer_cohorts
+group by cohort_month
+order by cohort_month
+```
+
+**Current data availability:** ⚠️ **Partially computable.** Only `r nrow(customers)`
+customers. Earliest customer acquired `r min(customers$first_order)`. Cohort-based
+retention is not statistically meaningful until there are ≥ 10 customers in a
+single cohort month.
+
+**Target:** 30-day retention ≥ 40% (industry benchmark for specialty food
+subscription is 35–50%). At 30 orders/week target, a 40% 30-day retention means
+roughly 12 returning customers per week out of 30.
+
+**Current values (all customers, point-in-time):**
+
+```{r retention}
+repeat_customers <- sum(customers$total_orders > 1)
+total_customers  <- nrow(customers)
+
+# Days to second order
+retention_data <- orders |>
+  arrange(email, order_date) |>
+  group_by(email) |>
+  mutate(order_rank = row_number()) |>
+  filter(order_rank <= 2) |>
+  summarise(
+    first_order  = min(order_date),
+    second_order = if (n() >= 2) max(order_date) else as.Date(NA),
+    .groups      = "drop"
+  ) |>
+  mutate(days_to_second = as.numeric(second_order - first_order))
+
+ret_30 <- sum(!is.na(retention_data$days_to_second) & retention_data$days_to_second <= 30)
+ret_60 <- sum(!is.na(retention_data$days_to_second) & retention_data$days_to_second <= 60)
+ret_90 <- sum(!is.na(retention_data$days_to_second) & retention_data$days_to_second <= 90)
+
+tibble(
+  Metric = c(
+    "Total customers",
+    "Customers with ≥2 orders",
+    "Retention-30d (any second order within 30d of first)",
+    "Retention-60d",
+    "Retention-90d"
+  ),
+  Value = c(
+    as.character(total_customers),
+    as.character(repeat_customers),
+    percent(ret_30 / total_customers, accuracy = 0.1),
+    percent(ret_60 / total_customers, accuracy = 0.1),
+    percent(ret_90 / total_customers, accuracy = 0.1)
+  )
+) |>
+  kable(align = c("l","r")) |>
+  kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+```
+
+::: {.callout-warning}
+**Interpretation:** Retention metrics are not cohort-based yet — they describe
+the current universe of 5 customers, not a true month-1 cohort. Build
+`mart_customer_cohorts` dbt model before quoting retention in board decks.
 :::
 
 ---
 
 ## Repeat Purchase Rate
 
-**Definition:** Fraction of customers who have placed more than one order.
+**Business definition:** Point-in-time fraction of all customers who have placed
+more than one order ever. A simpler (non-cohort) variant of retention.
 
-**Formula:** `count(customers where total_orders > 1) / count(all customers)`
+**Formula:** `count(customers: total_orders > 1) / count(all customers)`
 
 **Source table:** `mart_customers`
-
-**SQL:**
-```sql
-select
-  countif(total_orders > 1) / count(*) as repeat_rate,
-  countif(total_orders > 1)            as repeat_customers,
-  count(*)                             as total_customers
-from mart_customers
-```
 
 **Current value:**
 
 ```{r repeat_rate}
-n_repeat <- sum(ltv$orders > 1)
-n_total  <- nrow(ltv)
+n_repeat <- sum(customers$total_orders > 1)
+n_total  <- nrow(customers)
 tibble(
-  Metric = c("Total customers", "Repeat customers", "Repeat rate"),
+  Metric = c("Total customers","Repeat customers","Repeat rate"),
   Value  = c(
     as.character(n_total),
     as.character(n_repeat),
@@ -273,19 +490,12 @@ tibble(
   kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
 ```
 
-::: {.callout-warning}
-**Interpretation caution:** The current repeat rate is driven by 2 customers
-with 18 and 9 orders respectively. This is not a stable cohort-based retention
-metric. Once the customer base grows, compute retention properly as
-"fraction of month-1 customers who placed an order in month-2+."
-:::
-
 ---
 
-## Customer Acquisition
+## Customer Acquisition (New Customers per Period)
 
-**Definition:** Number of new unique customers acquired in a given period
-(first-ever order in that period).
+**Business definition:** Number of distinct customers placing their first-ever order
+in a given week or month. Informs whether acquisition is growing.
 
 **Source table:** `mart_customers` (acquisition_month column)
 
@@ -299,16 +509,122 @@ group by acquisition_month
 order by acquisition_month
 ```
 
+**Current values:**
+
+```{r acquisition}
+customers |>
+  mutate(acq_month = floor_date(first_order, "month")) |>
+  count(acq_month) |>
+  mutate(month_label = format(acq_month, "%b %Y")) |>
+  select(`Acquisition Month` = month_label, `New Customers` = n) |>
+  kable(align = c("l","r")) |>
+  kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+```
+
 ---
 
 # Conversion Metrics
 
-## Checkout Conversion Rate
+## Full Funnel Conversion (Visit → Cart → Checkout → Purchase)
 
-**Definition:** Fraction of Stripe Checkout Sessions where payment was collected
-(`payment_status = 'paid'`).
+**Business definition:** The fraction of website sessions that progress through each
+stage of the purchase funnel. Identifies where customers drop off, informing
+UX and copy improvements.
 
-**Formula:** `count(payment_status = 'paid') / count(*)`
+**Formula:**
+- Session → Add-to-Cart rate: `sessions_with_add_to_cart / total_sessions`
+- Add-to-Cart → Begin Checkout: `sessions_with_begin_checkout / sessions_with_add_to_cart`
+- Begin Checkout → Purchase: `sessions_with_purchase / sessions_with_begin_checkout`
+- End-to-end CVR: `sessions_with_purchase / total_sessions`
+
+**Source:** GA4 BigQuery export (`analytics_494626869.events_*`) or
+`ga4_session_summary` parquet.
+
+**SQL (BigQuery):**
+```sql
+with sessions as (
+  select
+    concat(user_pseudo_id, cast(ga_session_id as string)) as session_key,
+    max(case when event_name = 'page_view'       then 1 end) as has_pageview,
+    max(case when event_name = 'add_to_cart'     then 1 end) as has_add_to_cart,
+    max(case when event_name = 'begin_checkout'  then 1 end) as has_begin_checkout,
+    max(case when event_name = 'purchase'        then 1 end) as has_purchase
+  from `uncle-mays-automation.analytics_494626869.events_*`
+  where _table_suffix between '20260429' and format_date('%Y%m%d', current_date())
+  group by session_key
+)
+select
+  count(*)                        as total_sessions,
+  sum(has_add_to_cart)            as add_to_cart_sessions,
+  sum(has_begin_checkout)         as begin_checkout_sessions,
+  sum(has_purchase)               as purchase_sessions,
+  safe_divide(sum(has_add_to_cart),    count(*)) as visit_to_cart_rate,
+  safe_divide(sum(has_begin_checkout), sum(has_add_to_cart)) as cart_to_checkout_rate,
+  safe_divide(sum(has_purchase),       sum(has_begin_checkout)) as checkout_to_purchase_rate,
+  safe_divide(sum(has_purchase),       count(*)) as end_to_end_cvr
+from sessions
+```
+
+**Current data availability:** ⚠️ **Partial.** GA4 session parquet records 276
+sessions but `add_to_cart` and `begin_checkout` event counts are all zero.
+This indicates GA4 custom event tracking (add_to_cart, begin_checkout) is
+**not firing** — only the native `purchase` event is captured. Full funnel
+analysis requires fixing GA4 event tracking in the checkout flow.
+
+**Baseline (available today):**
+
+```{r funnel}
+if (nrow(ga4) > 0) {
+  ga4_num <- ga4 |>
+    mutate(
+      add_to_cart_events    = as.numeric(add_to_cart_events),
+      begin_checkout_events = as.numeric(begin_checkout_events),
+      purchase_events       = as.numeric(purchase_events)
+    )
+
+  n_sessions       <- nrow(ga4_num)
+  n_cart           <- sum(ga4_num$add_to_cart_events > 0, na.rm = TRUE)
+  n_checkout       <- sum(ga4_num$begin_checkout_events > 0, na.rm = TRUE)
+  n_purchase       <- sum(ga4_num$purchase_events > 0, na.rm = TRUE)
+
+  tibble(
+    Stage  = c("Sessions","Sessions with add-to-cart","Sessions with begin-checkout","Sessions with purchase"),
+    Count  = c(n_sessions, n_cart, n_checkout, n_purchase),
+    `Rate vs. sessions` = c(
+      "—",
+      percent(n_cart     / n_sessions, accuracy = 0.1),
+      percent(n_checkout / n_sessions, accuracy = 0.1),
+      percent(n_purchase / n_sessions, accuracy = 0.1)
+    ),
+    Note = c(
+      "GA4 export from 2026-04-29",
+      "⚠ GA4 event not firing",
+      "⚠ GA4 event not firing",
+      "GA4 purchase event active"
+    )
+  ) |>
+    kable(align = c("l","r","r","l")) |>
+    kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+}
+```
+
+**Target:**
+- Visit → Purchase (end-to-end CVR): ≥ 1.0% (current baseline 0.10%; industry
+  median for specialty food DTC is 1–3%)
+- Add-to-Cart → Purchase: ≥ 25%
+
+**Action required:** File GA4 event tracking fix with CTO. Without this data
+the funnel cannot be optimized.
+
+---
+
+## Checkout Conversion Rate (Stripe)
+
+**Business definition:** Fraction of Stripe Checkout Sessions where payment was
+collected. Lower-funnel metric; denominator is only sessions where the customer
+reached the Stripe checkout page.
+
+**Formula:** `count(payment_status = 'paid') / count(all sessions)`
 
 **Source table:** `stg_stripe_checkout_sessions`
 
@@ -321,6 +637,11 @@ select
 from stg_stripe_checkout_sessions
 ```
 
+**Current data availability:** ✅ Computable.
+
+**Target:** ≥ 70% (industry norm for DTC checkout pages that the customer
+voluntarily navigated to).
+
 **Current value:**
 
 ```{r checkout_cvr}
@@ -328,11 +649,12 @@ if (nrow(cs) > 0) {
   paid  <- sum(cs$payment_status == "paid", na.rm = TRUE)
   total <- nrow(cs)
   tibble(
-    Metric = c("Total sessions", "Paid sessions", "Checkout CVR"),
+    Metric = c("Total sessions","Paid sessions","Checkout CVR","Abandonment rate"),
     Value  = c(
       comma(total),
       comma(paid),
-      percent(paid/total, accuracy = 0.1)
+      percent(paid / total, accuracy = 0.1),
+      percent(1 - paid / total, accuracy = 0.1)
     )
   ) |>
     kable(align = c("l","r")) |>
@@ -340,20 +662,23 @@ if (nrow(cs) > 0) {
 }
 ```
 
-**Notes:**
-- Sessions prior to 2026-05-03 lack UTM/attribution metadata.
-- Checkout CVR ≠ site-wide conversion rate. Site-wide CVR uses GA4 sessions
-  as the denominator (see section below).
+::: {.callout-note}
+Sessions prior to 2026-05-03 lack UTM attribution metadata. Checkout CVR by
+traffic source will be available once a meaningful post-2026-05-03 dataset
+accumulates.
+:::
 
 ---
 
 ## Site-Wide Conversion Rate (GA4)
 
-**Definition:** Fraction of GA4 sessions that resulted in a completed purchase.
+**Business definition:** Fraction of all GA4 sessions that resulted in a purchase.
+The broadest CVR measure; reflects both traffic quality and the entire site
+experience.
 
-**Formula:** `purchase_events / total_sessions` from GA4 BigQuery export.
+**Formula:** `purchase_sessions / total_sessions`
 
-**Source:** `analytics_494626869.events_YYYYMMDD` (BigQuery, daily sharded)
+**Source:** `analytics_494626869.events_*` (BigQuery)
 
 **SQL (BigQuery):**
 ```sql
@@ -369,30 +694,11 @@ from `uncle-mays-automation.analytics_494626869.events_*`
 where _table_suffix between '20260429' and format_date('%Y%m%d', current_date())
 ```
 
-**Baseline:** 0.10% site-wide CVR as of CIO audit 2026-04-29.
-GA4 export only started 2026-04-29; historical data is not available.
+**Baseline:** 0.10% site-wide CVR (CIO audit 2026-04-29). GA4 export only
+started 2026-04-29; GA4 session parquet shows 1 purchase in 276 sessions = 0.36%.
 
----
-
-## Checkout Abandonment Rate
-
-**Definition:** Fraction of checkout sessions where the customer did not pay
-and the session expired.
-
-**Formula:** `1 - checkout_cvr`
-
-```{r abandonment}
-if (nrow(cs) > 0) {
-  paid  <- sum(cs$payment_status == "paid", na.rm = TRUE)
-  total <- nrow(cs)
-  tibble(
-    Metric = "Abandonment rate",
-    Value  = percent(1 - paid/total, accuracy = 0.1)
-  ) |>
-    kable(align = c("l","r")) |>
-    kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
-}
-```
+**Target:** ≥ 1.0% (10× current baseline; requires both traffic quality improvement
+and funnel optimization).
 
 ---
 
@@ -400,40 +706,122 @@ if (nrow(cs) > 0) {
 
 ## Customer Acquisition Cost (CAC)
 
-**Definition:** Total paid ad spend divided by number of new customers acquired
-in the same period, by channel.
+**Business definition:** Total marketing spend divided by the number of new unique
+customers acquired in the same period. The primary efficiency metric for paid
+acquisition. Informs how much budget is justified per channel.
 
-**Formula:** `sum(ad_spend_dollars) / count(new_customers)` by channel/week
+**Formula:** `sum(ad_spend_dollars) / count(new_customers)`
 
-**Source table:** `mart_channel_performance` (dbt)
+**By channel:**
+- **Meta CAC:** `meta_spend / meta_attributed_new_customers`
+- **Google CAC:** `google_spend / google_attributed_new_customers`
+- **Blended CAC:** `(meta_spend + google_spend) / all_new_customers_in_period`
+- **Organic / Direct CAC:** $0 (by definition; fixed costs only)
+
+**Source table:** `mart_channel_performance` (dbt, to be built)
 
 **SQL:**
 ```sql
 select
-  order_week,
   channel,
-  ad_spend_dollars,
-  new_customers,
-  ad_spend_dollars / nullif(new_customers, 0) as cac_dollars
+  sum(ad_spend_dollars)                            as spend,
+  count(distinct customer_email)                   as new_customers,
+  sum(ad_spend_dollars) / nullif(count(distinct customer_email), 0) as cac
 from mart_channel_performance
+where order_week between :start_week and :end_week
+group by channel
 ```
 
-**Status:** ⚠️ **Not computable.** Meta Ads and Google Ads parquet data
-exists at `ml/data/raw/` but has not been loaded to BigQuery yet.
-CAC will be available once:
-1. `ml/ingest/meta_ads.py` and `ml/ingest/google_ads.py` outputs are
-   loaded to BQ (`meta_ads_raw` and `google_ads_raw` datasets), and
-2. `mart_ad_spend` dbt model is built.
+**Current data availability:** ⚠️ **Partially computable from local parquet.**
+Ad spend data exists locally for Meta and Google Ads (parquet at `ml/data/raw/`).
+Attribution to specific customers is limited: only 6 of 34 orders have `utm_source`
+populated (pre-2026-05-03 orders lack attribution). Full channel-level CAC
+requires (1) post-2026-05-03 order data with UTM attribution, and (2) `mart_channel_performance`
+dbt model.
+
+**Blended CAC (current estimate — paid period only):**
+
+```{r cac}
+if (nrow(meta) > 0 && nrow(gads) > 0) {
+  meta_spend  <- sum(meta$spend_usd, na.rm = TRUE)
+  gads_spend  <- sum(gads$spend_usd, na.rm = TRUE)
+  total_spend <- meta_spend + gads_spend
+
+  # Orders placed after ad campaign start (2026-04-24)
+  ad_start    <- as.Date("2026-04-24")
+  paid_orders <- orders |> filter(order_date >= ad_start)
+  new_custs   <- paid_orders |>
+    semi_join(
+      customers |> filter(first_order >= ad_start),
+      by = "email"
+    ) |>
+    pull(email) |> n_distinct()
+
+  tibble(
+    Metric = c(
+      "Meta spend (Apr 24 – May 2)",
+      "Google spend (Apr 24 – May 2)",
+      "Total paid spend",
+      "Orders in paid period",
+      "New customers in paid period",
+      "Blended CAC (total spend / new customers)"
+    ),
+    Value = c(
+      dollar(meta_spend),
+      dollar(gads_spend),
+      dollar(total_spend),
+      as.character(nrow(paid_orders)),
+      as.character(new_custs),
+      if (new_custs > 0) dollar(total_spend / new_custs) else "—"
+    )
+  ) |>
+    kable(align = c("l","r")) |>
+    kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+}
+```
+
+**Target:**
+- Blended CAC ≤ LTV / 3 (unit economics floor).
+- At target LTV ~$200 (assuming 3 orders × $65 AOV), maximum CAC = $67.
+- Current blended CAC of ~$146 is above this threshold — the business is
+  currently acquiring customers at a loss on paid channels. Paid spend should
+  be paused or restructured until CAC improves (requires board approval per
+  standing order).
 
 ---
 
 ## Return on Ad Spend (ROAS)
 
-**Definition:** Gross revenue divided by ad spend in the same period and channel.
+**Business definition:** Gross revenue generated per dollar of ad spend.
+ROAS > 1 means the channel generates more revenue than it costs (before COGS).
 
 **Formula:** `sum(gross_revenue_dollars) / sum(ad_spend_dollars)`
 
-**Status:** ⚠️ **Not computable.** Same blocker as CAC above.
+**Note:** ROAS alone does not indicate profitability — subtract COGS and
+fulfillment costs for contribution margin ROAS.
+
+**Source table:** `mart_channel_performance` (dbt)
+
+```{r roas}
+if (nrow(meta) > 0 && nrow(gads) > 0) {
+  ad_start    <- as.Date("2026-04-24")
+  paid_rev    <- sum(orders$amount_dollars[orders$order_date >= ad_start])
+  total_spend <- sum(meta$spend_usd) + sum(gads$spend_usd)
+
+  tibble(
+    Metric = c("Paid-period revenue","Total paid spend","Blended ROAS"),
+    Value  = c(
+      dollar(paid_rev),
+      dollar(total_spend),
+      sprintf("%.2f×", paid_rev / total_spend)
+    )
+  ) |>
+    kable(align = c("l","r")) |>
+    kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+}
+```
+
+**Target:** ROAS ≥ 3× (covers COGS + gross margin at 33% margin assumption).
 
 ---
 
@@ -441,38 +829,74 @@ CAC will be available once:
 
 ## Gross Margin
 
-**Definition:** (Gross Revenue − COGS) / Gross Revenue.
+**Business definition:** (Gross Revenue − Cost of Goods Sold) / Gross Revenue.
+Measures how much of each revenue dollar remains after paying for the produce.
 
-**Status:** ⚠️ **Not computable.** COGS requires:
-1. SKU-level cost data from the COO (vendor prices, not yet in Airtable)
-2. SKU quantities per order (requires parsing `cart_json` in `mart_orders`)
+**Formula:** `(revenue - cogs) / revenue`
 
-Once cost data is available, this will be built as `mart_sku_margin`.
+**Source table:** `mart_sku_margin` (not yet built)
+
+**Current data availability:** ⚠️ **Not computable.** COGS requires:
+1. Vendor cost per SKU — not yet in Airtable Catalog table
+2. SKU quantity per order — requires consistent `cart_json` capture
+
+**Action required:** COO to add vendor cost column to Airtable Catalog.
+Data Engineer to ensure `cart_json` is populated for every order.
+
+**Target:** Gross margin ≥ 35% (specialty produce DTC typical range: 30–45%).
 
 ---
 
 ## Contribution Margin per SKU
 
-**Definition:** (Revenue per unit − Variable cost per unit) / Revenue per unit.
+**Business definition:** Per-unit revenue minus per-unit variable cost, expressed
+as a percentage of revenue. Identifies which SKUs actually contribute to profit
+and which should be repriced or dropped.
 
-**Status:** ⚠️ **Not computable.** Same blocker as gross margin.
-Customer-facing prices are in Airtable (`appm6F6H9obydzAM2` table `Catalog`).
-Vendor costs are not yet tracked.
+**Formula:** `(unit_price - unit_variable_cost) / unit_price`
+
+**Source table:** `mart_sku_margin` (not yet built)
+
+**Current data availability:** ⚠️ **Not computable.** Same blockers as Gross Margin.
+Customer-facing prices are in Airtable (`appm6F6H9obydzAM2`, table `Catalog`,
+45 active SKUs). Vendor costs are missing.
 
 ---
 
-# Data Quality Notes
+# Data Quality & Coverage Summary
 
-| Source | Freshness | Known Issues |
-|--------|-----------|--------------|
-| Stripe PaymentIntents | 2026-05-02 | UTM/fbclid/gclid null before 2026-05-03 (attribution fix date) |
-| Stripe CheckoutSessions | 2026-05-02 | 285 of 303 sessions unpaid; includes visitors who opened but never submitted checkout |
-| Stripe Charges | 2026-05-02 | Matches PIs closely but 15 fewer rows; some PIs have no charge record |
-| GA4 BigQuery export | Daily from 2026-04-29 | Short history; no pre-2026-04-29 session data |
-| Meta Ads | 2026-05-02 | Parquet exists locally; not in BQ yet |
-| Google Ads | 2026-05-02 | Parquet exists locally; not in BQ yet |
-| Mailchimp | 2026-05-02 | Members parquet available; not yet joined to orders |
-| Airtable Catalog | Live | 45 active SKUs; no vendor cost column |
+| Metric | Status | Computable Today? | Key Blocker |
+|--------|--------|-------------------|-------------|
+| AOV (total) | ✅ Live | Yes | — |
+| AOV by SKU category | ⚠️ Partial | No | `cart_json` inconsistent |
+| Weekly Revenue | ✅ Live | Yes | — |
+| LTV (all-time) | ✅ Live | Yes | N too small for inference |
+| LTV (30/90/365-day) | ✅ Live | Yes | N too small for inference |
+| Order Frequency | ✅ Live | Yes | N too small for inference |
+| Retention Rate (30/60/90d) | ⚠️ Partial | Point-in-time only | Need cohort model |
+| Repeat Purchase Rate | ✅ Live | Yes | — |
+| Checkout CVR (Stripe) | ✅ Live | Yes | — |
+| Full Funnel CVR (GA4) | ⚠️ Partial | Partial | GA4 events not firing |
+| Site-wide CVR | ✅ Live | Yes | Short history (from Apr 29) |
+| CAC (blended) | ✅ Live | Yes (estimate) | UTM attribution sparse pre-May 3 |
+| CAC (by channel) | ⚠️ Pending | No | `mart_channel_performance` not built |
+| ROAS | ⚠️ Pending | Blended only | Channel attribution needed |
+| Gross Margin | ❌ Blocked | No | Vendor costs missing from Airtable |
+| Contribution Margin/SKU | ❌ Blocked | No | Same as Gross Margin |
+
+---
+
+# Data Source Freshness
+
+| Source | Last Ingested | Known Issues |
+|--------|--------------|--------------|
+| Stripe PaymentIntents | 2026-05-02 | UTM/fbclid/gclid null before 2026-05-03 |
+| Stripe CheckoutSessions | 2026-05-02 | Most sessions unpaid (checkout page opens ≠ intent to buy) |
+| GA4 BigQuery export | Daily from 2026-04-29 | `add_to_cart` / `begin_checkout` events not firing |
+| Meta Ads | 2026-05-02 | Local parquet only; not yet in BigQuery |
+| Google Ads | 2026-05-02 | Local parquet only; not yet in BigQuery |
+| Mailchimp | 2026-05-02 | Not yet joined to orders |
+| Airtable Catalog | Live (API) | 45 active SKUs; vendor cost column missing |
 
 ---
 
@@ -484,10 +908,14 @@ Vendor costs are not yet tracked.
 | Weekly Revenue | mart_orders | Live | Analytics Engineer | 2026-05-03 |
 | All-time Revenue | mart_orders | Live | Analytics Engineer | 2026-05-03 |
 | Customer LTV | mart_customers | Live | Analytics Engineer | 2026-05-03 |
+| Order Frequency | mart_customers | Live | Analytics Engineer | 2026-05-03 |
+| Retention Rate | mart_customer_cohorts (pending) | Partial | Analytics Engineer | 2026-05-03 |
 | Repeat Purchase Rate | mart_customers | Live | Analytics Engineer | 2026-05-03 |
 | Checkout CVR | stg_stripe_checkout_sessions | Live | Analytics Engineer | 2026-05-03 |
-| Site-wide CVR | GA4 (BQ direct) | Live (BQ only) | Analytics Engineer | 2026-05-03 |
-| CAC | mart_channel_performance | Pending ad spend load | Analytics Engineer | — |
-| ROAS | mart_channel_performance | Pending ad spend load | Analytics Engineer | — |
-| Gross Margin | mart_sku_margin (not built) | Pending COGS data | Analytics Engineer | — |
-| Contribution Margin/SKU | mart_sku_margin (not built) | Pending COGS data | Analytics Engineer | — |
+| Full Funnel CVR | GA4 BQ (events broken) | Partial | Analytics Engineer | 2026-05-03 |
+| Site-wide CVR | GA4 BQ direct | Live (BQ only) | Analytics Engineer | 2026-05-03 |
+| CAC (blended) | mart_channel_performance (pending) | Estimate from parquet | Analytics Engineer | 2026-05-03 |
+| CAC (by channel) | mart_channel_performance (pending) | Pending model build | Analytics Engineer | — |
+| ROAS | mart_channel_performance (pending) | Partial | Analytics Engineer | 2026-05-03 |
+| Gross Margin | mart_sku_margin (not built) | Blocked on COGS data | Analytics Engineer | — |
+| Contribution Margin/SKU | mart_sku_margin (not built) | Blocked on COGS data | Analytics Engineer | — |
