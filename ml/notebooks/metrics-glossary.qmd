@@ -1,0 +1,493 @@
+---
+title: "Uncle May's Metrics Glossary"
+subtitle: "Single source of truth for every metric quoted in a board deck"
+author: "Analytics Engineer"
+date: "2026-05-03"
+date-modified: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    theme: flatly
+    code-fold: true
+    self-contained: true
+  pdf:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    geometry: margin=1in
+    fontsize: 11pt
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+library(arrow)
+library(dplyr)
+library(lubridate)
+library(scales)
+library(knitr)
+library(kableExtra)
+
+# Load raw parquet data — path relative to notebooks/ directory
+raw_dir <- normalizePath("../data/raw", mustWork = FALSE)
+
+# Helper: get latest file matching a glob pattern
+latest_parquet <- function(pattern) {
+  files <- list.files(raw_dir, pattern = pattern, full.names = TRUE)
+  if (length(files) == 0) return(NULL)
+  files[which.max(file.mtime(files))]
+}
+
+pi_path  <- latest_parquet("stripe_payment_intents")
+cs_path  <- latest_parquet("stripe_checkout_sessions")
+chg_path <- latest_parquet("stripe_charges")
+cust_path <- latest_parquet("stripe_customers")
+
+pi   <- if (!is.null(pi_path))   read_parquet(pi_path)   else tibble()
+cs   <- if (!is.null(cs_path))   read_parquet(cs_path)   else tibble()
+chg  <- if (!is.null(chg_path))  read_parquet(chg_path)  else tibble()
+cust <- if (!is.null(cust_path)) read_parquet(cust_path) else tibble()
+
+# Orders = succeeded, non-test payment intents
+orders <- pi |>
+  filter(status == "succeeded", !isTRUE(is_test)) |>
+  mutate(
+    amount_dollars = amount_received_cents / 100,
+    order_week  = floor_date(as.Date(created_at), "week", week_start = 1),
+    order_month = floor_date(as.Date(created_at), "month")
+  )
+
+ingest_date <- "2026-05-02"
+```
+
+::: {.callout-note}
+**Data freshness:** Metrics in this document are computed from raw Stripe parquet
+files ingested on **`r ingest_date`**. Re-run `ml/ingest/stripe.py` and
+re-render this document to refresh all numbers.
+:::
+
+# Purpose & Governance
+
+This document is the **single source of truth** for every metric Uncle May's uses
+in board decks, marketing reports, and operational reviews. If a number in any
+report disagrees with a number computed from the SQL in this glossary, the SQL
+wins.
+
+**Owner:** Analytics Engineer (`analytics-engineer` on Paperclip).
+**Review cadence:** Quarterly or whenever a new metric is added to a board deck.
+**Source of record:** `ml/notebooks/metrics-glossary.qmd` committed to the
+website repository.
+**dbt models:** `ml/dbt/uncle_mays/` (see README.md for run instructions).
+
+---
+
+# Revenue Metrics
+
+## Average Order Value (AOV)
+
+**Definition:** Mean gross revenue per completed order, in USD.
+
+**Formula:** `sum(amount_received_cents) / count(orders) / 100`
+
+**Source table:** `mart_orders` (dbt) → `stg_stripe_payment_intents` → raw parquet
+
+**Scope:** Orders with `status = 'succeeded'` and `is_test = false`.
+
+**SQL:**
+```sql
+select avg(gross_revenue_dollars) as aov_dollars
+from mart_orders
+```
+
+**Current value (as of `r ingest_date`):**
+
+```{r aov}
+aov_val <- mean(orders$amount_dollars)
+n_orders <- nrow(orders)
+tibble(
+  Metric = "AOV",
+  Value = dollar(aov_val),
+  `N Orders` = n_orders
+) |>
+  kable(align = c("l","r","r")) |>
+  kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+```
+
+**Notes:** AOV is computed on gross revenue (amount actually received by Stripe).
+Refunded amounts should be subtracted when computing net AOV; refund tracking
+is not yet wired into the mart.
+
+---
+
+## Weekly Revenue
+
+**Definition:** Sum of gross revenue for all completed orders in a calendar week
+(Monday–Sunday ISO week).
+
+**Formula:** `sum(gross_revenue_dollars) group by order_week`
+
+**Source table:** `mart_orders`
+
+**SQL:**
+```sql
+select
+  order_week,
+  sum(gross_revenue_dollars) as weekly_revenue_dollars,
+  count(*)                   as weekly_orders
+from mart_orders
+group by order_week
+order by order_week
+```
+
+**Current values:**
+
+```{r weekly_revenue}
+weekly <- orders |>
+  group_by(order_week) |>
+  summarise(
+    orders  = n(),
+    revenue = sum(amount_dollars),
+    .groups = "drop"
+  ) |>
+  mutate(
+    revenue_fmt  = dollar(revenue),
+    week_label   = format(order_week, "%b %d, %Y")
+  )
+
+weekly |>
+  select(`Week of` = week_label, Orders = orders, Revenue = revenue_fmt) |>
+  kable(align = c("l", "r", "r")) |>
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE)
+```
+
+**Goal:** 30 orders/week (`d45fd7bc` on Paperclip). Current peak:
+`r max(weekly$orders)` orders (week of
+`r format(weekly$order_week[which.max(weekly$orders)], "%b %d, %Y")`).
+
+---
+
+## Gross Revenue (All-Time)
+
+**Definition:** Cumulative sum of `amount_received_cents` across all succeeded,
+non-test payment intents.
+
+```{r total_revenue}
+tibble(
+  Metric = "All-time gross revenue",
+  Value  = dollar(sum(orders$amount_dollars))
+) |>
+  kable(align = c("l","r")) |>
+  kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+```
+
+---
+
+# Customer Metrics
+
+## Customer Lifetime Value (LTV)
+
+**Definition:** Total gross revenue attributed to a single customer across all
+their orders, identified by email address.
+
+**Formula:** `sum(gross_revenue_dollars) group by email_hash`
+
+**Source table:** `mart_customers` (dbt)
+
+**SQL:**
+```sql
+select
+  email_hash,
+  ltv_dollars,
+  total_orders
+from mart_customers
+order by ltv_dollars desc
+```
+
+**Distribution (current):**
+
+```{r ltv}
+ltv <- orders |>
+  group_by(email) |>
+  summarise(
+    ltv    = sum(amount_dollars),
+    orders = n(),
+    .groups = "drop"
+  )
+
+tibble(
+  Statistic  = c("N customers", "Min LTV", "Median LTV", "Mean LTV", "Max LTV"),
+  Value      = c(
+    as.character(nrow(ltv)),
+    dollar(min(ltv$ltv)),
+    dollar(median(ltv$ltv)),
+    dollar(mean(ltv$ltv)),
+    dollar(max(ltv$ltv))
+  )
+) |>
+  kable(align = c("l","r")) |>
+  kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+```
+
+::: {.callout-warning}
+**Small sample caveat:** Only `r nrow(ltv)` unique customers in the current
+dataset. LTV statistics are not stable at this scale. Revisit after N ≥ 50.
+:::
+
+---
+
+## Repeat Purchase Rate
+
+**Definition:** Fraction of customers who have placed more than one order.
+
+**Formula:** `count(customers where total_orders > 1) / count(all customers)`
+
+**Source table:** `mart_customers`
+
+**SQL:**
+```sql
+select
+  countif(total_orders > 1) / count(*) as repeat_rate,
+  countif(total_orders > 1)            as repeat_customers,
+  count(*)                             as total_customers
+from mart_customers
+```
+
+**Current value:**
+
+```{r repeat_rate}
+n_repeat <- sum(ltv$orders > 1)
+n_total  <- nrow(ltv)
+tibble(
+  Metric = c("Total customers", "Repeat customers", "Repeat rate"),
+  Value  = c(
+    as.character(n_total),
+    as.character(n_repeat),
+    percent(n_repeat / n_total, accuracy = 0.1)
+  )
+) |>
+  kable(align = c("l","r")) |>
+  kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+```
+
+::: {.callout-warning}
+**Interpretation caution:** The current repeat rate is driven by 2 customers
+with 18 and 9 orders respectively. This is not a stable cohort-based retention
+metric. Once the customer base grows, compute retention properly as
+"fraction of month-1 customers who placed an order in month-2+."
+:::
+
+---
+
+## Customer Acquisition
+
+**Definition:** Number of new unique customers acquired in a given period
+(first-ever order in that period).
+
+**Source table:** `mart_customers` (acquisition_month column)
+
+**SQL:**
+```sql
+select
+  acquisition_month,
+  count(*) as new_customers
+from mart_customers
+group by acquisition_month
+order by acquisition_month
+```
+
+---
+
+# Conversion Metrics
+
+## Checkout Conversion Rate
+
+**Definition:** Fraction of Stripe Checkout Sessions where payment was collected
+(`payment_status = 'paid'`).
+
+**Formula:** `count(payment_status = 'paid') / count(*)`
+
+**Source table:** `stg_stripe_checkout_sessions`
+
+**SQL:**
+```sql
+select
+  count(case when is_converted then 1 end)  as converted_sessions,
+  count(*)                                  as total_sessions,
+  avg(cast(is_converted as int)) * 100      as checkout_cvr_pct
+from stg_stripe_checkout_sessions
+```
+
+**Current value:**
+
+```{r checkout_cvr}
+if (nrow(cs) > 0) {
+  paid  <- sum(cs$payment_status == "paid", na.rm = TRUE)
+  total <- nrow(cs)
+  tibble(
+    Metric = c("Total sessions", "Paid sessions", "Checkout CVR"),
+    Value  = c(
+      comma(total),
+      comma(paid),
+      percent(paid/total, accuracy = 0.1)
+    )
+  ) |>
+    kable(align = c("l","r")) |>
+    kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+}
+```
+
+**Notes:**
+- Sessions prior to 2026-05-03 lack UTM/attribution metadata.
+- Checkout CVR ≠ site-wide conversion rate. Site-wide CVR uses GA4 sessions
+  as the denominator (see section below).
+
+---
+
+## Site-Wide Conversion Rate (GA4)
+
+**Definition:** Fraction of GA4 sessions that resulted in a completed purchase.
+
+**Formula:** `purchase_events / total_sessions` from GA4 BigQuery export.
+
+**Source:** `analytics_494626869.events_YYYYMMDD` (BigQuery, daily sharded)
+
+**SQL (BigQuery):**
+```sql
+select
+  count(distinct session_id)                                          as sessions,
+  count(distinct case when event_name = 'purchase' then session_id end)
+                                                                      as purchase_sessions,
+  safe_divide(
+    count(distinct case when event_name = 'purchase' then session_id end),
+    count(distinct session_id)
+  )                                                                   as site_cvr
+from `uncle-mays-automation.analytics_494626869.events_*`
+where _table_suffix between '20260429' and format_date('%Y%m%d', current_date())
+```
+
+**Baseline:** 0.10% site-wide CVR as of CIO audit 2026-04-29.
+GA4 export only started 2026-04-29; historical data is not available.
+
+---
+
+## Checkout Abandonment Rate
+
+**Definition:** Fraction of checkout sessions where the customer did not pay
+and the session expired.
+
+**Formula:** `1 - checkout_cvr`
+
+```{r abandonment}
+if (nrow(cs) > 0) {
+  paid  <- sum(cs$payment_status == "paid", na.rm = TRUE)
+  total <- nrow(cs)
+  tibble(
+    Metric = "Abandonment rate",
+    Value  = percent(1 - paid/total, accuracy = 0.1)
+  ) |>
+    kable(align = c("l","r")) |>
+    kable_styling(bootstrap_options = c("condensed"), full_width = FALSE)
+}
+```
+
+---
+
+# Marketing & Acquisition Metrics
+
+## Customer Acquisition Cost (CAC)
+
+**Definition:** Total paid ad spend divided by number of new customers acquired
+in the same period, by channel.
+
+**Formula:** `sum(ad_spend_dollars) / count(new_customers)` by channel/week
+
+**Source table:** `mart_channel_performance` (dbt)
+
+**SQL:**
+```sql
+select
+  order_week,
+  channel,
+  ad_spend_dollars,
+  new_customers,
+  ad_spend_dollars / nullif(new_customers, 0) as cac_dollars
+from mart_channel_performance
+```
+
+**Status:** ⚠️ **Not computable.** Meta Ads and Google Ads parquet data
+exists at `ml/data/raw/` but has not been loaded to BigQuery yet.
+CAC will be available once:
+1. `ml/ingest/meta_ads.py` and `ml/ingest/google_ads.py` outputs are
+   loaded to BQ (`meta_ads_raw` and `google_ads_raw` datasets), and
+2. `mart_ad_spend` dbt model is built.
+
+---
+
+## Return on Ad Spend (ROAS)
+
+**Definition:** Gross revenue divided by ad spend in the same period and channel.
+
+**Formula:** `sum(gross_revenue_dollars) / sum(ad_spend_dollars)`
+
+**Status:** ⚠️ **Not computable.** Same blocker as CAC above.
+
+---
+
+# Financial Metrics
+
+## Gross Margin
+
+**Definition:** (Gross Revenue − COGS) / Gross Revenue.
+
+**Status:** ⚠️ **Not computable.** COGS requires:
+1. SKU-level cost data from the COO (vendor prices, not yet in Airtable)
+2. SKU quantities per order (requires parsing `cart_json` in `mart_orders`)
+
+Once cost data is available, this will be built as `mart_sku_margin`.
+
+---
+
+## Contribution Margin per SKU
+
+**Definition:** (Revenue per unit − Variable cost per unit) / Revenue per unit.
+
+**Status:** ⚠️ **Not computable.** Same blocker as gross margin.
+Customer-facing prices are in Airtable (`appm6F6H9obydzAM2` table `Catalog`).
+Vendor costs are not yet tracked.
+
+---
+
+# Data Quality Notes
+
+| Source | Freshness | Known Issues |
+|--------|-----------|--------------|
+| Stripe PaymentIntents | 2026-05-02 | UTM/fbclid/gclid null before 2026-05-03 (attribution fix date) |
+| Stripe CheckoutSessions | 2026-05-02 | 285 of 303 sessions unpaid; includes visitors who opened but never submitted checkout |
+| Stripe Charges | 2026-05-02 | Matches PIs closely but 15 fewer rows; some PIs have no charge record |
+| GA4 BigQuery export | Daily from 2026-04-29 | Short history; no pre-2026-04-29 session data |
+| Meta Ads | 2026-05-02 | Parquet exists locally; not in BQ yet |
+| Google Ads | 2026-05-02 | Parquet exists locally; not in BQ yet |
+| Mailchimp | 2026-05-02 | Members parquet available; not yet joined to orders |
+| Airtable Catalog | Live | 45 active SKUs; no vendor cost column |
+
+---
+
+# Appendix: Metric Ownership
+
+| Metric | dbt Model | Status | Owner | Last Reviewed |
+|--------|-----------|--------|-------|---------------|
+| AOV | mart_orders | Live | Analytics Engineer | 2026-05-03 |
+| Weekly Revenue | mart_orders | Live | Analytics Engineer | 2026-05-03 |
+| All-time Revenue | mart_orders | Live | Analytics Engineer | 2026-05-03 |
+| Customer LTV | mart_customers | Live | Analytics Engineer | 2026-05-03 |
+| Repeat Purchase Rate | mart_customers | Live | Analytics Engineer | 2026-05-03 |
+| Checkout CVR | stg_stripe_checkout_sessions | Live | Analytics Engineer | 2026-05-03 |
+| Site-wide CVR | GA4 (BQ direct) | Live (BQ only) | Analytics Engineer | 2026-05-03 |
+| CAC | mart_channel_performance | Pending ad spend load | Analytics Engineer | — |
+| ROAS | mart_channel_performance | Pending ad spend load | Analytics Engineer | — |
+| Gross Margin | mart_sku_margin (not built) | Pending COGS data | Analytics Engineer | — |
+| Contribution Margin/SKU | mart_sku_margin (not built) | Pending COGS data | Analytics Engineer | — |
