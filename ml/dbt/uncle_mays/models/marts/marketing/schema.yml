@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: mart_channel_performance
+    description: >
+      Weekly channel-level aggregation of orders and revenue.
+      Used for CAC and ROAS reporting. Ad spend columns are null
+      until mart_ad_spend is built (pending BQ load of Meta/Google
+      Ads parquet data).
+    columns:
+      - name: order_week
+        description: ISO week start date (Monday)
+        tests:
+          - not_null
+      - name: channel
+        description: Derived channel label
+        tests:
+          - not_null
+      - name: orders
+        description: Count of completed orders in this channel/week
+        tests:
+          - not_null
+      - name: gross_revenue_dollars
+        description: Sum of gross revenue for this channel/week
+        tests:
+          - not_null

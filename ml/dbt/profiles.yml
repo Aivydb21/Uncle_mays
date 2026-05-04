@@ -1,0 +1,22 @@
+uncle_mays:
+  target: dev
+  outputs:
+    dev:
+      # DuckDB for local development — reads parquet files directly from ml/data/raw/
+      # Run:  dbt run --target dev
+      type: duckdb
+      path: "C:/Users/Anthony/Desktop/um_website/ml/data/uncle_mays_dev.duckdb"
+      threads: 4
+
+    prod:
+      # BigQuery for production — all raw data must be loaded first (see ml/ingest/)
+      # Run:  dbt run --target prod
+      type: bigquery
+      method: service-account
+      project: uncle-mays-automation
+      dataset: uncle_mays_dbt
+      keyfile: "~/.claude/ga-service-account.json"
+      location: US
+      threads: 4
+      timeout_seconds: 300
+      priority: interactive

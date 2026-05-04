@@ -1,0 +1,98 @@
+version: 2
+
+models:
+  - name: stg_stripe_charges
+    description: >
+      One row per Stripe Charge. Includes both paid and failed charges.
+      Source: stripe_charges_*.parquet (ingest via ml/ingest/stripe.py).
+    columns:
+      - name: charge_id
+        description: Stripe charge ID (ch_...)
+        tests:
+          - unique
+          - not_null
+      - name: amount_dollars
+        description: Charge amount in USD dollars (amount_cents / 100)
+        tests:
+          - not_null
+      - name: charge_status
+        description: Stripe charge status (succeeded, failed, pending)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['succeeded', 'failed', 'pending']
+      - name: is_paid
+        description: True if Stripe reports the charge as paid
+        tests:
+          - not_null
+      - name: created_at
+        description: Timestamp when charge was created (UTC)
+        tests:
+          - not_null
+
+  - name: stg_stripe_checkout_sessions
+    description: >
+      One row per Stripe Checkout Session. Includes both paid and
+      abandoned sessions. 303 sessions as of 2026-05-02 ingest;
+      18 paid (5.9% checkout conversion).
+    columns:
+      - name: checkout_session_id
+        description: Stripe checkout session ID (cs_...)
+        tests:
+          - unique
+          - not_null
+      - name: payment_status
+        description: Stripe payment status (paid, unpaid, no_payment_required)
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['paid', 'unpaid', 'no_payment_required']
+      - name: is_converted
+        description: True if payment_status = 'paid'
+        tests:
+          - not_null
+      - name: created_at
+        description: Timestamp when session was created (UTC)
+        tests:
+          - not_null
+
+  - name: stg_stripe_customers
+    description: >
+      One row per Stripe Customer. Created at checkout initiation,
+      so includes both purchasers and non-converting visitors who
+      provided an email.
+    columns:
+      - name: customer_id
+        description: Stripe customer ID (cus_...)
+        tests:
+          - unique
+          - not_null
+      - name: created_at
+        tests:
+          - not_null
+
+  - name: stg_stripe_payment_intents
+    description: >
+      One row per Stripe PaymentIntent. Carries the authoritative
+      attribution metadata (UTM, gclid, fbclid, fbc, fbp) and full
+      cart breakdown. 141 rows as of 2026-05-02 ingest.
+    columns:
+      - name: payment_intent_id
+        description: Stripe payment intent ID (pi_...)
+        tests:
+          - unique
+          - not_null
+      - name: pi_status
+        description: PaymentIntent status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['succeeded', 'canceled', 'requires_payment_method',
+                       'requires_confirmation', 'requires_action',
+                       'processing', 'requires_capture']
+      - name: amount_dollars
+        tests:
+          - not_null
+      - name: created_at
+        tests:
+          - not_null

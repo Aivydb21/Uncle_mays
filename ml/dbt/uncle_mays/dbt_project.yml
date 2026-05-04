@@ -1,0 +1,41 @@
+name: 'uncle_mays'
+version: '1.0.0'
+config-version: 2
+
+profile: 'uncle_mays'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  uncle_mays:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      core:
+        +materialized: table
+        +schema: core
+      marketing:
+        +materialized: table
+        +schema: marketing
+      finance:
+        +materialized: table
+        +schema: finance
+
+vars:
+  # Stripe data lands in this BQ dataset after ingest
+  stripe_dataset: "stripe_raw"
+  # GA4 export dataset
+  ga4_dataset: "analytics_494626869"
+  # Currency for all money fields
+  default_currency: "usd"

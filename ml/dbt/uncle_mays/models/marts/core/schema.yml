@@ -1,0 +1,72 @@
+version: 2
+
+models:
+  - name: mart_orders
+    description: >
+      One row per completed order (PaymentIntent.status = 'succeeded').
+      Authoritative revenue fact table. Sources from stg_stripe_payment_intents
+      joined to stg_stripe_checkout_sessions.
+
+      Key metrics derivable from this table:
+        - AOV: avg(gross_revenue_dollars)
+        - Weekly revenue: sum(gross_revenue_dollars) group by order_week
+        - Repeat purchase: is_first_order = false
+        - Attribution: channel, utm_source, utm_medium, utm_campaign
+    columns:
+      - name: payment_intent_id
+        description: Primary key — Stripe payment intent ID (pi_...)
+        tests:
+          - unique
+          - not_null
+      - name: ordered_at
+        description: Timestamp of order creation (UTC)
+        tests:
+          - not_null
+      - name: gross_revenue_dollars
+        description: >
+          Amount received in USD. Use this for revenue reporting.
+          Equals amount_received_cents / 100 from Stripe.
+        tests:
+          - not_null
+      - name: channel
+        description: >
+          Derived acquisition channel. Values: google_ads, meta_ads,
+          email, organic_social, organic_search, referral, direct, other.
+          Based on has_gclid, has_fbclid, utm_medium, utm_source.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['google_ads', 'meta_ads', 'email', 'organic_social',
+                       'organic_search', 'referral', 'direct', 'other']
+
+  - name: mart_customers
+    description: >
+      One row per unique customer (keyed on email_hash). Aggregates
+      order history to produce LTV, AOV, and acquisition channel.
+
+      Key metrics derivable from this table:
+        - LTV: ltv_dollars
+        - Repeat rate: count(is_repeat_customer) / count(*)
+        - Cohort revenue: sum(ltv_dollars) group by acquisition_month
+    columns:
+      - name: email_hash
+        description: Primary key — SHA-256 hash of customer email
+        tests:
+          - unique
+          - not_null
+      - name: total_orders
+        description: Lifetime order count for this customer
+        tests:
+          - not_null
+      - name: ltv_dollars
+        description: Total lifetime revenue from this customer
+        tests:
+          - not_null
+      - name: aov_dollars
+        description: Average order value for this customer
+        tests:
+          - not_null
+      - name: is_repeat_customer
+        description: True if customer has placed more than one order
+        tests:
+          - not_null
