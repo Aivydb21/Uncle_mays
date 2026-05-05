@@ -1,20 +1,18 @@
-import type { Metadata } from "next";
-import { GetStartedContent } from "./GetStartedContent";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Get Your First Order — Uncle May's Produce",
-  description:
-    "Build your own grocery order from Uncle May's catalog — produce, pantry, and pasture-raised protein. Use code FRESH10 for $10 off your first order. Free Chicago delivery, $25 minimum.",
-  openGraph: {
-    title: "Get Your First Order — $10 off with FRESH10",
-    description:
-      "Build your own order from Uncle May's catalog. $10 off your first order with FRESH10. Free Chicago delivery, $25 minimum.",
-    url: "https://unclemays.com/get-started",
-    type: "website",
-  },
-  alternates: { canonical: "https://unclemays.com/get-started" },
-};
-
-export default function GetStartedPage() {
-  return <GetStartedContent />;
+/**
+ * Legacy ad-funnel landing page. The catalog launch on 2026-04-30 made this
+ * redundant: ads now point directly at /shop. UTM params are forwarded so
+ * GA4 + Meta Pixel attribution is preserved on any old backlinks or
+ * lingering ad creatives that still hit this URL.
+ */
+export default async function GetStartedPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string>>;
+}) {
+  const params = await searchParams;
+  const merged = { promo: "FRESH10", ...params };
+  const qs = new URLSearchParams(merged).toString();
+  redirect(`/shop?${qs}`);
 }
