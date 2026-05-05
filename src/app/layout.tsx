@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Work_Sans } from "next/font/google";
+import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";
 
@@ -68,21 +69,32 @@ export default function RootLayout({
     <html lang="en" className={`${playfair.variable} ${workSans.variable}`}>
       <body>
         {/*
-          All tracking scripts (GTM, GA4, Google Ads, Meta Pixel, Clarity) are
-          injected by <DeferredAnalytics />. They wait 3s after mount OR until
-          the user scrolls/taps/types — whichever fires first — before any
-          third-party script tag is added to the DOM. This keeps the
-          12.7s mobile Time-to-Interactive measured on 2026-05-05 from
-          blocking the catalog grid for paid-traffic landings.
+          Tracking-script bootstrap.
 
-          PageView events still fire because the deferred load uses Next.js
-          strategy="lazyOnload"; the only attribution loss is the small
-          fraction of users who bounce within 3s without scrolling/tapping —
-          which is exactly the audience the deferral is meant to retain.
+          Step 1 (this inline stub, fires immediately, ~0.4 KB): defines
+          window.fbq and window.gtag as queueing stubs so that any
+          AddToCart / InitiateCheckout event triggered before the
+          full pixels load is buffered, not dropped. Mirrors the queue
+          pattern inside Meta's own pixel snippet.
+
+          Step 2 (<DeferredAnalytics />, mounts after 3s OR first user
+          interaction): swaps the network <script> tags for GTM, GA4,
+          Google Ads, Meta Pixel, and Clarity. When fbevents.js / gtag.js
+          load, they read the queued calls from f._fbq.queue and
+          window.dataLayer respectively, so all earlier events fire
+          retroactively with their correct payload.
+
+          This split keeps the 12.7s mobile TTI measured on 2026-05-05 from
+          blocking the catalog grid for paid-traffic landings, without
+          losing the AddToCart / InitiateCheckout events that drive Meta's
+          optimization signal.
 
           Authorized by CEO Anthony Ivy on 2026-05-05 against the Marketing
           Infrastructure Standing Order.
         */}
+        <Script id="analytics-stubs" strategy="beforeInteractive">
+          {`!function(){var w=window;w.dataLayer=w.dataLayer||[];if(!w.gtag){w.gtag=function(){w.dataLayer.push(arguments)}}if(!w.fbq){var n=w.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};w._fbq=w._fbq||n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}}();`}
+        </Script>
         <DeferredAnalytics />
 
         <noscript>

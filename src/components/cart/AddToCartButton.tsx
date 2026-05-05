@@ -107,7 +107,8 @@ function fireAnalytics(item: CatalogItem, newQty: number) {
     };
     const value = (item.priceCents * newQty) / 100;
 
-    // Meta Pixel fires immediately (loaded synchronously earlier in page lifecycle)
+    // Meta Pixel. fbq is pre-stubbed in layout.tsx so calls made before
+    // fbevents.js loads are buffered into the queue and replayed.
     if (w.fbq) {
       w.fbq("track", "AddToCart", {
         content_name: item.name,
@@ -118,7 +119,7 @@ function fireAnalytics(item: CatalogItem, newQty: number) {
       });
     }
 
-    // GA4 gtag uses lazyOnload strategy, so retry up to 8s for early cart adds
+    // GA4 gtag. Stubbed in layout.tsx; retry kept as belt-and-braces.
     let attempts = 0;
     const maxAttempts = 8;
     const tryGtag = () => {

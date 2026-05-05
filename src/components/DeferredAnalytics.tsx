@@ -50,8 +50,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </Script>
       ) : null}
 
+      {/* Meta Pixel: window.fbq + window._fbq.queue are pre-stubbed in
+          layout.tsx so calls made before this script loads are buffered,
+          not dropped. We skip the snippet's `if(f.fbq)return` self-guard
+          and just inject the network script + init + PageView; fbevents.js
+          will flush the queue when it loads. */}
       <Script id="fb-pixel" strategy="lazyOnload">
-        {`!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','2276705169443313');fbq('track','PageView');`}
+        {`!function(b,e,v){var t=b.createElement(e);t.async=!0;t.src=v;var s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','2276705169443313');fbq('track','PageView');`}
       </Script>
 
       {clarityId ? (

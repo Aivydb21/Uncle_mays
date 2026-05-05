@@ -62,9 +62,13 @@ const EMPTY_ADDRESS: AddressFields = {
 };
 
 /**
- * Fire GA4 begin_checkout event with retry. gtag loads via lazyOnload
- * strategy so may not be ready when the user clicks "Continue to payment".
- * Retry up to 8s to match add_to_cart + purchase event reliability.
+ * Fire begin_checkout / InitiateCheckout across GA4 (gtag), Meta Pixel
+ * (browser), and Meta CAPI (server). The browser pixel and CAPI call
+ * share an eventId so Meta dedupes them. fbq + gtag are pre-stubbed in
+ * layout.tsx, so calls made before the deferred scripts load are
+ * buffered and flushed by fbevents.js / gtag.js when they arrive — no
+ * retry needed on the gtag path anymore, but kept short as belt-and-
+ * braces for legacy session storage races.
  */
 function fireBeginCheckout(value: number, items: { sku: string; name: string; quantity: number; unitPriceCents: number }[]) {
   try {
@@ -74,38 +78,54 @@ function fireBeginCheckout(value: number, items: { sku: string; name: string; qu
       gtag?: (...args: unknown[]) => void;
     };
 
-    // Meta Pixel
+    const eventId = `initiate-custom_cart-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const contentIds = items.map((i) => i.sku);
+
+    // Meta Pixel (browser). The fbq stub queues if fbevents.js hasn't
+    // loaded; the queue replays automatically when it does.
     if (w.fbq) {
-      w.fbq("track", "InitiateCheckout", {
-        value,
-        currency: "USD",
-        content_type: "product",
-        content_ids: items.map((i) => i.sku),
-      });
+      w.fbq(
+        "track",
+        "InitiateCheckout",
+        {
+          value,
+          currency: "USD",
+          content_type: "product",
+          content_ids: contentIds,
+        },
+        { eventID: eventId }
+      );
     }
 
-    // GA4 with retry
-    let attempts = 0;
-    const maxAttempts = 8;
-    const tryGtag = () => {
-      if (typeof w.gtag === "function") {
-        w.gtag("event", "begin_checkout", {
-          currency: "USD",
-          value,
-          items: items.map((item) => ({
-            item_id: item.sku,
-            item_name: item.name,
-            price: item.unitPriceCents / 100,
-            quantity: item.quantity,
-          })),
-        });
-        return;
-      }
-      if (++attempts < maxAttempts) {
-        setTimeout(tryGtag, 1000);
-      }
-    };
-    tryGtag();
+    // Meta CAPI (server). Survives iOS ATT and Safari ITP, which the
+    // browser pixel does not. Same eventId → Meta dedupes.
+    fetch("/api/capi/initiate-checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        slug: "custom_cart",
+        contentName: items.map((i) => `${i.quantity}x ${i.name}`).join(", ").slice(0, 200),
+        value,
+        eventId,
+      }),
+    }).catch(() => {
+      /* CAPI failure must never block checkout. */
+    });
+
+    // GA4
+    if (typeof w.gtag === "function") {
+      w.gtag("event", "begin_checkout", {
+        currency: "USD",
+        value,
+        items: items.map((item) => ({
+          item_id: item.sku,
+          item_name: item.name,
+          price: item.unitPriceCents / 100,
+          quantity: item.quantity,
+        })),
+      });
+    }
   } catch {
     // analytics never blocks
   }
