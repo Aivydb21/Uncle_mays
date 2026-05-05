@@ -42,7 +42,7 @@ export function PromoStrip() {
       <div className="container flex items-center justify-center gap-3 px-6 py-2 text-center text-sm">
         <span className="font-semibold">
           🎁 New customer? Use code{" "}
-          <span className="rounded bg-primary-foreground/15 px-2 py-0.5 font-bold tracking-wider">
+          <span className="rounded bg-primary-foreground px-2 py-0.5 font-bold tracking-wider text-primary">
             FRESH10
           </span>{" "}
           for $10 off your first order over $25
