@@ -6,7 +6,7 @@
 > ### 🛑 Standing Order — Marketing & Advertising Infrastructure (effective 2026-04-29)
 > **No agent (Paperclip, Claude Code, or otherwise) may change, pause, launch, or otherwise impact marketing or advertising infrastructure without explicit board approval (CEO: Anthony Ivy).**
 >
-> **In scope (touching requires board approval first):** Meta (FB/IG) + Google Ads accounts and everything in them (campaigns, ad sets, creatives, audiences, budgets, schedules, conversion events, pixel/tag config); Mailchimp newsletter audience changes, campaign drafts, scheduled sends; promo codes (`FRESH10`, `FRESH30`, future codes) AND the underlying Stripe coupon registry (`fresh*-apr-2026`); marketing landing pages (`/ask` and future ad-funnel variants — both code and copy); organic social posts on owned accounts (FB Page 755316477673748, Uncle May's IG, LinkedIn company); attribution wiring tied to the above (UTM parameters used in marketing URLs, Meta Pixel + CAPI, Google Ads conversion tracking, GA4 events feeding ad optimization).
+> **In scope (touching requires board approval first):** Meta (FB/IG) + Google Ads accounts and everything in them (campaigns, ad sets, creatives, audiences, budgets, schedules, conversion events, pixel/tag config); Mailchimp newsletter audience changes, campaign drafts, scheduled sends; promo codes (`FRESH10`, `FRESH30`, future codes) AND the underlying Stripe coupon registry (`fresh*-apr-2026`); marketing landing pages (any future ad-funnel variants — both code and copy; the `/ask` page referenced in earlier docs no longer exists, current ads route to `/shop`); organic social posts on owned accounts (FB Page 755316477673748, Uncle May's IG, LinkedIn company); attribution wiring tied to the above (UTM parameters used in marketing URLs, Meta Pixel + CAPI, Google Ads conversion tracking, GA4 events feeding ad optimization).
 >
 > **Out of scope (touch freely):** transactional emails (order confirmation, payment failed, shipping); core product pages (`/`, `/shop`, `/faq`, `/about`) unless changes are part of an active ad test; investor / BD outreach via Apollo (that is BD/IR, not consumer marketing); internal-only analytics dashboards.
 >
@@ -281,6 +281,47 @@ Anthony manages Apollo outreach through Claude. Full workflow doc: `investor-out
 - `/newsletter draft` — Create campaign in saved state for Mailchimp UI review
 - `/newsletter stats` — Pull campaign performance and audience growth
 - `/newsletter list` — Show audience segments and member counts
+
+## Airtable API
+
+- **Config:** `~/.claude/airtable-config.json` (PAT + base URL + base IDs)
+- **Base URL:** `https://api.airtable.com/v0`
+- **Auth:** `Authorization: Bearer <pat>` header
+- **PAT name:** `Uncle_Mays` (personal access token)
+- **Bases:**
+  - `appHgPTKlcuFKajQp` — Black Vendors
+  - `app3raEVB9kHeUoHE` — Product Mix Table
+  - `appm6F6H9obydzAM2` — Contacts
+- **Docs:** https://airtable.com/developers/web/api/introduction
+
+### Airtable API Usage
+
+```bash
+# List bases the token can see
+curl -sS 'https://api.airtable.com/v0/meta/bases' \
+  -H "Authorization: Bearer $AIRTABLE_PAT"
+
+# List tables in a base (schema)
+curl -sS 'https://api.airtable.com/v0/meta/bases/appHgPTKlcuFKajQp/tables' \
+  -H "Authorization: Bearer $AIRTABLE_PAT"
+
+# List records in a table (URL-encode the table name if it has spaces)
+curl -sS 'https://api.airtable.com/v0/appHgPTKlcuFKajQp/Vendors?maxRecords=10' \
+  -H "Authorization: Bearer $AIRTABLE_PAT"
+
+# Create a record
+curl -sS -X POST 'https://api.airtable.com/v0/appHgPTKlcuFKajQp/Vendors' \
+  -H "Authorization: Bearer $AIRTABLE_PAT" \
+  -H 'Content-Type: application/json' \
+  -d '{"records":[{"fields":{"Name":"Example Vendor"}}]}'
+```
+
+### Airtable Integration Rules
+
+- Treat Airtable as a **read-first** source for vendor, product, and contact data. Verify table schema with `meta/bases/{baseId}/tables` before writing — column names and types are owned by the humans curating the bases.
+- Writes (create/update/delete) require explicit user direction. Never bulk-mutate without a dry-run preview.
+- Pagination: list endpoints cap at 100 records per page; follow `offset` until empty when scanning a whole table.
+- Rate limit: 5 requests/sec/base. Batch writes use the records array (up to 10 records per request) instead of looping.
 
 ## Resend API — Transactional email
 
