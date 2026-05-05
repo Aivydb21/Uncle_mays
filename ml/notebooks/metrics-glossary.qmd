@@ -2,7 +2,7 @@
 title: "Uncle May's Metrics Glossary"
 subtitle: "Single source of truth for every metric quoted in a board deck"
 author: "Analytics Engineer"
-date: "2026-05-03"
+date: "2026-05-04"
 date-modified: today
 format:
   html:
@@ -70,8 +70,8 @@ orders <- pi |>
     order_month    = floor_date(order_date, "month")
   )
 
-ref_date   <- as.Date("2026-05-03")
-ingest_date <- "2026-05-02"
+ref_date   <- as.Date("2026-05-04")
+ingest_date <- "2026-05-04"
 
 # Customer-level aggregation
 customers <- orders |>
@@ -153,9 +153,12 @@ tibble(
 **AOV by SKU category:**
 
 ::: {.callout-warning}
-**Data gap:** `cart_json` is only populated for a subset of orders (attribution
-wiring was incomplete before 2026-05-03). AOV by SKU category is not computable
-until cart-level data is consistently captured. Track via [UNC-767](/UNC/issues/UNC-767).
+**Partially resolved (2026-05-04):** `cart_json` audit complete ([UNC-784](/UNC/issues/UNC-784)).
+The `/api/checkout/intent` path now reliably writes `cart_json` line items; subscribe-intent
+and legacy routes do not. Historical backfill is not feasible (no SKU-level source exists for
+pre-2026-05-04 orders). AOV by SKU is computable for new orders going forward once a sufficient
+post-fix dataset accumulates (~2–4 weeks). Ingest pipeline confirmed to read and surface `cart_json`
+into processed parquet.
 :::
 
 ---
@@ -565,11 +568,13 @@ select
 from sessions
 ```
 
-**Current data availability:** ⚠️ **Partial.** GA4 session parquet records 276
-sessions but `add_to_cart` and `begin_checkout` event counts are all zero.
-This indicates GA4 custom event tracking (add_to_cart, begin_checkout) is
-**not firing** — only the native `purchase` event is captured. Full funnel
-analysis requires fixing GA4 event tracking in the checkout flow.
+**Current data availability:** ⚠️ **Fix deployed — data accumulating.** GA4 event
+tracking was repaired on 2026-05-04 (commit `dba2ac4`, [UNC-783](/UNC/issues/UNC-783)).
+`add_to_cart` and `begin_checkout` events now fire from the checkout flow, with 8-second
+retry logic on add-to-cart and Meta Pixel events (AddToCart, InitiateCheckout) also wired.
+Historical sessions (pre-2026-05-04) still show zero for these events; funnel analysis will
+become meaningful once ~1–2 weeks of post-fix data lands in BigQuery. Full funnel is
+computable from 2026-05-05 onwards.
 
 **Baseline (available today):**
 
@@ -598,8 +603,8 @@ if (nrow(ga4) > 0) {
     ),
     Note = c(
       "GA4 export from 2026-04-29",
-      "⚠ GA4 event not firing",
-      "⚠ GA4 event not firing",
+      "⚠ Historical: event not firing pre-2026-05-04; fix deployed",
+      "⚠ Historical: event not firing pre-2026-05-04; fix deployed",
       "GA4 purchase event active"
     )
   ) |>
@@ -613,8 +618,9 @@ if (nrow(ga4) > 0) {
   median for specialty food DTC is 1–3%)
 - Add-to-Cart → Purchase: ≥ 25%
 
-**Action required:** File GA4 event tracking fix with CTO. Without this data
-the funnel cannot be optimized.
+**Status:** Fix deployed 2026-05-04 ([UNC-783](/UNC/issues/UNC-783)). Funnel data
+will be available in BigQuery from 2026-05-05. Re-run this glossary in 1–2 weeks
+to populate live funnel rates.
 
 ---
 
@@ -836,12 +842,13 @@ Measures how much of each revenue dollar remains after paying for the produce.
 
 **Source table:** `mart_sku_margin` (not yet built)
 
-**Current data availability:** ⚠️ **Not computable.** COGS requires:
-1. Vendor cost per SKU — not yet in Airtable Catalog table
-2. SKU quantity per order — requires consistent `cart_json` capture
-
-**Action required:** COO to add vendor cost column to Airtable Catalog.
-Data Engineer to ensure `cart_json` is populated for every order.
+**Current data availability:** ⚠️ **COGS resolved; SKU quantity still accumulating.**
+- **Vendor COGS:** ✅ Confirmed in Airtable Catalog ([UNC-785](/UNC/issues/UNC-785)).
+  Field `CostCents` (`fldDl9G5rq2CIhrnD`) in base `appm6F6H9obydzAM2`, table `tblkRY8kju3Dn5Hq2`
+  — operator-edited vendor cost in cents, populated for all 45 active SKUs.
+- **SKU quantity per order:** ⚠️ `cart_json` now populates on new orders via the intent checkout
+  path (fix deployed 2026-05-04). Historical orders cannot be backfilled. Gross margin will be
+  computable on a per-order basis for post-2026-05-04 orders as `cart_json` data accumulates.
 
 **Target:** Gross margin ≥ 35% (specialty produce DTC typical range: 30–45%).
 
@@ -857,32 +864,35 @@ and which should be repriced or dropped.
 
 **Source table:** `mart_sku_margin` (not yet built)
 
-**Current data availability:** ⚠️ **Not computable.** Same blockers as Gross Margin.
-Customer-facing prices are in Airtable (`appm6F6H9obydzAM2`, table `Catalog`,
-45 active SKUs). Vendor costs are missing.
+**Current data availability:** ⚠️ **Partially unblocked (2026-05-04).**
+- Customer-facing prices: ✅ Airtable Catalog (`appm6F6H9obydzAM2`), 45 active SKUs.
+- Vendor COGS: ✅ `CostCents` field confirmed populated for all 45 SKUs ([UNC-785](/UNC/issues/UNC-785)).
+- SKU quantity per order: ⚠️ `cart_json` now populates on new intent-path orders.
+  Contribution margin per SKU computable for new orders once ~2 weeks of post-2026-05-04 data lands.
+- Requires: `mart_sku_margin` dbt model (not yet built).
 
 ---
 
 # Data Quality & Coverage Summary
 
-| Metric | Status | Computable Today? | Key Blocker |
-|--------|--------|-------------------|-------------|
+| Metric | Status | Computable Today? | Key Blocker / Note |
+|--------|--------|-------------------|--------------------|
 | AOV (total) | ✅ Live | Yes | — |
-| AOV by SKU category | ⚠️ Partial | No | `cart_json` inconsistent |
+| AOV by SKU category | ⚠️ Accumulating | Not yet (new orders only) | `cart_json` fix deployed 2026-05-04; historical backfill not feasible |
 | Weekly Revenue | ✅ Live | Yes | — |
 | LTV (all-time) | ✅ Live | Yes | N too small for inference |
 | LTV (30/90/365-day) | ✅ Live | Yes | N too small for inference |
 | Order Frequency | ✅ Live | Yes | N too small for inference |
-| Retention Rate (30/60/90d) | ⚠️ Partial | Point-in-time only | Need cohort model |
+| Retention Rate (30/60/90d) | ⚠️ Partial | Point-in-time only | Need cohort model (`mart_customer_cohorts`) |
 | Repeat Purchase Rate | ✅ Live | Yes | — |
 | Checkout CVR (Stripe) | ✅ Live | Yes | — |
-| Full Funnel CVR (GA4) | ⚠️ Partial | Partial | GA4 events not firing |
+| Full Funnel CVR (GA4) | ⚠️ Accumulating | Not yet (new data only) | GA4 events fixed 2026-05-04 ([UNC-783](/UNC/issues/UNC-783)); live from 2026-05-05 |
 | Site-wide CVR | ✅ Live | Yes | Short history (from Apr 29) |
 | CAC (blended) | ✅ Live | Yes (estimate) | UTM attribution sparse pre-May 3 |
-| CAC (by channel) | ⚠️ Pending | No | `mart_channel_performance` not built |
+| CAC (by channel) | ⚠️ Pending | No | `mart_channel_performance` not built; needs 2–4 more weeks attributed data |
 | ROAS | ⚠️ Pending | Blended only | Channel attribution needed |
-| Gross Margin | ❌ Blocked | No | Vendor costs missing from Airtable |
-| Contribution Margin/SKU | ❌ Blocked | No | Same as Gross Margin |
+| Gross Margin | ⚠️ Accumulating | Not yet (new orders only) | COGS confirmed ([UNC-785](/UNC/issues/UNC-785)); needs `cart_json` SKU data to accumulate |
+| Contribution Margin/SKU | ⚠️ Accumulating | Not yet (new orders only) | Same as Gross Margin; needs `mart_sku_margin` dbt model |
 
 ---
 
@@ -892,11 +902,11 @@ Customer-facing prices are in Airtable (`appm6F6H9obydzAM2`, table `Catalog`,
 |--------|--------------|--------------|
 | Stripe PaymentIntents | 2026-05-02 | UTM/fbclid/gclid null before 2026-05-03 |
 | Stripe CheckoutSessions | 2026-05-02 | Most sessions unpaid (checkout page opens ≠ intent to buy) |
-| GA4 BigQuery export | Daily from 2026-04-29 | `add_to_cart` / `begin_checkout` events not firing |
+| GA4 BigQuery export | Daily from 2026-04-29 | `add_to_cart` / `begin_checkout` events fixed 2026-05-04 (commit `dba2ac4`); live from 2026-05-05 |
 | Meta Ads | 2026-05-02 | Local parquet only; not yet in BigQuery |
 | Google Ads | 2026-05-02 | Local parquet only; not yet in BigQuery |
 | Mailchimp | 2026-05-02 | Not yet joined to orders |
-| Airtable Catalog | Live (API) | 45 active SKUs; vendor cost column missing |
+| Airtable Catalog | Live (API) | 45 active SKUs; `CostCents` (vendor COGS) confirmed populated for all SKUs |
 
 ---
 
@@ -904,18 +914,18 @@ Customer-facing prices are in Airtable (`appm6F6H9obydzAM2`, table `Catalog`,
 
 | Metric | dbt Model | Status | Owner | Last Reviewed |
 |--------|-----------|--------|-------|---------------|
-| AOV | mart_orders | Live | Analytics Engineer | 2026-05-03 |
-| Weekly Revenue | mart_orders | Live | Analytics Engineer | 2026-05-03 |
-| All-time Revenue | mart_orders | Live | Analytics Engineer | 2026-05-03 |
-| Customer LTV | mart_customers | Live | Analytics Engineer | 2026-05-03 |
-| Order Frequency | mart_customers | Live | Analytics Engineer | 2026-05-03 |
-| Retention Rate | mart_customer_cohorts (pending) | Partial | Analytics Engineer | 2026-05-03 |
-| Repeat Purchase Rate | mart_customers | Live | Analytics Engineer | 2026-05-03 |
-| Checkout CVR | stg_stripe_checkout_sessions | Live | Analytics Engineer | 2026-05-03 |
-| Full Funnel CVR | GA4 BQ (events broken) | Partial | Analytics Engineer | 2026-05-03 |
-| Site-wide CVR | GA4 BQ direct | Live (BQ only) | Analytics Engineer | 2026-05-03 |
-| CAC (blended) | mart_channel_performance (pending) | Estimate from parquet | Analytics Engineer | 2026-05-03 |
+| AOV | mart_orders | Live | Analytics Engineer | 2026-05-04 |
+| Weekly Revenue | mart_orders | Live | Analytics Engineer | 2026-05-04 |
+| All-time Revenue | mart_orders | Live | Analytics Engineer | 2026-05-04 |
+| Customer LTV | mart_customers | Live | Analytics Engineer | 2026-05-04 |
+| Order Frequency | mart_customers | Live | Analytics Engineer | 2026-05-04 |
+| Retention Rate | mart_customer_cohorts (pending) | Partial | Analytics Engineer | 2026-05-04 |
+| Repeat Purchase Rate | mart_customers | Live | Analytics Engineer | 2026-05-04 |
+| Checkout CVR | stg_stripe_checkout_sessions | Live | Analytics Engineer | 2026-05-04 |
+| Full Funnel CVR | GA4 BQ (events fixed 2026-05-04) | Accumulating from 2026-05-05 | Analytics Engineer | 2026-05-04 |
+| Site-wide CVR | GA4 BQ direct | Live (BQ only) | Analytics Engineer | 2026-05-04 |
+| CAC (blended) | mart_channel_performance (pending) | Estimate from parquet | Analytics Engineer | 2026-05-04 |
 | CAC (by channel) | mart_channel_performance (pending) | Pending model build | Analytics Engineer | — |
-| ROAS | mart_channel_performance (pending) | Partial | Analytics Engineer | 2026-05-03 |
-| Gross Margin | mart_sku_margin (not built) | Blocked on COGS data | Analytics Engineer | — |
-| Contribution Margin/SKU | mart_sku_margin (not built) | Blocked on COGS data | Analytics Engineer | — |
+| ROAS | mart_channel_performance (pending) | Partial | Analytics Engineer | 2026-05-04 |
+| Gross Margin | mart_sku_margin (not built) | Accumulating — COGS confirmed, cart_json accumulating | Analytics Engineer | 2026-05-04 |
+| Contribution Margin/SKU | mart_sku_margin (not built) | Accumulating — needs model build | Analytics Engineer | 2026-05-04 |
