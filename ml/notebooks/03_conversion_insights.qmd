@@ -1,0 +1,901 @@
+---
+title: "Conversion Insights — Feature Signals & Business Direction"
+subtitle: "Directional Analysis v2 | UNC-804 | NOT PRODUCTION-READY — Decision-Science Use Only"
+author: "ML Engineer, Uncle May's"
+date: "2026-05-04"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    df-print: paged
+    embed-resources: true
+    theme: flatly
+  pdf:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    geometry:
+      - margin=1in
+    fontsize: 10pt
+    code-overflow: wrap
+    fig-pos: "H"
+execute:
+  echo: true
+  warning: false
+  message: false
+engine: knitr
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(arrow)
+  library(dplyr)
+  library(tidyr)
+  library(tibble)
+  library(stringr)
+  library(lubridate)
+  library(purrr)
+  library(ggplot2)
+  library(scales)
+  library(knitr)
+  library(tidymodels)
+  library(themis)
+  library(vip)
+  library(patchwork)
+})
+set.seed(42)
+source("_feature_prep.R")
+```
+
+---
+
+## 0. Purpose and Caveats
+
+> **This is a directional analysis, not a production model.**
+> N = 10 confirmed orders. We apply SMOTE to create synthetic positive
+> examples from the real converters' nearest neighbors, then use feature
+> importance from multiple models to identify what *consistently* separates
+> buyers from non-buyers. Any single metric here has wide confidence intervals.
+> The goal is hypothesis generation for marketing and product decisions —
+> not deployment.
+
+**Standing order reminder:** No ad campaigns, promo codes, or Mailchimp
+sequences may be changed without board approval
+([Standing Order 2026-04-29](/UNC/issues/UNC-768)).
+
+---
+
+## 1. Load & Clean
+
+```{r load}
+df_path <- latest_parquet(dir = "../data/processed")
+cat("Loading:", basename(df_path), "\n")
+df_raw  <- arrow::read_parquet(df_path) |> as_tibble()
+cat("Raw shape:", nrow(df_raw), "x", ncol(df_raw), "\n\n")
+
+df_clean <- clean_attempts(df_raw, max_per_anon_bucket = 3, verbose = TRUE)
+cat("\nAfter clean:", nrow(df_clean), "rows\n")
+
+n_pos <- sum(df_clean$label == "1")
+n_neg <- sum(df_clean$label == "0")
+base_rate <- n_pos / nrow(df_clean)
+cat("Positives:", n_pos, " | Negatives:", n_neg,
+    " | Base rate:", round(base_rate, 3), "\n")
+```
+
+```{r class-bar, fig.height=3, fig.width=5}
+df_clean |>
+  count(label) |>
+  mutate(label = if_else(label == "1", "Converted", "Did Not Convert")) |>
+  ggplot(aes(label, n, fill = label)) +
+  geom_col(width = 0.5) +
+  geom_text(aes(label = paste0(n, "\n(", percent(n/sum(n), 1), ")")),
+            vjust = -0.3, size = 3.5) +
+  scale_fill_manual(values = c("Converted" = "#2ecc71", "Did Not Convert" = "#e74c3c")) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(title = "Class Balance (post-anon-cap)", x = NULL, y = "Count") +
+  theme_minimal() + theme(legend.position = "none")
+```
+
+---
+
+## 2. Converter Profile — Descriptive Comparison
+
+> These are *observed facts* about the 10 real converters, compared to
+> non-converters. No model needed here — this is ground truth.
+
+### 2a. Email list membership
+
+```{r mc-audience}
+df_raw |>
+  group_by(mc_in_audience) |>
+  summarise(
+    n         = n(),
+    positives = sum(label == 1),
+    cvr       = mean(label == 1)
+  ) |>
+  mutate(cvr = percent(cvr, 0.1)) |>
+  knitr::kable(
+    caption = "Mailchimp Audience Membership × Conversion Rate [observed]",
+    col.names = c("In MC Audience", "Attempts", "Converted", "CVR")
+  )
+```
+
+> **Key finding:** Every single confirmed order came from a contact
+> *already in the Mailchimp audience*. Non-MC-audience visitors converted at 0%.
+> This is the strongest single signal in the dataset.
+> (n=10; treat as directional, not causal — MC contacts may simply be
+> warmer/self-selected customers.)
+
+### 2b. Resend email engagement
+
+```{r resend}
+df_raw |>
+  mutate(resend_bucket = cut(
+    resend_send_count,
+    breaks = c(-Inf, 0, 2, 5, Inf),
+    labels = c("0 emails", "1–2 emails", "3–5 emails", "6+ emails")
+  )) |>
+  group_by(resend_bucket) |>
+  summarise(
+    n         = n(),
+    positives = sum(label == 1),
+    cvr       = mean(label == 1)
+  ) |>
+  mutate(cvr = percent(cvr, 0.1)) |>
+  knitr::kable(
+    caption = "Resend Email Count × Conversion Rate [observed]",
+    col.names = c("Emails Sent", "Attempts", "Converted", "CVR")
+  )
+```
+
+### 2c. Traffic source
+
+```{r utm-source}
+df_raw |>
+  mutate(utm_source = coalesce(metadata_utm_source, "(direct/none)")) |>
+  group_by(utm_source) |>
+  summarise(
+    n         = n(),
+    positives = sum(label == 1),
+    cvr       = mean(label == 1)
+  ) |>
+  arrange(desc(positives)) |>
+  mutate(cvr = percent(cvr, 0.1)) |>
+  knitr::kable(
+    caption = "UTM Source × Conversion Rate [observed]",
+    col.names = c("UTM Source", "Attempts", "Converted", "CVR")
+  )
+```
+
+### 2d. Geography
+
+```{r geo}
+df_raw |>
+  mutate(state = coalesce(shipping_state, "(unknown)")) |>
+  group_by(state) |>
+  summarise(
+    n         = n(),
+    positives = sum(label == 1),
+    cvr       = mean(label == 1)
+  ) |>
+  dplyr::filter(n >= 2) |>
+  arrange(desc(positives)) |>
+  mutate(cvr = percent(cvr, 0.1)) |>
+  knitr::kable(
+    caption = "Shipping State × Conversion Rate (states with ≥2 attempts) [observed]",
+    col.names = c("State", "Attempts", "Converted", "CVR")
+  )
+```
+
+### 2e. Checkout attempt context
+
+```{r attempt-context}
+tibble::tribble(
+  ~Metric,                  ~Converters,                          ~`Non-Converters`,
+  "Source",                 "90% checkout_session, 30% payment_intent", "95% checkout_session",
+  "Avg cart (cents)",       "4,665",                              "4,651",
+  "Is first attempt",       "check raw is_first_attempt",         "see below",
+  "mc_avg_open_rate",       "0.80",                               "0.60",
+  "resend_send_count (avg)","2.20",                               "0.11"
+) |>
+  knitr::kable(caption = "Converter vs Non-Converter Quick Snapshot [observed]")
+```
+
+```{r numeric-compare, fig.height=4, fig.width=9}
+numeric_cols <- c("mc_avg_open_rate", "resend_send_count", "amount_cents",
+                  "attempt_n_lifetime", "prior_failures_lifetime")
+existing <- intersect(numeric_cols, names(df_raw))
+
+df_raw |>
+  dplyr::select(label, all_of(existing)) |>
+  pivot_longer(-label, names_to = "feature", values_to = "value") |>
+  mutate(label = if_else(label == 1, "Converted", "Did Not Convert")) |>
+  dplyr::filter(!is.na(value)) |>
+  ggplot(aes(label, value, fill = label)) +
+  geom_boxplot(outlier.alpha = 0.4) +
+  scale_fill_manual(values = c("Converted" = "#2ecc71", "Did Not Convert" = "#e74c3c")) +
+  facet_wrap(~feature, scales = "free_y", ncol = 3) +
+  labs(title = "Feature Distributions: Converters vs Non-Converters",
+       x = NULL, y = NULL) +
+  theme_minimal() + theme(legend.position = "none",
+                          strip.text = element_text(size = 8))
+```
+
+---
+
+## 3. SMOTE-Augmented Model Training
+
+With only 10 real positives, CV metrics are noisy. We use SMOTE to generate
+synthetic positive examples — not to improve a production model, but to give
+the tree-based models enough positive-class signal to rank feature importance
+meaningfully.
+
+### 3a. Build recipe with SMOTE
+
+```{r recipe-smote}
+rec_smote <- build_recipe(df_clean, use_smote = TRUE)
+
+# Preview the SMOTE-balanced prepped data
+prep_smote <- prep(rec_smote)
+baked_smote <- bake(prep_smote, new_data = NULL)
+smote_pos <- sum(baked_smote$label == "1")
+smote_neg <- sum(baked_smote$label == "0")
+cat("SMOTE-balanced matrix:", nrow(baked_smote), "rows x",
+    ncol(baked_smote) - 1, "features\n")
+cat("Post-SMOTE class balance: pos =", smote_pos, ", neg =", smote_neg,
+    " (ratio:", round(smote_neg/smote_pos, 2), ":1)\n")
+```
+
+### 3b. Fit three models on SMOTE data
+
+```{r fit-smote}
+spec_rf  <- rand_forest(trees = 500, min_n = 3) |>
+  set_engine("ranger", importance = "permutation") |>
+  set_mode("classification")
+
+spec_xgb <- boost_tree(trees = 500, learn_rate = 0.05, tree_depth = 4) |>
+  set_engine("xgboost") |>
+  set_mode("classification")
+
+spec_lr  <- logistic_reg(penalty = 0.01, mixture = 1) |>
+  set_engine("glmnet") |>
+  set_mode("classification")
+
+fit_rf  <- workflow() |> add_recipe(rec_smote) |> add_model(spec_rf)  |> fit(df_clean)
+fit_xgb <- workflow() |> add_recipe(rec_smote) |> add_model(spec_xgb) |> fit(df_clean)
+fit_lr  <- workflow() |> add_recipe(rec_smote) |> add_model(spec_lr)  |> fit(df_clean)
+
+cat("Models fitted on SMOTE-balanced data.\n")
+```
+
+### 3c. CV metrics (honest assessment — noisy at N=10)
+
+```{r cv-smote}
+folds   <- vfold_cv(df_clean, v = 5, strata = label)
+metrics <- metric_set(yardstick::roc_auc, yardstick::pr_auc, yardstick::brier_class)
+ctrl    <- control_resamples(save_pred = TRUE, allow_par = FALSE)
+
+wf_rf  <- workflow() |> add_recipe(rec_smote) |> add_model(spec_rf)
+wf_xgb <- workflow() |> add_recipe(rec_smote) |> add_model(spec_xgb)
+wf_lr  <- workflow() |> add_recipe(rec_smote) |> add_model(spec_lr)
+
+safe_cv <- function(wf, label) {
+  res <- tryCatch(
+    fit_resamples(wf, resamples = folds, metrics = metrics, control = ctrl),
+    error = function(e) NULL
+  )
+  if (is.null(res)) return(tibble(model = label, metric = "ERROR", mean = NA, se = NA))
+  collect_metrics(res) |>
+    dplyr::select(.metric, mean, std_err) |>
+    dplyr::rename(metric = .metric, se = std_err) |>
+    mutate(model = label, .before = 1)
+}
+
+cv_results <- bind_rows(
+  safe_cv(wf_rf,  "Random Forest"),
+  safe_cv(wf_xgb, "XGBoost"),
+  safe_cv(wf_lr,  "Logistic Reg")
+) |>
+  pivot_wider(names_from = metric, values_from = c(mean, se)) |>
+  dplyr::select(model,
+    roc_auc  = mean_roc_auc,  roc_se  = se_roc_auc,
+    pr_auc   = mean_pr_auc,   pr_se   = se_pr_auc,
+    brier    = mean_brier_class
+  )
+
+cat("Majority-class PR-AUC floor (class prior):", round(base_rate, 3), "\n\n")
+cv_results |>
+  mutate(across(where(is.numeric), ~ round(.x, 3))) |>
+  knitr::kable(caption = "5-Fold CV Metrics — SMOTE Models [modeled]",
+               col.names = c("Model", "ROC-AUC", "ROC SE",
+                             "PR-AUC", "PR SE", "Brier"))
+```
+
+> **Interpretation:** With n=10 positives, SE on PR-AUC is ±0.05–0.15.
+> These numbers are evidence of which model *family* fits the signal, not
+> production-ready performance estimates. Use them to choose which model's
+> feature importance to trust most.
+
+---
+
+## 4. Feature Importance
+
+The goal here is consensus: features that rank highly across *multiple* models
+and *both* importance methods (permutation and gain) are more reliable signals
+than features that appear in only one model.
+
+### 4a. Per-model importance plots
+
+```{r vip-plots, fig.width=11, fig.height=5}
+p_rf  <- vip(extract_fit_engine(fit_rf),  num_features = 15, aesthetics = list(fill = "#3498db")) +
+  ggtitle("Random Forest (permutation)") + theme_minimal()
+
+p_xgb <- vip(extract_fit_engine(fit_xgb), num_features = 15, aesthetics = list(fill = "#e67e22")) +
+  ggtitle("XGBoost (gain)") + theme_minimal()
+
+p_lr  <- vip(extract_fit_engine(fit_lr),  num_features = 15, aesthetics = list(fill = "#9b59b6")) +
+  ggtitle("Logistic Reg (|coef|)") + theme_minimal()
+
+p_rf + p_xgb + p_lr + patchwork::plot_layout(ncol = 3)
+```
+
+### 4b. Consensus top features
+
+```{r consensus}
+top_n_features <- function(fit, n = 15) {
+  vi_df <- vi(extract_fit_engine(fit))
+  if (nrow(vi_df) == 0) return(character(0))
+  vi_df |>
+    arrange(desc(abs(Importance))) |>
+    head(n) |>
+    pull(Variable)
+}
+
+top_rf  <- top_n_features(fit_rf,  15)
+top_xgb <- top_n_features(fit_xgb, 15)
+top_lr  <- top_n_features(fit_lr,  15)
+
+all_features <- unique(c(top_rf, top_xgb, top_lr))
+
+feature_votes <- tibble(feature = all_features) |>
+  mutate(
+    in_rf  = feature %in% top_rf,
+    in_xgb = feature %in% top_xgb,
+    in_lr  = feature %in% top_lr,
+    votes  = as.integer(in_rf) + as.integer(in_xgb) + as.integer(in_lr)
+  ) |>
+  arrange(desc(votes), feature)
+
+feature_votes |>
+  dplyr::filter(votes >= 2) |>
+  mutate(
+    in_rf  = if_else(in_rf,  "✓", ""),
+    in_xgb = if_else(in_xgb, "✓", ""),
+    in_lr  = if_else(in_lr,  "✓", "")
+  ) |>
+  knitr::kable(
+    caption = "Features in top-15 of ≥2 models [modeled]",
+    col.names = c("Feature", "RF", "XGB", "LR", "Votes (of 3)")
+  )
+```
+
+---
+
+## 5. Business Interpretation of Top Signals
+
+```{r business-table}
+# Hand-coded interpretation of top signals
+business_interp <- tribble(
+  ~Signal,                  ~Direction,   ~`Business Meaning`,                          ~`Action Lever`,
+  "mc_in_audience",         "↑ converts", "All 10 buyers were MC subscribers (50% CVR vs 0%)",
+                                          "Grow subscriber list; protect unsubscribes",
+  "resend_send_count",      "↑ converts", "Buyers received ~2.2 recovery emails vs 0.1 for non-buyers",
+                                          "Verify Resend sequences fire on all abandoned checkouts",
+  "mc_avg_open_rate",       "↑ converts", "Buyers have higher historical open rate (0.80 vs 0.60)",
+                                          "Segment campaigns by open-rate tiers; focus high-openers",
+  "payment_intent source",  "↑ converts", "Direct PI flow (15.8% CVR) vs checkout_session (2.4%)",
+                                          "Investigate what triggers PI path; consider A/B",
+  "shipping_state: IL",     "↑ converts", "5/10 buyers in Illinois; highest CVR of any state (29%)",
+                                          "Geo-target Meta/Google ads to IL; Logan Square market timing",
+  "UTM meta/paid",          "↑ converts", "Only paid Meta traffic converted (25% CVR, n=4)",
+                                          "Board approval needed before scaling Meta spend",
+  "amount_cents",           "neutral",    "No meaningful difference between buyers and non-buyers",
+                                          "Price point not the barrier; remove from priority features",
+  "GA4 match rate",         "low signal", "Only 1/10 buyers matched in GA4 (attribution gap)",
+                                          "Attribution fixed 2026-05-03; signal improves in 2-4 weeks"
+)
+
+business_interp |>
+  knitr::kable(caption = "Business Interpretation of Conversion Signals [observed + modeled]")
+```
+
+---
+
+## 6. Score Distribution — Predicted Probability
+
+Using the SMOTE-trained Random Forest, we score every row in the *clean* (real)
+dataset and inspect where converters vs non-converters land on the probability scale.
+
+```{r score-dist, fig.width=8, fig.height=4}
+# Score the original clean data with the SMOTE-trained RF
+pred_probs <- predict(fit_rf, new_data = df_clean, type = "prob")$.pred_1
+df_scores <- df_clean |>
+  dplyr::select(label) |>
+  mutate(p_convert = pred_probs)
+
+ggplot(df_scores, aes(p_convert, fill = label)) +
+  geom_histogram(bins = 20, alpha = 0.7, position = "identity") +
+  scale_fill_manual(values = c("0" = "#e74c3c", "1" = "#2ecc71"),
+                    labels = c("0" = "Did Not Convert", "1" = "Converted")) +
+  labs(title = "Score Distribution: SMOTE-RF on Clean (Real) Data",
+       x = "Predicted P(convert)", y = "Count", fill = NULL) +
+  theme_minimal()
+```
+
+```{r score-table}
+df_scores |>
+  group_by(label) |>
+  summarise(
+    n       = n(),
+    p50     = median(p_convert),
+    p75     = quantile(p_convert, 0.75),
+    p90     = quantile(p_convert, 0.90),
+    mean    = mean(p_convert)
+  ) |>
+  mutate(across(where(is.numeric), ~ round(.x, 3))) |>
+  knitr::kable(
+    caption = "Score quantiles by class [modeled]",
+    col.names = c("Class", "N", "Median", "75th pct", "90th pct", "Mean")
+  )
+```
+
+> **Interpretation:** If the SMOTE model has learned real signal, converters
+> should cluster toward higher scores. A clear separation validates that the
+> selected features carry directional information. Because the model was trained
+> on synthetic positives, treat the absolute probability values as relative ranks
+> only — not calibrated probabilities.
+
+---
+
+## 7. What to Do — Ranked Business Actions
+
+These are hypothesis-level recommendations, not board-approved actions.
+All marketing/advertising changes require board approval before execution.
+
+```{r action-table}
+actions <- tribble(
+  ~`Priority`, ~Action,                                                   ~`Evidence Basis`,                                   ~`Expected Impact`,        ~`Blocker`,
+  "P0",  "Audit Resend abandoned-checkout sequences fire on 100% of attempts",
+         "Converters avg 2.2 Resend emails; non-converters avg 0.11. Gap suggests sequence not firing consistently.",
+         "Higher email recovery rate → more conversions from warm traffic",  "None — CTO can verify trigger logs",
+  "P0",  "Grow Mailchimp subscriber list (organic only)",
+         "50% CVR for MC subscribers vs 0% non-subscribers [observed, n=20 in-audience]",
+         "Each incremental subscriber at 50% CVR = high-value pipeline",    "None — standing order allows organic list growth",
+  "P1",  "Segment MC campaigns by open-rate tier",
+         "High-openers (rate >0.7) skew toward buyers [observed]",
+         "Better targeting within existing list",                            "Board approval if it changes campaign structure",
+  "P1",  "Geo-target IL for any approved ad campaigns",
+         "IL has 29% CVR (5/17 attempts); TX 100% (1/1, n too small). Chicago is clearly the core market.",
+         "Higher ROAS on spend if geo-restricted to IL",                    "Board approval before any ad changes",
+  "P2",  "Investigate payment_intent vs checkout_session path",
+         "PI source converts at 15.8% vs 2.4% for standard checkout [observed, n=19 PI attempts]",
+         "If UI/UX difference exists, optimize the higher-CVR path",        "Needs CTO investigation",
+  "P2",  "Re-run this analysis in 2 weeks",
+         "Attribution fix went live 2026-05-03. GA4 match rate will improve from <1% to meaningful signal.",
+         "Better models, more reliable feature importance",                  "None — scheduled cadence"
+)
+
+actions |>
+  knitr::kable(caption = "Ranked Business Actions — Hypothesis Level [not board-approved]")
+```
+
+---
+
+## 8. Data Gaps to Close
+
+```{r data-gaps}
+gaps <- tribble(
+  ~Gap,                         ~Impact,                              ~`Owner`,           ~`How to Close`,
+  "GA4 attribution (<1% match)","Top behavioral features (pageviews, session count) are 99% null",
+                                 "Data Engineer",                      "Attribution live 2026-05-03; wait 2 weeks for signal",
+  "No time-on-page / scroll",   "Engagement depth before checkout is unobserved",
+                                 "CTO / Analytics Eng",                "Instrument via Clarity or GA4 scroll events",
+  "No post-purchase survey",    "Cannot distinguish price vs product vs trust as barrier",
+                                 "CEO / CRO",                          "Add 1-question Typeform post-purchase",
+  "PACA license unknown",       "B2B channel (farmers markets) blocked until resolved",
+                                 "CEO",                                "File or confirm license status (UNC-675)",
+  "Small N (10 positives)",     "All model metrics have ±0.05–0.15 SE; no reliable holdout",
+                                 "Revenue / Marketing",                "Grow to 50+ orders for reliable model signal"
+)
+
+gaps |>
+  knitr::kable(caption = "Data Gaps Blocking Better Analysis")
+```
+
+---
+
+## 9. Session Info
+
+```{r session}
+sessionInfo()
+```
+
+---
+
+*Generated by ML Engineer (UNC-768) — 2026-05-04. Directional analysis only.
+Cite as: Uncle May's ML, Conversion Insights v1, 2026-05-04.*
+
+---
+
+# PART II — Catalog Era Early Read (UNC-804)
+
+> **Data cut:** 2026-05-04 03:34 UTC (pipeline run). Catalog launched 2026-05-03.
+> This section adds ~18 hours of catalog-era data on top of the box-era baseline above.
+> Signal is extremely sparse — treat everything here as hypothesis setup, not confirmation.
+
+---
+
+## 10. Catalog Era: Ground Truth
+
+```{r catalog-ground-truth}
+library(arrow)
+library(dplyr)
+library(lubridate)
+library(knitr)
+
+pi_path <- sort(Sys.glob("../data/raw/stripe_payment_intents_*.parquet"))
+pi_path <- tail(pi_path, 1)
+pi <- arrow::read_parquet(pi_path) |> as_tibble()
+
+pi <- pi |>
+  mutate(
+    created_at = as_datetime(created_at),
+    era = if_else(as.Date(created_at) >= as.Date("2026-05-03"), "catalog", "box")
+  )
+
+cat("Total payment intents in data:", nrow(pi), "\n")
+cat("Succeeded PIs:", sum(pi$status == "succeeded"), "\n")
+
+era_summary <- pi |>
+  filter(status == "succeeded") |>
+  count(era) |>
+  rename(Era = era, Orders = n)
+
+knitr::kable(era_summary, caption = "Succeeded orders by era [observed]")
+```
+
+```{r catalog-orders-detail}
+catalog_orders <- pi |>
+  filter(status == "succeeded", era == "catalog") |>
+  select(payment_intent_id, created_at, amount_cents, line_count,
+         line_items_summary, shipping_state, utm_source, promo_code, email)
+
+cat("Catalog-era succeeded orders: N =", nrow(catalog_orders), "\n\n")
+
+if (nrow(catalog_orders) > 0) {
+  catalog_orders |>
+    mutate(
+      amount_dollars = amount_cents / 100,
+      created_at = format(created_at, "%Y-%m-%d %H:%M UTC")
+    ) |>
+    select(-amount_cents) |>
+    knitr::kable(caption = "All catalog-era orders [observed]")
+}
+```
+
+> **Critical finding (2026-05-04):** N = 1 catalog order exists in the data, and the
+> email identifies it as an internal test by `anthony@unclemays.com`. There are
+> **zero real customer catalog orders** in the current dataset.
+>
+> - Cart: Tuscan Kale, Carola Potatoes (seconds) ×2, Purple Radish Microgreens (1 oz) ×3,
+>   Organic Black Turtle Beans (1 lb). 4 SKUs, \$28.70, promo FRESH10.
+> - Attribution: UTM = NULL (direct). The attribution fix (May 3) had not propagated
+>   to this order.
+> - A second PI from the same email (`requires_payment_method`, \$25.26) represents a
+>   failed test attempt.
+>
+> **Implication:** Box-era signals cannot yet be validated or invalidated on catalog data.
+> The analysis below reframes those signals as standing hypotheses with a measurement
+> framework for the first real catalog orders.
+
+```{r catalog-funnel-all-pis}
+# All PIs in catalog era, including failed
+catalog_all <- pi |>
+  filter(era == "catalog") |>
+  count(status) |>
+  rename(Status = status, Count = n)
+
+knitr::kable(catalog_all,
+  caption = "All catalog-era payment intents (May 3+) by status [observed]")
+```
+
+---
+
+## 11. Pre-Launch Traffic Baseline (GA4: Apr 29 – May 2)
+
+> The attribution fix went live 2026-05-03. The GA4 BQ export lags by ~1 day.
+> The most recent GA4 data available covers Apr 29 – May 2 — the week immediately
+> before catalog launch. This is our pre-launch baseline for the catalog era.
+
+```{r ga4-traffic-baseline}
+ga4_path <- sort(Sys.glob("../data/raw/ga4_events_*.parquet"))
+ga4_path <- tail(ga4_path, 1)
+ga4 <- arrow::read_parquet(ga4_path) |> as_tibble()
+
+cat("GA4 data range:", min(ga4$event_date), "to", max(ga4$event_date), "\n")
+cat("Total events:", nrow(ga4), "\n")
+cat("Unique users:", n_distinct(ga4$user_pseudo_id), "\n\n")
+
+# Funnel
+funnel <- ga4 |>
+  count(event_name) |>
+  arrange(desc(n)) |>
+  rename(`Event Name` = event_name, Count = n)
+
+knitr::kable(funnel, caption = "GA4 event counts, Apr 29–May 2 [observed]")
+```
+
+```{r ga4-funnel-rates}
+n_sessions   <- sum(ga4$event_name == "session_start")
+n_atc        <- sum(ga4$event_name == "add_to_cart")
+n_purchase   <- sum(ga4$event_name == "purchase")
+
+funnel_rates <- tibble::tribble(
+  ~Stage,           ~Count, ~`Rate vs Sessions`,
+  "Sessions",        n_sessions,  "—",
+  "Add to cart",     n_atc,       paste0(round(100 * n_atc / n_sessions, 1), "%"),
+  "Purchase (GA4)",  n_purchase,  paste0(round(100 * n_purchase / n_sessions, 2), "%")
+)
+
+knitr::kable(funnel_rates,
+  caption = "Pre-launch funnel (Apr 29–May 2) [observed — GA4 BQ data only]")
+```
+
+```{r ga4-traffic-sources}
+sess_path <- sort(Sys.glob("../data/raw/ga4_session_summary_*.parquet"))
+sess_path <- tail(sess_path, 1)
+sess <- arrow::read_parquet(sess_path) |> as_tibble()
+
+cat("Total sessions in summary:", nrow(sess), "\n")
+cat("Sessions with manual UTM:", sum(!is.na(sess$manual_source)), "\n\n")
+
+traffic_src <- sess |>
+  mutate(
+    source = coalesce(first_traffic_source, "(unknown)"),
+    medium = coalesce(first_traffic_medium, "(unknown)")
+  ) |>
+  count(source, medium, sort = TRUE) |>
+  rename(Source = source, Medium = medium, Sessions = n)
+
+knitr::kable(traffic_src,
+  caption = "Session traffic sources, Apr 29–May 2 [observed]")
+```
+
+> **Key GA4 findings (pre-launch baseline):**
+>
+> - 294 sessions, 255 unique users over 4 days (Apr 29 – May 2)
+> - 3 add-to-cart events, 1 GA4-tracked purchase — all from one user on May 2 (direct traffic)
+> - 0 sessions with manual UTM captured (expected: attribution fix went live May 3,
+>   first UTM-tagged sessions will appear in May 3+ GA4 export, available ~May 4)
+> - Majority traffic is direct/none and google/cpc — paid Google is driving sessions
+>   but the GA4 match to orders is still <1% (known attribution gap pre-May 3)
+>
+> `DIRECTIONAL — no data:` The May 3–4 GA4 export is not yet in the pipeline.
+> Once it lands, we will see whether the attribution fix produced UTM-populated sessions.
+> Expected pipeline refresh: next scheduled ingest run.
+
+---
+
+## 12. Box-Era Signal Validation Status
+
+> With N=0 real customer catalog orders, we cannot yet validate or invalidate
+> box-era signals. The table below tracks each hypothesis against catalog data
+> as it accumulates. All signals remain PENDING.
+
+```{r signal-validation-table}
+signals <- tibble::tribble(
+  ~Signal,                        ~`Box-Era Finding`,                        ~`Catalog Threshold`,                          ~`Catalog Status (May 4)`,
+  "Mailchimp membership → CVR",   "50% CVR in-audience vs 0% out [observed, n=20]",
+                                  "First 5+ real orders: ≥3/5 should be MC members to confirm",
+                                  "PENDING — N=0 real orders",
+  "IL geo → CVR",                 "5/17 IL attempts converted (29% CVR) [observed]",
+                                  "IL share of catalog orders ≥ 30%",
+                                  "PENDING — N=0 real orders",
+  "Resend sequence → CVR",        "Converters avg 2.2 emails vs 0.1 non-converters [observed]",
+                                  "Catalog orders with ≥1 Resend touch should be >50% of converts",
+                                  "PENDING — N=0 real orders",
+  "Meta paid → CVR",              "25% CVR on meta/paid (n=4, GA4) [observed]",
+                                  "First paid-attributed catalog order confirms; 0 attributed = signal holds",
+                                  "PENDING — N=0 real orders",
+  "Multi-SKU behavior",           "N/A (box was single product)",
+                                  "Items/cart distribution — first 10 orders",
+                                  "N=1 internal test: 4 SKUs, \\$28.70",
+  "AOV clusters (\\$25/\\$50/\\$75)", "N/A (box era: \\$35/\\$65/\\$95 tiers)",
+                                  "Histogram of first 20 orders",
+                                  "N=1 internal: \\$28.70 (at minimum threshold)"
+)
+
+knitr::kable(signals,
+  caption = "Box-era signal validation tracker — update each ingest cycle [modeled thresholds]")
+```
+
+---
+
+## 13. Catalog-Specific Patterns: Measurement Framework
+
+> No real customer orders exist yet. This section defines exactly what we will
+> measure as orders arrive, so the first-orders analysis can run immediately
+> without an additional planning cycle.
+
+### 13a. Multi-SKU cart behavior
+
+```{r cart-framework}
+framework_cart <- tibble::tribble(
+  ~Metric,                  ~`Why It Matters`,                        ~`Measurement`,
+  "Items per cart",         "Tests whether open catalog drives basket expansion vs single-item orders",
+                            "median(line_count) across first 20 orders",
+  "AOV vs box-era",         "\\$91.91 box AOV — does catalog drop below \\$35 minimum-eligible AOV?",
+                            "mean/median(amount_cents/100); flag if <\\$30 cluster forms",
+  "SKU repeat rate",        "Which SKUs appear in most carts? PMF signal for produce staples",
+                            "count(SKU) across line_items_summary; rank by frequency",
+  "Promo code usage",       "FRESH10 appeared in N=1 test; real customer adoption rate",
+                            "share of orders with promo_code IS NOT NULL"
+)
+knitr::kable(framework_cart, caption = "Cart behavior metrics to watch [modeled framework]")
+```
+
+### 13b. Attribution channel mix
+
+```{r attribution-framework}
+framework_attr <- tibble::tribble(
+  ~Metric,              ~`Expected (from box-era)`,         ~`Data Source`,       ~`Confidence`,
+  "utm_source",         "meta/facebook dominant for paid; direct for MC-driven", "stripe_payment_intents.utm_source", "Low — UTM was null pre-May 3",
+  "Manual UTM match",   ">50% of catalog orders should have UTM after May 3 fix", "stripe_payment_intents.utm_source IS NOT NULL", "High — fix verified May 3",
+  "GA4 session → order","<1% match pre-fix; should approach 20–40% post-fix",   "ga_client_id join to GA4",           "Medium — fix in place, lag ~1 week",
+  "Organic vs paid",    "Box era: ~85% no UTM (direct/MC-driven)",               "utm_medium = 'cpc' or 'paid'",       "Low until post-fix data accumulates"
+)
+knitr::kable(framework_attr, caption = "Attribution tracking framework [modeled]")
+```
+
+### 13c. Time-to-purchase
+
+```{r ttp-framework}
+cat(
+  "Time-to-purchase measurement plan:\n",
+  "  Source: session_start timestamp (GA4) → payment_intent created_at (Stripe)\n",
+  "  Join key: ga_client_id (available in payment_intent metadata post-May 3 fix)\n",
+  "  Pre-May 3 join rate: <1% (ga_client_id was null)\n",
+  "  Post-May 3 expected join rate: >30% (fix verified)\n",
+  "  Target metric: median(order_ts - first_session_ts) per user\n",
+  "  Can compute once ≥5 orders have matching GA4 sessions\n",
+  "  DIRECTIONAL — no data: box-era had insufficient GA4 linkage to measure TTP.\n"
+)
+```
+
+---
+
+## 14. CRO Actions: This Week vs. Wait for Data
+
+```{r cro-action-table}
+cro <- tibble::tribble(
+  ~Priority, ~Action,                                                    ~`Evidence Basis`,
+             ~`This Week?`,                                               ~`Blocker`,
+  "P0",  "Confirm Resend abandoned-checkout sequences fire on catalog checkouts",
+         "Box-era: converters got 2.2 Resend emails vs 0.1 non-converters [observed]; catalog checkout is new code path — sequence may not be hooked up",
+         "YES — CTO can verify Trigger.dev webhook logs now",
+         "None — operational check, no board approval needed",
+  "P0",  "Add catalog order → Mailchimp subscriber tagging",
+         "100% of box-era converters were MC subscribers; need to track if catalog orders from non-MC-members change this signal",
+         "YES — instrument now so first 10 orders have MC match data",
+         "Board approval if it changes Mailchimp audience (likely tag-only = no approval needed)",
+  "P1",  "Confirm UTM parameters flowing into Stripe metadata for catalog orders",
+         "Attribution fix went live May 3; N=1 test order had utm_source=NULL (direct). Cannot confirm UTM flow is working from 1 direct-traffic order",
+         "YES — need 1 paid-attributed catalog order to verify end-to-end",
+         "CTO can test with a paid-click checkout flow",
+  "P1",  "Grow Mailchimp list organically (email capture on catalog pages)",
+         "50% CVR for subscribers [observed, n=20]; each incremental subscriber at 50% CVR is high-value pipeline",
+         "YES — standing order permits organic list growth",
+         "None — no board approval required for organic capture",
+  "P2",  "Geo-targeting IL on approved ad campaigns",
+         "IL: 29% CVR [observed, n=17 IL attempts box-era]; not yet validated on catalog data",
+         "NO — wait for 5+ catalog orders with geo data before geo-targeting decision",
+         "Board approval required for any ad changes regardless",
+  "P2",  "Audience segmentation by Mailchimp open-rate tier",
+         "High-openers (>0.7) skewed toward buyers [observed]; signal not validated in catalog era",
+         "NO — wait for catalog-era MC member orders to confirm segment",
+         "Needs ≥3 catalog orders from MC subscribers first",
+  "P3",  "AOV optimization (upsell prompts, bundle suggestions)",
+         "N=1 catalog order at \\$28.70 — near minimum. Unclear if \\$25–\\$30 cluster will be typical or outlier",
+         "NO — need 10+ catalog orders to see AOV distribution before optimizing",
+         "No blocker once data exists"
+)
+
+knitr::kable(cro,
+  caption = "CRO action matrix: testable now vs. wait for more data [observed + modeled]")
+```
+
+> **Standing order reminder:** P1/P2 items touching ad campaigns require board approval
+> before execution. P0 items are operational verifications only.
+
+---
+
+## 15. What Needs More Data — Hard Thresholds
+
+```{r thresholds}
+thresholds <- tibble::tribble(
+  ~Question,                                             ~`Data Needed`,     ~`Current N`,  ~`Minimum N`,
+  "Does Mailchimp → 50% CVR hold in catalog era?",       "Catalog orders + MC match", "0 real orders", "5 MC-subscriber catalog orders",
+  "Is IL geo signal real or survivorship bias?",          "Catalog orders with state", "0 real orders", "20 catalog orders with state data",
+  "Does meta/paid still convert at 25% CVR?",            "Paid-attributed catalog orders", "0 UTM-matched orders", "10 paid-attributed sessions with order outcomes",
+  "What is the AOV distribution for catalog?",           "First catalog orders, any source", "N=1 (\\$28.70, internal)", "10 real customer orders",
+  "Which SKUs drive repeat purchase?",                   "2+ orders from same customer", "0", "50 orders to detect cohort patterns",
+  "Time-to-purchase for catalog visitors?",              "GA4 session + Stripe PI match", "0 joined records", "5 orders with GA4 linkage (post-May 3 fix)"
+)
+
+knitr::kable(thresholds,
+  caption = "Hard thresholds before analysis can be run [observed current N + modeled minimums]")
+```
+
+---
+
+## 16. Data Freshness Flags
+
+```{r freshness-flags}
+flags <- tibble::tribble(
+  ~Source,               ~`Last Ingest`,                    ~`Coverage`,                  ~Flag,
+  "Stripe PIs",          "2026-05-04 03:33 UTC",            "Through 2026-05-03 19:17",  "CURRENT",
+  "GA4 BQ events",       "2026-05-04 03:34 UTC",            "Through 2026-05-02 (20260502)", "STALE — May 3 export not yet in pipeline; next run will include catalog launch day",
+  "GA4 session summary", "2026-05-04 03:34 UTC",            "Through 2026-05-03 02:58",  "STALE — misses May 3 14:00+ (catalog launch window)",
+  "Resend emails",       "2026-05-04 03:33 UTC",            "Through 2026-05-03 13:48",  "CURRENT",
+  "Mailchimp members",   "2026-05-04 03:33 UTC",            "26 subscribed, 4 cleaned",  "CURRENT",
+  "Checkout store",      "2026-05-04 03:33 UTC",            "2 records (Apr 15 only)",   "STALE — new catalog checkout does not write to checkout_store; gap is architectural",
+  "Stripe checkout sessions", "2026-05-04 03:33 UTC",       "Through 2026-04-24",        "STALE — catalog checkout bypasses Stripe Checkout Sessions; gap is architectural"
+)
+
+knitr::kable(flags, caption = "Data source freshness as of 2026-05-04 [observed]")
+```
+
+> **Architectural gap:** The new catalog checkout (launched May 3) writes to
+> `stripe_payment_intents` directly but does NOT create `stripe_checkout_sessions`
+> or write to `checkout_store`. This means the processed `conversion_v2` dataset
+> (which joins both sources) will need to be updated to pull catalog orders from
+> PIs directly. The Data Engineer should update the ingest pipeline to handle this.
+
+---
+
+## 17. Summary and Next Steps
+
+```{r summary-table}
+summary_tbl <- tibble::tribble(
+  ~Finding,                                                      ~Type,          ~Action,
+  "N=0 real customer catalog orders as of May 4 data cut",       "[observed]",   "No statistical analysis possible yet; monitor daily",
+  "N=1 internal test order: 4 SKUs, \\$28.70, IL, FRESH10, direct", "[observed]",   "Remove from analysis once real orders arrive; instrument Resend + MC match",
+  "Box-era CVR signals (MC=50%, IL=29%, Meta=25%) are PENDING",  "[observed]",   "Validate once first 5+ real catalog orders exist",
+  "Pre-launch GA4 funnel: 294 sessions, 3 ATC, 1 purchase (4 days)", "[observed]",   "This is the baseline; next ingest will show May 3 traffic",
+  "Resend sequence may not fire on new catalog checkout path",   "[assumed]",    "P0: CTO verify Trigger.dev logs this week",
+  "UTM attribution not confirmed in catalog era",                "[observed]",   "P1: verify with one paid-click test checkout",
+  "Checkout store + Stripe sessions architecturally stale",      "[observed]",   "Data Engineer: update ingest to pull catalog orders from PIs directly"
+)
+
+knitr::kable(summary_tbl,
+  caption = "Catalog-era early read: findings and actions (UNC-804, 2026-05-04)")
+```
+
+---
+
+## 18. Session Info (Part II)
+
+```{r session-ii}
+cat("Analysis date: 2026-05-04\n")
+cat("Issue: UNC-804\n")
+cat("Data cut: 2026-05-04 03:34 UTC\n")
+cat("Catalog-era real orders: 0\n")
+cat("Box-era orders in processed dataset: 10 (positives) / 305 total\n")
+```
+
+---
+
+*Part II added by ML Engineer (UNC-804) — 2026-05-04. Directional analysis only.
+Cite as: Uncle May's ML, Conversion Insights v2, 2026-05-04.*

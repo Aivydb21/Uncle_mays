@@ -1,0 +1,13 @@
+# Python virtual environment — use .venv/Scripts/dbt to run commands
+.venv/
+
+# dbt compiled artifacts
+uncle_mays/target/
+uncle_mays/logs/
+uncle_mays/dbt_packages/
+
+# Local DuckDB dev database
+*.duckdb
+
+# Anonymous user UUID (machine-specific)
+.user.yml

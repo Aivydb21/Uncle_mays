@@ -1,0 +1,36 @@
+# Raw extracts can be large and contain PII (emails, phone numbers, addresses).
+# Never commit. Re-extract from source on demand.
+data/raw/**
+!data/raw/.gitkeep
+
+# Trained model artifacts (binary, large, easily recreated from configs+data).
+models/artifacts/**
+!models/artifacts/.gitkeep
+
+# Notebook checkpoints
+notebooks/.ipynb_checkpoints/
+
+# MLflow / experiment run artifacts
+experiments/runs/**
+!experiments/runs/.gitkeep
+mlruns/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.env.local
+
+# DuckDB / Parquet local caches
+*.duckdb
+*.parquet
+
+# R + Quarto rendered artifacts
+notebooks/*.html
+notebooks/*_files/
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata

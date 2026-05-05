@@ -1,0 +1,24 @@
+{
+  "_doc": "Bridges Meta/Google dashboard names to canonical slugs that match Stripe's utm_campaign values, AND collapses legacy Stripe slugs (multiple slugs that refer to the same paid campaign) into one canonical key. Going forward, set every new campaign's destination URL utm_campaign= to a canonical slug AND add a row here. Convention: <source>-<intent>-<yyyymm>.",
+
+  "meta_dashboard_to_slug": {
+    "Subscription Launch Apr 2026":          "meta-sub-launch-202604",
+    "One-Time Box Launch - Apr 2026":        "meta-onetime-launch-202604",
+    "Retargeting - Website Visitors Apr 2026": "meta-retargeting-202604"
+  },
+
+  "gads_dashboard_to_slug": {
+    "Produce Box - Search Campaign": "gads-search-produce-202604"
+  },
+
+  "stripe_legacy_slug_aliases": {
+    "subscription_launch_apr2026": "meta-sub-launch-202604",
+    "sub-launch-apr26":            "meta-sub-launch-202604",
+    "onetime-launch-apr26":        "meta-onetime-launch-202604"
+  },
+
+  "_known_non_paid_slugs": {
+    "recovery":     "Abandoned-cart recovery email click. Not a paid platform; leave as-is.",
+    "profile_link": "Instagram bio link / organic. Not a paid platform; leave as-is."
+  }
+}

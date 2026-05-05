@@ -1,0 +1,529 @@
+---
+title: "Conversion-Prediction Baseline — Deployment Readiness Assessment"
+subtitle: "Model Card v1.0 | UNC-768"
+author: "ML Engineer, Uncle May's"
+date: "2026-05-03"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    df-print: paged
+    embed-resources: true
+    theme: flatly
+  pdf:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    geometry:
+      - margin=1in
+    fontsize: 10pt
+    code-overflow: wrap
+    fig-pos: "H"
+execute:
+  echo: false
+  warning: false
+  message: false
+engine: knitr
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(arrow)
+  library(dplyr)
+  library(tidyr)
+  library(tibble)
+  library(lubridate)
+  library(knitr)
+  library(scales)
+})
+```
+
+---
+
+## Executive Summary
+
+> **Verdict: NOT READY FOR PRODUCTION.**
+> The conversion-prediction prototype in `01_first_look_baseline.qmd` is a
+> well-structured research notebook, not a deployable system. There is no
+> serialized model artifact, no serving API, no monitoring, and no retraining
+> loop. The training dataset (305 rows, ≈10 real positives before anon-capping)
+> is too small to produce estimates with confidence intervals narrower than ±0.05
+> AUC. The correct near-term decision is to **continue collecting data and
+> investing in attribution coverage** before deploying to any real decision
+> (ad bidding, personalization, or segmentation).
+
+This document:
+
+1. Summarizes the prototype as built
+2. Scores it against a deployment readiness checklist
+3. Ranks the gaps that must be closed before production use
+4. Maps the data dependencies the model requires
+
+---
+
+## 1. Model Summary
+
+### 1.1 Business Question
+
+> *Given a checkout attempt (a Stripe Checkout Session or PaymentIntent), what
+> is the probability that this customer completes payment?*
+
+Intended applications: abandon-recovery prioritization, ad-bid adjustment,
+customer segmentation. **None of these applications are live yet.**
+
+### 1.2 Architecture
+
+The prototype evaluates **six (model × resampling) combinations** via 5-fold
+stratified cross-validation:
+
+| Model | Engine | Resampling | Imbalance handling |
+|-------|--------|------------|-------------------|
+| Logistic Regression (L1) | glmnet (R) | Balanced | `case_weights` via workflow |
+| Random Forest | ranger (R) | Balanced | `class.weights = c(0=1, 1=pos_weight)` |
+| XGBoost | xgboost (R) | Balanced | `scale_pos_weight = neg/pos` |
+| Logistic Regression (L1) | glmnet (R) | SMOTE | synthetic minority oversampling |
+| Random Forest | ranger (R) | SMOTE | synthetic minority oversampling |
+| XGBoost | xgboost (R) | SMOTE | synthetic minority oversampling |
+
+Hyperparameters are fixed (not tuned): LR penalty = 0.01, RF trees = 500,
+XGB trees = 500 / lr = 0.05 / depth = 4. No hyperparameter search has been run.
+
+### 1.3 Training Data
+
+```{r load-parquet}
+# Load the latest processed parquet for static statistics.
+processed_dir <- "../data/processed"
+files <- list.files(processed_dir,
+                    pattern = "^conversion_v2_.*\\.parquet$",
+                    full.names = TRUE)
+latest_file <- sort(files, decreasing = TRUE)[1]
+
+df_raw <- tryCatch(
+  arrow::read_parquet(latest_file) |> as_tibble(),
+  error = function(e) NULL
+)
+```
+
+```{r data-stats, results="asis"}
+if (!is.null(df_raw)) {
+  n_rows   <- nrow(df_raw)
+  n_cols   <- ncol(df_raw)
+  n_pos    <- sum(df_raw$label == 1, na.rm = TRUE)
+  n_neg    <- sum(df_raw$label == 0, na.rm = TRUE)
+  base_rate_raw <- n_pos / n_rows
+  n_email_non_null <- sum(!is.na(df_raw$email_hash))
+  file_ts  <- basename(latest_file)
+
+  cat("| Metric | Value |\n")
+  cat("|--------|-------|\n")
+  cat("| Source parquet | `", file_ts, "` |\n", sep = "")
+  cat("| Total rows (raw spine) | ", scales::comma(n_rows), " |\n", sep = "")
+  cat("| Columns | ", n_cols, " |\n", sep = "")
+  cat("| Positive class (converted) | ", n_pos, " |\n", sep = "")
+  cat("| Negative class (abandoned) | ", n_neg, " |\n", sep = "")
+  cat("| Raw base rate | ", scales::percent(base_rate_raw, accuracy = 0.1), " |\n", sep = "")
+  cat("| Rows with non-null email_hash | ", n_email_non_null, " |\n", sep = "")
+} else {
+  cat("*Parquet not found — run `python -m ml.features.build_dataset` to regenerate.*\n")
+}
+```
+
+> **Why the notebook shows ~34% positive rate but the raw parquet is ~3%:**
+> `clean_attempts()` in `_feature_prep.R` caps anonymous (null-email) attempts
+> at 3 per fingerprint bucket, collapsing the bot/probe-dominated negative class.
+> This is intentional — the model should learn "what predicts conversion among
+> real-looking attempts," not "is this anonymous traffic?" The cleaning step
+> is correctly designed but dramatically changes the effective dataset size.
+
+### 1.4 Feature Space
+
+```{r feature-list, results="asis"}
+if (!is.null(df_raw)) {
+  # Leakage and ID cols (from _feature_prep.R) — these are dropped before modeling.
+  leakage_cols <- c("chg_status", "chg_failure_code", "chg_failure_message",
+                    "chg_network_status", "chg_seller_message", "chg_outcome_type",
+                    "chg_risk_level", "cs_recovery1_at", "cs_recovery2_at",
+                    "cs_recovery3_at")
+  id_cols <- c("attempt_id", "payment_intent_id", "email", "email_hash",
+               "customer_id", "customer_name", "metadata_email", "billing_email",
+               "billing_name", "client_ip", "client_user_agent", "cart_json",
+               "mc_tags", "apollo_org_name", "apollo_city", "apollo_state",
+               "apollo_country", "apollo_labels", "shipping_street",
+               "metadata_utm_content", "metadata_utm_term", "fbc", "fbp",
+               "gclid", "fbclid", "checkout_session_local_id", "line_items_summary")
+  target_col <- "label"
+  drop_all <- c(leakage_cols, id_cols, target_col)
+
+  feature_cols <- setdiff(names(df_raw), drop_all)
+
+  # Classify features by source
+  classify_source <- function(col) {
+    if (grepl("^mc_|^mailchimp", col)) "Mailchimp"
+    else if (grepl("^resend_", col)) "Resend"
+    else if (grepl("^apollo_|is_apollo", col)) "Apollo"
+    else if (grepl("^ga4_|^ga_", col)) "GA4"
+    else if (grepl("^cs_", col)) "Checkout Store"
+    else if (grepl("^cust_", col)) "Stripe Customer"
+    else if (grepl("^chg_", col)) "Stripe Charge"
+    else if (grepl("^zip_|^census", col)) "Census ACS"
+    else if (grepl("^meta_|has_fbclid", col)) "Meta Ads"
+    else if (grepl("^gads_|has_gclid", col)) "Google Ads"
+    else if (grepl("^campaign_slug", col)) "Campaign Map"
+    else if (col %in% c("amount_cents", "currency", "shipping_city",
+                         "shipping_state", "shipping_zip", "source",
+                         "metadata_product", "metadata_utm_source",
+                         "metadata_utm_medium", "metadata_utm_campaign",
+                         "created_at", "created_dow", "created_hour_utc"))
+      "Stripe / Core"
+    else if (grepl("^attempt_|^prior_|^is_first|^seconds_since", col)) "Attempt Features"
+    else "Other"
+  }
+
+  feat_df <- tibble(
+    feature = feature_cols,
+    source = sapply(feature_cols, classify_source)
+  )
+
+  feat_df |>
+    count(source, name = "n_features") |>
+    arrange(desc(n_features)) |>
+    knitr::kable(caption = paste("Feature sources —", length(feature_cols),
+                                  "total features (before recipe drops)"))
+}
+```
+
+**Recipe transformations** (from `_feature_prep.R`):
+
+- Log-transforms `amount_cents` and `seconds_since_prior_attempt`
+- Extracts day-of-week, hour, and is-weekend from `created_at`
+- Lumps rare categoricals (<2%) into "Other"
+- Drops zero-variance and near-zero-variance columns
+- Median-imputes numeric predictors (for glmnet compatibility)
+- SMOTE applied post-recipe when `use_smote = TRUE`
+
+### 1.5 Held-out Performance
+
+> **Note:** The baseline notebook does not produce a held-out test-set score.
+> All metrics reported below are 5-fold cross-validation estimates from
+> `01_first_look_baseline.qmd`. With only ≈10–30 positives depending on
+> the anon-capping threshold, each fold contains 2–6 positive examples.
+> AUC estimates at this sample size have standard errors large enough that
+> model comparisons are unreliable. The PR-AUC numbers should be treated
+> as rough feasibility signals, not deployment thresholds.
+
+| Metric | Interpretation | Reliability at N≈30 positives |
+|--------|---------------|-------------------------------|
+| ROC-AUC | Rank-ordering quality | Low (±0.10 SE expected) |
+| PR-AUC | Precision-recall tradeoff | Very low (±0.10–0.15 SE) |
+| Brier score | Calibration of probabilities | Low |
+
+**Majority-class PR-AUC floor** (= base rate after anon-capping): approximately
+**0.34**. Any model must beat this to add value.
+
+The Decision Scientist's notebook summary (`section 8`) states directly:
+*"N=X with Y positives is too thin for a deployable model. Treat these
+PR-AUC numbers as ±0.05 noise."*
+
+---
+
+## 2. Deployment Readiness Checklist
+
+```{r checklist, results="asis"}
+checklist <- tribble(
+  ~Category, ~Item, ~Status, ~Notes,
+
+  "Artifact", "Serialized model file (.pkl / .joblib / .rds)",
+  "MISSING", "No artifact found in `ml/models/`. Notebook trains but never saves.",
+
+  "Artifact", "Reproducible training script (separate from notebook)",
+  "MISSING", "Training logic is embedded in the Quarto notebook. No `train.py` or equivalent.",
+
+  "Artifact", "Versioned artifact registry (S3 / GCS / MLflow)",
+  "MISSING", "No registry. Local disk only.",
+
+  "Serving", "Prediction API endpoint (REST / Trigger.dev task)",
+  "MISSING", "No API. No Trigger.dev task. No R plumber service.",
+
+  "Serving", "Batch prediction pipeline (offline scores in BQ / parquet)",
+  "MISSING", "Not built.",
+
+  "Serving", "Input validation (schema enforcement at inference time)",
+  "MISSING", "No serving layer exists to validate against.",
+
+  "Monitoring", "Score distribution drift alert",
+  "MISSING", "No monitoring infrastructure exists.",
+
+  "Monitoring", "Feature drift alert (population stability index or similar)",
+  "MISSING", "Not built.",
+
+  "Monitoring", "Ground-truth feedback loop (labels landing back to evaluate live predictions)",
+  "MISSING", "Not built. Labels are only visible after Stripe resolves the attempt.",
+
+  "Retraining", "Retraining trigger (schedule or performance threshold)",
+  "MISSING", "No trigger. Retraining is manual.",
+
+  "Retraining", "Automated pipeline to rebuild `conversion_v2` parquet and re-fit",
+  "PARTIAL", "`run_pipeline.py` and `ml/ingest/*.py` exist; no orchestrated retrain schedule.",
+
+  "Data", "Stable, versioned feature parquet produced reliably by Data Engineer",
+  "PARTIAL", "Ingest scripts exist and ran on 2026-05-02. No reliability SLA or freshness alert.",
+
+  "Data", "GA4 attribution coverage >10% (needed for GA4 features to add signal)",
+  "PARTIAL", "Attribution fixed 2026-05-03 (UTM/gclid/fbclid now flow end-to-end). Historical coverage <1%. Future coverage TBD.",
+
+  "Data", "Minimum training positives (≥100 real converters recommended)",
+  "MISSING", "10 positives in raw parquet (2026-05-02). ~30 post anon-capping. Well below threshold.",
+
+  "Governance", "Model card reviewed and approved by Decision Scientist + CEO",
+  "MISSING", "This document is the first model card. Pending review (UNC-768).",
+
+  "Governance", "Fairness check (disparate impact on protected characteristics)",
+  "MISSING", "Census ACS demographic features are in the feature set. No fairness audit done.",
+
+  "Governance", "Retraining cadence and on-call owner defined",
+  "MISSING", "Not defined."
+)
+
+checklist |>
+  mutate(
+    Status = case_when(
+      Status == "MISSING"  ~ "❌ MISSING",
+      Status == "PARTIAL"  ~ "⚠️ PARTIAL",
+      Status == "DONE"     ~ "✅ DONE",
+      TRUE                 ~ Status
+    )
+  ) |>
+  knitr::kable(caption = "Deployment readiness checklist — conversion prediction v1")
+```
+
+**Score: 0 / 16 items fully done, 3 partial.**
+
+---
+
+## 3. Gaps and Recommendations (Ranked)
+
+Items are ranked by blocking severity: **P0** = must fix before any production
+signal is used; **P1** = must fix before soft-launch to a single use case;
+**P2** = should fix within 30 days of soft-launch.
+
+### P0 — Blockers (do not deploy until resolved)
+
+**P0-A: Training N is too small.**
+10 raw positives (≈30 post anon-capping) yields cross-validation estimates
+with ±0.05–0.15 AUC standard errors. Confidence intervals span most of the
+meaningful range. A model trained on this data will assign scores with very
+wide uncertainty, making it unsuitable for bidding or personalization.
+
+*Recommended action:* Wait until the dataset has ≥100 real converters (not
+SMOTE-augmented). At the current trajectory, this requires monitoring weekly
+ingest from Stripe and re-evaluating after each weekly delivery cycle. Custom-
+cart launch will accelerate this.
+
+**P0-B: No serialized model artifact.**
+Even if metrics were acceptable, there is nothing to serve. The notebook
+trains models in memory and discards them at session end.
+
+*Recommended action (when N is sufficient):* Add a `save_model()` step at the
+end of the training notebook or in a standalone `ml/models/train.py` script.
+For R, use `saveRDS(fit_rf, "ml/models/conv_pred_v1_rf.rds")`. For Python
+portability, serialize with `joblib` after porting the winner to scikit-learn.
+
+**P0-C: No fairness audit.**
+The feature set includes Census ACS demographic proxies (income, age, household
+size, racial composition by ZIP). Using these to rank customers for recovery
+or bidding requires an explicit disparate-impact audit. This is both a legal
+and ethical blocker.
+
+*Recommended action:* Before any deployment, run a fairness analysis (AUC by
+ZIP-income quartile, by racial composition quartile). Document the analysis in
+a companion Quarto notebook. Escalate to CEO if disparate impact is found.
+
+### P1 — Required for soft-launch
+
+**P1-A: No serving layer.**
+There is no API, no Trigger.dev task, and no offline batch job that generates
+scores. Predictions cannot reach any downstream system.
+
+*Recommended action:* Once an artifact exists, build the simplest viable
+serving path. For Uncle May's at current scale, this is likely a Trigger.dev
+TypeScript task that:
+
+1. Reads the latest `conversion_v2` parquet or calls a Python subprocess
+2. Calls `predict_proba()` on the serialized model
+3. Returns a JSON `{ attempt_id, score, threshold_flag }`
+
+Alternatively: an R `plumber` API containerized in Docker on Cloud Run.
+Discuss the trade-off with the Decision Scientist before choosing.
+
+**P1-B: No ground-truth feedback loop.**
+Predictions are only useful if we can later compare them to actual outcomes.
+Without this loop, model monitoring is impossible.
+
+*Recommended action:* Log every prediction (attempt_id, score, timestamp,
+model_version) to a BigQuery table. The Stripe webhook already fires on
+payment success/failure — join that signal back to the prediction log weekly.
+
+**P1-C: GA4 attribution coverage below threshold.**
+GA4 session features (pageviews, scroll depth, form starts, traffic source)
+are the most valuable behavioral signals the model could use. As of 2026-05-02,
+coverage was <1% (1 of 305 rows had a GA4 match). Attribution was fixed on
+2026-05-03, but historic data cannot be backfilled. GA4 features will only
+become reliable after several weeks of post-fix data accumulates.
+
+*Recommended action:* Track GA4 join rate weekly as a data quality metric.
+Do not use GA4 features as load-bearing in a production model until join rate
+exceeds 30% (≈ 90 matched rows at 300-row scale, or ≈ 300 rows at 1,000-row
+scale).
+
+### P2 — Within 30 days of soft-launch
+
+**P2-A: Hyperparameter tuning.**
+Fixed hyperparameters are a research shortcut. Before committing to a model
+architecture, run `tune_grid()` or `tune_bayes()` on the top-2 candidates.
+
+**P2-B: Monitoring dashboard.**
+Weekly: plot score distribution of new predictions vs. the training distribution.
+Flag if KL-divergence exceeds a threshold. This can be a short Quarto document
+auto-rendered by a Trigger.dev cron.
+
+**P2-C: Retraining cadence.**
+Define the trigger: "retrain weekly if new data adds >20 positives since last
+retrain" OR "retrain on the 1st Sunday of each month." Document the owner
+(ML Engineer) and the on-call escalation path.
+
+**P2-D: Separate train/test split.**
+Current evaluation is 5-fold CV only — no holdout. Once N ≥ 100 positives,
+do a temporal holdout (most recent 20% of data by `created_at`) to get an
+unbiased estimate of live performance.
+
+---
+
+## 4. Data Dependency Map
+
+The `conversion_v2` feature pipeline requires the following raw parquet files,
+all produced by `ml/ingest/*.py`:
+
+```{r dep-map, results="asis"}
+deps <- tribble(
+  ~Source, ~Ingest_Script, ~Join_Key, ~Features_Added, ~Reliability,
+
+  "Stripe Checkout Sessions", "ingest/stripe.py",
+  "checkout_session_id", "Core attempt spine (label, amount, timestamps, UTMs)",
+  "✅ Live",
+
+  "Stripe Payment Intents", "ingest/stripe.py",
+  "payment_intent_id", "Core attempt spine (label, amount, timestamps, UTMs, fbc/fbp/gclid)",
+  "✅ Live",
+
+  "Stripe Customers", "ingest/stripe.py",
+  "customer_id", "Billing geo, delinquency flag",
+  "✅ Live",
+
+  "Stripe Charges", "ingest/stripe.py",
+  "payment_intent_id", "Charge outcome columns (leakage-flagged — currently dropped in recipe)",
+  "✅ Live",
+
+  "Stripe Invoices / Subscriptions", "ingest/stripe.py",
+  "—", "Not used in v2 model (subscription flow excluded from label)",
+  "✅ Live",
+
+  "GA4 Session Summary", "ingest/bigquery_ga4.py",
+  "ga_client_id / payment_intent_id", "Device, browser, traffic source, pageviews, scrolls, form_starts",
+  "⚠️ <1% join rate (pre-2026-05-03); improving post-fix",
+
+  "Mailchimp Members", "ingest/mailchimp.py",
+  "email_hash", "Subscription status, open/click rates, tag count",
+  "✅ Live",
+
+  "Resend Emails", "ingest/resend.py",
+  "email_hash", "Send count, email type count",
+  "✅ Live",
+
+  "Apollo Contacts", "ingest/apollo.py",
+  "email_hash", "Professional title, seniority, industry",
+  "✅ Live",
+
+  "Census ACS (ZIP)", "ingest/census.py",
+  "shipping_zip", "Median income, population, age, household size, racial composition",
+  "✅ Annual; refresh once/year",
+
+  "Meta Campaign Insights", "ingest/meta_ads.py",
+  "campaign_slug_canonical", "Lifetime impressions, clicks, spend, CTR, CPC per campaign",
+  "✅ Live",
+
+  "Google Ads Campaign Insights", "ingest/google_ads.py",
+  "campaign_slug_canonical", "Lifetime impressions, clicks, spend, conversions, CTR, CPC",
+  "✅ Live",
+
+  "Checkout Store (local)", "ingest/checkout_store.py",
+  "payment_intent_id", "Cart line count, total, fulfillment mode, recovery email flags",
+  "⚠️ Partial — only post-2026-04-24 data",
+
+  "Microsoft Clarity", "ingest/clarity.py",
+  "—", "URL-level dwell/scroll/rage-click (NOT joined in v2 — noted as skipped)",
+  "⚠️ Available but not used"
+)
+
+deps |>
+  select(-Reliability) |>
+  knitr::kable(caption = "Data dependencies for conversion_v2 feature pipeline")
+```
+
+### Reliability assessment
+
+```{r reliability, results="asis"}
+deps |>
+  select(Source, Reliability) |>
+  knitr::kable(caption = "Ingest reliability status (2026-05-03)")
+```
+
+**Key observations:**
+
+1. **GA4 join rate is the critical gap.** All GA4 behavioral features are
+   functionally null for the entire historical dataset. Post-fix data will
+   accumulate from 2026-05-03 forward.
+
+2. **Checkout Store is partial.** Only attempts from 2026-04-24 onward have
+   cart-level features (line count, cart total, recovery flags). These may
+   be among the most predictive features when sufficient history accumulates.
+
+3. **No freshness SLA exists.** Ingest scripts are run manually. A broken
+   ingest (e.g. Stripe rate limit, GA4 token expiry like the 48h gap on
+   2026-04-29) can silently produce stale features. Recommend a daily
+   freshness check: if any raw parquet is >36h old, alert the Data Engineer.
+
+4. **Census ACS** is low-risk because it refreshes annually. Confirm the
+   ACS vintage year and document it.
+
+---
+
+## 5. Recommended Next Steps (Prioritized)
+
+| Priority | Owner | Action | Precondition |
+|----------|-------|--------|-------------|
+| P0-A | Data Engineer + DE Scientist | Monitor weekly: track cumulative positives in Stripe; surface when N_pos > 50, 100 | — |
+| P0-C | Decision Scientist | Fairness audit on Census ACS demographic features | Can run now on current data |
+| P0-B | ML Engineer | Add `saveRDS()` / `joblib.dump()` to training notebook | N_pos ≥ 100 |
+| P1-B | ML Engineer | Create BQ prediction log table; log every future score | Serving layer |
+| P1-A | ML Engineer | Build minimal serving layer (Trigger.dev task or R plumber) | Model artifact |
+| P1-C | Data Engineer | Track and report GA4 join rate weekly | Attribution fix live |
+| P2-A | Decision Scientist | Hyperparameter tuning (tune_grid / tune_bayes) | N_pos ≥ 100 |
+| P2-B | ML Engineer | Weekly score-distribution monitoring Quarto | Prediction log |
+| P2-D | Decision Scientist | Temporal train/test split evaluation | N_pos ≥ 100 |
+
+---
+
+## 6. Reviewer Sign-Off
+
+This document is submitted for review under [UNC-768](/UNC/issues/UNC-768).
+Required reviewers:
+
+- [ ] **Decision Scientist** — validate model summary accuracy and gap prioritization
+- [ ] **CEO (Anthony Ivy)** — acknowledge readiness verdict before any production deployment decision
+
+No model deployment actions will be taken until both reviewers sign off.
+
+---
+
+*Generated by ML Engineer agent (c57979b2) · Run 32bb7114 · 2026-05-03*
