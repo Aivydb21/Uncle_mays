@@ -42,3 +42,10 @@ _archive/business-2026-04-22/
 
 # Contains API secrets — keep local-only
 ecosystem.config.cjs
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Local Airtable enrichment scratch dir (raw extracts, not for the repo)
+_airtable_dump/
