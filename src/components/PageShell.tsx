@@ -29,6 +29,14 @@ export function PageShell({ children }: { children: React.ReactNode }) {
   // customer is at the totals stage and the discount input lives next to the
   // tally. The banner up top is for top-of-funnel traffic, not the close.
   const showPromoStrip = !isLandingPage && pathname !== "/checkout" && !inFunnel;
+  // MobileCTA is the "Shop the catalog" thumb-reach button used on top-of-
+  // funnel pages (home, faq, about). It must NOT render on /shop (the
+  // catalog page renders its own MobileCartTotal which links to /checkout
+  // — MobileCTA was overlaying it at z-50 > z-40 and re-routing customers
+  // back to /shop, breaking the bottom-of-funnel conversion path) or on
+  // /checkout itself (where it would be nonsensical).
+  const showMobileCTA =
+    !isLandingPage && pathname !== "/shop" && pathname !== "/checkout" && !inFunnel;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -40,7 +48,7 @@ export function PageShell({ children }: { children: React.ReactNode }) {
           <Footer />
         </div>
       )}
-      {!isLandingPage && <MobileCTA />}
+      {showMobileCTA && <MobileCTA />}
     </div>
   );
 }
