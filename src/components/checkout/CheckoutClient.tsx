@@ -386,6 +386,10 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       setClientSecret(intentJson.clientSecret as string);
       setPaymentIntentId(intentJson.paymentIntentId as string);
 
+      // Persist email so AddToCart CAPI events can include em (Advanced Matching)
+      // on return visits or if the user navigates back to /shop mid-session.
+      try { localStorage.setItem("unc-email", contact.email.trim()); } catch { /* ignore */ }
+
       // Fire begin_checkout before transitioning to payment stage
       fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems, contact.email.trim());
 

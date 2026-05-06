@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import { useHydratedCart, useCartStore } from "@/lib/cart/store";
+import { sha256 } from "@/lib/browser-hash";
 import type { CatalogItem } from "@/lib/catalog/types";
 
 interface Props {
@@ -98,7 +99,7 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
   );
 }
 
-function fireAnalytics(item: CatalogItem, newQty: number) {
+async function fireAnalytics(item: CatalogItem, newQty: number) {
   try {
     if (typeof window === "undefined") return;
     const w = window as unknown as {
@@ -107,17 +108,56 @@ function fireAnalytics(item: CatalogItem, newQty: number) {
     };
     const value = (item.priceCents * newQty) / 100;
 
+    // Read email persisted at checkout (unc-email key). Present for returning
+    // visitors or users who started checkout in the same session. Used for
+    // Advanced Matching to lift Meta Pixel Match Quality.
+    let capturedEmail: string | null = null;
+    try {
+      capturedEmail = localStorage.getItem("unc-email");
+    } catch {
+      // ignore storage errors
+    }
+    const hashedEmail = capturedEmail ? await sha256(capturedEmail) : undefined;
+
+    // Stable eventId shared with CAPI so Meta deduplicates the two signals.
+    const eventId = `atc-${item.sku}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+
     // Meta Pixel. fbq is pre-stubbed in layout.tsx so calls made before
     // fbevents.js loads are buffered into the queue and replayed.
+    // Pass hashed em (Advanced Matching) when available.
     if (w.fbq) {
-      w.fbq("track", "AddToCart", {
-        content_name: item.name,
-        content_ids: [item.sku],
-        content_type: "product",
-        value,
-        currency: "USD",
-      });
+      w.fbq(
+        "track",
+        "AddToCart",
+        {
+          content_name: item.name,
+          content_ids: [item.sku],
+          content_type: "product",
+          value,
+          currency: "USD",
+          ...(hashedEmail && { em: hashedEmail }),
+        },
+        { eventID: eventId },
+      );
     }
+
+    // Server-side CAPI companion. Survives iOS ATT / Safari ITP.
+    // Same eventId → Meta deduplicates. Fire-and-forget; never blocks UI.
+    fetch("/api/capi/add-to-cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        sku: item.sku,
+        contentName: item.name,
+        value,
+        quantity: newQty,
+        eventId,
+        email: capturedEmail || undefined,
+      }),
+    }).catch(() => {
+      /* CAPI failure must never affect UX */
+    });
 
     // GA4 gtag. Stubbed in layout.tsx; retry kept as belt-and-braces.
     let attempts = 0;
