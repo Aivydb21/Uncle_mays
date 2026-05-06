@@ -8,7 +8,7 @@ import { sendCapiEvent } from "@/lib/meta-capi";
 // eventId must match the one passed to fbq so Meta deduplicates correctly.
 export async function POST(req: NextRequest) {
   try {
-    const { sku, contentName, value, quantity = 1, eventId: clientEventId, email } =
+    const { sku, contentName, value, quantity = 1, eventId: clientEventId, email, fbc, fbp } =
       (await req.json()) as {
         sku: string;
         contentName: string;
@@ -16,6 +16,8 @@ export async function POST(req: NextRequest) {
         quantity?: number;
         eventId?: string;
         email?: string;
+        fbc?: string;
+        fbp?: string;
       };
 
     const clientIp =
@@ -36,6 +38,8 @@ export async function POST(req: NextRequest) {
         client_ip_address: clientIp,
         client_user_agent: userAgent,
         email: typeof email === "string" && email.length > 3 ? email : undefined,
+        fbc: typeof fbc === "string" && fbc.length > 0 ? fbc : undefined,
+        fbp: typeof fbp === "string" && fbp.length > 0 ? fbp : undefined,
       },
       customData: {
         content_ids: [sku],

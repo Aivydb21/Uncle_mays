@@ -12,6 +12,7 @@ import { useAddressAutocomplete } from "@/hooks/use-address-autocomplete";
 import { formatCents } from "@/lib/format";
 import { MIN_SUBTOTAL_CENTS } from "@/lib/cart-pricing-constants";
 import { sha256, hashPhone } from "@/lib/browser-hash";
+import { getFbAttribution } from "@/lib/fb-attribution";
 
 // localStorage keys for hashed identity — written at InitiateCheckout, read
 // by Purchase (order-success) and AddToCart (returning users) pixel events.
@@ -80,7 +81,7 @@ const EMPTY_ADDRESS: AddressFields = {
  * Now includes hashed email (Advanced Matching) to improve Meta Pixel
  * Match Quality from 5.0/10 to 8.0+/10.
  */
-async function fireBeginCheckout(value: number, items: { sku: string; name: string; quantity: number; unitPriceCents: number }[], email?: string, phone?: string) {
+async function fireBeginCheckout(value: number, items: { sku: string; name: string; quantity: number; unitPriceCents: number }[], email?: string, phone?: string, fbc?: string, fbp?: string) {
   try {
     if (typeof window === "undefined") return;
     const w = window as unknown as {
@@ -136,6 +137,8 @@ async function fireBeginCheckout(value: number, items: { sku: string; name: stri
         eventId,
         email: email || undefined,
         phone: phone || undefined,
+        fbc,
+        fbp,
       }),
     }).catch(() => {
       /* CAPI failure must never block checkout. */
@@ -288,6 +291,8 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
     }
 
     // CAPI fires without raw email/phone at mount time (not yet collected).
+    // fbc/fbp are available immediately from cookies — include for click attribution.
+    const { fbc: viewFbc, fbp: viewFbp } = getFbAttribution();
     fetch("/api/capi/view", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -297,6 +302,8 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
         contentName: "Checkout",
         value: 0,
         eventId: viewEventId,
+        fbc: viewFbc,
+        fbp: viewFbp,
       }),
     }).catch(() => { /* never block */ });
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -456,7 +463,8 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       try { localStorage.setItem("unc-email", contact.email.trim()); } catch { /* ignore */ }
 
       // Fire begin_checkout before transitioning to payment stage
-      fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems, contact.email.trim(), contact.phone.trim() || undefined);
+      const { fbc: checkoutFbc, fbp: checkoutFbp } = getFbAttribution();
+      fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems, contact.email.trim(), contact.phone.trim() || undefined, checkoutFbc, checkoutFbp);
 
       setStage("payment");
     } catch (err) {
