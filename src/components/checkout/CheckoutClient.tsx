@@ -70,7 +70,7 @@ const EMPTY_ADDRESS: AddressFields = {
  * retry needed on the gtag path anymore, but kept short as belt-and-
  * braces for legacy session storage races.
  */
-function fireBeginCheckout(value: number, items: { sku: string; name: string; quantity: number; unitPriceCents: number }[]) {
+function fireBeginCheckout(value: number, items: { sku: string; name: string; quantity: number; unitPriceCents: number }[], email?: string) {
   try {
     if (typeof window === "undefined") return;
     const w = window as unknown as {
@@ -108,6 +108,7 @@ function fireBeginCheckout(value: number, items: { sku: string; name: string; qu
         contentName: items.map((i) => `${i.quantity}x ${i.name}`).join(", ").slice(0, 200),
         value,
         eventId,
+        email: email || undefined,
       }),
     }).catch(() => {
       /* CAPI failure must never block checkout. */
@@ -378,7 +379,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       setPaymentIntentId(intentJson.paymentIntentId as string);
 
       // Fire begin_checkout before transitioning to payment stage
-      fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems);
+      fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems, contact.email.trim());
 
       setStage("payment");
     } catch (err) {
