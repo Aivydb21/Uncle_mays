@@ -15,6 +15,7 @@ import { useHydratedCart, useCartStore, useCartItemCount } from "@/lib/cart/stor
 import { formatCents } from "@/lib/format";
 import { MIN_SUBTOTAL_CENTS } from "@/lib/cart-pricing-constants";
 import type { CatalogItem, PricingResponse } from "@/lib/catalog/types";
+import { sha256 } from "@/lib/browser-hash";
 
 export function CartDrawer() {
   const [open, setOpen] = useState(false);
@@ -296,6 +297,16 @@ function SaveCartCapture({
       const data = await res.json();
       if (data.ok) {
         setDone(true);
+        // Persist email for Meta Pixel Advanced Matching (same keys used in checkout).
+        // Store both plaintext (for CAPI server-side hashing) and hashed (for browser pixel).
+        try {
+          const normalizedEmail = email.trim().toLowerCase();
+          localStorage.setItem("unc-email", normalizedEmail);
+          const hashed = await sha256(normalizedEmail);
+          if (hashed) localStorage.setItem("unc-em", hashed);
+        } catch {
+          // ignore storage errors; analytics failure should not affect UX
+        }
       } else {
         setErr(
           data.error === "invalid_email"

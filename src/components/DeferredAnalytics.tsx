@@ -2,11 +2,13 @@
 
 import Script from "next/script";
 import { useEffect, useState } from "react";
+import { sha256 } from "@/lib/browser-hash";
 
 const DEFER_MS = 3000;
 
 export function DeferredAnalytics() {
   const [armed, setArmed] = useState(false);
+  const [hashedEmail, setHashedEmail] = useState<string | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setArmed(true), DEFER_MS);
@@ -20,6 +22,27 @@ export function DeferredAnalytics() {
       window.removeEventListener("pointerdown", onInteract);
       window.removeEventListener("keydown", onInteract);
     };
+  }, []);
+
+  useEffect(() => {
+    // Advanced Matching: check for hashed email (set by CheckoutClient or
+    // CartDrawer save-cart flow). If only plaintext unc-email exists, hash it.
+    async function loadHashedEmail() {
+      try {
+        let hashed = localStorage.getItem("unc-em");
+        if (!hashed) {
+          const plainEmail = localStorage.getItem("unc-email");
+          if (plainEmail) {
+            hashed = await sha256(plainEmail);
+            if (hashed) localStorage.setItem("unc-em", hashed);
+          }
+        }
+        if (hashed) setHashedEmail(hashed);
+      } catch {
+        // ignore storage errors
+      }
+    }
+    loadHashedEmail();
   }, []);
 
   if (!armed) return null;
@@ -54,9 +77,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           layout.tsx so calls made before this script loads are buffered,
           not dropped. We skip the snippet's `if(f.fbq)return` self-guard
           and just inject the network script + init + PageView; fbevents.js
-          will flush the queue when it loads. */}
+          will flush the queue when it loads. Advanced Matching: pass hashed
+          email when available to improve Match Quality. */}
       <Script id="fb-pixel" strategy="lazyOnload">
-        {`!function(b,e,v){var t=b.createElement(e);t.async=!0;t.src=v;var s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','2276705169443313');fbq('track','PageView');`}
+        {`!function(b,e,v){var t=b.createElement(e);t.async=!0;t.src=v;var s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','2276705169443313'${hashedEmail ? `,{em:'${hashedEmail}'}` : ""});fbq('track','PageView');`}
       </Script>
 
       {clarityId ? (
