@@ -10,6 +10,11 @@ function hashSHA256(value: string): string {
 export interface CapiUserData {
   email?: string;
   phone?: string;
+  firstName?: string;
+  lastName?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
   client_ip_address?: string;
   client_user_agent?: string;
   fbc?: string;
@@ -51,6 +56,21 @@ export async function sendCapiEvent(params: SendCapiEventParams): Promise<void> 
   if (params.userData.phone) {
     const normalized = params.userData.phone.replace(/\D/g, "");
     if (normalized) userData.ph = hashSHA256(normalized);
+  }
+  if (params.userData.firstName) {
+    userData.fn = hashSHA256(params.userData.firstName);
+  }
+  if (params.userData.lastName) {
+    userData.ln = hashSHA256(params.userData.lastName);
+  }
+  if (params.userData.city) {
+    userData.ct = hashSHA256(params.userData.city);
+  }
+  if (params.userData.state) {
+    userData.st = hashSHA256(params.userData.state);
+  }
+  if (params.userData.zip) {
+    userData.zp = hashSHA256(params.userData.zip);
   }
   if (params.userData.client_ip_address) {
     userData.client_ip_address = params.userData.client_ip_address;

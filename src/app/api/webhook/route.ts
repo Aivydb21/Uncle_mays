@@ -170,6 +170,9 @@ export async function POST(req: NextRequest) {
       // Fire CAPI Purchase server-side (bypasses ITP/ad blockers, critical for Meta attribution).
       // Skip for internal/test emails — feeding Meta's optimizer test-purchase signal teaches it
       // to chase profiles that look like Anthony rather than real customers.
+      const sessionName = session.customer_details?.name ?? null;
+      const [sessionFn, ...sessionRestName] = sessionName ? sessionName.split(" ") : [];
+      const sessionLn = sessionRestName.join(" ") || undefined;
       if (!isSuppressed(email !== "unknown" ? email : null)) {
         sendCapiEvent({
           eventName: "Purchase",
@@ -177,6 +180,11 @@ export async function POST(req: NextRequest) {
           userData: {
             email: email !== "unknown" ? email : undefined,
             phone: phone || undefined,
+            firstName: sessionFn || undefined,
+            lastName: sessionLn,
+            city: session.customer_details?.address?.city || undefined,
+            state: session.customer_details?.address?.state || undefined,
+            zip: session.customer_details?.address?.postal_code || undefined,
             fbc: session.metadata?.fbc || undefined,
             fbp: session.metadata?.fbp || undefined,
             client_ip_address: session.metadata?.client_ip || undefined,
@@ -394,6 +402,11 @@ export async function POST(req: NextRequest) {
         `[WEBHOOK] payment_intent.succeeded | pi=${intent.id} amount=${intent.amount} status=${intent.status} invoice=${intentInvoice ?? "none"}`
       );
 
+      // Parse customer name once for both CAPI call sites below.
+      const intentName = intent.metadata?.customer_name ?? null;
+      const [intentFn, ...intentRestName] = intentName ? intentName.split(" ") : [];
+      const intentLn = intentRestName.join(" ") || undefined;
+
       // Non-blocking: clean up Mailchimp abandoned cart for subscribe-intent flow.
       // customer_email is stored in metadata by /api/checkout/subscribe-intent.
       const intentEmail = intent.metadata?.customer_email || intent.receipt_email;
@@ -412,6 +425,11 @@ export async function POST(req: NextRequest) {
             userData: {
               email: intentEmail || undefined,
               phone: intent.metadata?.phone || undefined,
+              firstName: intentFn || undefined,
+              lastName: intentLn,
+              city: intent.metadata?.shipping_city || undefined,
+              state: intent.metadata?.shipping_state || undefined,
+              zip: intent.metadata?.shipping_zip || undefined,
               fbc: intent.metadata?.fbc || undefined,
               fbp: intent.metadata?.fbp || undefined,
               client_ip_address: intent.metadata?.client_ip || undefined,
@@ -474,6 +492,11 @@ export async function POST(req: NextRequest) {
             userData: {
               email: confirmEmail,
               phone: intent.metadata?.customer_phone || intent.metadata?.phone || undefined,
+              firstName: intentFn || undefined,
+              lastName: intentLn,
+              city: intent.metadata?.shipping_city || undefined,
+              state: intent.metadata?.shipping_state || undefined,
+              zip: intent.metadata?.shipping_zip || undefined,
               fbc: intent.metadata?.fbc || undefined,
               fbp: intent.metadata?.fbp || undefined,
               client_ip_address: intent.metadata?.client_ip || undefined,
