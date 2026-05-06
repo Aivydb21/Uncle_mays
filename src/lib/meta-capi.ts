@@ -15,6 +15,7 @@ export interface CapiUserData {
   city?: string;
   state?: string;
   zip?: string;
+  country?: string;
   client_ip_address?: string;
   client_user_agent?: string;
   fbc?: string;
@@ -70,7 +71,12 @@ export async function sendCapiEvent(params: SendCapiEventParams): Promise<void> 
     userData.st = hashSHA256(params.userData.state);
   }
   if (params.userData.zip) {
-    userData.zp = hashSHA256(params.userData.zip);
+    // Extract first 5 digits for US zip codes (Meta spec)
+    const zipDigits = params.userData.zip.replace(/\D/g, "").slice(0, 5);
+    if (zipDigits) userData.zp = hashSHA256(zipDigits);
+  }
+  if (params.userData.country) {
+    userData.country = hashSHA256(params.userData.country);
   }
   if (params.userData.client_ip_address) {
     userData.client_ip_address = params.userData.client_ip_address;
