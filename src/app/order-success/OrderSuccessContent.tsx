@@ -60,6 +60,24 @@ function trackGA(transactionId: string, value: number, items: TrackingItem[]) {
   tryFire();
 }
 
+// localStorage keys shared with CheckoutClient — hashed identity cached at
+// InitiateCheckout time so Purchase pixel can include em/ph for Match Quality.
+const LS_EM = "unc-em";
+const LS_PH = "unc-ph";
+
+function readAndClearHashedIdentity(): { em?: string; ph?: string } {
+  try {
+    const em = localStorage.getItem(LS_EM) || undefined;
+    const ph = localStorage.getItem(LS_PH) || undefined;
+    // Clear after one use — avoids polluting future sessions' attribution.
+    localStorage.removeItem(LS_EM);
+    localStorage.removeItem(LS_PH);
+    return { em, ph };
+  } catch {
+    return {};
+  }
+}
+
 /**
  * Fire Meta Pixel Purchase event. The eventId MUST match the CAPI server-side
  * event_id ([src/app/api/webhook/route.ts]) so Meta dedupes the two events
@@ -67,14 +85,21 @@ function trackGA(transactionId: string, value: number, items: TrackingItem[]) {
  * are blocked by in-app browsers and ITP). Without dedup Meta double-counts
  * and ad attribution lands on the worse-quality event = no purchases credited
  * back to ads.
+ *
+ * em/ph (SHA-256-hashed email/phone) are included when available from the
+ * localStorage cache written by CheckoutClient at InitiateCheckout time.
+ * This lifts Match Quality on the browser Pixel side alongside the CAPI
+ * identity signal already present in webhook/route.ts.
  */
-function fireMetaPurchase(value: number, product: string, eventId?: string): boolean {
+function fireMetaPurchase(value: number, product: string, eventId?: string, em?: string, ph?: string): boolean {
   if (typeof window === "undefined" || typeof window.fbq !== "function") return false;
   const data = {
     value,
     currency: "USD",
     content_type: "product",
     content_ids: [product],
+    ...(em && { em }),
+    ...(ph && { ph }),
   };
   if (eventId) {
     window.fbq("track", "Purchase", data, { eventID: eventId });
@@ -100,12 +125,16 @@ function trackPurchase(
 
   trackGA(transactionId, value, resolvedItems);
 
+  // Read and clear hashed identity cached by CheckoutClient at InitiateCheckout.
+  // Clearing after read avoids polluting future sessions' attribution.
+  const { em, ph } = readAndClearHashedIdentity();
+
   // Fire Meta Pixel with retry — order-success is often reached via 3DS
   // redirect where fbq loads async. Try up to 8 times at 1s intervals.
   let attempts = 0;
   const maxAttempts = 8;
   const tryMeta = () => {
-    if (fireMetaPurchase(value, resolvedProduct, metaEventId)) return;
+    if (fireMetaPurchase(value, resolvedProduct, metaEventId, em, ph)) return;
     if (++attempts < maxAttempts) setTimeout(tryMeta, 1000);
   };
   tryMeta();

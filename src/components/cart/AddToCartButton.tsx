@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
 import { useHydratedCart, useCartStore } from "@/lib/cart/store";
 import { sha256 } from "@/lib/browser-hash";
+import { getFbAttribution } from "@/lib/fb-attribution";
 import type { CatalogItem } from "@/lib/catalog/types";
 
 interface Props {
@@ -108,12 +109,15 @@ async function fireAnalytics(item: CatalogItem, newQty: number) {
     };
     const value = (item.priceCents * newQty) / 100;
 
-    // Read email persisted at checkout (unc-email key). Present for returning
-    // visitors or users who started checkout in the same session. Used for
-    // Advanced Matching to lift Meta Pixel Match Quality.
+    // Read identity cached at InitiateCheckout time. Present for returning
+    // visitors or users who started checkout in the same session.
+    //   unc-email → raw email  → hashed here for Pixel em + sent raw to CAPI
+    //   unc-ph    → pre-hashed phone → used directly as Pixel ph
     let capturedEmail: string | null = null;
+    let cachedPh: string | undefined;
     try {
       capturedEmail = localStorage.getItem("unc-email");
+      cachedPh = localStorage.getItem("unc-ph") || undefined;
     } catch {
       // ignore storage errors
     }
@@ -136,6 +140,7 @@ async function fireAnalytics(item: CatalogItem, newQty: number) {
           value,
           currency: "USD",
           ...(hashedEmail && { em: hashedEmail }),
+          ...(cachedPh && { ph: cachedPh }),
         },
         { eventID: eventId },
       );
@@ -143,6 +148,7 @@ async function fireAnalytics(item: CatalogItem, newQty: number) {
 
     // Server-side CAPI companion. Survives iOS ATT / Safari ITP.
     // Same eventId → Meta deduplicates. Fire-and-forget; never blocks UI.
+    const { fbc, fbp } = getFbAttribution();
     fetch("/api/capi/add-to-cart", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -154,6 +160,8 @@ async function fireAnalytics(item: CatalogItem, newQty: number) {
         quantity: newQty,
         eventId,
         email: capturedEmail || undefined,
+        fbc,
+        fbp,
       }),
     }).catch(() => {
       /* CAPI failure must never affect UX */

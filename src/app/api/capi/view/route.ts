@@ -5,11 +5,15 @@ import { sendCapiEvent } from "@/lib/meta-capi";
 // Fires ViewContent only. InitiateCheckout is fired separately on user action (UNC-559).
 export async function POST(req: NextRequest) {
   try {
-    const { slug, contentName, value, eventId: clientEventId } = await req.json() as {
+    const { slug, contentName, value, eventId: clientEventId, email, phone, fbc, fbp } = await req.json() as {
       slug: string;
       contentName: string;
       value: number;
       eventId?: string;
+      email?: string;
+      phone?: string;
+      fbc?: string;
+      fbp?: string;
     };
 
     const clientIp =
@@ -24,6 +28,10 @@ export async function POST(req: NextRequest) {
     const userData = {
       client_ip_address: clientIp,
       client_user_agent: userAgent,
+      email: typeof email === "string" && email.length > 3 ? email : undefined,
+      phone: typeof phone === "string" && phone.length > 0 ? phone : undefined,
+      fbc: typeof fbc === "string" && fbc.length > 0 ? fbc : undefined,
+      fbp: typeof fbp === "string" && fbp.length > 0 ? fbp : undefined,
     };
 
     // Use client-supplied eventId when available so the browser pixel event and

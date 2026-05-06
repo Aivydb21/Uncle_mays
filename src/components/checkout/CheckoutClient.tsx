@@ -12,6 +12,12 @@ import { useAddressAutocomplete } from "@/hooks/use-address-autocomplete";
 import { formatCents } from "@/lib/format";
 import { MIN_SUBTOTAL_CENTS } from "@/lib/cart-pricing-constants";
 import { sha256, hashPhone } from "@/lib/browser-hash";
+
+// localStorage keys for hashed identity — written at InitiateCheckout, read
+// by Purchase (order-success) and AddToCart (returning users) pixel events.
+const LS_EM = "unc-em";
+const LS_PH = "unc-ph";
+
 import type {
   FulfillmentMode,
   PickupSlot,
@@ -74,7 +80,7 @@ const EMPTY_ADDRESS: AddressFields = {
  * Now includes hashed email (Advanced Matching) to improve Meta Pixel
  * Match Quality from 5.0/10 to 8.0+/10.
  */
-async function fireBeginCheckout(value: number, items: { sku: string; name: string; quantity: number; unitPriceCents: number }[], email?: string) {
+async function fireBeginCheckout(value: number, items: { sku: string; name: string; quantity: number; unitPriceCents: number }[], email?: string, phone?: string) {
   try {
     if (typeof window === "undefined") return;
     const w = window as unknown as {
@@ -85,8 +91,19 @@ async function fireBeginCheckout(value: number, items: { sku: string; name: stri
     const eventId = `initiate-custom_cart-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     const contentIds = items.map((i) => i.sku);
 
-    // Hash email for Advanced Matching (improves Match Quality 5.0→8.0+)
+    // Hash email + phone for Advanced Matching (lifts Match Quality 5.0→8.0+).
+    // Cache both raw (for CAPI routes that rehash server-side) and hashed
+    // (for browser Pixel em/ph fields) so downstream events can reuse them:
+    //   unc-email → raw email  (AddToCart CAPI, which hashes server-side)
+    //   unc-em    → SHA-256 hex email (Purchase/ViewContent/AddToCart Pixel)
+    //   unc-ph    → SHA-256 hex phone (Purchase/ViewContent/AddToCart Pixel)
     const hashedEmail = email ? await sha256(email) : undefined;
+    const hashedPhone = phone ? await hashPhone(phone) : undefined;
+    try {
+      if (email) localStorage.setItem("unc-email", email);
+      if (hashedEmail) localStorage.setItem(LS_EM, hashedEmail);
+      if (hashedPhone) localStorage.setItem(LS_PH, hashedPhone);
+    } catch { /* ignore storage errors */ }
 
     // Meta Pixel (browser). The fbq stub queues if fbevents.js hasn't
     // loaded; the queue replays automatically when it does.
@@ -100,6 +117,7 @@ async function fireBeginCheckout(value: number, items: { sku: string; name: stri
           content_type: "product",
           content_ids: contentIds,
           ...(hashedEmail && { em: hashedEmail }),
+          ...(hashedPhone && { ph: hashedPhone }),
         },
         { eventID: eventId }
       );
@@ -117,6 +135,7 @@ async function fireBeginCheckout(value: number, items: { sku: string; name: stri
         value,
         eventId,
         email: email || undefined,
+        phone: phone || undefined,
       }),
     }).catch(() => {
       /* CAPI failure must never block checkout. */
@@ -236,6 +255,52 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       zip: parsed.zip || cur.zip,
     }));
   });
+
+  // Fire ViewContent once on mount. Returning users may have hashed em/ph
+  // cached in localStorage from a prior InitiateCheckout — include those in
+  // the browser Pixel call (already SHA-256 hex). The CAPI route needs raw
+  // email/phone to hash server-side, which we don't have at mount time, so
+  // CAPI fires without identity params (still improves server-side attribution).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const w = window as unknown as { fbq?: (...args: unknown[]) => void };
+    let cachedEm: string | undefined;
+    let cachedPh: string | undefined;
+    try {
+      cachedEm = localStorage.getItem(LS_EM) || undefined;
+      cachedPh = localStorage.getItem(LS_PH) || undefined;
+    } catch { /* ignore */ }
+
+    const viewEventId = `view-checkout-${Date.now()}`;
+
+    if (w.fbq) {
+      w.fbq(
+        "track",
+        "ViewContent",
+        {
+          content_ids: ["custom_cart"],
+          content_type: "product",
+          ...(cachedEm && { em: cachedEm }),
+          ...(cachedPh && { ph: cachedPh }),
+        },
+        { eventID: viewEventId }
+      );
+    }
+
+    // CAPI fires without raw email/phone at mount time (not yet collected).
+    fetch("/api/capi/view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        slug: "custom_cart",
+        contentName: "Checkout",
+        value: 0,
+        eventId: viewEventId,
+      }),
+    }).catch(() => { /* never block */ });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const canProceed =
     pricing?.ok &&
@@ -391,7 +456,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       try { localStorage.setItem("unc-email", contact.email.trim()); } catch { /* ignore */ }
 
       // Fire begin_checkout before transitioning to payment stage
-      fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems, contact.email.trim());
+      fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems, contact.email.trim(), contact.phone.trim() || undefined);
 
       setStage("payment");
     } catch (err) {
