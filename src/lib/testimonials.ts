@@ -11,9 +11,20 @@ export type Testimonial = {
 export const TESTIMONIALS: Testimonial[] = [
   {
     quote:
-      "Loved my first box from them, looking to order more. Friendly customer service, fresh quality produce. Can't wait until I receive my next box next week.",
+      "Finally. An opportunity to buy from Black people all in one place. And I could just order it directly without doing all the networking myself.",
     name: "Antoinette W.",
-    source: "Facebook comment, April 2026",
+    source: "Customer interview, May 2026 (3x repeat customer, Auburn Gresham)",
+  },
+  {
+    quote: "Y'all had me at all Black farmers.",
+    name: "Miriam J.",
+    source: "Customer interview, May 2026",
+  },
+  {
+    quote:
+      "Always searching for real food, given the limited options on the Southside. I was happy to support a Black farmer.",
+    name: "Morgan W.",
+    source: "Customer interview, May 2026",
   },
   {
     quote: "Beautiful veggies.",
