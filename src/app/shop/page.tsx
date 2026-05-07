@@ -3,6 +3,7 @@ import { fetchCatalog } from "@/lib/catalog/airtable";
 import { CatalogGrid } from "@/components/shop/CatalogGrid";
 import { ShopHeader } from "@/components/shop/ShopHeader";
 import { PromoBanner } from "@/components/shop/PromoBanner";
+import { RealBoxGallery } from "@/components/RealBoxGallery";
 import type { CatalogItem } from "@/lib/catalog/types";
 
 // Note: <Navigation /> and <Footer /> are rendered by PageShell at the
@@ -49,6 +50,10 @@ export default async function ShopPage({
       ) : (
         <CatalogGrid items={catalog} />
       )}
+      <RealBoxGallery
+        title="What's been showing up in recent boxes"
+        subtitle="Real photos from the last few weeks of Uncle May's deliveries."
+      />
     </div>
   );
 }

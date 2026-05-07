@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Hero } from "@/components/Hero";
 import { HomeEmailCapture } from "@/components/HomeEmailCapture";
+import { RealBoxGallery } from "@/components/RealBoxGallery";
 import { TESTIMONIALS } from "@/lib/testimonials";
 
 const faqs = [
@@ -59,6 +60,8 @@ const Index = ({ productSection }: { productSection: ReactNode }) => {
       {/* Shop CTA + 4-tile catalog preview. Provided by the parent server
           page (src/app/page.tsx) so the catalog fetch happens server-side. */}
       <Suspense>{productSection}</Suspense>
+
+      <RealBoxGallery />
 
       {/* Customer voice — real, attributed quotes only (see src/lib/testimonials.ts) */}
       {TESTIMONIALS.length > 0 ? (
