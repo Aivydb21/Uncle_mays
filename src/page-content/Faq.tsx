@@ -30,7 +30,7 @@ const features = [
     icon: ShoppingBag,
     title: "Build Your Own Order",
     description:
-      "Pick exactly what you want, in any quantity. Greens, roots, microgreens, pantry staples, and pasture-raised protein. $25 minimum.",
+      "Pick exactly what you want, in any quantity. Greens, roots, microgreens, pantry staples, and pasture-raised protein. $20 minimum.",
   },
   {
     icon: ShieldCheck,
@@ -71,7 +71,7 @@ const faqs = [
   },
   {
     q: "How does ordering work?",
-    a: "Browse the catalog at unclemays.com/shop, fill your cart with the items you want (any quantity), and check out. $25 minimum. Use code FRESH10 for $10 off your first order.",
+    a: "Browse the catalog at unclemays.com/shop, fill your cart with the items you want (any quantity), and check out. $20 minimum. Use code FRESH10 for $10 off your first order.",
   },
   {
     q: "How does delivery work?",
@@ -83,7 +83,7 @@ const faqs = [
   },
   {
     q: "What's the minimum order?",
-    a: "$25. Most customers land between $30 and $60 for a week of produce + a protein. There's no upper limit.",
+    a: "$20. Most customers land between $30 and $60 for a week of produce + a protein. There's no upper limit.",
   },
   {
     q: "What if I have an issue with my order?",

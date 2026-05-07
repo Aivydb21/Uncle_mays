@@ -6,7 +6,7 @@ export function ShopHeader() {
       </div>
       <h1 className="mt-4 text-4xl font-bold md:text-5xl">Shop the catalog</h1>
       <p className="mx-auto mt-3 max-w-2xl text-lg text-muted-foreground">
-        Pick exactly what you want, in whatever quantity you want. $25 minimum.
+        Pick exactly what you want, in whatever quantity you want. $20 minimum.
         Delivered to your door in Chicago or ready for pickup at Polsky Center
         in Hyde Park.
       </p>

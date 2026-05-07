@@ -101,7 +101,7 @@ export async function priceCart(input: PriceCartInput): Promise<PricingResponse>
     return {
       ok: false,
       code: "below_minimum",
-      message: "Add a few more items to reach the $25 minimum.",
+      message: "Add a few more items to reach the $20 minimum.",
       shortfallCents: MIN_SUBTOTAL_CENTS - subtotalCents,
       lineItems,
       subtotalCents,

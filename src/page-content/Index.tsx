@@ -12,7 +12,7 @@ const faqs = [
   {
     question: "How does ordering work?",
     answer:
-      "Browse the catalog, fill your cart with the items you want (any quantity), and check out. $25 minimum. Pay once per order. No subscription, no auto-renewal, no card on file.",
+      "Browse the catalog, fill your cart with the items you want (any quantity), and check out. $20 minimum. Pay once per order. No subscription, no auto-renewal, no card on file.",
   },
   {
     question: "How does delivery work?",

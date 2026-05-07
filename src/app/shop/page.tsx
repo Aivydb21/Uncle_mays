@@ -12,7 +12,7 @@ import type { CatalogItem } from "@/lib/catalog/types";
 export const metadata: Metadata = {
   title: "Shop fresh produce, pantry, and protein | Uncle May's",
   description:
-    "Build your own grocery box from Uncle May's curated catalog. $25 minimum. Chicago delivery or Hyde Park pickup.",
+    "Build your own grocery box from Uncle May's curated catalog. $20 minimum. Chicago delivery or Hyde Park pickup.",
 };
 
 export const revalidate = 300;

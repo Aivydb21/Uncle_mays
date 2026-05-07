@@ -141,7 +141,7 @@ async function sendEmail(
       Your cart is still saved. Pick up where you left off whenever you're ready.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      Use code <strong>FRESH10</strong> at checkout for $10 off your first order ($25 minimum).
+      Use code <strong>FRESH10</strong> at checkout for $10 off your first order ($20 minimum).
     </p>
     <p style="margin:32px 0;">
       <a href="${checkoutUrl}"
@@ -162,7 +162,7 @@ async function sendEmail(
 
 You started an order at Uncle May's but didn't finish checking out. Your cart is still saved. Pick up where you left off whenever you're ready.
 
-Use code FRESH10 at checkout for $10 off your first order ($25 minimum).
+Use code FRESH10 at checkout for $10 off your first order ($20 minimum).
 
 ${checkoutUrl}
 
@@ -185,7 +185,7 @@ unclemays.com · info@unclemays.com`;
       that, your order ships the following Wednesday.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      Code <strong>FRESH10</strong> still works on your first order ($25 minimum).
+      Code <strong>FRESH10</strong> still works on your first order ($20 minimum).
     </p>
     <p style="margin:32px 0;">
       <a href="${checkoutUrl}"
@@ -206,7 +206,7 @@ unclemays.com · info@unclemays.com`;
 
 We deliver every Wednesday across the Chicago metro. To get your order this Wednesday, finish checking out by Sunday at 11:59 PM CT. After that, your order ships the following Wednesday.
 
-Code FRESH10 still works on your first order ($25 minimum).
+Code FRESH10 still works on your first order ($20 minimum).
 
 ${checkoutUrl}
 
@@ -229,7 +229,7 @@ unclemays.com · info@unclemays.com`;
       pasture-raised protein from Black farmers, delivered weekly.
     </p>
     <p style="font-size:16px;line-height:1.6;">
-      <strong>FRESH10</strong> is good for $10 off your first order ($25 minimum).
+      <strong>FRESH10</strong> is good for $10 off your first order ($20 minimum).
     </p>
     <p style="margin:32px 0;">
       <a href="${checkoutUrl}"
@@ -254,7 +254,7 @@ unclemays.com · info@unclemays.com`;
 
 Last note from us. Your cart is still here whenever you're ready. No commitment, no subscription , just fresh produce, pantry, and pasture-raised protein from Black farmers, delivered weekly.
 
-FRESH10 is good for $10 off your first order ($25 minimum).
+FRESH10 is good for $10 off your first order ($20 minimum).
 
 ${checkoutUrl}
 

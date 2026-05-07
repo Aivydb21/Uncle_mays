@@ -202,7 +202,7 @@ function renderHtml(a: RenderArgs): string {
       </a>
     </p>
     <p style="font-size:14px;color:#666;line-height:1.6;">
-      Use code <strong>FRESH10</strong> at checkout for $10 off your first order ($25 minimum).
+      Use code <strong>FRESH10</strong> at checkout for $10 off your first order ($20 minimum).
     </p>
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
@@ -227,7 +227,7 @@ ${lines}
 ${a.subtotalCents > 0 ? `\nSubtotal: ${formatCents(a.subtotalCents)}\n` : ""}
 Open your cart: ${a.restoreUrl}
 
-Use code FRESH10 at checkout for $10 off your first order ($25 minimum).
+Use code FRESH10 at checkout for $10 off your first order ($20 minimum).
 
 ---
 Uncle May's Produce · Hyde Park, Chicago, IL

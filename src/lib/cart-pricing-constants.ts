@@ -3,7 +3,7 @@
 // that just need the minimum-subtotal threshold or shipping default for
 // display use this file instead.
 
-export const MIN_SUBTOTAL_CENTS = 2500;
+export const MIN_SUBTOTAL_CENTS = 2000;
 export const SHIPPING_CHICAGO_CENTS = 799;
 export const TAX_RATE = 0.01;
 export const MAX_QTY_PER_LINE = 99;

@@ -70,7 +70,7 @@ export const Hero = () => {
                 </Link>
               </Button>
               <span className="text-sm text-foreground/70 ml-1">
-                $25 minimum. Use code FRESH10 for $10 off.
+                $20 minimum. Use code FRESH10 for $10 off.
               </span>
             </div>
           </motion.div>

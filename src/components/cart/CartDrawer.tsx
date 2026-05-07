@@ -209,7 +209,7 @@ export function CartDrawer() {
             {!meetsMin && pricing && pricing.ok && (
               <p className="mt-2 text-xs text-amber-700">
                 Add {formatCents(Math.max(0, MIN_SUBTOTAL_CENTS - subtotalCents))}{" "}
-                more to reach the $25 minimum.
+                more to reach the $20 minimum.
               </p>
             )}
             <Link

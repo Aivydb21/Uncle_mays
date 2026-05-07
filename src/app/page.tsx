@@ -12,7 +12,7 @@ const localBusinessSchema = {
   "@id": "https://unclemays.com/",
   name: "Uncle Mays Produce",
   description:
-    "Premium produce, pantry staples, and pasture-raised protein sourced directly from Black farmers. Build your own grocery order from the catalog. Chicago delivery or free pickup at the Polsky Center in Hyde Park. $25 minimum, no subscription required.",
+    "Premium produce, pantry staples, and pasture-raised protein sourced directly from Black farmers. Build your own grocery order from the catalog. Chicago delivery or free pickup at the Polsky Center in Hyde Park. $20 minimum, no subscription required.",
   url: "https://unclemays.com",
   logo: "https://www.unclemays.com/uncle-mays-logo.png",
   image: "https://www.unclemays.com/uncle-mays-logo.png",
@@ -46,7 +46,7 @@ const organizationSchema = {
   url: "https://unclemays.com",
   logo: "https://www.unclemays.com/uncle-mays-logo.png",
   description:
-    "Uncle May's Produce connects Black farmers directly to households across the Chicago metro area through a curated catalog of premium produce, pantry staples, and pasture-raised protein. Build your own grocery order. $25 minimum, no subscription required.",
+    "Uncle May's Produce connects Black farmers directly to households across the Chicago metro area through a curated catalog of premium produce, pantry staples, and pasture-raised protein. Build your own grocery order. $20 minimum, no subscription required.",
   contactPoint: {
     "@type": "ContactPoint",
     telephone: "+1-312-972-2595",
@@ -72,7 +72,7 @@ const storeSchema = {
   "@type": "Store",
   name: "Uncle Mays Produce — Shop",
   description:
-    "Build your own grocery order from Uncle May's curated catalog. Premium produce, pantry staples, and pasture-raised protein from Black farmers. $25 minimum.",
+    "Build your own grocery order from Uncle May's curated catalog. Premium produce, pantry staples, and pasture-raised protein from Black farmers. $20 minimum.",
   url: "https://unclemays.com/shop",
   image: "https://www.unclemays.com/uncle-mays-logo.png",
   priceRange: "$$",
@@ -93,7 +93,7 @@ const faqSchema = {
       name: "How does ordering work?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Browse the catalog at unclemays.com/shop, fill your cart with the items you want (any quantity), and check out. $25 minimum. Pay once per order. No subscription, no auto-renewal, no card on file.",
+        text: "Browse the catalog at unclemays.com/shop, fill your cart with the items you want (any quantity), and check out. $20 minimum. Pay once per order. No subscription, no auto-renewal, no card on file.",
       },
     },
     {

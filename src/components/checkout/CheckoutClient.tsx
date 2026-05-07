@@ -978,7 +978,7 @@ function OrderSummary({
             typeof pricing.shortfallCents === "number" && (
               <p className="text-xs text-amber-700">
                 Add {formatCents(pricing.shortfallCents)} more to reach the
-                $25 minimum.
+                $20 minimum.
               </p>
             )}
         </div>

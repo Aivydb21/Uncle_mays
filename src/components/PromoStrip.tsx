@@ -45,7 +45,7 @@ export function PromoStrip() {
           <span className="rounded bg-primary-foreground px-2 py-0.5 font-bold tracking-wider text-primary">
             FRESH10
           </span>{" "}
-          for $10 off your first order over $25
+          for $10 off your first order over $20
         </span>
         <button
           type="button"

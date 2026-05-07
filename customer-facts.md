@@ -32,7 +32,7 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 
 ## Pricing — ONE AUTHORITATIVE TABLE
 
-**Build-your-own catalog. No fixed boxes. $25 minimum cart. The customer adds individual items at right-sized portions and checks out one-time.**
+**Build-your-own catalog. No fixed boxes. $20 minimum cart. The customer adds individual items at right-sized portions and checks out one-time.**
 
 Live SKU-by-SKU pricing is in Airtable (base `appm6F6H9obydzAM2`, table `Catalog`) and rendered live at `/shop`. The full per-SKU sizing rationale is in [`notes/catalog-right-sizing-2026-05-03.md`](./notes/catalog-right-sizing-2026-05-03.md). Headline anchors customers see:
 
@@ -56,8 +56,8 @@ Typical first-time cart lands $30–$60 (produce + one protein). No upper limit.
 ### Rules
 
 - **Build-your-own catalog only.** No fixed Spring Box / Full Harvest Box / Community Box. No subscription tier.
-- **$25 minimum** cart. Customers under $25 see a "add a few more items to reach $25" gate at the cart drawer; checkout is blocked.
-- **`FRESH10`** is the primary promo code: $10 off the first order ($25 minimum). Customer enters it in the cart drawer or on the checkout page; we do **not** auto-apply it from `?promo=` URL params anymore.
+- **$20 minimum** cart. Customers under $20 see a "add a few more items to reach $20" gate at the cart drawer; checkout is blocked.
+- **`FRESH10`** is the primary promo code: $10 off the first order ($20 minimum). Customer enters it in the cart drawer or on the checkout page; we do **not** auto-apply it from `?promo=` URL params anymore.
 - **`FRESH30`** is the social-ask promo on `/ask` (35% off, capped). Both codes can coexist; they are separate Stripe coupons in `src/lib/promo.ts`.
 - Customer-facing display rule: portion size is shown in the unit label on every catalog card (e.g. "$2.50 / 1/4 lb"). The customer-facing visual is the AI-generated portion photo at `/catalog/{sku}.jpg`.
 - Doina has a **grandfathered $55/wk subscription** through Stripe directly. She is the only active subscription customer; we are not signing up new subscriptions until further notice.

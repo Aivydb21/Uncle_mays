@@ -27,7 +27,7 @@ export async function ShopCTA() {
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Pick the produce, pantry items, and protein you actually want.
-            Sourced from our Black farmer partners. $25 minimum.
+            Sourced from our Black farmer partners. $20 minimum.
           </p>
           <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
             Use code{" "}

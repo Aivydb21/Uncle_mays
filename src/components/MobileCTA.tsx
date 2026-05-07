@@ -36,7 +36,7 @@ export const MobileCTA = () => {
             className="flex w-full flex-col items-center justify-center rounded-xl bg-primary text-primary-foreground py-3 text-center shadow-soft"
           >
             <span className="text-xs opacity-80">Build your own order</span>
-            <span className="text-base font-bold">Shop the catalog · $25 min</span>
+            <span className="text-base font-bold">Shop the catalog · $20 min</span>
           </Link>
         </motion.div>
       )}
