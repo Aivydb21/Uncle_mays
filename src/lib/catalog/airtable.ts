@@ -31,6 +31,18 @@ const VALID_UNITS: ReadonlySet<CatalogUnit> = new Set([
   "oz",
 ]);
 
+// Local product photos served from /public/photos/. Keyed by SKU.
+// Wins over the Airtable ImageURL when the SKU appears here. Add SKUs to
+// extend coverage; remove a SKU to fall back to the Airtable image.
+const SKU_IMAGE_OVERRIDES: Readonly<Record<string, string>> = {
+  "kale-tuscan-lb": "/photos/collards-armful.jpg",
+  "radishes-green-meat-daikon-lb": "/photos/daikon.jpg",
+  "radishes-purple-daikon-lb": "/photos/daikon.jpg",
+  "potatoes-white-eva-lb": "/photos/potatoes.jpg",
+  "sweet-potatoes-lb": "/photos/sweet-potatoes.jpg",
+  "chicken-pastured-whole-lb": "/photos/heritage-chicken.jpg",
+};
+
 interface AirtableRecord {
   id: string;
   fields: Record<string, unknown>;
@@ -106,7 +118,7 @@ function mapRecord(record: AirtableRecord): CatalogItemInternal | null {
     costCents: Math.round(costCents),
     active,
     availableQty: asNumber(f.AvailableQty),
-    imageUrl: asString(f.ImageURL),
+    imageUrl: SKU_IMAGE_OVERRIDES[sku] ?? asString(f.ImageURL),
     sortOrder: asNumber(f.SortOrder) ?? 999,
     taxCategory,
     freshnessLabel: asString(f.FreshnessLabel),
@@ -188,7 +200,7 @@ async function fetchInternalCatalogUncached(): Promise<CatalogItemInternal[]> {
 
 const getInternalCatalogCached = unstable_cache(
   fetchInternalCatalogUncached,
-  ["catalog-internal-v7-no-spruce"],
+  ["catalog-internal-v8-photo-overrides"],
   { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_TAG] }
 );
 

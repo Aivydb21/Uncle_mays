@@ -3,9 +3,9 @@
 import { Suspense, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import Image from "next/image";
 import { Hero } from "@/components/Hero";
 import { HomeEmailCapture } from "@/components/HomeEmailCapture";
-import { RealBoxGallery } from "@/components/RealBoxGallery";
 import { TESTIMONIALS } from "@/lib/testimonials";
 
 const faqs = [
@@ -61,7 +61,35 @@ const Index = ({ productSection }: { productSection: ReactNode }) => {
           page (src/app/page.tsx) so the catalog fetch happens server-side. */}
       <Suspense>{productSection}</Suspense>
 
-      <RealBoxGallery />
+      {/* Real photos: a single Uncle May's box, and a market-table set of three. */}
+      <section className="py-12 bg-background">
+        <div className="container px-6 max-w-5xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold">What actually arrives at your door</h2>
+            <p className="mt-2 text-foreground/70">Real photos from recent Uncle May&rsquo;s deliveries.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border/50 shadow-soft bg-muted">
+              <Image
+                src="/photos/produce-box.jpg"
+                alt="A single Uncle May's Fresh Produce box, packed and ready for delivery"
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border/50 shadow-soft bg-muted">
+              <Image
+                src="/photos/market-table.jpg"
+                alt="Three Uncle May's produce boxes lined up on a covered market table"
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Customer voice — real, attributed quotes only (see src/lib/testimonials.ts) */}
       {TESTIMONIALS.length > 0 ? (
