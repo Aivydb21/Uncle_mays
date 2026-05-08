@@ -15,7 +15,7 @@ uncle_mays:
       method: service-account
       project: uncle-mays-automation
       dataset: uncle_mays_dbt
-      keyfile: "~/.claude/ga-service-account.json"
+      keyfile: "C:/Users/Anthony/.claude/ga-service-account.json"
       location: US
       threads: 4
       timeout_seconds: 300
