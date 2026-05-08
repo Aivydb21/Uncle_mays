@@ -1042,6 +1042,18 @@ function PaymentSection({
 
   void paymentIntentId;
 
+  // Fire add_payment_info event when payment form is visible
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const w = window as unknown as { gtag?: (...args: unknown[]) => void };
+    if (w.gtag) {
+      w.gtag('event', 'add_payment_info', {
+        currency: 'USD',
+        payment_type: 'card'
+      });
+    }
+  }, []); // Run once on mount
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!stripe || !elements) return;
