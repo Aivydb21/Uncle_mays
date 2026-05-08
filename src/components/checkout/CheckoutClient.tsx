@@ -178,12 +178,12 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
   const [address, setAddress] = useState<AddressFields>(EMPTY_ADDRESS);
   const [pricing, setPricing] = useState<PricingResponse | null>(null);
   const [pricingLoading, setPricingLoading] = useState(false);
-  const [stage, setStage] = useState<"form" | "payment">("form");
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [preparingPayment, setPreparingPayment] = useState(false);
 
   const fulfillmentMode: FulfillmentMode = cartFulfillment ?? "delivery";
 
@@ -318,6 +318,14 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       ? Boolean(cartPickupSlot)
       : address.street.trim() && /^\d{5}$/.test(address.zip));
 
+  // Auto-prepare payment intent when form is complete (single-page checkout)
+  useEffect(() => {
+    if (canProceed && !clientSecret && !preparingPayment) {
+      preparePaymentIntent();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canProceed, clientSecret, preparingPayment]);
+
   if (!cartHydrated) {
     return (
       <div className="mx-auto mt-16 flex max-w-md items-center justify-center gap-2 text-sm text-muted-foreground">
@@ -331,9 +339,10 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
     return <EmptyCheckout />;
   }
 
-  async function handleProceed() {
+  async function preparePaymentIntent() {
     if (!pricing?.ok) return;
-    setSubmitting(true);
+    if (clientSecret) return; // Already prepared
+    setPreparingPayment(true);
     setSubmitError(null);
     try {
       const sessionRes = await fetch("/api/checkout/session", {
@@ -462,15 +471,21 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       // on return visits or if the user navigates back to /shop mid-session.
       try { localStorage.setItem("unc-email", contact.email.trim()); } catch { /* ignore */ }
 
-      // Fire begin_checkout before transitioning to payment stage
+      // Fire begin_checkout when payment intent is prepared
       const { fbc: checkoutFbc, fbp: checkoutFbp } = getFbAttribution();
       fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems, contact.email.trim(), contact.phone.trim() || undefined, checkoutFbc, checkoutFbp);
 
-      setStage("payment");
+      // Auto-scroll to payment section on mobile
+      setTimeout(() => {
+        const paymentSection = document.getElementById('payment-section');
+        if (paymentSection && window.innerWidth < 1024) {
+          paymentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Unknown error");
     } finally {
-      setSubmitting(false);
+      setPreparingPayment(false);
     }
   }
 
@@ -486,78 +501,64 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
           <MobileCollapsibleSummary pricing={pricing} loading={pricingLoading} />
         </div>
 
-        {stage === "form" && (
-          <div className="space-y-8">
-            <ContactSection contact={contact} setContact={setContact} />
-            <FulfillmentSection
-              mode={fulfillmentMode}
-              onChange={(m) => {
-                setFulfillmentMode(m);
-                if (m === "delivery") setPickupSlotId(null);
-              }}
-            />
-            {fulfillmentMode === "delivery" ? (
-              <DeliverySection
-                address={address}
-                setAddress={setAddress}
-                addressRef={addressInputRef}
-              />
-            ) : (
-              <PickupSection
-                slots={slots}
-                selected={cartPickupSlot}
-                onSelect={setPickupSlotId}
-              />
-            )}
-
-            {submitError && (
-              <p className="text-sm text-destructive">{submitError}</p>
-            )}
-
-            <button
-              type="button"
-              disabled={!canProceed || submitting}
-              onClick={handleProceed}
-              className={`inline-flex h-12 items-center justify-center rounded-xl px-8 text-base font-semibold transition-colors ${
-                canProceed && !submitting
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "cursor-not-allowed bg-muted text-muted-foreground"
-              }`}
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Preparing payment…
-                </>
-              ) : (
-                "Continue to payment"
-              )}
-            </button>
-          </div>
-        )}
-
-        {stage === "payment" && clientSecret && (
-          <Elements
-            stripe={stripePromise}
-            options={{
-              clientSecret,
-              appearance: { theme: "stripe" },
+        <div className="space-y-8">
+          <ContactSection contact={contact} setContact={setContact} />
+          <FulfillmentSection
+            mode={fulfillmentMode}
+            onChange={(m) => {
+              setFulfillmentMode(m);
+              if (m === "delivery") setPickupSlotId(null);
             }}
-          >
-            <PaymentSection
-              sessionId={sessionId}
-              paymentIntentId={paymentIntentId}
-              onSuccess={() => {
-                useCartStore.getState().clear();
-                router.push(`/order-success?pi=${paymentIntentId ?? ""}`);
-              }}
-              onBack={() => {
-                setStage("form");
-                setClientSecret(null);
-              }}
+          />
+          {fulfillmentMode === "delivery" ? (
+            <DeliverySection
+              address={address}
+              setAddress={setAddress}
+              addressRef={addressInputRef}
             />
-          </Elements>
-        )}
+          ) : (
+            <PickupSection
+              slots={slots}
+              selected={cartPickupSlot}
+              onSelect={setPickupSlotId}
+            />
+          )}
+
+          {submitError && (
+            <p className="text-sm text-destructive">{submitError}</p>
+          )}
+
+          {/* Show payment section inline when form is complete */}
+          {clientSecret ? (
+            <div id="payment-section" className="pt-4 border-t">
+              <Elements
+                stripe={stripePromise}
+                options={{
+                  clientSecret,
+                  appearance: { theme: "stripe" },
+                }}
+              >
+                <PaymentSection
+                  sessionId={sessionId}
+                  paymentIntentId={paymentIntentId}
+                  onSuccess={() => {
+                    useCartStore.getState().clear();
+                    router.push(`/order-success?pi=${paymentIntentId ?? ""}`);
+                  }}
+                />
+              </Elements>
+            </div>
+          ) : preparingPayment ? (
+            <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Preparing payment…
+            </div>
+          ) : !canProceed ? (
+            <div className="py-4 text-sm text-muted-foreground">
+              Please complete all required fields above to continue.
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
@@ -1029,12 +1030,10 @@ function PaymentSection({
   sessionId,
   paymentIntentId,
   onSuccess,
-  onBack,
 }: {
   sessionId: string | null;
   paymentIntentId: string | null;
   onSuccess: () => void;
-  onBack: () => void;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -1085,34 +1084,24 @@ function PaymentSection({
       <h2 className="text-xl font-semibold">Payment</h2>
       <PaymentElement />
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={onBack}
-          disabled={submitting}
-          className="text-sm font-semibold text-muted-foreground hover:text-foreground"
-        >
-          ← Back to details
-        </button>
-        <button
-          type="submit"
-          disabled={submitting || !stripe}
-          className={`ml-auto inline-flex h-12 items-center justify-center rounded-xl px-8 text-base font-semibold transition-colors ${
-            !submitting
-              ? "bg-primary text-primary-foreground hover:bg-primary/90"
-              : "cursor-not-allowed bg-muted text-muted-foreground"
-          }`}
-        >
-          {submitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Processing…
-            </>
-          ) : (
-            "Place order"
-          )}
-        </button>
-      </div>
+      <button
+        type="submit"
+        disabled={submitting || !stripe}
+        className={`inline-flex h-12 w-full items-center justify-center rounded-xl px-8 text-base font-semibold transition-colors ${
+          !submitting
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "cursor-not-allowed bg-muted text-muted-foreground"
+        }`}
+      >
+        {submitting ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            Processing…
+          </>
+        ) : (
+          "Place order"
+        )}
+      </button>
     </form>
   );
 }
