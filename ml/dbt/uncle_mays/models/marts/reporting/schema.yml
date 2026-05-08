@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: rpt_ceo_weekly
+    description: >
+      CEO weekly review table. One row per week. Covers revenue WoW,
+      order count, new vs. repeat customers, CAC trend by channel, ROAS.
+      Use as the source for the Monday morning CEO read-out.
+    columns:
+      - name: order_week
+        description: ISO week start date (Monday)
+        tests:
+          - unique
+          - not_null
+      - name: total_revenue
+        description: Gross revenue for the week
+        tests:
+          - not_null
+
+  - name: rpt_cro_weekly
+    description: >
+      CRO weekly review table. One row per week. Covers checkout CVR,
+      abandonment rate, AOV by customer segment (new vs repeat),
+      promo usage, channel mix, fulfillment split.
+    columns:
+      - name: order_week
+        description: ISO week start date (Monday)
+        tests:
+          - unique
+          - not_null

@@ -31,11 +31,18 @@ models:
       finance:
         +materialized: table
         +schema: finance
+      reporting:
+        +materialized: table
+        +schema: reporting
 
 vars:
   # Stripe data lands in this BQ dataset after ingest
   stripe_dataset: "stripe_raw"
-  # GA4 export dataset
+  # GA4 export dataset (native BQ export, project uncle-mays-automation)
   ga4_dataset: "analytics_494626869"
+  # Meta + Google Ads daily snapshots (bigquery_ads_loader.py -> ads_raw)
+  ads_dataset: "ads_raw"
+  # Mailchimp + Resend snapshots (crm_loader.py -> crm_raw, not yet built)
+  crm_dataset: "crm_raw"
   # Currency for all money fields
   default_currency: "usd"
