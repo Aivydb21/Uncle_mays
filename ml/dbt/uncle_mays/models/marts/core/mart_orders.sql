@@ -112,6 +112,23 @@ orders as (
 
     from pi
     left join cs using (payment_intent_id)
+),
+
+-- Rolling AOV windows (7d and 28d, looking back from each order date)
+orders_with_rolling_aov as (
+    select
+        *,
+        -- 7-day rolling AOV: average of all orders in the 7 days ending on this order's date
+        round(avg(gross_revenue_dollars) over (
+            order by ordered_at
+            range between interval '6 days' preceding and current row
+        ), 2)                                                    as rolling_aov_7d,
+        -- 28-day rolling AOV
+        round(avg(gross_revenue_dollars) over (
+            order by ordered_at
+            range between interval '27 days' preceding and current row
+        ), 2)                                                    as rolling_aov_28d
+    from orders
 )
 
-select * from orders
+select * from orders_with_rolling_aov

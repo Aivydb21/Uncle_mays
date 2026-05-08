@@ -24,3 +24,35 @@ models:
         description: Sum of gross revenue for this channel/week
         tests:
           - not_null
+
+  - name: mart_order_attribution
+    description: >
+      One row per completed order with best-available attribution from
+      both Stripe PI metadata (utm_*, gclid, fbclid) and GA4 purchase events.
+      Canonical attribution table — all CAC/ROAS derives from this model.
+
+      Attribution hierarchy:
+        1. Stripe PI metadata (utm/gclid/fbclid) — post-2026-05-03
+        2. GA4 purchase event (transaction_id = payment_intent_id)
+        3. Historical orders: channel inferred from available signal
+
+      NOTE: ga_client_id is not yet wired from checkout to PI metadata
+      (as of 2026-05-07). GA4 join uses transaction_id. Most pre-fix
+      orders will show channel = 'direct'.
+    columns:
+      - name: payment_intent_id
+        description: Primary key — Stripe payment intent ID
+        tests:
+          - unique
+          - not_null
+      - name: channel
+        description: Effective attribution channel
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['google_ads', 'meta_ads', 'email', 'organic_social',
+                       'organic_search', 'referral', 'direct']
+      - name: is_new_customer
+        description: True if this is the customer's first order
+        tests:
+          - not_null

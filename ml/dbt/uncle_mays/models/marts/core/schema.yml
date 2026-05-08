@@ -70,3 +70,36 @@ models:
         description: True if customer has placed more than one order
         tests:
           - not_null
+
+  - name: mart_cac
+    description: >
+      Customer Acquisition Cost by channel by week.
+      CAC = ad_spend_dollars / new_customers.
+      Covers Meta Ads + Google Ads spend. Direct and organic channels
+      have ad_spend = 0, so CAC = NULL (not 0) to avoid misleading math.
+    columns:
+      - name: order_week
+        description: Week start date (Monday) of the order cohort
+        tests:
+          - not_null
+      - name: channel
+        description: Attribution channel (google_ads, meta_ads, direct, etc.)
+        tests:
+          - not_null
+
+  - name: mart_retention
+    description: >
+      Cohort-based retention analysis. One row per acquisition month.
+      Measures 30d and 60d repeat purchase rates.
+      NOTE: n is very small (11 customers as of 2026-05-07). Use as
+      directional signal; CIs are wide until n > 30.
+    columns:
+      - name: cohort_month
+        description: First order month for this cohort
+        tests:
+          - unique
+          - not_null
+      - name: cohort_size
+        description: Number of unique customers who first ordered this month
+        tests:
+          - not_null
