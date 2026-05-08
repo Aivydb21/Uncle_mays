@@ -474,14 +474,6 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       // Fire begin_checkout when payment intent is prepared
       const { fbc: checkoutFbc, fbp: checkoutFbp } = getFbAttribution();
       fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems, contact.email.trim(), contact.phone.trim() || undefined, checkoutFbc, checkoutFbp);
-
-      // Auto-scroll to payment section on mobile
-      setTimeout(() => {
-        const paymentSection = document.getElementById('payment-section');
-        if (paymentSection && window.innerWidth < 1024) {
-          paymentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 100);
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -1039,6 +1031,7 @@ function PaymentSection({
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [elementsReady, setElementsReady] = useState(false);
 
   void paymentIntentId;
 
@@ -1053,6 +1046,21 @@ function PaymentSection({
       });
     }
   }, []); // Run once on mount
+
+  // Auto-scroll to payment section on mobile ONLY after Stripe Elements is ready.
+  // Previously this happened 100ms after clientSecret was set, which caused a
+  // race condition where Elements hadn't mounted yet, resulting in a blank/
+  // broken payment form on mobile (especially slower connections). This fix
+  // waits for the onReady callback before scrolling, ensuring Elements is
+  // interactive when it comes into view. Fixes UNC-956 (78% checkout abandonment).
+  useEffect(() => {
+    if (!elementsReady) return;
+    if (typeof window === 'undefined') return;
+    const paymentSection = document.getElementById('payment-section');
+    if (paymentSection && window.innerWidth < 1024) {
+      paymentSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [elementsReady]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -1103,7 +1111,23 @@ function PaymentSection({
         <span>🔒 Secure checkout · Your information is encrypted and secure</span>
       </div>
 
-      <PaymentElement />
+      <div className="relative">
+        <PaymentElement
+          onReady={() => setElementsReady(true)}
+          onLoadError={(event) => {
+            setError(event.error.message || "Payment form failed to load. Please refresh and try again.");
+            setElementsReady(false);
+          }}
+        />
+        {!elementsReady && (
+          <div className="absolute inset-0 flex items-center justify-center bg-background/80">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Loading payment form…
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Trust signals: Powered by Stripe */}
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
