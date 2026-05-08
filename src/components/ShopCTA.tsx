@@ -4,13 +4,33 @@ import { fetchCatalog } from "@/lib/catalog/airtable";
 import { formatCents } from "@/lib/format";
 import type { CatalogItem } from "@/lib/catalog/types";
 
-const PREVIEW_LIMIT = 4;
+// Curated 4 SKUs for the homepage preview, picked for visual variety
+// across categories (greens, leafy green, protein, root). Order matters:
+// it controls left-to-right display.
+const FEATURED_SKUS = [
+  "asparagus-green-lb",
+  "kale-tuscan-lb",
+  "chicken-pastured-whole-lb",
+  "sweet-potatoes-lb",
+];
 
 export async function ShopCTA() {
   let preview: CatalogItem[] = [];
   try {
     const all = await fetchCatalog();
-    preview = all.slice(0, PREVIEW_LIMIT);
+    const bySku = new Map(all.map((item) => [item.sku, item]));
+    preview = FEATURED_SKUS.map((sku) => bySku.get(sku)).filter(
+      (x): x is CatalogItem => x != null,
+    );
+    // If any featured SKU is missing from the catalog (out of stock,
+    // renamed, etc.) backfill from the catalog so we still show 4 tiles.
+    if (preview.length < FEATURED_SKUS.length) {
+      const featuredSet = new Set(preview.map((p) => p.sku));
+      for (const item of all) {
+        if (preview.length >= FEATURED_SKUS.length) break;
+        if (!featuredSet.has(item.sku)) preview.push(item);
+      }
+    }
   } catch {
     preview = [];
   }

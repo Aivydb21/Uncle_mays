@@ -35,7 +35,6 @@ const VALID_UNITS: ReadonlySet<CatalogUnit> = new Set([
 // Wins over the Airtable ImageURL when the SKU appears here. Add SKUs to
 // extend coverage; remove a SKU to fall back to the Airtable image.
 const SKU_IMAGE_OVERRIDES: Readonly<Record<string, string>> = {
-  "kale-tuscan-lb": "/photos/collards-armful.jpg",
   "radishes-green-meat-daikon-lb": "/photos/daikon.jpg",
   "radishes-purple-daikon-lb": "/photos/daikon.jpg",
   "potatoes-white-eva-lb": "/photos/potatoes.jpg",
