@@ -5,6 +5,7 @@
 **Approval required:** No — affects core product pages (Hero, Pricing, /shop) and checkout/subscribe delivery steps, which the standing order 2026-04-29 explicitly marks as freely touchable when the change is not part of an active ad funnel variant. This is a CRO/conversion experiment, not an ad-funnel test.
 **Target start (T0):** 2026-05-09 (deploy timestamp)
 **Target completion:** T0 + 14 days
+**Material amendment 2026-05-09:** CEO authorized mid-experiment restart of Meta + Google Ads campaigns. See §9 risks for the contamination disclosure. Post-period readout will segment by paid vs organic traffic; the unsegmented pre/post comparison is no longer interpretable as a causal lift.
 
 ---
 
@@ -132,6 +133,8 @@ Do not stop early for positive results. Wait the minimum 14-day window to captur
 |---|---|---|
 | Customers feel deceived by the painted door | High | Honest reveal email immediately on order success; no overpromise about future delivery dates |
 | Pre/post comparison is confounded by ads pause and seasonality | High | Disclose explicitly; do not over-claim causal inference; use directional language |
+| **Mid-experiment ad restart contaminates the post period** | **High** | **CEO authorized restart of Meta + Google Ads campaigns on 2026-05-09 as part of the painted-door evaluation. Post-period traffic mix will differ from the planned organic-only design. Readout MUST segment by `traffic_medium` (paid vs organic) and report both slices. The session→purchase rate comparison remains valid only at the segment level; the headline pre/post number is no longer interpretable as a causal lift.** |
+| **Pre-period was not actually ad-free** | **Medium** | **API check on 2026-05-09 found Google Ads "Catalog Sprint May 2026" (campaign 23822705962) still ENABLED at $17/day during the pause memo's stated window. The original memory entry was wrong. Pre-period traffic was already partially Google-ads-driven; only Meta was fully paused.** |
 | Underpowered for definitive read | High | Pre-specify directional language and lean on secondary metrics for the ops decision |
 | Pickup mode (Airtable-backed slot picker) accidentally affected | Medium | Scope changes to `delivery` fulfillment mode only; explicit regression check in verification |
 | `delivery_scheduler_view` / `delivery_slot_selected` events fail to fire | Medium | Verify in GA4 DebugView during the deploy verification step |

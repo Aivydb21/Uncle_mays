@@ -173,11 +173,90 @@ GROUP BY preferred_date, preferred_window
 ORDER BY preferred_date, preferred_window;
 
 -- =====================================================================
--- DECISION GUIDE (per EXP-002 pre-spec):
+-- 6. SEGMENTED PRIMARY METRIC: session->purchase rate by traffic source
+--    Added 2026-05-09 after CEO authorized mid-experiment ad restart.
+--    The unsegmented pre/post in result 1 is no longer interpretable as
+--    causal lift; this segmented view is the closest thing to a clean
+--    read because it isolates organic + email + LinkedIn traffic from
+--    paid-ad traffic. Compare 'organic_or_email' rates pre vs post for
+--    the most defensible signal.
+-- =====================================================================
+WITH all_events AS (
+  SELECT
+    user_pseudo_id,
+    (SELECT value.int_value FROM UNNEST(event_params) WHERE key = 'ga_session_id') AS session_id,
+    event_name,
+    TIMESTAMP_MICROS(event_timestamp) AS event_ts,
+    -- Pull source/medium for traffic classification. GA4 stores these on
+    -- the session_start event; we cross-join across the session below.
+    (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'source') AS event_source,
+    (SELECT value.string_value FROM UNNEST(event_params) WHERE key = 'medium') AS event_medium
+  FROM `uncle-mays-automation.analytics_494626869.events_*`
+  WHERE _TABLE_SUFFIX BETWEEN
+    FORMAT_DATE('%Y%m%d', DATE(PRE_START))
+    AND FORMAT_DATE('%Y%m%d', DATE(POST_END))
+),
+session_traffic AS (
+  -- One source/medium per session: take the first non-null pair seen.
+  SELECT
+    user_pseudo_id,
+    session_id,
+    ANY_VALUE(event_source IGNORE NULLS) AS source,
+    ANY_VALUE(event_medium IGNORE NULLS) AS medium,
+    MIN(event_ts) AS session_start
+  FROM all_events
+  WHERE session_id IS NOT NULL
+  GROUP BY 1, 2
+),
+session_with_purchase AS (
+  SELECT
+    s.user_pseudo_id,
+    s.session_id,
+    s.source,
+    s.medium,
+    CASE
+      WHEN s.session_start <  T0 THEN 'pre'
+      WHEN s.session_start >= T0 THEN 'post'
+    END AS bucket,
+    -- Coarse traffic class. Tweak this if your UTM hygiene differs.
+    CASE
+      WHEN LOWER(COALESCE(s.medium, '')) IN ('cpc', 'cpm', 'paid', 'paidsearch', 'paid_search', 'paidsocial', 'paid_social') THEN 'paid_ads'
+      WHEN LOWER(COALESCE(s.source, '')) IN ('google', 'facebook', 'meta', 'instagram') AND LOWER(COALESCE(s.medium, '')) NOT IN ('organic', 'referral', '(none)') THEN 'paid_ads'
+      WHEN LOWER(COALESCE(s.medium, '')) = 'email' THEN 'email'
+      WHEN LOWER(COALESCE(s.source, '')) LIKE '%linkedin%' THEN 'linkedin'
+      WHEN LOWER(COALESCE(s.medium, '')) IN ('organic', 'referral', '(none)', '') OR s.medium IS NULL THEN 'organic_or_direct'
+      ELSE 'other'
+    END AS traffic_class,
+    CASE WHEN p.session_id IS NOT NULL THEN 1 ELSE 0 END AS purchased
+  FROM session_traffic s
+  LEFT JOIN (
+    SELECT user_pseudo_id, session_id
+    FROM all_events
+    WHERE event_name = 'purchase'
+    GROUP BY 1, 2
+  ) p USING (user_pseudo_id, session_id)
+)
+SELECT
+  bucket,
+  traffic_class,
+  COUNT(*) AS sessions,
+  SUM(purchased) AS purchases,
+  SAFE_DIVIDE(SUM(purchased), COUNT(*)) * 100 AS conversion_pct
+FROM session_with_purchase
+GROUP BY bucket, traffic_class
+ORDER BY bucket DESC, sessions DESC;
+
+-- =====================================================================
+-- DECISION GUIDE (per EXP-002 pre-spec, amended 2026-05-09):
 --
---   * Result 1: report rate, lift, p-value. CAVEAT confounds (paid ads
---     paused 2026-05-09; pre traffic was ad-driven, post is organic).
---     Do NOT claim causal lift on this alone.
+--   * Result 1 (unsegmented pre/post): report but DO NOT claim causal
+--     lift. Mid-experiment ad restart contaminated the post period.
+--   * Result 6 (segmented pre/post): primary read. Compare the
+--     'organic_or_direct' + 'email' + 'linkedin' rows pre vs post for
+--     the cleanest signal on whether the painted door moved organic
+--     conversion. The 'paid_ads' row is contaminated both ways
+--     (Google had 1 campaign on during pre; Meta + Google fully on in
+--     post) and should be reported separately, not used for causal lift.
 --   * Result 3: if >=30% of picks are non-Wednesday days, demand for
 --     flexibility exists. <30%, demand is weaker than feedback suggested.
 --   * Result 5: same threshold but with real money behind it. Prefer
