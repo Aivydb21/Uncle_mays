@@ -6,6 +6,8 @@ import {
   MIN_SUBTOTAL_CENTS,
   SHIPPING_CHICAGO_CENTS,
   TAX_RATE,
+  IL_STATE_GROCERY_TAX_RATE,
+  CHICAGO_LOCAL_GROCERY_TAX_RATE,
   MAX_QTY_PER_LINE,
 } from "./cart-pricing-constants";
 import type {
@@ -19,6 +21,8 @@ export {
   MIN_SUBTOTAL_CENTS,
   SHIPPING_CHICAGO_CENTS,
   TAX_RATE,
+  IL_STATE_GROCERY_TAX_RATE,
+  CHICAGO_LOCAL_GROCERY_TAX_RATE,
   MAX_QTY_PER_LINE,
 };
 
@@ -143,7 +147,16 @@ export async function priceCart(input: PriceCartInput): Promise<PricingResponse>
     shippingCents = SHIPPING_CHICAGO_CENTS;
   }
 
-  const taxCents = Math.round(postDiscountSubtotalCents * TAX_RATE);
+  // Split tax into state vs. local layers so the receipt can show them
+  // separately. Both are 0% on qualifying food in Chicago in 2026 (see
+  // cart-pricing-constants.ts for citations).
+  const stateTaxCents = Math.round(
+    postDiscountSubtotalCents * IL_STATE_GROCERY_TAX_RATE
+  );
+  const localTaxCents = Math.round(
+    postDiscountSubtotalCents * CHICAGO_LOCAL_GROCERY_TAX_RATE
+  );
+  const taxCents = stateTaxCents + localTaxCents;
   const totalCents = postDiscountSubtotalCents + shippingCents + taxCents;
 
   return {
@@ -153,6 +166,8 @@ export async function priceCart(input: PriceCartInput): Promise<PricingResponse>
     discountCents,
     postDiscountSubtotalCents,
     shippingCents,
+    stateTaxCents,
+    localTaxCents,
     taxCents,
     totalCents,
     appliedPromoCode,

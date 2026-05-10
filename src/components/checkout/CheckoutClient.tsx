@@ -977,7 +977,21 @@ function OrderSummary({
               />
             )}
             <Row label="Shipping" value={formatCents(pricing.shippingCents)} />
-            <Row label="Tax" value={formatCents(pricing.taxCents)} />
+            {pricing.stateTaxCents > 0 && (
+              <Row
+                label="Sales tax (IL state)"
+                value={formatCents(pricing.stateTaxCents)}
+              />
+            )}
+            {pricing.localTaxCents > 0 && (
+              <Row
+                label="Sales tax (Chicago / Cook)"
+                value={formatCents(pricing.localTaxCents)}
+              />
+            )}
+            {pricing.stateTaxCents === 0 && pricing.localTaxCents === 0 && (
+              <Row label="Sales tax" value="$0.00" />
+            )}
             <div className="mt-2 flex justify-between border-t border-border pt-2 text-base font-semibold">
               <span>Total</span>
               <span>{formatCents(pricing.totalCents)}</span>

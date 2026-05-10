@@ -73,6 +73,11 @@ export interface PricingResult {
   discountCents: number;
   postDiscountSubtotalCents: number;
   shippingCents: number;
+  /** Illinois state grocery tax portion (0% on qualifying food since 2026-01-01). */
+  stateTaxCents: number;
+  /** Chicago + Cook County + RTA local grocery tax portion (0% on qualifying food). */
+  localTaxCents: number;
+  /** Sum of stateTaxCents + localTaxCents, kept for backward-compat. */
   taxCents: number;
   totalCents: number;
   appliedPromoCode: string | null;
