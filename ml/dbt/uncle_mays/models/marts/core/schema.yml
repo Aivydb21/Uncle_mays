@@ -87,6 +87,77 @@ models:
         tests:
           - not_null
 
+  - name: mart_conversion_funnel
+    description: >
+      Session-grain conversion funnel from first touch to purchase.
+      One row per GA4 session (user_pseudo_id + ga_session_id).
+
+      Purpose: Expose step-level drop-off rates across the funnel so
+      that paid media, UX, and product decisions are grounded in where
+      users actually leave — not guesses.
+
+      Steps tracked (in order):
+        1. session_start      — baseline
+        2. page_view          — any page viewed
+        3. view_item          — product detail page viewed
+        4. add_to_cart        — item added (reliable from 2026-05-06; commit dea0488)
+        5. begin_checkout     — checkout initiated (CTA overlay fixed 2026-05-06; commit 3bb8909)
+        6. purchase           — order completed
+
+      Key metrics derivable from this table:
+        - view_item → add_to_cart CVR:     countif(has_add_to_cart)    / countif(has_view_item)
+        - add_to_cart → begin_checkout CVR: countif(has_begin_checkout) / countif(has_add_to_cart)
+        - begin_checkout → purchase CVR:   countif(has_purchase)       / countif(has_begin_checkout)
+        - Full funnel CVR:                 countif(has_purchase)       / count(*)
+        - Median time-to-purchase:         percentile_cont(0.5) of secs_to_purchase
+
+      Data quality: filter to session_date >= '2026-05-06' for clean numbers.
+      Earlier dates have under-counted add_to_cart + begin_checkout due to
+      tracking bugs fixed on that date.
+
+      Channel logic is identical to mart_order_attribution — denominators
+      for channel CAC and funnel CVR are always consistent.
+    columns:
+      - name: session_key
+        description: >
+          Surrogate primary key: concat(user_pseudo_id, '-', ga_session_id).
+        tests:
+          - unique
+          - not_null
+      - name: session_date
+        description: Date of the session (from the earliest event in the session)
+        tests:
+          - not_null
+      - name: channel
+        description: >
+          Derived acquisition channel. Identical logic to mart_order_attribution.
+          Values: google_ads, email, organic_social, organic_search, referral, other, direct.
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['google_ads', 'email', 'organic_social', 'organic_search',
+                       'referral', 'other', 'direct']
+      - name: has_session_start
+        description: True if a session_start event was recorded for this session
+        tests:
+          - not_null
+      - name: has_view_item
+        description: True if a view_item event was recorded in this session
+        tests:
+          - not_null
+      - name: has_add_to_cart
+        description: True if an add_to_cart event was recorded in this session
+        tests:
+          - not_null
+      - name: has_begin_checkout
+        description: True if a begin_checkout event was recorded in this session
+        tests:
+          - not_null
+      - name: has_purchase
+        description: True if a purchase event was recorded in this session
+        tests:
+          - not_null
+
   - name: mart_retention
     description: >
       Cohort-based retention analysis. One row per acquisition month.
