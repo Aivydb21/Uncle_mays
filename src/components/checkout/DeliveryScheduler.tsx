@@ -18,11 +18,23 @@ export interface DeliverySchedulerSelection {
 
 interface Props {
   value: DeliverySchedulerSelection | null;
-  onChange: (selection: DeliverySchedulerSelection) => void;
+  onChange: (selection: DeliverySchedulerSelection | null) => void;
   className?: string;
 }
 
 type GtagWindow = Window & { gtag?: (...args: unknown[]) => void };
+
+// EXP-002 verification helper. Append `?debug_exp=1` to any URL with the
+// scheduler to (a) console-log every fired event and (b) flip GA4 into
+// debug_mode so the events appear in DebugView for live verification.
+function debugLogEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return new URLSearchParams(window.location.search).has("debug_exp");
+  } catch {
+    return false;
+  }
+}
 
 const WEEKDAY_HEADERS = ["S", "M", "T", "W", "T", "F", "S"];
 const MONTH_NAMES = [
@@ -180,23 +192,30 @@ export function DeliveryScheduler({ value, onChange, className }: Props) {
   // Fire scheduler view exactly once per mount.
   useEffect(() => {
     if (typeof window === "undefined") return;
+    const debug = debugLogEnabled();
     const gtag = (window as GtagWindow).gtag;
-    if (typeof gtag !== "function") return;
-    gtag("event", "delivery_scheduler_view", {
+    const params: Record<string, unknown> = {
       event_category: "experiment",
       event_label: "EXP-002",
-    });
+    };
+    if (debug) params.debug_mode = true;
+    if (debug) {
+      // eslint-disable-next-line no-console
+      console.log("[EXP-002] delivery_scheduler_view", params, {
+        gtag_present: typeof gtag === "function",
+      });
+    }
+    if (typeof gtag !== "function") return;
+    gtag("event", "delivery_scheduler_view", params);
   }, []);
 
   function pickDate(iso: string) {
     setSelectedIso(iso);
-    // Drop any window selection from the previous date so the user has to
-    // affirmatively pick a window for the new date (prevents accidental
-    // submission with stale window).
+    // If the user switches to a new date, clear the parent's stored
+    // selection so canProceed flips back to false until they pick a
+    // window for the new date.
     if (value && value.isoDate !== iso) {
-      // Reset by emitting null-like state via not-calling onChange. Caller
-      // gates submission on `value` being non-null, so this just leaves the
-      // window cards unselected until the user clicks one.
+      onChange(null);
     }
   }
 
@@ -213,15 +232,24 @@ export function DeliveryScheduler({ value, onChange, className }: Props) {
     };
     onChange(next);
     if (typeof window !== "undefined") {
+      const debug = debugLogEnabled();
       const gtag = (window as GtagWindow).gtag;
-      if (typeof gtag === "function") {
-        gtag("event", "delivery_slot_selected", {
-          event_category: "experiment",
-          event_label: "EXP-002",
-          day_offset: dayOffset,
-          weekday: WEEKDAYS_LONG[date.getDay()],
-          window_key: windowKey,
+      const params: Record<string, unknown> = {
+        event_category: "experiment",
+        event_label: "EXP-002",
+        day_offset: dayOffset,
+        weekday: WEEKDAYS_LONG[date.getDay()],
+        window_key: windowKey,
+      };
+      if (debug) params.debug_mode = true;
+      if (debug) {
+        // eslint-disable-next-line no-console
+        console.log("[EXP-002] delivery_slot_selected", params, {
+          gtag_present: typeof gtag === "function",
         });
+      }
+      if (typeof gtag === "function") {
+        gtag("event", "delivery_slot_selected", params);
       }
     }
   }
