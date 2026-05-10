@@ -535,6 +535,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
                 address={address}
                 setAddress={setAddress}
                 addressRef={addressInputRef}
+                pricing={pricing}
               />
             </>
           ) : (
@@ -576,7 +577,9 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
             </div>
           ) : !canProceed ? (
             <div className="py-4 text-sm text-muted-foreground">
-              Please complete all required fields above to continue.
+              {pricing && !pricing.ok && ["out_of_zone", "missing_zip"].includes(pricing.code ?? "")
+                ? pricing.message
+                : "Please complete all required fields above to continue."}
             </div>
           ) : null}
         </div>
@@ -802,10 +805,12 @@ function DeliverySection({
   address,
   setAddress,
   addressRef,
+  pricing,
 }: {
   address: AddressFields;
   setAddress: (a: AddressFields) => void;
   addressRef: (node: HTMLInputElement | null) => void;
+  pricing: PricingResponse | null;
 }) {
   return (
     <section>
@@ -868,6 +873,9 @@ function DeliverySection({
               inputMode="numeric"
               className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
             />
+            {pricing && !pricing.ok && ["out_of_zone", "missing_zip"].includes(pricing.code ?? "") && (
+              <p className="text-xs text-destructive mt-1">{pricing.message}</p>
+            )}
           </Field>
         </div>
       </div>
