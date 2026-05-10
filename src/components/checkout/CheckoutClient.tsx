@@ -502,7 +502,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
   }
 
   return (
-    <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 lg:grid-cols-[1fr_380px]">
+    <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 pb-20 lg:pb-0 lg:grid-cols-[1fr_380px]">
       <div>
         <h1 className="mb-6 text-3xl font-bold">Checkout</h1>
 
@@ -585,6 +585,47 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
         <OrderSummary pricing={pricing} loading={pricingLoading} />
       </aside>
+
+      {/* Mobile sticky total bar - always visible */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border bg-card/95 backdrop-blur-sm shadow-lg">
+        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Total
+            </p>
+            <p className="text-lg font-bold text-foreground">
+              {pricing && pricing.ok ? formatCents(pricing.totalCents) : "—"}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (canProceed && !clientSecret) {
+                preparePaymentIntent();
+              } else if (clientSecret) {
+                document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            disabled={!canProceed || preparingPayment}
+            className={`inline-flex h-11 items-center justify-center rounded-xl px-6 text-sm font-semibold transition-colors whitespace-nowrap ${
+              canProceed && !preparingPayment
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "cursor-not-allowed bg-muted text-muted-foreground"
+            }`}
+          >
+            {preparingPayment ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading…
+              </>
+            ) : clientSecret ? (
+              "Continue to payment"
+            ) : (
+              "Place order"
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
