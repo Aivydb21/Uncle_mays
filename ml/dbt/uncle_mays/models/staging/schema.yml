@@ -96,3 +96,133 @@ models:
       - name: created_at
         tests:
           - not_null
+
+  - name: stg_ga4_events
+    description: >
+      One row per GA4 event. Wraps the BigQuery daily-sharded export
+      (analytics_494626869.events_*) in prod and flattened parquet
+      snapshots in dev. event_params are unnested inline in BQ.
+    columns:
+      - name: user_pseudo_id
+        description: GA4 anonymous user identifier
+        tests:
+          - not_null
+      - name: event_name
+        description: GA4 event name (page_view, purchase, add_to_cart, etc.)
+        tests:
+          - not_null
+      - name: event_ts
+        description: Event timestamp (UTC), normalised from BQ microseconds or parquet ISO string
+        tests:
+          - not_null
+      - name: event_date
+        description: Event date (UTC) derived from event_date shard suffix
+        tests:
+          - not_null
+
+  - name: stg_meta_campaign_insights
+    description: >
+      One row per Meta (Facebook/Instagram) campaign per day.
+      Source: meta_campaign_insights_*.parquet (dev) or
+      ads_raw.meta_campaign_insights (prod, bigquery_ads_loader.py).
+      Deduped on (campaign_id, date) keeping latest snapshot.
+    columns:
+      - name: campaign_id
+        description: Meta campaign ID
+        tests:
+          - not_null
+      - name: report_date
+        description: Date of the daily snapshot
+        tests:
+          - not_null
+      - name: spend_usd
+        description: Spend in USD for this campaign on this date
+        tests:
+          - not_null
+      - name: impressions
+        tests:
+          - not_null
+      - name: clicks
+        tests:
+          - not_null
+
+  - name: stg_gads_campaign_insights
+    description: >
+      One row per Google Ads campaign per day.
+      Source: google_ads_campaign_insights_*.parquet (dev) or
+      ads_raw.google_ads_campaign_insights (prod, bigquery_ads_loader.py).
+      cost_micros retained alongside spend_usd for auditability.
+    columns:
+      - name: campaign_id
+        description: Google Ads campaign ID (cast to string)
+        tests:
+          - not_null
+      - name: report_date
+        description: Date of the daily snapshot
+        tests:
+          - not_null
+      - name: spend_usd
+        description: Spend in USD (cost_micros / 1,000,000)
+        tests:
+          - not_null
+      - name: impressions
+        tests:
+          - not_null
+      - name: clicks
+        tests:
+          - not_null
+      - name: campaign_status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['ENABLED', 'PAUSED', 'REMOVED']
+
+  - name: stg_mailchimp_members
+    description: >
+      One row per Mailchimp list member, deduped on email_hash keeping
+      most recently changed record. email is PII; downstream joins
+      should use email_hash.
+    columns:
+      - name: email_hash
+        description: SHA-256[:24] of lower(trim(email)) — stable join key
+        tests:
+          - unique
+          - not_null
+      - name: status
+        description: Mailchimp member status
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['subscribed', 'unsubscribed', 'cleaned', 'pending', 'transactional']
+      - name: is_subscribed
+        description: True when status = subscribed
+        tests:
+          - not_null
+
+  - name: stg_resend_emails
+    description: >
+      One row per Resend email send, deduped on email_id.
+      last_event tracks the furthest delivery state reached.
+      delivery_stage maps last_event to a numeric ladder for funnel math.
+    columns:
+      - name: email_id
+        description: Resend UUID for this send
+        tests:
+          - unique
+          - not_null
+      - name: sent_at
+        description: Timestamp when the email was sent (UTC)
+        tests:
+          - not_null
+      - name: to_hash
+        description: SHA-256[:24] of recipient email — joins to stg_mailchimp_members
+        tests:
+          - not_null
+      - name: last_event
+        description: Furthest delivery event reached
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['sent', 'delivered', 'opened', 'clicked', 'bounced', 'complained', 'unsubscribed']
+      - name: delivery_stage
+        description: Numeric delivery ladder (3=clicked, 2=opened, 1=delivered, 0=sent, negatives=negative outcomes)

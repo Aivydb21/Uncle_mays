@@ -45,7 +45,11 @@ orders as (
         coalesce(
             pi.email_hash,
             case when cs.customer_email is not null
-                 then left(sha256(lower(trim(cs.customer_email))), 24)
+                 then {% if target.type == 'bigquery' %}
+                      left(to_hex(sha256(lower(trim(cs.customer_email)))), 24)
+                      {% else %}
+                      left(sha256(lower(trim(cs.customer_email))), 24)
+                      {% endif %}
             end
         )                                                as email_hash,
         coalesce(pi.customer_name, cs.customer_name)     as customer_name,
@@ -119,14 +123,15 @@ orders_with_rolling_aov as (
     select
         *,
         -- 7-day rolling AOV: average of all orders in the 7 days ending on this order's date
+        -- BQ: order by unix epoch (numeric) to use numeric RANGE BETWEEN
         round(avg(gross_revenue_dollars) over (
-            order by ordered_at
-            range between interval '6 days' preceding and current row
+            order by {% if target.type == 'bigquery' %}unix_seconds(ordered_at){% else %}ordered_at{% endif %}
+            range between {% if target.type == 'bigquery' %}518400{% else %}interval '6 days'{% endif %} preceding and current row
         ), 2)                                                    as rolling_aov_7d,
         -- 28-day rolling AOV
         round(avg(gross_revenue_dollars) over (
-            order by ordered_at
-            range between interval '27 days' preceding and current row
+            order by {% if target.type == 'bigquery' %}unix_seconds(ordered_at){% else %}ordered_at{% endif %}
+            range between {% if target.type == 'bigquery' %}2332800{% else %}interval '27 days'{% endif %} preceding and current row
         ), 2)                                                    as rolling_aov_28d
     from orders
 )

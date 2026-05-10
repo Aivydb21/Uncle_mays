@@ -1,0 +1,158 @@
+﻿{
+    "Header":  {
+                   "Time":  "2026-05-07T13:49:25-07:00",
+                   "ReportName":  "CashFlow",
+                   "StartPeriod":  "2026-01-01",
+                   "EndPeriod":  "2026-05-07",
+                   "SummarizeColumnsBy":  "Total",
+                   "Currency":  "USD",
+                   "Option":  [
+                                  {
+                                      "Name":  "NoReportData",
+                                      "Value":  "false"
+                                  }
+                              ]
+               },
+    "Columns":  {
+                    "Column":  [
+                                   {
+                                       "ColTitle":  "",
+                                       "ColType":  "Account"
+                                   },
+                                   {
+                                       "ColTitle":  "Total",
+                                       "ColType":  "Money",
+                                       "MetaData":  [
+                                                        {
+                                                            "Name":  "ColKey",
+                                                            "Value":  "total"
+                                                        }
+                                                    ]
+                                   }
+                               ]
+                },
+    "Rows":  {
+                 "Row":  [
+                             {
+                                 "Header":  {
+                                                "ColData":  [
+                                                                {
+                                                                    "value":  "OPERATING ACTIVITIES"
+                                                                },
+                                                                {
+                                                                    "value":  ""
+                                                                }
+                                                            ]
+                                            },
+                                 "Rows":  {
+                                              "Row":  [
+                                                          {
+                                                              "ColData":  [
+                                                                              {
+                                                                                  "value":  "Net Income"
+                                                                              },
+                                                                              {
+                                                                                  "value":  ""
+                                                                              }
+                                                                          ],
+                                                              "type":  "Data",
+                                                              "group":  "NetIncome"
+                                                          },
+                                                          {
+                                                              "ColData":  [
+                                                                              {
+                                                                                  "value":  "Adjustments to reconcile Net Income to Net Cash provided by operations:"
+                                                                              },
+                                                                              {
+                                                                                  "value":  ""
+                                                                              }
+                                                                          ],
+                                                              "type":  "Data",
+                                                              "group":  "OperatingAdjustments"
+                                                          }
+                                                      ]
+                                          },
+                                 "Summary":  {
+                                                 "ColData":  [
+                                                                 {
+                                                                     "value":  "Net cash provided by operating activities"
+                                                                 },
+                                                                 {
+                                                                     "value":  "0.00"
+                                                                 }
+                                                             ]
+                                             },
+                                 "type":  "Section",
+                                 "group":  "OperatingActivities"
+                             },
+                             {
+                                 "Header":  {
+                                                "ColData":  [
+                                                                {
+                                                                    "value":  "FINANCING ACTIVITIES"
+                                                                },
+                                                                {
+                                                                    "value":  ""
+                                                                }
+                                                            ]
+                                            },
+                                 "Rows":  {
+                                              "Row":  [
+                                                          {
+                                                              "ColData":  [
+                                                                              {
+                                                                                  "value":  "Opening Balance Equity",
+                                                                                  "id":  "10"
+                                                                              },
+                                                                              {
+                                                                                  "value":  "6089.90"
+                                                                              }
+                                                                          ],
+                                                              "type":  "Data"
+                                                          }
+                                                      ]
+                                          },
+                                 "Summary":  {
+                                                 "ColData":  [
+                                                                 {
+                                                                     "value":  "Net cash provided by financing activities"
+                                                                 },
+                                                                 {
+                                                                     "value":  "6089.90"
+                                                                 }
+                                                             ]
+                                             },
+                                 "type":  "Section",
+                                 "group":  "FinancingActivities"
+                             },
+                             {
+                                 "Summary":  {
+                                                 "ColData":  [
+                                                                 {
+                                                                     "value":  "Net cash increase for period"
+                                                                 },
+                                                                 {
+                                                                     "value":  "6089.90"
+                                                                 }
+                                                             ]
+                                             },
+                                 "type":  "Section",
+                                 "group":  "CashIncrease"
+                             },
+                             {
+                                 "Summary":  {
+                                                 "ColData":  [
+                                                                 {
+                                                                     "value":  "Cash at end of period"
+                                                                 },
+                                                                 {
+                                                                     "value":  "6089.90"
+                                                                 }
+                                                             ]
+                                             },
+                                 "type":  "Section",
+                                 "group":  "EndingCash"
+                             }
+                         ]
+             }
+}

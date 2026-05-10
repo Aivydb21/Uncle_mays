@@ -1,6 +1,7 @@
 import { schedules, task } from "@trigger.dev/sdk/v3";
 import { createHash } from "crypto";
 import { uploadGoogleAdsConversion } from "./google-ads-conversion-tracking";
+import { mlParquetRebuild } from "./ml-parquet-rebuild";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
@@ -180,12 +181,29 @@ export const stripePurchaseSync = schedules.task({
   cron: "0 */2 * * *",
   run: async () => {
     const since = Math.floor(Date.now() / 1000) - POLL_WINDOW_SECONDS;
-    return processCompletedPurchases(
+    const result = await processCompletedPurchases(
       process.env.STRIPE_API_KEY!,
       process.env.APOLLO_API_KEY!,
       process.env.MAILCHIMP_API_KEY!,
       since
     );
+
+    // Trigger parquet rebuild whenever new payment_intents are detected.
+    // Fires as a separate task so a slow Python env doesn't block the sync.
+    if (result.processed > 0) {
+      const latestPiId = result.results[result.results.length - 1]?.sessionId;
+      await mlParquetRebuild.trigger(
+        {
+          runStripeIngest: true,
+          runCheckoutStore: true,
+          triggeredByPaymentIntentId: latestPiId,
+        },
+        { idempotencyKey: `stripe-sync-rebuild-${Math.floor(Date.now() / 3_600_000)}` }
+      );
+      console.log(`[stripe-purchase-sync] Triggered ml-parquet-rebuild (${result.processed} new purchases).`);
+    }
+
+    return result;
   },
 });
 

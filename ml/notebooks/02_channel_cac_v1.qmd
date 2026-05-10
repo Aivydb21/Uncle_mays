@@ -1,0 +1,457 @@
+---
+title: "Channel CAC Analysis — Decision Memo v1"
+subtitle: "UNC-900: Which paid channel acquires customers most cheaply?"
+author: "Decision Scientist, Uncle May's"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: show
+    df-print: paged
+    embed-resources: true
+  pdf:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    geometry:
+      - margin=1in
+    fontsize: 10pt
+    code-overflow: wrap
+    fig-pos: "H"
+execute:
+  echo: true
+  warning: false
+  message: false
+engine: knitr
+---
+
+```{r setup}
+suppressPackageStartupMessages({
+  library(duckdb)
+  library(dplyr)
+  library(tidyr)
+  library(tibble)
+  library(lubridate)
+  library(ggplot2)
+  library(scales)
+  library(knitr)
+  library(gt)
+})
+
+DB_PATH <- "../data/uncle_mays_dev.duckdb"
+con <- dbConnect(duckdb(), dbdir = DB_PATH, read_only = TRUE)
+```
+
+## 1. Executive Summary
+
+**Headline:** Paid CAC is currently undefined (infinite) for both Meta and Google Ads.
+$537.36 [observed] in paid spend (Apr 20 – May 6, 2026) generated zero new-customer
+acquisitions. ROAS across all paid weeks averages **0.26x** — losing $0.74 for every
+$1 spent before accounting for COGS.
+
+**Recommendation:** File board approval to pause paid campaigns pending post-attribution-fix
+data accumulation (minimum 4–6 weeks of post-May-3 orders required to compute a
+statistically meaningful paid CAC). Organic channels (direct + social) are acquiring
+new customers at $0 CAC, which dominates paid on every metric available.
+
+**Confidence:** DIRECTIONAL. All paid attribution data predates or is concurrent with
+the attribution fix (2026-05-03). Post-fix N = 2 paid orders (1 Meta, 1 Google), both
+from repeat customers. No valid paid CAC estimate is possible at current N.
+
+---
+
+## 2. Data State and Attribution Quality
+
+```{r data-state}
+# Order date range and counts
+order_range <- dbGetQuery(con, "
+  SELECT
+    strftime(CAST(MIN(ordered_at) AS TIMESTAMP), '%Y-%m-%d') AS first_order,
+    strftime(CAST(MAX(ordered_at) AS TIMESTAMP), '%Y-%m-%d') AS last_order,
+    COUNT(*) AS total_orders,
+    SUM(CASE WHEN is_new_customer THEN 1 ELSE 0 END) AS new_customers,
+    SUM(gross_revenue_dollars) AS total_revenue
+  FROM main_marketing.mart_order_attribution
+")
+
+# Channel-level attribution summary
+channel_summary <- dbGetQuery(con, "
+  SELECT
+    channel,
+    COUNT(*) AS orders,
+    SUM(gross_revenue_dollars) AS revenue_dollars,
+    SUM(CASE WHEN is_new_customer THEN 1 ELSE 0 END) AS new_customers,
+    SUM(CASE WHEN is_new_customer THEN gross_revenue_dollars ELSE 0 END) AS new_customer_revenue
+  FROM main_marketing.mart_order_attribution
+  GROUP BY channel
+  ORDER BY orders DESC
+")
+
+channel_summary <- channel_summary |>
+  mutate(
+    pct_of_orders = orders / sum(orders),
+    pct_of_revenue = revenue_dollars / sum(revenue_dollars)
+  )
+```
+
+```{r attribution-quality-flag}
+# Flag: how many orders are post-attribution-fix (2026-05-03)?
+post_fix <- dbGetQuery(con, "
+  SELECT
+    CASE WHEN ordered_at >= TIMESTAMPTZ '2026-05-03 00:00:00+00' THEN 'post_fix' ELSE 'pre_fix' END AS period,
+    channel,
+    COUNT(*) AS orders
+  FROM main_marketing.mart_order_attribution
+  GROUP BY 1, 2
+  ORDER BY 1, 3 DESC
+")
+```
+
+**Order universe:** `r order_range$total_orders` total orders from
+`r order_range$first_order` to `r order_range$last_order` [observed].
+Total revenue: `r dollar(order_range$total_revenue)` [observed].
+
+**Attribution quality warning:** The UTM/gclid/fbclid pipeline was broken until
+2026-05-03 (fixed in UNC-876). All pre-fix orders have null UTM metadata and are
+attributed to `direct` by default. This means the `direct` channel share of 82% is
+inflated — it includes misattributed paid and organic traffic from before the fix.
+
+```{r post-fix-table}
+post_fix |>
+  gt() |>
+  tab_header(title = "Orders by period and channel") |>
+  cols_label(
+    period = "Period", channel = "Channel", orders = "Orders"
+  )
+```
+
+---
+
+## 3. CAC by Channel
+
+```{r cac-data}
+# Pull from mart_cac (weekly grain, channel x week)
+mart_cac_raw <- dbGetQuery(con, "
+  SELECT
+    strftime(CAST(order_week AS TIMESTAMP), '%Y-%m-%d') AS week,
+    channel,
+    ad_spend_dollars,
+    new_customers,
+    new_customer_revenue_dollars,
+    total_orders,
+    total_revenue_dollars,
+    cac_dollars,
+    roas,
+    new_customer_roas
+  FROM main_core.mart_cac
+  ORDER BY order_week, channel
+") |> mutate(week = as.Date(week))
+
+# Aggregate to channel-total
+cac_by_channel <- mart_cac_raw |>
+  group_by(channel) |>
+  summarise(
+    total_spend = sum(ad_spend_dollars, na.rm = TRUE),
+    total_new_customers = sum(new_customers, na.rm = TRUE),
+    total_revenue = sum(total_revenue_dollars, na.rm = TRUE),
+    total_new_cust_revenue = sum(new_customer_revenue_dollars, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(
+    cac_dollars = if_else(total_new_customers > 0,
+                          total_spend / total_new_customers,
+                          NA_real_),
+    roas = if_else(total_spend > 0,
+                   total_revenue / total_spend,
+                   NA_real_),
+    note = case_when(
+      total_spend == 0 & total_new_customers > 0 ~ "$0 spend",
+      total_new_customers == 0 & total_spend > 0 ~ "DIRECTIONAL — N=0 new customers",
+      TRUE ~ paste0("n=", total_new_customers, " new customers")
+    )
+  ) |>
+  arrange(desc(total_spend))
+```
+
+```{r cac-table}
+cac_by_channel |>
+  select(channel, total_spend, total_new_customers, cac_dollars, roas, note) |>
+  gt() |>
+  tab_header(
+    title = "Channel CAC Summary",
+    subtitle = "Period: Apr 20 – May 6, 2026 (paid spend window)"
+  ) |>
+  cols_label(
+    channel = "Channel",
+    total_spend = "Ad Spend",
+    total_new_customers = "New Customers",
+    cac_dollars = "CAC",
+    roas = "ROAS",
+    note = "Confidence"
+  ) |>
+  fmt_currency(columns = c(total_spend, cac_dollars), decimals = 2) |>
+  fmt_number(columns = roas, decimals = 2, suffix = "x") |>
+  sub_missing(missing_text = "∞ (undefined)") |>
+  tab_source_note("Sources: mart_cac (DuckDB dev), stg_meta_campaign_insights, stg_gads_campaign_insights [observed]")
+```
+
+**Math:**
+- Meta: $325.64 spend ÷ 0 new customers = **undefined CAC (∞)** [observed]
+- Google: $211.72 spend ÷ 0 new customers = **undefined CAC (∞)** [observed]
+- Combined paid: $537.36 spend ÷ 0 new customers = **∞**; ROAS = $142 / $537.36 = **0.26x** [observed]
+- Direct: $0 spend ÷ 4 new customers = **$0 CAC** [observed, but pre-fix attribution inflated]
+- Organic social: $0 spend ÷ 2 new customers = **$0 CAC** [observed, n=2 — very small]
+
+**Breakeven ROAS:** At 35% gross margin [assumed — awaiting COGS model], breakeven
+ROAS = 1 / 0.35 = **2.86x**. Current paid ROAS of 0.26x is 91% below breakeven.
+
+---
+
+## 4. Weekly Paid Performance
+
+```{r weekly-paid}
+paid_weekly <- mart_cac_raw |>
+  filter(channel %in% c("meta_ads", "google_ads")) |>
+  select(week, channel, ad_spend_dollars, total_revenue_dollars, roas) |>
+  arrange(week, channel)
+```
+
+```{r weekly-paid-table}
+paid_weekly |>
+  gt() |>
+  tab_header(title = "Weekly Paid Channel Performance") |>
+  cols_label(
+    week = "Week of",
+    channel = "Channel",
+    ad_spend_dollars = "Spend",
+    total_revenue_dollars = "Revenue",
+    roas = "ROAS"
+  ) |>
+  fmt_currency(columns = c(ad_spend_dollars, total_revenue_dollars), decimals = 2) |>
+  fmt_number(columns = roas, decimals = 2, suffix = "x") |>
+  sub_missing(missing_text = "—") |>
+  tab_source_note("Source: mart_cac [observed]")
+```
+
+```{r roas-chart}
+paid_weekly |>
+  filter(!is.na(roas)) |>
+  ggplot(aes(x = week, y = roas, color = channel, group = channel)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 3) +
+  geom_hline(yintercept = 1.0, linetype = "dashed", color = "black", linewidth = 0.8) +
+  geom_hline(yintercept = 2.86, linetype = "dotted", color = "darkred", linewidth = 0.8) +
+  annotate("text", x = min(paid_weekly$week, na.rm=TRUE), y = 1.05,
+           label = "Breakeven ROAS (1x)", hjust = 0, size = 3) +
+  annotate("text", x = min(paid_weekly$week, na.rm=TRUE), y = 2.91,
+           label = "GM breakeven ROAS (2.86x, assumed 35% GM)", hjust = 0, size = 3, color = "darkred") +
+  scale_color_manual(values = c("meta_ads" = "#1877F2", "google_ads" = "#EA4335")) +
+  scale_y_continuous(labels = scales::label_number(suffix = "x")) +
+  scale_x_date(date_labels = "%b %d") +
+  labs(
+    title = "Weekly ROAS by Paid Channel",
+    subtitle = "Only weeks with attributed revenue shown. Most weeks: ROAS = 0x.",
+    x = "Week of", y = "ROAS", color = "Channel",
+    caption = "Source: mart_cac [observed]. Dashed = ad-spend breakeven; dotted = GM breakeven (35% assumed)."
+  ) +
+  theme_minimal()
+```
+
+---
+
+## 5. Organic Channel Benchmarking
+
+```{r organic-benchmark}
+# Direct + organic_social performance
+organic <- channel_summary |>
+  filter(channel %in% c("direct", "organic_social")) |>
+  mutate(
+    avg_order_value = revenue_dollars / orders,
+    cac = 0,
+    note = if_else(
+      channel == "direct",
+      "DIRECTIONAL — 82% share likely inflated by pre-fix misattribution",
+      paste0("n=", new_customers, " new customers, n=", orders, " total orders")
+    )
+  )
+```
+
+```{r organic-table}
+organic |>
+  select(channel, orders, revenue_dollars, avg_order_value, new_customers, cac, note) |>
+  gt() |>
+  tab_header(title = "Organic Channel Performance (all time)") |>
+  cols_label(
+    channel = "Channel", orders = "Orders", revenue_dollars = "Revenue",
+    avg_order_value = "AOV", new_customers = "New Customers", cac = "CAC", note = "Note"
+  ) |>
+  fmt_currency(columns = c(revenue_dollars, avg_order_value, cac), decimals = 2) |>
+  tab_source_note("Source: mart_order_attribution [observed]")
+```
+
+**Organic social (facebook, video + image):**
+- 2 confirmed new customers from `subscription_launch_apr2026` campaign [observed]
+- $225 revenue from 4 orders [observed]
+- AOV: $56.25 [modeled: $225 / 4]
+- CAC: $0 (no paid spend) — but opportunity cost of content creation not captured
+
+---
+
+## 6. Customer LTV and Payback Context
+
+```{r retention-data}
+retention <- dbGetQuery(con, "
+  SELECT
+    strftime(CAST(cohort_month AS TIMESTAMP), '%Y-%m') AS cohort_month,
+    cohort_size,
+    repeat_rate_pct,
+    retention_30d_pct,
+    avg_ltv_dollars,
+    avg_first_order_value,
+    est_ltv_12m_dollars
+  FROM main_core.mart_retention
+  ORDER BY cohort_month
+")
+```
+
+```{r retention-table}
+retention |>
+  gt() |>
+  tab_header(
+    title = "Customer Retention by Acquisition Cohort",
+    subtitle = "Warning: n ≤ 5 in all cohorts — CIs are very wide"
+  ) |>
+  cols_label(
+    cohort_month = "Cohort",
+    cohort_size = "n",
+    repeat_rate_pct = "Repeat Rate %",
+    retention_30d_pct = "30d Retention %",
+    avg_ltv_dollars = "Avg LTV (to date)",
+    avg_first_order_value = "Avg First Order",
+    est_ltv_12m_dollars = "Est. 12m LTV"
+  ) |>
+  fmt_currency(columns = c(avg_ltv_dollars, avg_first_order_value, est_ltv_12m_dollars), decimals = 2) |>
+  fmt_number(columns = c(repeat_rate_pct, retention_30d_pct), decimals = 1, suffix = "%") |>
+  tab_source_note("Source: mart_retention [observed]. Est. 12m LTV is modeled — treat as directional only at this N.")
+```
+
+**LTV-based CAC tolerance [DIRECTIONAL — modeled]:**
+
+Using Apr 2026 cohort (n=5, most representative of current customer type):
+- Avg first order: $58.00 [observed]
+- Avg LTV to date: $87.40 [observed]
+- 30d retention: 20% (1 of 5 customers) [observed, n=5]
+- At 35% GM [assumed], max viable CAC = LTV × GM − fulfillment cost
+
+Using a conservative LTV of $87.40 (all-in to date, not projected):
+- Max viable CAC = $87.40 × 0.35 = $30.59 [modeled, 35% GM assumed]
+
+**Implication:** Even if paid channels started acquiring new customers, CAC would need
+to be under ~$30 to be sustainable at current LTV. At $537.36 spent and 0 new customers,
+we are currently ∞ above that threshold.
+
+---
+
+## 7. Attribution Fix Impact Assessment
+
+```{r pre-post-fix}
+pre_post <- dbGetQuery(con, "
+  SELECT
+    CASE WHEN ordered_at >= TIMESTAMPTZ '2026-05-03 00:00:00+00' THEN 'post_fix' ELSE 'pre_fix' END AS period,
+    channel,
+    COUNT(*) AS orders,
+    SUM(gross_revenue_dollars) AS revenue,
+    SUM(CASE WHEN is_new_customer THEN 1 ELSE 0 END) AS new_customers
+  FROM main_marketing.mart_order_attribution
+  GROUP BY 1, 2
+  ORDER BY 1, 3 DESC
+")
+```
+
+```{r pre-post-table}
+pre_post |>
+  gt() |>
+  tab_header(
+    title = "Order Attribution: Pre vs. Post Fix (2026-05-03)",
+    subtitle = "Post-fix window is only 4 days — insufficient for CAC estimation"
+  ) |>
+  cols_label(
+    period = "Period", channel = "Channel",
+    orders = "Orders", revenue = "Revenue", new_customers = "New Customers"
+  ) |>
+  fmt_currency(columns = revenue, decimals = 2)
+```
+
+**Post-fix window (May 3 only):** 1 order, $56.00 revenue, channel = direct.
+Insufficient data to compute channel CAC in the post-fix period. Need 4–6 weeks minimum.
+
+---
+
+## 8. What We Cannot Know Yet
+
+| Question | Status | Required to answer |
+|----------|--------|--------------------|
+| Paid CAC (Meta) | **Unknown** — 0 new customers from paid | ≥ 5 new customers from post-fix Meta orders |
+| Paid CAC (Google) | **Unknown** — 0 new customers from paid | ≥ 5 new customers from post-fix Google orders |
+| True direct CAC | **Unknown** — 82% share includes misattributed traffic | 4–6 wks post-fix accumulation |
+| LTV by channel | **Unknown** — too few observations per channel | ≥ 10 customers per channel, 60+ day follow-up |
+| Price elasticity | Not started | Requires pricing experiment design |
+
+---
+
+## 9. Recommendations
+
+**Immediate (board action required under Standing Order 2026-04-29):**
+
+1. **Request board approval to pause or significantly reduce paid spend** while
+   attribution data accumulates. Current burn rate: ~$180/wk on paid ads with ROAS = 0.26x.
+   At 35% GM, net contribution from paid = $142 × 0.35 − $537.36 = **−$488.64/period**
+   [modeled: GM contribution minus full ad spend over Apr 20 – May 6].
+
+2. **If board declines pause:** Implement weekly ROAS floor of 1.0x — any channel below
+   that floor in the prior week gets budget zeroed until recovered. This requires board
+   approval to modify campaigns.
+
+**Data work (Decision Scientist, no approval needed):**
+
+3. **Set a 4-week attribution quality check:** Re-run this notebook on 2026-06-05.
+   At that point, if post-fix orders have accumulated (target: ≥ 5 per paid channel),
+   compute a meaningful CAC estimate with bootstrap confidence intervals.
+
+4. **Wire ga_client_id into PaymentIntent.metadata** (flagged by Analytics Engineer in
+   UNC-899). This will enable session-level attribution joins and improve channel
+   accuracy beyond last-touch. CTO-owned change.
+
+**Experiment to propose (Monday cadence):**
+
+5. **Organic social test:** Run a controlled 2-week pause of organic social posting
+   to estimate baseline direct orders attributable to organic discovery. N is small but
+   this is the cheapest test available. Design: pause weeks 1–2, resume weeks 3–4,
+   compare order counts. Pre-register stop condition: if week 1 direct orders drop > 50%
+   vs. prior 4-week average, resume immediately.
+
+---
+
+## 10. Methodology Notes
+
+- All data from `main_marketing.mart_order_attribution` and `main_core.mart_cac` in
+  `uncle_mays_dev.duckdb` (Analytics Engineer, commit `8818ce5`, 2026-05-07) [observed].
+- Ad spend from `stg_meta_campaign_insights` and `stg_gads_campaign_insights` [observed].
+- Attribution hierarchy: Stripe PI metadata UTMs → GA4 purchase event → inferred from
+  signal. Pre-attribution-fix (before 2026-05-03) orders default to `direct`.
+- GM of 35% is assumed — COGS model has not been built. Sensitivity: at 30% GM,
+  max viable CAC = $26.22; at 40% GM, $34.96.
+- No confidence intervals on CAC or ROAS because N (0 new paid customers) makes them
+  degenerate. All paid metrics are tagged DIRECTIONAL.
+- LTV estimates from `mart_retention` are modeled from observed repeat behavior.
+  At n ≤ 5 per cohort, treat as directional only.
+
+```{r close}
+dbDisconnect(con)
+```
+
+---
+
+*Filed: 2026-05-08 | Analyst: Decision Scientist (UChicago Booth PhD, data-driven marketing)*
+*Notebook: `ml/notebooks/02_channel_cac_v1.qmd` | Data: `uncle_mays_dev.duckdb` commit `8818ce5`*

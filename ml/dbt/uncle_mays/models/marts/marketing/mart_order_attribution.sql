@@ -42,9 +42,9 @@ with orders as (
 -- GA4 purchase events carry transaction_id = Stripe payment_intent_id
 -- and session-level attribution when Stripe PI metadata is null.
 -- Deduplicate: GA4 parquet snapshots overlap — each purchase can appear
--- in multiple daily files. DISTINCT ON takes one row per transaction_id.
-ga4_purchases as (
-    select distinct on (transaction_id)
+-- in multiple daily files. Take one row per transaction_id (latest event_ts).
+ga4_purchases_ranked as (
+    select
         transaction_id                           as payment_intent_id,
         user_pseudo_id,
         ga_session_id,
@@ -63,11 +63,14 @@ ga4_purchases as (
         geo_region,
         geo_city,
         event_date                               as ga_event_date,
-        event_ts                                 as ga_event_ts
+        event_ts                                 as ga_event_ts,
+        row_number() over (partition by transaction_id order by event_ts desc) as _rn
     from {{ ref('stg_ga4_events') }}
     where event_name = 'purchase'
       and transaction_id is not null
-    order by transaction_id, event_ts desc
+),
+ga4_purchases as (
+    select * except(_rn) from ga4_purchases_ranked where _rn = 1
 ),
 
 attribution as (

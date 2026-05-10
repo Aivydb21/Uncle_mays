@@ -59,8 +59,8 @@ select
     delivery_orders,
     pickup_orders,
     -- Placeholders until mart_ad_spend is built
-    cast(null as double)                                      as ad_spend_dollars,
-    cast(null as double)                                      as cac_dollars,
-    cast(null as double)                                      as roas
+    cast(null as {{ 'FLOAT64' if target.type == 'bigquery' else 'double' }})  as ad_spend_dollars,
+    cast(null as {{ 'FLOAT64' if target.type == 'bigquery' else 'double' }})  as cac_dollars,
+    cast(null as {{ 'FLOAT64' if target.type == 'bigquery' else 'double' }})  as roas
 
 from weekly_channel

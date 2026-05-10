@@ -31,7 +31,7 @@
 
 with sessions as (
     select
-        date_trunc('week', created_at)           as order_week,
+        {% if target.type == 'bigquery' %}DATE_TRUNC(cast(created_at as date), WEEK(MONDAY)){% else %}date_trunc('week', created_at){% endif %} as order_week,
         count(*)                                  as checkout_sessions,
         sum(case when is_converted then 1 else 0 end) as paid_sessions,
         sum(case when is_abandoned  then 1 else 0 end) as abandoned_sessions

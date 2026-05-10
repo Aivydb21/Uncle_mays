@@ -42,15 +42,21 @@ customer_agg as (
     group by email_hash
 ),
 
--- First-touch channel requires a separate subquery
-first_touch as (
-    select distinct on (email_hash)
+-- First-touch channel: one row per customer, earliest order
+-- DISTINCT ON (DuckDB/Postgres) replaced with ROW_NUMBER for BQ compatibility
+first_touch_ranked as (
+    select
         email_hash,
         channel                                          as acquisition_channel,
         utm_source                                       as acquisition_utm_source,
-        utm_campaign                                     as acquisition_utm_campaign
+        utm_campaign                                     as acquisition_utm_campaign,
+        row_number() over (partition by email_hash order by ordered_at asc) as _rn
     from orders
-    order by email_hash, ordered_at asc
+),
+first_touch as (
+    select email_hash, acquisition_channel, acquisition_utm_source, acquisition_utm_campaign
+    from first_touch_ranked
+    where _rn = 1
 )
 
 select

@@ -72,7 +72,7 @@ where _rn = 1
 
 with source as (
     select *
-    from `{{ var('stripe_dataset') }}.stripe_checkout_sessions`
+    from `{{ var('stripe_dataset') }}.checkout_sessions`
 )
 
 select

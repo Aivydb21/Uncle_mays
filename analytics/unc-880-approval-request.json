@@ -1,0 +1,15 @@
+{
+  "type": "request_board_approval",
+  "requestedByAgentId": "0df6fe9a-9676-41e7-89e9-724d05272a51",
+  "issueIds": ["UNC-880"],
+  "payload": {
+    "title": "Meta Ad Destination URL Update — Point Directly to /shop",
+    "summary": "Update Meta ad destination URLs from redirect pages (/get-started, /checkout/family) to direct /shop landing. Current ads force a redirect hop that causes 75% of paid sessions to bounce before reaching the catalog. Expected lift: 25% → 40-50% /shop reach rate.",
+    "recommendedAction": "Approve updating 8 ad creatives in Meta campaign 120243766361490762 to point directly to /shop with UTM params and promo=FRESH10. All other ad elements (creative, copy, targeting, budget) unchanged. Detailed plan in analytics/cro-recommendation-unc-880.md",
+    "risks": [
+      "Minor: users with old ad links in browser history will still hit redirect pages (acceptable, redirects remain as fallback)",
+      "Minor: ~1-2 hour implementation window in Meta Ads Manager",
+      "Low rollback complexity: revert destination URLs in Meta UI (<5 min)"
+    ]
+  }
+}

@@ -1,0 +1,449 @@
+[
+  {
+    "email": "alisia_walton@yahoo.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 2,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Alisia Walton",
+    "phone": null,
+    "last_seen": 1777654240,
+    "last_cart": "family",
+    "utm_source": "meta",
+    "utm_campaign": "onetime-launch-apr26",
+    "shipping_zip": "60409"
+  },
+  {
+    "email": "bartoli.linda@gmail.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Linda Bartoli",
+    "phone": null,
+    "last_seen": 1777556874,
+    "last_cart": "family",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": "60659"
+  },
+  {
+    "email": "miriamisjackson@gmail.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 1,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Miriam Jackson",
+    "phone": "3127927038",
+    "last_seen": 1777522599,
+    "last_cart": "family",
+    "utm_source": "meta",
+    "utm_campaign": "onetime-launch-apr26",
+    "shipping_zip": "60619"
+  },
+  {
+    "email": "lloyd.laverne@yahoo.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Vern Lloyd",
+    "phone": null,
+    "last_seen": 1777475495,
+    "last_cart": "starter",
+    "utm_source": "meta",
+    "utm_campaign": "onetime-launch-apr26",
+    "shipping_zip": "60411"
+  },
+  {
+    "email": "awoods@mail.roosevelt.edu",
+    "sources": [
+      "stripe_customer",
+      "stripe_session",
+      "stripe_pi"
+    ],
+    "pi_attempts": 10,
+    "pi_succeeded": 2,
+    "sess_attempts": 1,
+    "sess_succeeded": 1,
+    "name": "Antoinette Woods",
+    "phone": "7738632051",
+    "last_seen": 1777422152,
+    "last_cart": "family",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": "60620"
+  },
+  {
+    "email": "doina.romanciuc.dr@gmail.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 2,
+    "pi_succeeded": 1,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Doina Romanciuc",
+    "phone": "3128388581",
+    "last_seen": 1776975402,
+    "last_cart": "family",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "melissabell744@gmail.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Melissa Bell",
+    "phone": "6302902018",
+    "last_seen": 1776971379,
+    "last_cart": "family",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": "60515"
+  },
+  {
+    "email": "brandy.gines@gmail.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 4,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Brandy Gines",
+    "phone": null,
+    "last_seen": 1776871868,
+    "last_cart": "starter",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "vrmeyers@gmail.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "VAZANTHA R MEYERS",
+    "phone": "17088550680",
+    "last_seen": 1776826356,
+    "last_cart": "starter",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "niki1437aol@gmail.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 3,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Nicole Randall",
+    "phone": null,
+    "last_seen": 1776814037,
+    "last_cart": "family",
+    "utm_source": "instagram",
+    "utm_campaign": "profile_link",
+    "shipping_zip": null
+  },
+  {
+    "email": "finalcheck2@test.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "F C",
+    "phone": null,
+    "last_seen": 1776718795,
+    "last_cart": null,
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "finalcheck@test.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Final Check",
+    "phone": null,
+    "last_seen": 1776718792,
+    "last_cart": null,
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "webhooktest@test.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Test Webhook",
+    "phone": null,
+    "last_seen": 1776718630,
+    "last_cart": null,
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "ctocheck@test.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Test CTO",
+    "phone": null,
+    "last_seen": 1776718412,
+    "last_cart": null,
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "test@test.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 4,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Test User",
+    "phone": null,
+    "last_seen": 1776718285,
+    "last_cart": "starter",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": "60601"
+  },
+  {
+    "email": "verify2@test.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Verify Test",
+    "phone": null,
+    "last_seen": 1776717897,
+    "last_cart": null,
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "verify@test.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Verify Test",
+    "phone": null,
+    "last_seen": 1776717872,
+    "last_cart": "starter",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": "60601"
+  },
+  {
+    "email": "test2@test.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 1,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Jane Smith",
+    "phone": null,
+    "last_seen": 1776716223,
+    "last_cart": "starter",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": "60602"
+  },
+  {
+    "email": "mawoodthorn@gmail.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_session",
+      "stripe_pi"
+    ],
+    "pi_attempts": 4,
+    "pi_succeeded": 0,
+    "sess_attempts": 1,
+    "sess_succeeded": 1,
+    "name": "Maria Thornton",
+    "phone": "7738446362",
+    "last_seen": 1776629907,
+    "last_cart": "family",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "test@example.com",
+    "sources": [
+      "stripe_customer",
+      "stripe_pi"
+    ],
+    "pi_attempts": 10,
+    "pi_succeeded": 0,
+    "sess_attempts": 0,
+    "sess_succeeded": 0,
+    "name": "Test User",
+    "phone": null,
+    "last_seen": 1776264099,
+    "last_cart": "starter",
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "revmd247@gmail.com",
+    "sources": [
+      "stripe_session"
+    ],
+    "pi_attempts": 0,
+    "pi_succeeded": 0,
+    "sess_attempts": 1,
+    "sess_succeeded": 1,
+    "name": "Morgan E Dixon",
+    "phone": null,
+    "last_seen": 1775358092,
+    "last_cart": null,
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "knoahf@gmail.com",
+    "sources": [
+      "stripe_session"
+    ],
+    "pi_attempts": 0,
+    "pi_succeeded": 0,
+    "sess_attempts": 1,
+    "sess_succeeded": 1,
+    "name": "KEARY N FOSTER",
+    "phone": null,
+    "last_seen": 1767882003,
+    "last_cart": null,
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "tolch.nicole@gmail.com",
+    "sources": [
+      "stripe_session"
+    ],
+    "pi_attempts": 0,
+    "pi_succeeded": 0,
+    "sess_attempts": 1,
+    "sess_succeeded": 1,
+    "name": "Nicole Tolch",
+    "phone": null,
+    "last_seen": 1765912584,
+    "last_cart": null,
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "bpillowsidibeh@gmail.com",
+    "sources": [
+      "stripe_session"
+    ],
+    "pi_attempts": 0,
+    "pi_succeeded": 0,
+    "sess_attempts": 1,
+    "sess_succeeded": 1,
+    "name": "Barbara  Pillow Sidibeh",
+    "phone": null,
+    "last_seen": 1765871353,
+    "last_cart": null,
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  },
+  {
+    "email": "hems_insurer_9e@icloud.com",
+    "sources": [
+      "stripe_session"
+    ],
+    "pi_attempts": 0,
+    "pi_succeeded": 0,
+    "sess_attempts": 1,
+    "sess_succeeded": 1,
+    "name": "Srinivasa Katta",
+    "phone": "4085075071",
+    "last_seen": 1764711944,
+    "last_cart": null,
+    "utm_source": null,
+    "utm_campaign": null,
+    "shipping_zip": null
+  }
+]

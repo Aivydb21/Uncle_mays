@@ -44,5 +44,7 @@ vars:
   ads_dataset: "ads_raw"
   # Mailchimp + Resend snapshots (crm_loader.py -> crm_raw, not yet built)
   crm_dataset: "crm_raw"
+  # Set to true once ml/ingest/bigquery_crm_loader.py lands and crm_raw tables exist
+  crm_pipeline_live: false
   # Currency for all money fields
   default_currency: "usd"

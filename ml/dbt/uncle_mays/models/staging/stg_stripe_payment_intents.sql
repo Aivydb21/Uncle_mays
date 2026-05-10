@@ -106,7 +106,7 @@ where _rn = 1
 
 with source as (
     select *
-    from `{{ var('stripe_dataset') }}.stripe_payment_intents`
+    from `{{ var('stripe_dataset') }}.payment_intents`
 )
 
 select

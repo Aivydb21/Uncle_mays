@@ -37,7 +37,11 @@ customer_orders as (
         is_first_order,
         row_number() over (partition by email_hash order by ordered_at) as order_seq,
         min(ordered_at) over (partition by email_hash)                   as first_order_at,
-        date_trunc('month', min(ordered_at) over (partition by email_hash)) as cohort_month
+        {% if target.type == 'bigquery' %}
+        DATE_TRUNC(cast(min(ordered_at) over (partition by email_hash) as date), MONTH)
+        {% else %}
+        date_trunc('month', min(ordered_at) over (partition by email_hash))
+        {% endif %}                                                           as cohort_month
     from orders
 ),
 
@@ -71,19 +75,19 @@ customer_retention as (
         -- Days from first to second order
         case when second_order_at is not null
             then cast(
-                (epoch(second_order_at) - epoch(first_order_at))
+                ({% if target.type == 'bigquery' %}UNIX_SECONDS(second_order_at) - UNIX_SECONDS(first_order_at){% else %}epoch(second_order_at) - epoch(first_order_at){% endif %})
                 / 86400 as integer)
         end                                                        as days_to_second_order,
         -- 30/60 day retention flags
         case when second_order_at is not null
               and cast(
-                (epoch(second_order_at) - epoch(first_order_at))
+                ({% if target.type == 'bigquery' %}UNIX_SECONDS(second_order_at) - UNIX_SECONDS(first_order_at){% else %}epoch(second_order_at) - epoch(first_order_at){% endif %})
                 / 86400 as integer) <= 30
             then true else false
         end                                                        as retained_30d,
         case when second_order_at is not null
               and cast(
-                (epoch(second_order_at) - epoch(first_order_at))
+                ({% if target.type == 'bigquery' %}UNIX_SECONDS(second_order_at) - UNIX_SECONDS(first_order_at){% else %}epoch(second_order_at) - epoch(first_order_at){% endif %})
                 / 86400 as integer) <= 60
             then true else false
         end                                                        as retained_60d

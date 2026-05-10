@@ -45,7 +45,7 @@ where _rn = 1
 
 with source as (
     select *
-    from `{{ var('stripe_dataset') }}.stripe_customers`
+    from `{{ var('stripe_dataset') }}.customers`
 )
 
 select

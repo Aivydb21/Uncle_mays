@@ -15,7 +15,9 @@ from ml.features import build_dataset
 from ml.ingest import (
     apollo,
     airtable as airtable_ingest,
+    bigquery_ads_loader,
     bigquery_ga4,
+    bigquery_stripe_loader,
     census,
     checkout_store,
     clarity,
@@ -38,6 +40,8 @@ def main() -> None:
     p.add_argument("--skip-google-ads", action="store_true")
     p.add_argument("--skip-clarity", action="store_true")
     p.add_argument("--skip-airtable", action="store_true")
+    p.add_argument("--skip-bq-load", action="store_true",
+                   help="Skip loading parquets to BigQuery warehouse")
     args = p.parse_args()
 
     steps: list[tuple[str, callable]] = [
@@ -71,6 +75,21 @@ def main() -> None:
         except Exception as e:
             print(f"[FAIL] {name}: {e}")
             traceback.print_exc()
+
+    # --- BigQuery warehouse load (after parquets are fresh) ---
+    if not args.skip_bq_load:
+        print("\n--- loading to BigQuery warehouse ---")
+        for name, fn in [
+            ("bq_stripe_loader", bigquery_stripe_loader.load_all),
+            ("bq_ads_loader", bigquery_ads_loader.load_all),
+        ]:
+            t0 = time.time()
+            try:
+                fn()
+                print(f"[OK] {name} in {time.time() - t0:.1f}s")
+            except Exception as e:
+                print(f"[FAIL] {name}: {e}")
+                traceback.print_exc()
 
     print("\n--- building dataset ---")
     build_dataset.build()
