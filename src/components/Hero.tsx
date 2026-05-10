@@ -35,7 +35,7 @@ export const Hero = () => {
             {/* Delivery badge */}
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-4">
               <Truck className="h-4 w-4 shrink-0" />
-              <span>Delivered to south Chicago – Wednesdays 5–8 PM</span>
+              <span>Citywide delivery, 7 days a week, pick your window</span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">

@@ -82,6 +82,9 @@ export async function POST(req: NextRequest) {
       fbp,
       ga_client_id,
       checkoutSessionId,
+      preferredDeliveryDate,
+      preferredDeliveryWindow,
+      preferredDeliveryWindowLabel,
     } = body || {};
 
     const fwd = req.headers.get("x-forwarded-for") || "";
@@ -160,6 +163,19 @@ export async function POST(req: NextRequest) {
         fulfillment_mode: fulfillmentMode,
         ...(pickupSlotId ? { pickup_slot: pickupSlotId } : {}),
         ...(pickupSlotLabel ? { pickup_slot_label: pickupSlotLabel } : {}),
+        ...(preferredDeliveryDate
+          ? { preferred_delivery_date: String(preferredDeliveryDate) }
+          : {}),
+        ...(preferredDeliveryWindow
+          ? { preferred_delivery_window: String(preferredDeliveryWindow) }
+          : {}),
+        ...(preferredDeliveryWindowLabel
+          ? {
+              preferred_delivery_window_label: String(
+                preferredDeliveryWindowLabel
+              ).slice(0, STRIPE_METADATA_VALUE_LIMIT),
+            }
+          : {}),
         line_count: String(pricing.lineItems.length),
         line_items_summary: summary,
         subtotal_cents: String(pricing.subtotalCents),

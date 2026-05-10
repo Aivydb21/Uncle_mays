@@ -13,6 +13,10 @@ import { formatCents } from "@/lib/format";
 import { MIN_SUBTOTAL_CENTS } from "@/lib/cart-pricing-constants";
 import { sha256, hashPhone } from "@/lib/browser-hash";
 import { getFbAttribution } from "@/lib/fb-attribution";
+import {
+  DeliveryScheduler,
+  type DeliverySchedulerSelection,
+} from "@/components/checkout/DeliveryScheduler";
 
 // localStorage keys for hashed identity — written at InitiateCheckout, read
 // by Purchase (order-success) and AddToCart (returning users) pixel events.
@@ -176,6 +180,8 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
 
   const [contact, setContact] = useState<ContactFields>(EMPTY_CONTACT);
   const [address, setAddress] = useState<AddressFields>(EMPTY_ADDRESS);
+  const [deliverySelection, setDeliverySelection] =
+    useState<DeliverySchedulerSelection | null>(null);
   const [pricing, setPricing] = useState<PricingResponse | null>(null);
   const [pricingLoading, setPricingLoading] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -316,7 +322,9 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
     contact.lastName.trim() &&
     (fulfillmentMode === "pickup"
       ? Boolean(cartPickupSlot)
-      : address.street.trim() && /^\d{5}$/.test(address.zip));
+      : Boolean(deliverySelection) &&
+        address.street.trim() &&
+        /^\d{5}$/.test(address.zip));
 
   // Auto-prepare payment intent when form is complete (single-page checkout)
   useEffect(() => {
@@ -458,6 +466,18 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
           fbc,
           fbp,
           ga_client_id: gaClientId,
+          preferredDeliveryDate:
+            fulfillmentMode === "delivery" && deliverySelection
+              ? deliverySelection.isoDate
+              : undefined,
+          preferredDeliveryWindow:
+            fulfillmentMode === "delivery" && deliverySelection
+              ? deliverySelection.windowKey
+              : undefined,
+          preferredDeliveryWindowLabel:
+            fulfillmentMode === "delivery" && deliverySelection
+              ? deliverySelection.windowLabel
+              : undefined,
         }),
       });
       const intentJson = await intentRes.json();
@@ -503,11 +523,20 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
             }}
           />
           {fulfillmentMode === "delivery" ? (
-            <DeliverySection
-              address={address}
-              setAddress={setAddress}
-              addressRef={addressInputRef}
-            />
+            <>
+              <section>
+                <h2 className="mb-4 text-xl font-semibold">Schedule delivery</h2>
+                <DeliveryScheduler
+                  value={deliverySelection}
+                  onChange={setDeliverySelection}
+                />
+              </section>
+              <DeliverySection
+                address={address}
+                setAddress={setAddress}
+                addressRef={addressInputRef}
+              />
+            </>
           ) : (
             <PickupSection
               slots={slots}

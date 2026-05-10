@@ -2,6 +2,7 @@ import { task } from "@trigger.dev/sdk/v3";
 import { createHash } from "crypto";
 import { isSuppressed } from "./_email-suppression";
 import { sendTransactional } from "../lib/email/resend";
+import { formatPreferredSlotLabel } from "../lib/delivery-windows";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
@@ -71,6 +72,7 @@ function buildConfirmationEmail(params: {
   totalCents?: number | null;
   fulfillmentMode?: "delivery" | "pickup" | null;
   pickupSlotLabel?: string | null;
+  preferredSlotLabel?: string | null;
 }): { subject: string; html: string; text: string } {
   const {
     firstName,
@@ -87,6 +89,7 @@ function buildConfirmationEmail(params: {
     totalCents,
     fulfillmentMode,
     pickupSlotLabel,
+    preferredSlotLabel,
   } = params;
   const sessionTag = sessionId.substring(0, 8);
   const formattedAmount = `$${amountDollars.toFixed(2)}`;
@@ -171,6 +174,18 @@ function buildConfirmationEmail(params: {
       <li>You will receive a delivery confirmation with your scheduled window.</li>
       <li>Fresh produce delivered to your door, ready for your kitchen.</li>
     </ul>
+    ${
+      preferredSlotLabel && fulfillmentMode === "delivery"
+        ? `<div style="background:#fff8e1;border:1px solid #f0c36d;border-radius:8px;padding:14px 16px;margin:16px 0;">
+            <p style="margin:0 0 6px 0;font-size:14px;font-weight:bold;color:#7a5a00;">A note on your delivery window</p>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#5a4500;">
+              You picked <strong>${preferredSlotLabel}</strong>. Thank you for sharing your preferred window.
+              For this week, your box ships <strong>Wednesday</strong> while we finish rolling out every-day delivery citywide.
+              We will reach out as soon as your chosen window opens, and your preference is on file for future orders.
+            </p>
+           </div>`
+        : ""
+    }
 
     ${subscriptionNote}
 
@@ -209,6 +224,11 @@ function buildConfirmationEmail(params: {
       ? `\nDelivery: address on file`
       : "";
 
+  const preferredText =
+    preferredSlotLabel && fulfillmentMode === "delivery"
+      ? `\n\nA NOTE ON YOUR DELIVERY WINDOW\nYou picked ${preferredSlotLabel}. Thank you for sharing your preferred window. For this week, your box ships Wednesday while we finish rolling out every-day delivery citywide. We will reach out as soon as your chosen window opens, and your preference is on file for future orders.\n`
+      : "";
+
   const text = `Hi ${firstName},
 
 Thank you for your order. We have received your payment and your Uncle May's order is confirmed.
@@ -220,7 +240,7 @@ Order ID: ${sessionTag}
 WHAT HAPPENS NEXT:
 - Our team will prepare your produce box with care.
 - You will receive a delivery confirmation with your scheduled window.
-- Fresh produce delivered to your door, ready for your kitchen.
+- Fresh produce delivered to your door, ready for your kitchen.${preferredText}
 
 ${isSubscription ? `Your subscription renews automatically each ${billingInterval || "month"}. To manage or cancel, reply to this email or call (312) 972-2595.\n\n` : ""}Questions? Call or text: (312) 972-2595 | info@unclemays.com
 
@@ -255,6 +275,8 @@ export const sendOrderConfirmationEmail = task({
     totalCents?: number | null;
     fulfillmentMode?: "delivery" | "pickup" | null;
     pickupSlotLabel?: string | null;
+    preferredDeliveryDate?: string | null;
+    preferredDeliveryWindow?: string | null;
   }) => {
     if (isSuppressed(payload.email)) {
       console.log(`[OrderConfirmation] Suppressed recipient ${payload.email} — skipping send`);
@@ -277,6 +299,11 @@ export const sendOrderConfirmationEmail = task({
       );
     }
 
+    const preferredSlotLabel = formatPreferredSlotLabel(
+      payload.preferredDeliveryDate,
+      payload.preferredDeliveryWindow
+    );
+
     const { subject, html, text } = buildConfirmationEmail({
       firstName,
       sessionId: payload.sessionId,
@@ -292,6 +319,7 @@ export const sendOrderConfirmationEmail = task({
       totalCents: payload.totalCents ?? null,
       fulfillmentMode: payload.fulfillmentMode ?? null,
       pickupSlotLabel: payload.pickupSlotLabel ?? null,
+      preferredSlotLabel,
     });
 
     const result = await sendTransactional({
@@ -303,6 +331,9 @@ export const sendOrderConfirmationEmail = task({
         { name: "type", value: "order_confirmation" },
         { name: "session", value: payload.sessionId.substring(0, 8) },
         { name: "subscription", value: payload.isSubscription ? "true" : "false" },
+        ...(payload.preferredDeliveryWindow
+          ? [{ name: "preferred_window", value: String(payload.preferredDeliveryWindow) }]
+          : []),
       ],
     });
 

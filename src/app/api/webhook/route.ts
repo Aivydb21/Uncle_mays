@@ -292,6 +292,10 @@ export async function POST(req: NextRequest) {
               billingInterval: null, // populated from subscription metadata if needed
               subscriptionId:
                 typeof session.subscription === "string" ? session.subscription : null,
+              preferredDeliveryDate:
+                session.metadata?.preferred_delivery_date ?? null,
+              preferredDeliveryWindow:
+                session.metadata?.preferred_delivery_window ?? null,
             },
             options: {
               idempotencyKey: `order-confirmation-${session.id}`,
@@ -565,6 +569,10 @@ export async function POST(req: NextRequest) {
           const fulfillmentMode =
             intent.metadata?.fulfillment_mode === "pickup" ? "pickup" : "delivery";
           const pickupSlotLabel = intent.metadata?.pickup_slot_label ?? null;
+          const preferredDeliveryDate =
+            intent.metadata?.preferred_delivery_date ?? null;
+          const preferredDeliveryWindow =
+            intent.metadata?.preferred_delivery_window ?? null;
 
           fetch(`${TRIGGER_API_BASE}/send-order-confirmation-email/trigger`, {
             method: "POST",
@@ -590,6 +598,8 @@ export async function POST(req: NextRequest) {
                 totalCents: numberOrNull(intent.metadata?.total_cents) ?? intent.amount,
                 fulfillmentMode,
                 pickupSlotLabel,
+                preferredDeliveryDate,
+                preferredDeliveryWindow,
               },
               options: {
                 idempotencyKey: `order-confirmation-pi-${intent.id}`,
