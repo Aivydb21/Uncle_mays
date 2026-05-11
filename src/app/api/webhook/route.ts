@@ -164,7 +164,7 @@ export async function POST(req: NextRequest) {
             quantity: 1,
           },
         ],
-        clientId: customerId || undefined,
+        clientId: session.metadata?.ga_client_id || undefined,
       });
 
       // Fire CAPI Purchase server-side (bypasses ITP/ad blockers, critical for Meta attribution).
@@ -469,6 +469,7 @@ export async function POST(req: NextRequest) {
             price: intent.amount / 100,
             quantity: 1,
           }],
+          clientId: intent.metadata?.ga_client_id || undefined,
         }).catch((err) => console.error("[GA4] Purchase (subscription) error:", err));
       }
 
@@ -545,6 +546,7 @@ export async function POST(req: NextRequest) {
           value: intent.amount / 100,
           currency: "USD",
           items: ga4Items,
+          clientId: intent.metadata?.ga_client_id || undefined,
         }).catch((err) => console.error("[GA4] Purchase (one-time) error:", err));
       }
 
