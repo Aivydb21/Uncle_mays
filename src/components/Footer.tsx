@@ -56,14 +56,6 @@ export const Footer = () => {
                   Manage Subscription
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/press"
-                  className="text-background/70 hover:text-background transition-colors"
-                >
-                  Press
-                </Link>
-              </li>
             </ul>
           </div>
 

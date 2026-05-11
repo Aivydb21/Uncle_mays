@@ -4,7 +4,7 @@
 > Website, emails, ads, Mailchimp campaigns, and agent-generated copy must match this doc.
 > If any of these facts change, update this file FIRST, then propagate to every surface.
 
-**Last updated:** 2026-05-03 (catalog launch + right-sized portions)
+**Last updated:** 2026-05-10 (citywide every-day delivery, customer-picked window)
 **Owner:** Anthony Ivy
 
 ---
@@ -21,12 +21,14 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 
 | Fact | Value |
 |------|-------|
-| Delivery day | **Wednesday, every week** |
-| Delivery window | **Wednesday 5pm–8pm CT** (after-work, so someone is home to receive) |
-| Order cutoff | **Sunday 11:59 PM CT** — orders placed after cutoff ship the following Wednesday |
-| Service area | **Chicagoland metro south** — south Chicago city ZIPs (606xx) plus south-suburban cluster (Calumet City, Dolton, Harvey, Markham, Hazel Crest, Homewood, Flossmoor, Lansing, South Holland, Matteson, Olympia Fields, Richton Park, Posen, Blue Island, Riverdale, Chicago Heights). Authoritative ZIP list: [`src/lib/service-area.ts`](./src/lib/service-area.ts). |
-| Delivery fee | $7.99 flat rate to Chicago + south-suburb service ZIPs. Free pickup at Polsky Center. |
+| Delivery cadence | **Every day, 7 days a week** (Mon–Sun) |
+| Delivery window | **Customer picks at checkout** — Morning (8am–11am), Midday (11am–2pm), Afternoon (2pm–5pm), or Evening (5pm–8pm), all CT |
+| Order cutoff | **No weekly cutoff.** Customer chooses any delivery date at checkout. Earliest delivery: tomorrow. Booking horizon: 30 days. |
+| Service area | **Entire Chicago metro** — every Chicago city ZIP (all 606xx, plus 60290 and 60707) plus the south-suburban cluster (Blue Island, Calumet City, Chicago Heights, Dolton, Flossmoor, Harvey, Hazel Crest, Homewood, Lansing, Markham, Matteson, Olympia Fields, Posen, Richton Park, Riverdale, South Holland). Authoritative ZIP list: [`src/lib/service-area.ts`](./src/lib/service-area.ts). |
+| Delivery fee | $7.99 flat rate inside the service area. Free pickup at Polsky Center. |
 | Missed delivery policy | 100% freshness guarantee — full refund, no questions asked |
+
+> **Operational note (do not put in customer copy):** The customer-facing promise is "every day, citywide, pick your window." Real driver routing still operates against whichever subset the team can actually serve in any given week — see EXP-002 painted-door experiment (`ml/experiments/EXP-002_delivery_window_painted_door.md`). The order-confirmation email currently includes an honest-reveal note that the first delivery may ship Wednesday while we roll out every-day fulfillment; remove that caveat once daily fulfillment is fully live.
 
 ---
 
@@ -69,8 +71,8 @@ Typical first-time cart lands $30–$60 (produce + one protein). No upper limit.
 | Fact | Value |
 |------|-------|
 | Tagline | Cleaner than Whole Foods. Cheaper than Aldi. |
-| Short description | Black-farmed seasonal produce, delivered across the Chicago metro area every Wednesday. |
-| Who it's for | Chicago metro households (1–4 people, city + south suburbs) who want fresh, ethically sourced produce without a long-term commitment |
+| Short description | Black-farmed seasonal produce, delivered across the Chicago metro area every day of the week. |
+| Who it's for | Chicago metro households (1–4 people, citywide) who want fresh, ethically sourced produce without a long-term commitment |
 | Sourcing claim | Sourced directly from Run A Way Buckers Club (Pembroke, IL) and our growing network of Black farmer partners |
 | Guarantee | 100% freshness guarantee — if it's off, full refund, no questions asked |
 
@@ -143,3 +145,4 @@ Every claim on these pages must match this doc. Files marked DELETED were remove
 - ❌ Auto-applied promo codes via `?promo=CODE` URL params. The customer must type the code in the cart drawer or on /checkout.
 - ❌ "Thursday delivery" / "Thursday 2–6pm" / "Order by Thursday for Wednesday delivery".
 - ❌ "Now delivering in Hyde Park" alone (service area is Chicago-wide; Hyde Park is the flagship neighborhood).
+- ❌ **"Wednesday-only delivery"** / "We deliver every Wednesday" / "Order by Sunday for Wednesday delivery" / "Wednesday 5–8pm window." Replaced 2026-05-10 with "every day, citywide, pick your window at checkout." Customer chooses delivery date and time-of-day window during checkout.

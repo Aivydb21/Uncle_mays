@@ -4,7 +4,7 @@ import OrderSuccessContent from "./OrderSuccessContent";
 
 export const metadata: Metadata = {
   title: "Order Confirmed | Uncle Mays Produce",
-  description: "Your Uncle May's produce box order is confirmed. We'll deliver fresh seasonal produce to your door this Wednesday.",
+  description: "Your Uncle May's produce order is confirmed. We'll deliver fresh seasonal produce to your door in your selected window.",
   robots: { index: false, follow: false },
 };
 
