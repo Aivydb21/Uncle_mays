@@ -540,10 +540,27 @@ UX and copy improvements.
 - Begin Checkout → Purchase: `sessions_with_purchase / sessions_with_begin_checkout`
 - End-to-end CVR: `sessions_with_purchase / total_sessions`
 
-**Source:** GA4 BigQuery export (`analytics_494626869.events_*`) or
-`ga4_session_summary` parquet.
+**Source (canonical):** `mart_conversion_funnel` dbt model (dev: DuckDB `uncle_mays_dev.main_core.mart_conversion_funnel`; prod: BigQuery `uncle_mays_dbt.mart_conversion_funnel`).
 
-**SQL (BigQuery):**
+Raw fallback: GA4 BigQuery export (`analytics_494626869.events_*`) or `ga4_session_summary` parquet.
+
+**SQL (dbt mart — preferred):**
+```sql
+-- Filter to post-fix data only (tracking bugs fixed 2026-05-06)
+select
+  count(*)                                                          as total_sessions,
+  sum(case when has_add_to_cart    then 1 else 0 end)              as add_to_cart_sessions,
+  sum(case when has_begin_checkout then 1 else 0 end)              as begin_checkout_sessions,
+  sum(case when has_purchase       then 1 else 0 end)              as purchase_sessions,
+  round(sum(case when has_add_to_cart    then 1.0 else 0 end) / nullif(count(*), 0), 4) as visit_to_cart_rate,
+  round(sum(case when has_begin_checkout then 1.0 else 0 end) / nullif(sum(case when has_add_to_cart then 1 else 0 end), 0), 4) as cart_to_checkout_rate,
+  round(sum(case when has_purchase       then 1.0 else 0 end) / nullif(sum(case when has_begin_checkout then 1 else 0 end), 0), 4) as checkout_to_purchase_rate,
+  round(sum(case when has_purchase       then 1.0 else 0 end) / nullif(count(*), 0), 4) as end_to_end_cvr
+from mart_conversion_funnel
+where session_date >= '2026-05-06'   -- post-tracking-fix data only
+```
+
+**SQL (raw BigQuery — fallback only):**
 ```sql
 with sessions as (
   select
@@ -553,7 +570,7 @@ with sessions as (
     max(case when event_name = 'begin_checkout'  then 1 end) as has_begin_checkout,
     max(case when event_name = 'purchase'        then 1 end) as has_purchase
   from `uncle-mays-automation.analytics_494626869.events_*`
-  where _table_suffix between '20260429' and format_date('%Y%m%d', current_date())
+  where _table_suffix >= '20260506'   -- post-tracking-fix date
   group by session_key
 )
 select
@@ -568,13 +585,7 @@ select
 from sessions
 ```
 
-**Current data availability:** ⚠️ **Fix deployed — data accumulating.** GA4 event
-tracking was repaired on 2026-05-04 (commit `dba2ac4`, [UNC-783](/UNC/issues/UNC-783)).
-`add_to_cart` and `begin_checkout` events now fire from the checkout flow, with 8-second
-retry logic on add-to-cart and Meta Pixel events (AddToCart, InitiateCheckout) also wired.
-Historical sessions (pre-2026-05-04) still show zero for these events; funnel analysis will
-become meaningful once ~1–2 weeks of post-fix data lands in BigQuery. Full funnel is
-computable from 2026-05-05 onwards.
+**Current data availability:** ✅ **Funnel data live.** `mart_conversion_funnel` built and all 10 schema tests pass (2026-05-10). GA4 tracking was repaired 2026-05-06 (commits `dea0488` + `3bb8909`; `add_to_cart` silent drop and checkout CTA overlay both fixed). Use `session_date >= '2026-05-06'` filter for clean funnel analysis. Pre-fix sessions are in the mart but will show zero for add_to_cart/begin_checkout.
 
 **Baseline (available today):**
 
@@ -618,9 +629,7 @@ if (nrow(ga4) > 0) {
   median for specialty food DTC is 1–3%)
 - Add-to-Cart → Purchase: ≥ 25%
 
-**Status:** Fix deployed 2026-05-04 ([UNC-783](/UNC/issues/UNC-783)). Funnel data
-will be available in BigQuery from 2026-05-05. Re-run this glossary in 1–2 weeks
-to populate live funnel rates.
+**Status:** ✅ Live. Fix deployed 2026-05-06 ([UNC-783](/UNC/issues/UNC-783)); `mart_conversion_funnel` built 2026-05-09, all 10 tests green 2026-05-10. Channel breakdown available via the `channel` column. Funnel rates will stabilize after 2–3 weeks of post-fix data (full data expected by ~2026-05-27). Last reviewed: 2026-05-10.
 
 ---
 
