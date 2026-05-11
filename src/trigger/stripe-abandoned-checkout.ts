@@ -1,14 +1,10 @@
 import { schedules, task } from "@trigger.dev/sdk/v3";
-import { createHash } from "crypto";
 import { isSuppressed } from "./_email-suppression";
 import { sendTransactional } from "../lib/email/resend";
+import { hashEmail } from "../lib/mailchimp";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
-
-function md5(s: string) {
-  return createHash("md5").update(s).digest("hex");
-}
 
 /**
  * Per-session send-state tracking.
@@ -31,7 +27,7 @@ function sessionEmailTag(sessionId: string, emailNumber: 1 | 2 | 3): string {
 }
 
 async function getContactTags(apiKey: string, email: string): Promise<Set<string>> {
-  const emailHash = md5(email.toLowerCase());
+  const emailHash = hashEmail(email);
   const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
   try {
     const res = await fetch(
@@ -47,7 +43,7 @@ async function getContactTags(apiKey: string, email: string): Promise<Set<string
 }
 
 async function addContactTag(apiKey: string, email: string, tag: string): Promise<void> {
-  const emailHash = md5(email.toLowerCase());
+  const emailHash = hashEmail(email);
   const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
   await fetch(
     `https://${MAILCHIMP_DC}.api.mailchimp.com/3.0/lists/${MAILCHIMP_LIST_ID}/members/${emailHash}/tags`,
@@ -133,7 +129,7 @@ async function upsertMailchimpContact(
   email: string,
   name: { first?: string; last?: string }
 ) {
-  const emailHash = md5(email.toLowerCase());
+  const emailHash = hashEmail(email);
   const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
 
   const body: any = { email_address: email, status_if_new: "subscribed" };
@@ -216,18 +212,18 @@ Uncle May's Produce · Hyde Park, Chicago, IL
 unclemays.com · info@unclemays.com`;
   } else if (emailNumber === 2) {
     // Email 2: cutoff reminder (48h post-expiry)
-    subjectLine = "Order by Sunday for Wednesday delivery";
+    subjectLine = "Pick your delivery day, citywide";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Arial,sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
   <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
-    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Order by Sunday for Wednesday delivery</h2>
+    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Pick your delivery day, citywide</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
-      We deliver every Wednesday across the Chicago metro. To get your order
-      this Wednesday, finish checking out by Sunday at 11:59 PM CT. After
-      that, your order ships the following Wednesday.
+      We now deliver across the Chicago metro every day of the week. Pick the
+      day and the time-of-day window that works for you at checkout, mornings
+      through after-work.
     </p>
     <p style="font-size:16px;line-height:1.6;">
       Code <strong>FRESH10</strong> still works on your first order ($20 minimum).
@@ -249,7 +245,7 @@ unclemays.com · info@unclemays.com`;
 </html>`;
     plainText = `Hi ${firstName},
 
-We deliver every Wednesday across the Chicago metro. To get your order this Wednesday, finish checking out by Sunday at 11:59 PM CT. After that, your order ships the following Wednesday.
+We now deliver across the Chicago metro every day of the week. Pick the day and the time-of-day window that works for you at checkout, mornings through after-work.
 
 Code FRESH10 still works on your first order ($20 minimum).
 

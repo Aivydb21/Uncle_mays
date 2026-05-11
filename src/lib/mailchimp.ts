@@ -25,15 +25,18 @@ function isSuppressed(email: string | null | undefined): boolean {
   return !!domain && SUPPRESSED_DOMAINS.includes(domain);
 }
 
-function getConfig() {
+const config = (() => {
   const apiKey = process.env.MAILCHIMP_API_KEY;
   const listId = process.env.MAILCHIMP_AUDIENCE_ID;
   if (!apiKey || !listId) return null;
-  const serverPrefix = apiKey.split("-").pop();
-  return { apiKey, listId, serverPrefix };
+  return { apiKey, listId, serverPrefix: apiKey.split("-").pop() };
+})();
+
+function getConfig() {
+  return config;
 }
 
-function hashEmail(email: string): string {
+export function hashEmail(email: string): string {
   return createHash("md5").update(email.trim().toLowerCase()).digest("hex");
 }
 

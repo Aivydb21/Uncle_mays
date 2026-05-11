@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
+import type Stripe from "stripe";
+import { stripe } from "@/lib/stripe";
 import { tagOrderCompleted, deleteCart } from "@/lib/mailchimp";
 import { sendCapiEvent } from "@/lib/meta-capi";
 import { sendInternalAlert } from "@/lib/email/resend";
@@ -111,11 +112,6 @@ async function trackGA4Purchase(params: {
 }
 
 export async function POST(req: NextRequest) {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    return NextResponse.json({ error: "Stripe not configured" }, { status: 500 });
-  }
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
 

@@ -1,15 +1,12 @@
 import { task } from "@trigger.dev/sdk/v3";
-import { createHash } from "crypto";
 import { isSuppressed } from "./_email-suppression";
 import { sendTransactional } from "../lib/email/resend";
 import { formatPreferredSlotLabel } from "../lib/delivery-windows";
+import { hashEmail } from "../lib/mailchimp";
+import { formatCents } from "../lib/format";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
-
-function md5(s: string) {
-  return createHash("md5").update(s).digest("hex");
-}
 
 // Keeps the contact in the Mailchimp audience for future newsletter
 // segmentation. Transactional send itself has moved to Resend.
@@ -18,7 +15,7 @@ async function upsertMailchimpContact(
   email: string,
   name: { first?: string; last?: string }
 ) {
-  const emailHash = md5(email.toLowerCase());
+  const emailHash = hashEmail(email);
   const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
 
   const body: Record<string, unknown> = {
@@ -50,12 +47,6 @@ interface ConfirmationLineItem {
   lineTotalCents: number;
 }
 
-function fmtCents(cents: number): string {
-  if (!Number.isFinite(cents)) return "$0.00";
-  const sign = cents < 0 ? "-" : "";
-  const abs = Math.abs(cents);
-  return `${sign}$${(abs / 100).toFixed(2)}`;
-}
 
 function buildConfirmationEmail(params: {
   firstName: string;
@@ -124,34 +115,34 @@ function buildConfirmationEmail(params: {
               ${lineItems!
                 .map(
                   (l) =>
-                    `<tr><td style="padding:3px 0;">${l.name} <span style="color:#777;">x${l.quantity}</span></td><td style="padding:3px 0;text-align:right;">${fmtCents(
+                    `<tr><td style="padding:3px 0;">${l.name} <span style="color:#777;">x${l.quantity}</span></td><td style="padding:3px 0;text-align:right;">${formatCents(
                       l.lineTotalCents
                     )}</td></tr>`
                 )
                 .join("")}
               ${
                 typeof subtotalCents === "number"
-                  ? `<tr><td style="padding:6px 0 2px;color:#666;border-top:1px solid #e5e5e5;">Subtotal</td><td style="padding:6px 0 2px;text-align:right;border-top:1px solid #e5e5e5;">${fmtCents(subtotalCents)}</td></tr>`
+                  ? `<tr><td style="padding:6px 0 2px;color:#666;border-top:1px solid #e5e5e5;">Subtotal</td><td style="padding:6px 0 2px;text-align:right;border-top:1px solid #e5e5e5;">${formatCents(subtotalCents)}</td></tr>`
                   : ""
               }
               ${
                 typeof discountCents === "number" && discountCents > 0
-                  ? `<tr><td style="padding:2px 0;color:#2d7a2d;">Discount</td><td style="padding:2px 0;text-align:right;color:#2d7a2d;">-${fmtCents(discountCents)}</td></tr>`
+                  ? `<tr><td style="padding:2px 0;color:#2d7a2d;">Discount</td><td style="padding:2px 0;text-align:right;color:#2d7a2d;">-${formatCents(discountCents)}</td></tr>`
                   : ""
               }
               ${
                 typeof shippingCents === "number"
-                  ? `<tr><td style="padding:2px 0;color:#666;">Shipping</td><td style="padding:2px 0;text-align:right;">${fmtCents(shippingCents)}</td></tr>`
+                  ? `<tr><td style="padding:2px 0;color:#666;">Shipping</td><td style="padding:2px 0;text-align:right;">${formatCents(shippingCents)}</td></tr>`
                   : ""
               }
               ${
                 typeof taxCents === "number"
-                  ? `<tr><td style="padding:2px 0;color:#666;">Tax</td><td style="padding:2px 0;text-align:right;">${fmtCents(taxCents)}</td></tr>`
+                  ? `<tr><td style="padding:2px 0;color:#666;">Tax</td><td style="padding:2px 0;text-align:right;">${formatCents(taxCents)}</td></tr>`
                   : ""
               }
               ${
                 typeof totalCents === "number"
-                  ? `<tr><td style="padding:6px 0 2px;font-weight:bold;border-top:1px solid #ccc;">Total</td><td style="padding:6px 0 2px;text-align:right;font-weight:bold;border-top:1px solid #ccc;">${fmtCents(totalCents)}</td></tr>`
+                  ? `<tr><td style="padding:6px 0 2px;font-weight:bold;border-top:1px solid #ccc;">Total</td><td style="padding:6px 0 2px;text-align:right;font-weight:bold;border-top:1px solid #ccc;">${formatCents(totalCents)}</td></tr>`
                   : ""
               }
             </table>`
@@ -206,15 +197,15 @@ function buildConfirmationEmail(params: {
 
   const orderLinesText = hasLines
     ? lineItems!
-        .map((l) => `- ${l.name} x${l.quantity}  ${fmtCents(l.lineTotalCents)}`)
+        .map((l) => `- ${l.name} x${l.quantity}  ${formatCents(l.lineTotalCents)}`)
         .join("\n") +
-      (typeof subtotalCents === "number" ? `\n\nSubtotal: ${fmtCents(subtotalCents)}` : "") +
+      (typeof subtotalCents === "number" ? `\n\nSubtotal: ${formatCents(subtotalCents)}` : "") +
       (typeof discountCents === "number" && discountCents > 0
-        ? `\nDiscount: -${fmtCents(discountCents)}`
+        ? `\nDiscount: -${formatCents(discountCents)}`
         : "") +
-      (typeof shippingCents === "number" ? `\nShipping: ${fmtCents(shippingCents)}` : "") +
-      (typeof taxCents === "number" ? `\nTax: ${fmtCents(taxCents)}` : "") +
-      (typeof totalCents === "number" ? `\nTotal: ${fmtCents(totalCents)}` : "")
+      (typeof shippingCents === "number" ? `\nShipping: ${formatCents(shippingCents)}` : "") +
+      (typeof taxCents === "number" ? `\nTax: ${formatCents(taxCents)}` : "") +
+      (typeof totalCents === "number" ? `\nTotal: ${formatCents(totalCents)}` : "")
     : `Product: ${productName}\n${billingLine}`;
 
   const fulfillmentText =

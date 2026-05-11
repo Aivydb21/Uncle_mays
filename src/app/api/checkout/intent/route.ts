@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import {
   priceCart,
   serializeCartForMetadata,
@@ -7,19 +6,12 @@ import {
 } from "@/lib/cart-pricing";
 import { getSlot } from "@/lib/catalog/pickup-slots";
 import type { CartLine, FulfillmentMode } from "@/lib/catalog/types";
+import { stripe } from "@/lib/stripe";
 
 const STRIPE_METADATA_VALUE_LIMIT = 500;
 
 export async function POST(req: NextRequest) {
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.json(
-        { error: "Stripe not configured" },
-        { status: 500 }
-      );
-    }
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
     const body = await req.json();
     const cart = sanitizeCart(body?.cart);
     const fulfillmentMode: FulfillmentMode =

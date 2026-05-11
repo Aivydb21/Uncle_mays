@@ -4,7 +4,6 @@ import Script from "next/script";
 import { Suspense } from "react";
 import "./globals.css";
 
-import { Providers } from "@/components/Providers";
 import { PageShell } from "@/components/PageShell";
 import { FacebookPixelTracker } from "@/components/FacebookPixelTracker";
 import { UTMCapture } from "@/components/UTMCapture";
@@ -116,11 +115,9 @@ export default function RootLayout({
           />
         </noscript>
 
-        <Providers>
-          <PageShell>{children}</PageShell>
-          <Suspense fallback={null}><FacebookPixelTracker /></Suspense>
-          <UTMCapture />
-        </Providers>
+        <PageShell>{children}</PageShell>
+        <Suspense fallback={null}><FacebookPixelTracker /></Suspense>
+        <UTMCapture />
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 import { task } from "@trigger.dev/sdk/v3";
 import { isSuppressed } from "./_email-suppression";
 import { sendTransactional } from "../lib/email/resend";
+import { hashEmail } from "../lib/mailchimp";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
@@ -21,8 +22,7 @@ async function upsertMailchimpContact(
   email: string,
   name: { first?: string; last?: string }
 ) {
-  const { createHash } = await import("crypto");
-  const emailHash = createHash("md5").update(email.toLowerCase()).digest("hex");
+  const emailHash = hashEmail(email);
   const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
 
   const body: Record<string, unknown> = { email_address: email, status_if_new: "subscribed" };

@@ -1,16 +1,12 @@
 import { schedules, task } from "@trigger.dev/sdk/v3";
-import { createHash } from "crypto";
 import { uploadGoogleAdsConversion } from "./google-ads-conversion-tracking";
 import { mlParquetRebuild } from "./ml-parquet-rebuild";
+import { hashEmail } from "../lib/mailchimp";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
 const CUSTOMER_TAG = "Customers";
 const POLL_WINDOW_SECONDS = 9000; // 2.5h — covers 2h cron interval with overlap
-
-function md5(s: string) {
-  return createHash("md5").update(s).digest("hex");
-}
 
 // --- Stripe ---
 
@@ -42,7 +38,7 @@ async function upsertMailchimpCustomer(
   email: string,
   name: { first?: string; last?: string }
 ) {
-  const emailHash = md5(email.toLowerCase());
+  const emailHash = hashEmail(email);
   const authHeader = `Basic ${btoa("anystring:" + apiKey)}`;
 
   const body: any = { email_address: email, status_if_new: "subscribed" };
