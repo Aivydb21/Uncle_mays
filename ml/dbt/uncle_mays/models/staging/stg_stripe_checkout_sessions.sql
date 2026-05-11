@@ -67,6 +67,7 @@ select
 
 from deduped
 where _rn = 1
+  and not ({{ is_internal_test('try_cast(customer_id as varchar)', 'customer_email') }})
 
 {% else %}
 
@@ -109,5 +110,6 @@ select
     date_trunc(created_at, month)                         as created_month
 
 from source
+where not ({{ is_internal_test('customer_id', 'customer_email') }})
 
 {% endif %}

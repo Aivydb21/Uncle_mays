@@ -48,3 +48,18 @@ vars:
   crm_pipeline_live: false
   # Currency for all money fields
   default_currency: "usd"
+  # Internal / founder / smoke-test Stripe customers. Their charges, payment
+  # intents, checkout sessions, and customer rows are excluded at the staging
+  # layer so analytics + financial marts ignore them. Add new IDs here when
+  # team members start running test orders against prod.
+  # Confirmed 2026-05-11 via Stripe API.
+  internal_test_customer_ids:
+    - "cus_ULANE7v2APnG42"  # anthony@unclemays.com (founder)
+    - "cus_UN9KFkZFAKGnkF"  # anthonypivy@gmail.com (founder personal)
+    - "cus_UOeacOxSfcelAu"  # smoke-test@unclemays.com (smoke test suite)
+    - "cus_UN8fJjvyuLyWTy"  # cto-audit-test@unclemays.com (CTO audit)
+  # Email domain blocklist. Anything matching is treated as internal even if
+  # the customer ID is not yet in internal_test_customer_ids. Catches new
+  # team accounts created against prod before someone updates the ID list.
+  internal_test_email_domains:
+    - "@unclemays.com"
