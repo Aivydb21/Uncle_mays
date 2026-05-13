@@ -166,9 +166,10 @@ export async function deleteCart(sessionId: string): Promise<void> {
   }
 }
 
-// Add a new homepage-capture lead to the list with the new_signup tag.
-// This is the entry point for the welcome series (see
-// campaigns/email-sequences/welcome-series.md).
+// Add a new homepage-capture lead to the list and apply the new_signup tag.
+// new_signup is the trigger for the Customer Welcome Journey. The tag MUST
+// be applied via a separate POST to /tags — Mailchimp's "Contact is tagged"
+// trigger does NOT fire when tags are set in the member-upsert PUT body.
 // Idempotent: existing members get the tag added; existing subscribers stay subscribed.
 export async function addSignupLead(email: string, source?: string): Promise<{ ok: boolean; error?: string }> {
   if (isSuppressed(email)) return { ok: true };
@@ -177,9 +178,9 @@ export async function addSignupLead(email: string, source?: string): Promise<{ o
     return { ok: false, error: "Mailchimp not configured" };
   }
   const hash = hashEmail(email);
-  const url = `https://${config.serverPrefix}.api.mailchimp.com/3.0/lists/${config.listId}/members/${hash}`;
+  const base = `https://${config.serverPrefix}.api.mailchimp.com/3.0/lists/${config.listId}/members/${hash}`;
   try {
-    const res = await fetch(url, {
+    const subscribeRes = await fetch(base, {
       method: "PUT",
       headers: {
         Authorization: authHeader(config.apiKey),
@@ -188,13 +189,28 @@ export async function addSignupLead(email: string, source?: string): Promise<{ o
       body: JSON.stringify({
         email_address: email,
         status_if_new: "subscribed",
-        tags: ["new_signup", ...(source ? [`source:${source}`] : [])],
       }),
     });
-    if (!res.ok) {
-      const body = await res.text();
-      console.error("Mailchimp addSignupLead error:", res.status, body);
-      return { ok: false, error: `Mailchimp returned ${res.status}` };
+    if (!subscribeRes.ok) {
+      const body = await subscribeRes.text();
+      console.error("Mailchimp addSignupLead subscribe error:", subscribeRes.status, body);
+      return { ok: false, error: `Mailchimp returned ${subscribeRes.status}` };
+    }
+
+    const tags: { name: string; status: "active" }[] = [{ name: "new_signup", status: "active" }];
+    if (source) tags.push({ name: `source:${source}`, status: "active" });
+    const tagRes = await fetch(`${base}/tags`, {
+      method: "POST",
+      headers: {
+        Authorization: authHeader(config.apiKey),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tags }),
+    });
+    if (!tagRes.ok) {
+      const body = await tagRes.text();
+      console.error("Mailchimp addSignupLead tag error:", tagRes.status, body);
+      return { ok: false, error: `Mailchimp tag returned ${tagRes.status}` };
     }
     return { ok: true };
   } catch (err) {
