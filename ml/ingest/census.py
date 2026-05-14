@@ -1,8 +1,8 @@
 """Pull US Census Bureau ACS 5-year demographics by ZCTA (ZIP code).
 
-The Census Data API is free and requires no key for low-volume requests
-(register at https://api.census.gov/data/key_signup.html for higher rate
-limits, set CENSUS_API_KEY in env to use it).
+The Census Data API requires a free API key for all requests as of 2025.
+Register at https://api.census.gov/data/key_signup.html and set
+CENSUS_API_KEY in your .env file.
 
 Pulls:
   - median_household_income     B19013_001E
@@ -84,7 +84,13 @@ def _zips_from_stripe_extracts() -> list[str]:
 
 def extract() -> Path:
     load_dotenv_if_present()
-    api_key = os.environ.get("CENSUS_API_KEY")  # optional
+    api_key = os.environ.get("CENSUS_API_KEY")
+    if not api_key:
+        raise EnvironmentError(
+            "[census] CENSUS_API_KEY is not set. "
+            "Register for a free key at https://api.census.gov/data/key_signup.html "
+            "and set it in your .env file."
+        )
 
     zips = sorted(set(_service_area_zips() + _zips_from_stripe_extracts()))
     print(f"[census] pulling ACS for {len(zips)} ZIPs")
@@ -101,15 +107,24 @@ def extract() -> Path:
             params = {
                 "get": get_clause,
                 "for": f"zip code tabulation area:{','.join(batch)}",
+                "key": api_key,
             }
-            if api_key:
-                params["key"] = api_key
             url = f"{CENSUS_API}/{ACS_VINTAGE}/acs/acs5"
-            r = cli.get(url, params=params)
+            r = cli.get(url, params=params, follow_redirects=False)
+            # Census returns 302 -> missing_key.html when the key is invalid/missing
+            if r.status_code == 302 or "missing_key" in r.headers.get("location", ""):
+                raise EnvironmentError(
+                    f"[census] Census API rejected the key (302 redirect). "
+                    f"Check CENSUS_API_KEY is valid. Location: {r.headers.get('location')}"
+                )
             if r.status_code != 200:
                 print(f"[census] batch {i//BATCH} returned {r.status_code}: {r.text[:200]}")
                 continue
-            data = r.json()
+            try:
+                data = r.json()
+            except Exception as exc:
+                print(f"[census] batch {i//BATCH} JSON parse failed: {exc}; body: {r.text[:200]}")
+                continue
             if not data or len(data) < 2:
                 continue
             header = data[0]

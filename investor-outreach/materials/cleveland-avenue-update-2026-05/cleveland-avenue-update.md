@@ -1,12 +1,14 @@
 # Uncle May's Produce
 
+*Founder Update No. 1. Prepared for Cleveland Avenue.*
+
 *A culturally aligned food economy for Black Chicago. Built in three chapters.*
 
 Anthony Ivy, founder and CEO. anthony@unclemays.com. (312) 972-2595.
 
 www.unclemays.com
 
-Polsky Center referral. Application to Fifth Star Funds, May 2026.
+Confidential. Prepared for Cleveland Avenue. May 2026.
 
 [Cover image: a Wednesday Uncle May's delivery on a South Side Chicago doorstep, mixed produce and protein visible. Hand of a customer reaching for the box.]
 
@@ -16,10 +18,10 @@ Polsky Center referral. Application to Fifth Star Funds, May 2026.
 
 ## The Plan, in Three Chapters
 
-Uncle May's is not a produce-box business. It is not a single grocery store. It is not a data platform. It is all three, sequenced. Fifth Star is being asked to fund Chapter 1.
+Uncle May's is not a produce-box business. It is not a single grocery store. It is not a data platform. It is all three, sequenced. This update covers where Chapter 1 stands today and what is coming next.
 
 **Chapter 1: Mobilize Black farmers, ship culturally aligned grocery to Chicago households.**
-Operating today. A direct-to-consumer delivery business sourced from named Black-owned farms. Real customers, real revenue, paid acquisition running in Chicago. This is the chapter Fifth Star's $25K funds.
+Operating today. A direct-to-consumer delivery business sourced from named Black-owned farms. Real customers, paid acquisition running in Chicago, clean measurement infrastructure live. This update is about what we are seeing in Chapter 1.
 
 **Chapter 2: Build the flagship grocery store and a regional cluster.**
 Hyde Park flagship at 47th and Cottage Grove, in a building that has run $8M+ annual grocery revenue at that address for three years. SBA 7(a) loan conditionally approved at $2.0M. Tenant improvement support of $100K from the University of Chicago. Standalone unit economics, modeled at 23% IRR over 10 years (base case) and 18% IRR over 5 years (conservative case).
@@ -58,24 +60,24 @@ Investors deserve to see exactly how Chapter 1 produces the artifacts that make 
 
 ---
 
-*THIS RAISE*
+*YOU ARE HERE*
 
-## You Are Reading Chapter 1
+## Chapter 1, In Motion
 
-Fifth Star's $25K is the catalyst capital for Chapter 1. It buys six months of measured Chicago paid acquisition with clean attribution, a documented unit-economics outcome, and the customer evidence that makes the Chapter 2 conversation real.
+We are six weeks into Chapter 1 of a three-chapter plan. The build-your-own catalog shipped on April 30, paid acquisition is live, and the measurement infrastructure (Pixel feedback loop, attribution, dbt analytics) is healthy as of last week. This update is a snapshot of what we are seeing.
 
-**Why this fits Fifth Star specifically**
+**What is true about Chapter 1 right now**
 
-- Black founder, Chicago-based, Polsky referral path.
-- Mission: rebuild structural Black food economy infrastructure (farmers, consumers, supply chain, data) end to end.
-- Tech-enabled endpoint: Chapter 3 is the data and vendor network platform. Chapter 1 is the layer that produces the data Chapter 3 needs.
-- Scalable: chapter framework explicitly designed so each chapter is independently capitalized and each chapter unlocks a larger market.
-- Pareto-aligned: 20% of the founder's effort (the Chapter 1 box business) underwrites the customer truth that 80% of the eventual platform value depends on.
+- Real customers placing real orders across South and West Side Chicago.
+- Convergent customer language across four named-interview archetypes.
+- Demand signal on paid acquisition that is 3 to 5 times retail benchmark CTR at half the cost per click.
+- A clean per-order P&L, with the unit-economics gaps surfaced honestly (CAC currently far above target; the next six months are the test).
+- A team that has executed at far larger scales than the current operating footprint requires.
 
-**Why this fits the $25K check size**
+**What this means for Cleveland Avenue**
 
-- This raise is sized to the test, not to the ambition. Chapter 1 needs $25K to run six months of clean Chicago paid acquisition. Chapter 2 has its own capital stack (SBA + preferred equity + landlord TI) that is fully out of scope for this conversation.
-- No part of this plan requires more than $25K to be useful. A complete, self-contained six-month experiment with a defined success metric.
+- Cleveland Avenue invests where culturally aligned food meets venture-scale outcomes. Uncle May's is exactly that shape, built deliberately as a three-chapter business so each chapter is independently fundable and each chapter compounds the next.
+- This update is informational. We are not asking for capital today. We are putting the dataset in your hands now so the next conversation, when the six-month numbers land, is grounded in what you have already been tracking.
 
 [Slide image: a chapter-1-of-3 progress indicator at the top of the page, like a book table of contents with chapter 1 highlighted.]
 
@@ -337,73 +339,52 @@ Uncle May's is operating today on a complete commerce stack built on operating c
 - **Email and SMS communication:** transactional order confirmation, delivery alerts, abandoned-cart recovery, weekly newsletter (Resend + Mailchimp + Twilio).
 - **Analytics stack:** dbt + BigQuery, unified reporting across orders, cohorts, and customer behavior. This is the foundation of the Chapter 3 data product.
 
-This baseline lets every dollar of the Fifth Star check go toward acquisition and retention proof, not toward platform build.
-
----
-
-*CAPITAL DEPLOYMENT*
-
-## Use of Funds, $25K
-
-A $25K check from Fifth Star is allocated to a single thesis: prove that Uncle May's can acquire and retain customers profitably at Chicago scale, on real paid acquisition spend, with clean measurement. This is Chapter 1, scoped to six months.
-
-| Line item | Amount | What it buys |
-|---|---|---|
-| Chicago paid acquisition (Meta and Google) | $14,000 | Six months of paid spend with full conversion tracking live |
-| Creative and landing-page testing | $3,500 | Two to three ad-creative variants per week, two landing variants tested |
-| Customer interview and feedback program | $1,500 | 20 to 30 additional Black-customer interviews to confirm convergent signal at scale |
-| Catalog improvements and packaging upgrades | $2,000 | Receipt-tied insert, community box re-list, packaging refresh (all driven by customer feedback) |
-| Operating infrastructure and tooling | $1,500 | Email, analytics, conversion monitoring across the test window |
-| Reporting and reserve | $2,500 | Monthly investor reporting, contingency, end-of-period unit-economics audit |
-| **Total** | **$25,000** | **Six months of runway dedicated to proving the unit** |
-
-**Expected outcomes from this funding (Chapter 1 deliverables):**
-
-- Acquire customers at a measurable, sustainable cost.
-- Improve retention through better packaging, expanded SKU set, and the community box re-launch.
-- Optimize website conversion through iterative testing.
-- Expand supplier variety beyond Run A Way Buckers Club to a second and third Black-owned farm partner.
-- Validate repeat purchasing behavior with measurable cohort data.
-
-**No part of this plan requires more than $25K to be useful.** This is a complete, self-contained six-month experiment with a defined success metric, not a partial step inside a larger raise.
+This baseline means future operating capital goes toward acquisition and retention proof, not toward platform build.
 
 ---
 
 *MILESTONES*
 
-## 6-Month Growth Targets
+## Six-Month Targets We Are Tracking To
 
-Concrete, measurable targets for the period this funding covers. Hitting four of six is the trigger to return to Fifth Star with measured data and the Chapter 2 conversation.
+Six metrics that define whether Chapter 1 is working. We are tracking publicly to investors who have asked to be kept posted, and we will return with measured cohort data when four of six land in range.
 
-| Metric | Target |
-|---|---|
-| Average order value | $75 to $100 (observed $68 today, n=4 orders) |
-| Gross margin | 35% or higher (observed) |
-| Customer acquisition cost | $60 or lower |
-| First-order payback | Two orders or fewer |
-| 30-day repeat rate | 25% or higher |
-| LTV / CAC ratio | 3.0 or higher |
+| Metric | Target | Observed today |
+|---|---|---|
+| Average order value | $75 to $100 | $68 (n=4 cleaned orders) |
+| Gross margin | 35% or higher | Modeled 40%, observation pending audit |
+| Customer acquisition cost | $60 or lower | ~$270 blended (pre-fix baseline) |
+| First-order payback | Two orders or fewer | Not yet on path |
+| 30-day repeat rate | 25% or higher | One repeat customer to date |
+| LTV / CAC ratio | 3.0 or higher | Not yet measurable |
 
-When four of six metrics land in their target ranges, Anthony returns to Fifth Star with measured data.
+The gap between today and the targets is the test. The two binding constraints (broken Pixel feedback loop, pre-catalog creative) are already addressed; what remains is six months of measured spend behind the fix.
 
 ---
 
-*THE ASK*
+*WHAT'S NEXT*
 
-## The Ask
+## Where We Are, and What Comes Next
 
-**The bet.** Black households across the South and West Sides of Chicago are an underserved, high-affinity grocery customer. The companies that will serve them well do not exist yet. Uncle May's is building one as a three-chapter business: culturally aligned delivery, then brick-and-mortar grocery, then a vendor-network and data platform. Each chapter funds itself with a real product and real customers. Each chapter unlocks the next.
+**Where we are today**
 
-**The ask.** A $25K check from Fifth Star, on a SAFE at $5M cap with a 20% discount. Polsky referral path. Decision sought by 2026-06-15.
+- Catalog era is six weeks old. Measurement infrastructure is healthy. Four named-customer interviews complete, three paying customers in the cleaned data, one confirmed repeat.
+- Demand signal on paid acquisition is real (5.1% Meta CTR, 6.9% Google CTR, $0.26 Meta CPC, all multiples better than retail benchmark).
+- Cost of acquisition is the live wound. Closing it is the entirety of the next six months.
 
-**What we give back to Fifth Star**
+**What comes next (Chapter 1 deliverables, next six months)**
 
-- Monthly metrics email (CAC, AOV, gross margin, 30-day repeat, LTV / CAC).
-- Open invitation to ride along on a Wednesday delivery.
-- A return conversation when four of six six-month targets land, and an early look at the Chapter 2 deck.
-- Regardless of outcome, this funding will generate measurable insight into how culturally aligned grocery delivery can better serve Black households.
+- Drive observed CAC from ~$270 to under $60.
+- Document a measurable 30-day repeat cohort.
+- Expand supplier variety beyond Run A Way Buckers Club to two additional Black-owned farm partners.
+- Re-list the community box on customer demand.
+- Ship 20 to 30 additional named-customer interviews to confirm convergent signal at scale.
 
-**Chapter 1 is the catalyst. Chapter 2 is the flagship. Chapter 3 is the platform.** Fifth Star's $25K funds Chapter 1.
+**How we will keep you posted**
+
+- This is Update No. 1. Expect Update No. 2 at the 60-day mark with the first cohort signal, then Update No. 3 at six months with the full unit-economics audit.
+- Open invitation to ride along on a Wednesday delivery at any point. No pitch attached; just the work in motion.
+- If anything in this document raises a question you want answered between updates, ask directly. Cleveland Avenue's perspective on consumer-food unit economics is exactly the input we want this early.
 
 [Slide closing image: a Wednesday delivery moment in a Chicago neighborhood, customer receiving the box.]
 
@@ -428,12 +409,12 @@ Sources: U.S. Census Bureau ACS 2023 5-year estimates; BLS Consumer Expenditure 
 
 ## What This Application Does Not Claim
 
-We are deliberately not claiming things the data does not yet support. Fifth Star and Polsky can rely on this list as a true reflection of what we know and what we do not.
+We are deliberately not claiming things the data does not yet support. Cleveland Avenue can rely on this list as a true reflection of what we know and what we do not.
 
 - **No measured retention or LTV yet.** Four customer interviews and three net-paid catalog-era orders is not a cohort. Buying the time to measure LTV honestly is a primary use of this funding.
 - **No claim that signals from four interviews will hold across forty.** The right next move is to test convergent customer language as paid creative and measure conversion, not to assume.
 - **No long-range revenue forecast in Chapter 1.** This raise is funded against a six-month customer acquisition test, not a multi-year plan. The Chapter 2 and Chapter 3 economics are referenced for context only and are not the basis of this ask.
-- **No retail storefront in scope for this funding.** The Hyde Park flagship (Chapter 2) is a separate, larger raise on a separate timeline. The $25K from Fifth Star buys six months of paid-acquisition truth on the Chapter 1 delivery business.
+- **No retail storefront in scope for this update.** The Hyde Park flagship (Chapter 2) is a separate, larger raise on a separate timeline. This document is a Chapter 1 progress snapshot, not a flagship pitch.
 - **No claim that Chapter 3 is real yet.** The vendor network and proprietary food data are optionality that gets built only after Chapter 2 unit economics validate. Not the basis for Chapter 1's valuation.
 
-What this application does claim: a functional DTC unit, a clean measurement stack, four Black American customer interviews with convergent verbatim signal, a per-order P&L that reconciles, paid acquisition performance that is 3 to 5 times retail benchmark CTR, and a founder who will return to Fifth Star with measured data when the Chapter 1 unit-economics targets are met.
+What this update does claim: a functional DTC unit, a clean measurement stack, four Black American customer interviews with convergent verbatim signal, a per-order P&L that reconciles, paid acquisition performance that is 3 to 5 times retail benchmark CTR, and a founder who will return to Cleveland Avenue with measured data when the Chapter 1 unit-economics targets are met.

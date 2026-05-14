@@ -1,0 +1,17 @@
+{
+  "generationId": "VGljhSzSSZqKvLSc1fYAK",
+  "status": "completed",
+  "gammaId": "g_827wpg30odmojwq",
+  "gammaUrl": "https://gamma.app/docs/17jaju0qgj6az03",
+  "generatedOn": "2026-05-13",
+  "source": "fsfi-grs-innovation-award-budget.md",
+  "purpose": "Line-item budget submission for FSFI GRS 2026 Innovation Award. Compacted to 2 pages per reviewer expectations. Top-grant $50K + secondary $10K scenarios. Replaces earlier generation 121d85145aene7f.",
+  "previousGeneration": {
+    "gammaUrl": "https://gamma.app/docs/121d85145aene7f",
+    "note": "Earlier longer draft; superseded by this compact version. Safe to delete in Gamma."
+  },
+  "credits": {
+    "deducted": 30,
+    "remaining": 2174
+  }
+}

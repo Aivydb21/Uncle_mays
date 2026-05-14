@@ -1,0 +1,642 @@
+---
+title: "CRO Optimization Impact — Conversion Probability Framework"
+subtitle: "Statistical validation for ad-scale decision | UNC-1013 | Decision Scientist"
+author: "Uncle May's Data Team"
+date: "2026-05-11"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: true
+    df-print: paged
+    embed-resources: true
+    theme: flatly
+  pdf:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    geometry:
+      - margin=1in
+    fontsize: 10pt
+    code-overflow: wrap
+    fig-pos: "H"
+execute:
+  echo: true
+  warning: false
+  message: false
+engine: knitr
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(arrow)
+  library(dplyr)
+  library(tidyr)
+  library(tibble)
+  library(stringr)
+  library(lubridate)
+  library(forcats)
+  library(ggplot2)
+  library(scales)
+  library(knitr)
+  library(purrr)
+})
+set.seed(42)
+```
+
+---
+
+## Executive Summary
+
+**Headline:** The checkout funnel shows a directionally significant CVR improvement
+post-CRO activation (6.9% → 22.0%, Fisher's exact p = 0.013), but the improvement
+is substantially confounded by simultaneous Facebook campaign traffic. Cart recovery
+emails are the only cleanly attributed new conversion channel: **8.0% recovery CVR**
+(2/25 recovery attempts → orders, \$82 recovered at zero incremental cost).
+
+**Recommendation:** The data is *directionally sufficient* to proceed with Meta ad
+scale-up to \$100/day with one guard-rail — weekly CVR monitoring by traffic source
+with a stop condition if post-launch CVR falls below the 6.9% pre-period baseline.
+We should NOT claim statistical proof that checkout UX changes drove the CVR uplift;
+the honest story is "CRO + paid launch happened together and CVR improved — we will
+track them separately going forward."
+
+**Honest uncertainty acknowledgment:** N = 22 post-period conversions. Confidence
+intervals are wide. Point estimates should be treated as directional, not precise.
+The monitoring framework below is designed to close the gap as volume accumulates.
+
+---
+
+## 0. Data Sources & Caveats
+
+```{r data-sources}
+# Data as of 2026-05-11
+# Source: Stripe payment_intents (source of truth for all order outcomes)
+# Scope: Apr 1 – May 10, 2026 (post-catalog-launch period)
+# Excluded: Jan 2026 bulk test charges (10x $200 internal tests, 2026-01-29/30)
+# N is small — all CIs use Wilson score interval (exact method for small proportions)
+
+tribble(
+  ~Source, ~Records, ~Date_Range, ~Notes,
+  "stripe_payment_intents", "155 rows", "Nov 2025 – May 2026", "All checkout attempts; source of truth",
+  "stripe_checkout_sessions", "303 rows", "Nov 2025 – Apr 2026", "Legacy Stripe Checkout flow only",
+  "stripe_charges", "38 rows", "Nov 2025 – May 2026", "Completed charge records",
+  "conversion_v2 parquet", "309 rows", "Nov 2025 – May 2026", "ML feature matrix; 12 label=1"
+) |> knitr::kable(caption = "Data sources (all observed from Stripe API as of 2026-05-11)")
+```
+
+---
+
+## 1. Conversion Volume & Revenue Trend
+
+```{r load-data}
+# Load payment intents
+pi_files <- list.files("../data/raw", pattern = "^stripe_payment_intents_.*\\.parquet$",
+                       full.names = TRUE)
+pi_path  <- sort(pi_files, decreasing = TRUE)[1]
+cat("Loading:", basename(pi_path), "\n")
+
+pi_raw <- arrow::read_parquet(pi_path) |> as_tibble()
+cat("Shape:", nrow(pi_raw), "x", ncol(pi_raw), "\n")
+
+# Scope: Apr 1 – May 10, 2026
+pi_raw <- pi_raw |>
+  mutate(created_at = as.POSIXct(created_at, tz = "UTC"))
+
+pi <- pi_raw |>
+  dplyr::filter(created_at >= as.POSIXct("2026-04-01", tz = "UTC")) |>
+  mutate(
+    week       = floor_date(created_at, "week", week_start = 1),
+    succeeded  = status == "succeeded",
+    channel    = case_when(
+      utm_source == "email"    ~ "Cart Recovery (email)",
+      utm_source %in% c("meta", "facebook") ~ "Meta/Facebook Paid",
+      is.na(utm_source)        ~ "Direct / Organic",
+      TRUE                     ~ utm_source
+    )
+  )
+
+cat("\nStatus breakdown (Apr-May 2026):\n")
+pi |> count(status) |> knitr::kable()
+```
+
+```{r revenue-trend, fig.height=4, fig.width=8}
+weekly_rev <- pi |>
+  dplyr::filter(succeeded) |>
+  group_by(week) |>
+  summarise(
+    orders     = n(),
+    revenue    = sum(amount_cents, na.rm = TRUE) / 100,
+    aov        = revenue / orders,
+    .groups    = "drop"
+  )
+
+ggplot(weekly_rev, aes(week, revenue)) +
+  geom_col(fill = "#2ecc71", alpha = 0.85) +
+  geom_text(aes(label = paste0("$", round(revenue), "\n(", orders, " orders)")),
+            vjust = -0.3, size = 3) +
+  scale_y_continuous(labels = dollar_format(), expand = expansion(mult = c(0, 0.2))) +
+  scale_x_datetime(date_breaks = "1 week", date_labels = "%b %d") +
+  labs(
+    title    = "Weekly Revenue — Apr to May 2026 [observed, Stripe PI]",
+    subtitle = "Week starting Monday; all succeeded payment intents",
+    x = NULL, y = "Revenue (USD)"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+```
+
+```{r revenue-by-channel, fig.height=4, fig.width=8}
+channel_rev <- pi |>
+  dplyr::filter(succeeded) |>
+  group_by(channel) |>
+  summarise(orders = n(), revenue = sum(amount_cents, na.rm=TRUE)/100, .groups="drop") |>
+  mutate(pct_rev = revenue / sum(revenue),
+         channel = fct_reorder(channel, revenue))
+
+ggplot(channel_rev, aes(channel, revenue, fill = channel)) +
+  geom_col() +
+  geom_text(aes(label = paste0("$", round(revenue), "\n", orders, " orders\n",
+                               percent(pct_rev, 1))),
+            vjust = -0.2, size = 3.2) +
+  scale_y_continuous(labels = dollar_format(), expand = expansion(mult = c(0, 0.25))) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(title = "Revenue by Channel — Apr 1 to May 10, 2026 [observed]",
+       x = NULL, y = "Revenue (USD)") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "none", axis.text.x = element_text(angle = 20, hjust = 1))
+```
+
+---
+
+## 2. Checkout Conversion Rate Trend (Payment Intent Funnel)
+
+> **Denominator note:** We use *all payment intents created* (not just checkout sessions)
+> because the new embedded Stripe Elements checkout creates payment intents directly.
+> Checkout sessions (the legacy Stripe-hosted flow) only captured Apr 1–26 traffic.
+
+```{r wilson-ci}
+# Wilson score 95% CI helper
+wilson_ci <- function(k, n, z = 1.96) {
+  if (n == 0) return(list(lo = 0, hi = 0, p = NA_real_))
+  p      <- k / n
+  denom  <- 1 + z^2 / n
+  center <- (p + z^2 / (2*n)) / denom
+  margin <- z * sqrt(p*(1-p)/n + z^2/(4*n^2)) / denom
+  list(lo = max(0, center - margin), hi = min(1, center + margin), p = p)
+}
+```
+
+```{r weekly-cvr, fig.height=5, fig.width=9}
+weekly_cvr <- pi |>
+  group_by(week) |>
+  summarise(
+    attempts  = n(),
+    converted = sum(succeeded),
+    .groups   = "drop"
+  ) |>
+  mutate(
+    cvr    = converted / attempts,
+    ci_lo  = map2_dbl(converted, attempts, ~ wilson_ci(.x, .y)$lo),
+    ci_hi  = map2_dbl(converted, attempts, ~ wilson_ci(.x, .y)$hi)
+  )
+
+# Intervention markers
+interventions <- tribble(
+  ~date, ~label,
+  as.POSIXct("2026-04-15", tz="UTC"), "Cart recovery\nemails live",
+  as.POSIXct("2026-04-20", tz="UTC"), "FB subscription\ncampaign launch",
+  as.POSIXct("2026-05-04", tz="UTC"), "May Meta\ncampaign start"
+)
+
+ggplot(weekly_cvr, aes(week, cvr)) +
+  geom_ribbon(aes(ymin = ci_lo, ymax = ci_hi), fill = "#3498db", alpha = 0.2) +
+  geom_line(color = "#2c3e50", linewidth = 1.2) +
+  geom_point(aes(size = attempts), color = "#2c3e50", fill = "#3498db",
+             shape = 21, stroke = 1.2) +
+  geom_vline(data = interventions, aes(xintercept = as.numeric(date)),
+             linetype = "dashed", color = "#e74c3c", alpha = 0.7) +
+  geom_text(data = interventions, aes(x = date, y = 0.85, label = label),
+            size = 2.8, color = "#e74c3c", hjust = -0.05, lineheight = 0.9) +
+  scale_y_continuous(labels = percent_format(), limits = c(0, 1)) +
+  scale_x_datetime(date_breaks = "1 week", date_labels = "%b %d") +
+  scale_size_continuous(range = c(3, 10), name = "Attempts (N)") +
+  labs(
+    title    = "Weekly Checkout CVR with 95% Wilson CI [observed, Stripe PI]",
+    subtitle = "Point size = number of payment intents. Shaded band = 95% confidence interval.",
+    x = NULL, y = "Conversion Rate"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+```
+
+```{r cvr-table}
+weekly_cvr |>
+  mutate(
+    week     = format(week, "%Y-%m-%d"),
+    cvr      = percent(cvr, 0.1),
+    ci_lo    = percent(ci_lo, 0.1),
+    ci_hi    = percent(ci_hi, 0.1)
+  ) |>
+  knitr::kable(
+    col.names = c("Week (Mon)", "Attempts", "Conversions", "CVR", "CI Lo (95%)", "CI Hi (95%)"),
+    caption   = "Weekly CVR with Wilson score 95% CI [observed]"
+  )
+```
+
+---
+
+## 3. Before/After Statistical Test
+
+> **Intervention threshold:** We split at **2026-04-20** (Facebook subscription launch
+> + cart recovery emails both active). This is a *joint* intervention — both changes
+> happened simultaneously, so this test measures *combined* effect of paid traffic +
+> CRO changes, not CRO alone. This is the critical confound noted below.
+
+```{r before-after}
+pre  <- pi |> dplyr::filter(created_at <  as.POSIXct("2026-04-20", tz="UTC"))
+post <- pi |> dplyr::filter(created_at >= as.POSIXct("2026-04-20", tz="UTC"))
+
+pre_k  <- sum(pre$succeeded);  pre_n  <- nrow(pre)
+post_k <- sum(post$succeeded); post_n <- nrow(post)
+
+pre_ci  <- wilson_ci(pre_k, pre_n)
+post_ci <- wilson_ci(post_k, post_n)
+
+# Fisher's exact test (appropriate for small N)
+tbl <- matrix(c(pre_k, pre_n - pre_k, post_k, post_n - post_k),
+              nrow = 2, byrow = TRUE,
+              dimnames = list(c("Pre (Apr 1–19)", "Post (Apr 20–May 10)"),
+                              c("Converted", "Did Not Convert")))
+ft <- fisher.test(tbl, alternative = "less")  # H1: pre CVR < post CVR
+
+tribble(
+  ~Period, ~Attempts, ~Converted, ~CVR, ~CI_Lo, ~CI_Hi,
+  "Pre (Apr 1–19)",       pre_n,  pre_k,  percent(pre_k/pre_n, 0.1),
+                          percent(pre_ci$lo, 0.1), percent(pre_ci$hi, 0.1),
+  "Post (Apr 20–May 10)", post_n, post_k, percent(post_k/post_n, 0.1),
+                          percent(post_ci$lo, 0.1), percent(post_ci$hi, 0.1)
+) |>
+  knitr::kable(
+    col.names = c("Period", "Attempts", "Converted", "CVR", "CI Lo (95%)", "CI Hi (95%)"),
+    caption   = "Before/after CVR — all payment intents [observed]"
+  )
+```
+
+```{r fisher-result}
+cat(sprintf(
+  "Fisher's Exact Test (one-tailed: pre CVR < post CVR)\n  Odds Ratio: %.3f\n  p-value:    %.4f\n  Result:     %s\n",
+  ft$estimate,
+  ft$p.value,
+  if (ft$p.value < 0.05) "SIGNIFICANT at alpha=0.05" else "Not significant at alpha=0.05"
+))
+```
+
+> **Critical confound:** The post-period includes the Facebook subscription launch
+> (Apr 20), which drove 6 conversions from a warm, pre-qualified audience. Pre-period
+> traffic was primarily organic. A CVR improvement in this comparison reflects
+> **both** traffic quality improvement (paid campaign audiences convert better) **and**
+> any CRO improvements. We cannot currently separate these two effects without
+> a holdout group or channel-stratified analysis.
+
+```{r confound-illustration, fig.height=4, fig.width=8}
+channel_cvr <- pi |>
+  group_by(channel) |>
+  summarise(
+    attempts  = n(),
+    converted = sum(succeeded),
+    cvr       = converted / attempts,
+    ci_lo     = map2_dbl(converted, attempts, ~ wilson_ci(.x, .y)$lo),
+    ci_hi     = map2_dbl(converted, attempts, ~ wilson_ci(.x, .y)$hi),
+    .groups   = "drop"
+  ) |>
+  dplyr::filter(attempts >= 2)
+
+ggplot(channel_cvr, aes(fct_reorder(channel, cvr), cvr)) +
+  geom_col(fill = "#3498db", alpha = 0.8) +
+  geom_errorbar(aes(ymin = ci_lo, ymax = ci_hi), width = 0.3, color = "#2c3e50") +
+  geom_text(aes(label = paste0(percent(cvr, 0.1), "\n(", converted, "/", attempts, ")")),
+            hjust = -0.1, size = 3.2) +
+  scale_y_continuous(labels = percent_format(), limits = c(0, 1.1),
+                     expand = expansion(mult = c(0, 0))) +
+  coord_flip() +
+  labs(
+    title    = "CVR by Channel with 95% Wilson CI [observed]",
+    subtitle = "Error bars = 95% confidence intervals. Wide CI = small N.",
+    x = NULL, y = "Conversion Rate"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+---
+
+## 4. Cart Recovery Email Performance
+
+> Cart recovery is the cleanest intervention: all email/abandoned_cart UTM traffic is
+> directly attributable to the recovery email flow. Zero confound with traffic quality.
+
+```{r cart-recovery}
+recovery <- pi |>
+  dplyr::filter(utm_source == "email", utm_medium == "abandoned_cart") |>
+  arrange(created_at)
+
+rec_k <- sum(recovery$succeeded)
+rec_n <- nrow(recovery)
+rec_ci <- wilson_ci(rec_k, rec_n)
+
+cat("Cart Recovery Funnel (Apr 15 – May 10, 2026) [observed]\n")
+cat(sprintf("  Recovery payment intents created: %d\n", rec_n))
+cat(sprintf("  Converted (succeeded): %d\n", rec_k))
+cat(sprintf("  Recovery CVR: %.1f%% [95%% CI: %.1f%% – %.1f%%]\n",
+            rec_k/rec_n*100, rec_ci$lo*100, rec_ci$hi*100))
+cat(sprintf("  Revenue recovered: $%.2f\n",
+            sum(recovery$amount_cents[recovery$succeeded], na.rm=TRUE) / 100))
+cat(sprintf("  Avg recovered order value: $%.2f\n",
+            mean(recovery$amount_cents[recovery$succeeded], na.rm=TRUE) / 100))
+
+recovery |>
+  mutate(status_clean = case_when(
+    succeeded ~ "Succeeded",
+    status == "canceled" ~ "Cancelled",
+    status == "requires_payment_method" ~ "Failed (bad card)",
+    status == "requires_confirmation" ~ "Requires Confirmation",
+    TRUE ~ status
+  )) |>
+  count(status_clean) |>
+  mutate(pct = percent(n/sum(n), 0.1)) |>
+  knitr::kable(col.names = c("Status", "Count", "Pct"),
+               caption = "Cart recovery attempt outcomes [observed]")
+```
+
+```{r recovery-timeline, fig.height=4, fig.width=8}
+recovery |>
+  mutate(
+    date_trunc = as.Date(created_at),
+    outcome = if_else(succeeded, "Converted", "Did Not Convert")
+  ) |>
+  count(date_trunc, outcome) |>
+  ggplot(aes(date_trunc, n, fill = outcome)) +
+  geom_col() +
+  scale_fill_manual(values = c("Converted" = "#2ecc71", "Did Not Convert" = "#e74c3c")) +
+  scale_x_date(date_breaks = "5 days", date_labels = "%b %d") +
+  labs(
+    title    = "Cart Recovery Attempts by Day [observed]",
+    subtitle = "email/abandoned_cart UTM only; 2 of 25 attempts converted",
+    x = NULL, y = "Attempts", fill = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+```
+
+> **Business interpretation:** The recovery feature converted 2 of 25 click-throughs
+> (8.0%). Industry benchmark for cart abandonment email CVR is 5–10% (Klaviyo 2024
+> benchmark, Mailchimp 2024 ecommerce report). We are at the **midpoint** of the
+> benchmark range on a very small sample. This warrants continued investment but
+> no scale-up decision yet.
+
+---
+
+## 5. Conversion Feature Importance (Logistic Regression)
+
+> **Honest caveat first:** N = 12 positive examples in the processed parquet
+> (vs 309 total attempts). This is too small for reliable feature importance estimates.
+> We apply L2 regularization and report coefficients as *directional hypotheses*,
+> not production model weights. Confidence intervals on any individual coefficient
+> span the entire plausible range.
+
+```{r logistic-model}
+source("_feature_prep.R")
+
+df_path <- latest_parquet(dir = "../data/processed")
+df_raw  <- arrow::read_parquet(df_path) |> as_tibble()
+cat("Parquet:", basename(df_path), "\n")
+cat("Shape:", nrow(df_raw), "x", ncol(df_raw), "\n")
+
+df_clean <- clean_attempts(df_raw, max_per_anon_bucket = 3, verbose = TRUE)
+n_pos <- sum(df_clean$label == "1")
+n_neg <- sum(df_clean$label == "0")
+cat("Positives:", n_pos, "| Negatives:", n_neg,
+    "| Base rate:", round(n_pos/nrow(df_clean), 3), "\n")
+```
+
+```{r feature-selection}
+suppressPackageStartupMessages({
+  library(tidymodels)
+  library(glmnet)
+})
+
+# Use only numeric + binary features for the logistic regression
+# (keep it interpretable at small N — no dummy explosion)
+numeric_features <- df_clean |>
+  select(label,
+         amount_cents,
+         attempt_n_lifetime, prior_successes_lifetime, prior_failures_lifetime,
+         seconds_since_prior_attempt,
+         created_dow, created_hour_utc,
+         mc_avg_open_rate, mc_avg_click_rate, mc_tag_count, mc_in_audience,
+         resend_send_count, resend_unique_types,
+         ga4_event_count, ga4_pageviews, ga4_scrolls, ga4_form_starts,
+         ga4_matched,
+         is_apollo_contact,
+         zip_median_income, zip_median_age, zip_household_size,
+         has_meta_campaign_match, has_fbclid, has_gads_campaign_match, has_gclid
+  ) |>
+  # Replace NA with median for numeric, 0 for binary
+  mutate(across(where(is.numeric), ~ replace_na(.x, median(.x, na.rm = TRUE))),
+         across(where(is.logical), ~ as.integer(replace_na(.x, FALSE)))) |>
+  mutate(label = factor(label, levels = c("0","1")))
+
+cat("Feature matrix:", nrow(numeric_features), "rows x",
+    ncol(numeric_features)-1, "features\n")
+cat("Positives:", sum(numeric_features$label == "1"), "\n")
+```
+
+```{r logistic-fit, fig.height=6, fig.width=8}
+# Standardize for comparable coefficients
+X <- numeric_features |> select(-label) |>
+  mutate(across(everything(), ~ {
+    v <- suppressWarnings(as.numeric(as.character(.x)))
+    v[is.na(v)] <- median(v, na.rm = TRUE)
+    v
+  })) |>
+  mutate(across(everything(), ~ as.numeric(scale(.x)))) |>
+  mutate(across(everything(), ~ replace_na(.x, 0)))  # any residual NaN → 0
+y <- ifelse(numeric_features$label == "1", 1, 0)
+
+# Ridge logistic (alpha=0) — stable at small N
+fit <- glmnet::glmnet(as.matrix(X), y, family = "binomial",
+                      alpha = 0, lambda = 0.1, standardize = FALSE)
+
+coefs <- coef(fit, s = 0.1) |> as.matrix() |> as_tibble(rownames = "feature") |>
+  rename(coef = s1) |>
+  dplyr::filter(feature != "(Intercept)", abs(coef) > 0.001) |>
+  arrange(desc(abs(coef))) |>
+  slice_head(n = 20)
+
+ggplot(coefs, aes(fct_reorder(feature, coef), coef,
+                  fill = if_else(coef > 0, "Positive", "Negative"))) +
+  geom_col() +
+  coord_flip() +
+  scale_fill_manual(values = c("Positive" = "#2ecc71", "Negative" = "#e74c3c")) +
+  labs(
+    title    = "Ridge Logistic — Top Feature Coefficients [modeled, λ=0.1]",
+    subtitle = paste0("N=", nrow(X), " attempts, ", sum(y), " conversions. ",
+                      "DIRECTIONAL ONLY — CIs are very wide at this N."),
+    x = NULL, y = "Standardized Coefficient", fill = "Direction"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+> **Reading this chart:** All coefficients are standardized (1 SD change in feature =
+> Y-axis value change in log-odds). Positive = associated with higher conversion probability.
+> **Do not treat this as causal.** At N=12 positives, the model is fitting to noise as
+> much as signal. Use this only to generate hypotheses for future experiment design.
+
+---
+
+## 6. Conversion Probability Monitoring Dashboard
+
+> This section defines the **ongoing monitoring framework** for validating CRO impact.
+> These are the numbers leadership should track weekly.
+
+```{r monitoring-framework}
+# Current state snapshot
+snapshot_date <- "2026-05-11"
+
+tribble(
+  ~Metric, ~Current_Value, ~Source, ~Status, ~Target,
+  "Overall CVR (Apr 20 – May 10)", "22.0% [CI: 14.4%–32.1%]", "Stripe PI [observed]", "Above baseline", "≥15% sustained",
+  "Cart Recovery CVR", "8.0% [CI: 2.2%–24.1%]", "Stripe PI email UTM [observed]", "At benchmark", "≥5% sustained",
+  "Weekly orders", "~4–12/week", "Stripe PI [observed]", "Improving", "30/week (goal)",
+  "AOV", "$47–$57", "Stripe PI [observed]", "On target", "$40+ sustained",
+  "Baseline pre-CRO CVR", "6.9% [CI: 2.7%–16.4%]", "Stripe PI [observed]", "Reference", "—",
+  "Checkout start → payment intent", "Not yet tracked", "Requires GA4 + PI join [missing]", "Gap", "Need funnel data"
+) |>
+  knitr::kable(caption = paste("Conversion monitoring snapshot —", snapshot_date))
+```
+
+```{r stop-conditions}
+cat("=== AD SCALE STOP CONDITIONS ===\n\n")
+cat("If Meta spend is increased to $100/day, pause and review if:\n")
+cat("  1. Weekly CVR (all intents) falls below 10% for 2 consecutive weeks\n")
+cat("  2. Weekly orders < 4 for 2 consecutive weeks (traffic not converting)\n")
+cat("  3. CPC rises above $5 without CVR improvement (efficiency collapse)\n")
+cat("  4. Cart recovery CVR drops below 3% (email quality degrading)\n")
+cat("\nReview cadence: every Monday at 8am. Data: Stripe PI pull from ml pipeline.\n")
+```
+
+---
+
+## 7. What We Cannot Yet Measure (Honest Gaps)
+
+```{r gaps}
+tribble(
+  ~Gap, ~Why_It_Matters, ~What_Is_Needed,
+  "Checkout UX change impact (isolated)",
+    "UX changes and paid campaign launched simultaneously — cannot separate effects",
+    "A/B test or traffic-source-stratified before/after; or a 2-week organic-only period",
+  "Retention activation CVR",
+    "0 Mailchimp sends to existing customers in April (list was empty); no repeat-purchase data",
+    "First repeat cohort order needed; track 'first_payment=FALSE' rate in PI data",
+  "Session-level funnel (GA4 join)",
+    "We see payment intents but not what % of /shop visitors reach checkout",
+    "GA4 client_id <> PI join (wired 2026-05-03 but < 2 weeks of data)",
+  "Checkout UX specific metrics",
+    "Form completion rate, field-level drop-off, scroll-to-pay timing",
+    "Clarity heatmap export + GA4 form_starts event (partially available)",
+  "Statistical power for 30 orders/wk goal",
+    "At current volume, need 4–6 more weeks to distinguish 15% from 25% CVR",
+    "Run pipeline weekly; re-run this notebook on each new parquet"
+) |>
+  knitr::kable(caption = "Measurement gaps — needed for rigorous CRO attribution")
+```
+
+---
+
+## 8. Sample Size Planning
+
+```{r power-analysis, fig.height=4, fig.width=8}
+# Minimum detectable effect at current attempt volumes
+# H0: CVR = 7% (pre-period baseline)
+# H1: CVR = target_cvr
+# Two-sided, alpha = 0.05, power = 0.80
+
+power_grid <- expand.grid(
+  target_cvr = seq(0.10, 0.40, by = 0.05),
+  weekly_vol = c(20, 40, 80, 140)  # payment intents/week at $30, $60, $100, $150/day Meta
+)
+
+p0 <- 0.069  # baseline CVR
+
+# Approximate sample size using normal approximation (conservative for small p)
+n_per_arm <- function(p1, p0 = 0.069, alpha = 0.05, power = 0.80) {
+  z_alpha <- qnorm(1 - alpha/2)
+  z_beta  <- qnorm(power)
+  p_bar   <- (p0 + p1) / 2
+  (z_alpha * sqrt(2 * p_bar * (1 - p_bar)) +
+     z_beta * sqrt(p0 * (1-p0) + p1 * (1-p1)))^2 / (p1 - p0)^2
+}
+
+power_grid$n_needed <- pmax(
+  mapply(n_per_arm, power_grid$target_cvr),
+  0
+)
+power_grid$weeks_needed <- ceiling(power_grid$n_needed / power_grid$weekly_vol)
+
+ggplot(power_grid,
+       aes(x = target_cvr, y = weeks_needed, color = factor(weekly_vol))) +
+  geom_line(linewidth = 1.1) +
+  geom_point(size = 2) +
+  scale_x_continuous(labels = percent_format(), breaks = seq(0.10, 0.40, 0.05)) +
+  scale_y_continuous(breaks = seq(0, 40, 5)) +
+  scale_color_brewer(palette = "Set1",
+                     name   = "Weekly PI volume\n(attempts)",
+                     labels = c("20 (~$30/day)", "40 (~$60/day)",
+                                "80 (~$100/day)", "140 (~$150/day)")) +
+  geom_hline(yintercept = 4, linetype = "dashed", color = "grey50") +
+  annotate("text", x = 0.38, y = 5, label = "4 weeks", color = "grey50", size = 3) +
+  labs(
+    title    = "Weeks to Detect CVR Improvement [modeled]",
+    subtitle = "Baseline CVR = 6.9%. Power = 80%, alpha = 0.05 (two-sided). Dashed = 4 weeks.",
+    x        = "Target CVR to detect",
+    y        = "Weeks of data needed"
+  ) +
+  theme_minimal(base_size = 12)
+```
+
+> **Key implication:** At \$100/day Meta spend (~80 payment intents/week), we can detect
+> a 22% CVR (vs 7% baseline) in **~2 weeks** of data. This is achievable and
+> provides the statistical confidence needed for further scale decisions.
+
+---
+
+## 9. Decision
+
+```{r decision}
+cat("=== DECISION RECOMMENDATION ===\n\n")
+cat("RECOMMENDATION: Proceed with Meta ad scale to $100/day with monitoring guard-rails.\n\n")
+cat("RATIONALE:\n")
+cat("  1. Post-intervention CVR: 22.0% [CI: 14.4%–32.1%] vs 6.9% baseline\n")
+cat("     — directionally significant (Fisher's exact p=0.013)\n")
+cat("     — confounded by traffic quality shift, but the direction is clear\n")
+cat("  2. Cart recovery: 8.0% CVR, $82 recovered, clean attribution\n")
+cat("     — zero-cost incremental revenue; working as designed\n")
+cat("  3. Power analysis: at $100/day volume, we get definitive data in 2 weeks\n")
+cat("     — scale-up IS the experiment we need to run\n\n")
+cat("CONFOUND ACKNOWLEDGMENT:\n")
+cat("  Cannot isolate checkout UX impact from paid-traffic quality improvement.\n")
+cat("  The pre/post comparison measures JOINT effect.\n")
+cat("  This is acceptable for the scale decision; it is not acceptable for\n")
+cat("  claiming that UX changes alone drove the improvement.\n\n")
+cat("STOP CONDITIONS (pause spend if any two consecutive weeks show):\n")
+cat("  - Weekly CVR < 10%\n")
+cat("  - Weekly orders < 4\n")
+cat("  - CPC > $5 without proportional CVR gain\n")
+cat("  - Cart recovery CVR < 3%\n\n")
+cat("OWNER: CEO approves scale decision. Decision Scientist monitors weekly.\n")
+cat("NEXT REVIEW: 2026-05-25 (2 weeks post scale-up).\n")
+```
+
+---
+
+*Generated by Decision Scientist (UNC-1013) | Data as of 2026-05-11 | Source: Stripe payment_intents parquet*
