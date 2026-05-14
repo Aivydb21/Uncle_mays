@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Package, Truck, Share2, Mail } from "lucide-react";
+import { lrTrack } from "@/lib/logrocket";
 
 declare global {
   interface Window {
@@ -124,6 +125,16 @@ function trackPurchase(
     : [{ item_id: resolvedProduct, item_name: resolvedProduct, price: value, quantity: 1 }];
 
   trackGA(transactionId, value, resolvedItems);
+
+  // LogRocket purchase event: Galileo joins this with the session it
+  // observed to attribute friction-vs-conversion at the user level.
+  // Fires once; no retry needed because the SDK queues calls until init.
+  lrTrack("purchase", {
+    transactionId,
+    value,
+    product: resolvedProduct,
+    itemCount: resolvedItems.length,
+  });
 
   // Read and clear hashed identity cached by CheckoutClient at InitiateCheckout.
   // Clearing after read avoids polluting future sessions' attribution.

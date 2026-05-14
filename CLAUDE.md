@@ -447,6 +447,53 @@ curl -X POST 'https://api.firecrawl.dev/v2/map' \
 - DMARC will move to `p=quarantine` after warmup stabilizes
 - DMARC reports arrive as XML attachments; consider adding a DMARC monitoring service for automated parsing
 
+## LogRocket + Galileo AI (ACTIVE as of 2026-05-14)
+
+> **This is the central observability + product-intelligence layer.** Every Paperclip agent has a "Galileo-first" standing rule (see each AGENTS.md, LogRocket SOP block marked `LOGROCKET-CLAUSE-2026-05-14`). When you need to know what users are doing on unclemays.com, the first action is a Galileo MCP query — not a BigQuery scan, not a manual replay watch, not a heuristic. BigQuery is the durable journal; Galileo is the lens.
+
+- **Config:** `~/.claude/logrocket-config.json` (PAT, app slug, base URLs)
+- **Browser SDK:** [src/lib/logrocket.ts](src/lib/logrocket.ts) — lazy-imports the `logrocket` npm package once `DeferredAnalytics` arms; queues `identify` / `track` calls so the rest of the app can call them at any time
+- **App ID (browser):** `mk3nrx/uncle_mays` — set as `NEXT_PUBLIC_LOGROCKET_APP_ID` in `.env`, Vercel (prod + preview), and Trigger.dev project envs
+- **REST base URL:** `https://r.logrocket.io/v1`
+- **MCP URL:** `https://mcp.logrocket.com/mcp` (registered as `logrocket` via `claude mcp add`; PAT used as Bearer)
+- **Auth:** `Authorization: Bearer <pat>` where the PAT format is `pat:<org>:<app>:<token>` — see `~/.claude/logrocket-config.json`
+- **Replaced:** Microsoft Clarity (removed 2026-05-14). `NEXT_PUBLIC_CLARITY_ID` no longer used.
+- **PII config (live in [src/lib/logrocket.ts](src/lib/logrocket.ts)):**
+  - `dom.inputSanitizer: true` — every `<input>`, `<select>`, `<textarea>` value masked by default
+  - `data-private="redact"` on the Stripe `<PaymentElement>` wrapper in [src/components/checkout/CheckoutClient.tsx](src/components/checkout/CheckoutClient.tsx)
+  - Network request sanitizer redacts `Authorization` headers and Stripe / `/api/checkout` / `/api/portal` request + response bodies
+- **Identify call:** SHA-256 hashed email only (the same value already used for Meta CAPI Advanced Matching). Never raw PII. Identify fires from `fireBeginCheckout` in `CheckoutClient.tsx`.
+- **Track events:** `begin_checkout` (CheckoutClient) and `purchase` (OrderSuccessContent) wired today; new events should call `lrTrack('event_name', props)` from `src/lib/logrocket.ts`.
+
+### LogRocket API Usage
+
+```bash
+# Pull a session by ID
+curl -sS 'https://r.logrocket.io/v1/orgs/mk3nrx/apps/uncle_mays/sessions/<session_id>' \
+  -H "Authorization: Bearer $LOGROCKET_PAT"
+
+# List Galileo insights (issues / themes Galileo has classified)
+curl -sS 'https://r.logrocket.io/v1/orgs/mk3nrx/apps/uncle_mays/insights?limit=50' \
+  -H "Authorization: Bearer $LOGROCKET_PAT"
+```
+
+### LogRocket Commands (Galileo-first)
+
+- `"ask galileo [question]"` — issue a Galileo MCP query; quote the answer verbatim before adding business framing
+- `"galileo daily briefing"` — last-24h frustration patterns, behavior changes vs trailing 7d, top recommended fix (auto-run at 07:00 CT via `src/trigger/galileo-daily-briefing.ts` once Phase 4 ships)
+- `"galileo weekly narrative"` — Galileo's user-experience story for the week + experiment recommendations
+- `"replay [session_id]"` — open the session URL in a browser tab; cite when proposing UX changes
+- `"quantify galileo today"` — Decision Scientist command: join today's Galileo insights to `mart_orders` for revenue impact (Phase 5)
+
+### LogRocket Integration Rules
+
+- **Galileo-first.** When asked about user behavior, query Galileo before forming an opinion. Cite the Galileo query ID + session URL — same standard as every other external claim.
+- **Do not re-derive what Galileo classified.** Use Galileo's labels for frustration patterns; do not invent parallel taxonomies.
+- **BigQuery is the journal, not the lens.** Persist Galileo's outputs to `logrocket_galileo.*` (Phase 5) and join to revenue. Do not re-interpret raw events when Galileo has an answer.
+- **Standing Order amendment (auto-ship lane):** Non-funnel fixes Galileo flags (anything NOT on `/`, `/shop`, `/checkout/*`, `/order-success`, `/subscribe/*`, `/api/checkout`, `/api/webhook`, files in `src/components/checkout/`, `src/page-content/Index.tsx`, ad-landing variants, or analytics/pixel wiring) may be self-merged via PR with a LogRocket session link. Funnel fixes still require board approval per the existing Standing Order.
+- **PII hygiene.** Identify uses hashed email only. Never pass raw PII to `lrIdentify` or `lrTrack`. New form fields that capture sensitive data must inherit input masking or wear `data-private="redact"`.
+- **Disagreement protocol.** If your read of replay evidence conflicts with Galileo's conclusion, file a Paperclip task with both views — do not silently overrule.
+
 ## Meta (Facebook/Instagram) API
 
 - **Config:** `~/.claude/meta-config.json` (access token, ad account ID, page ID)

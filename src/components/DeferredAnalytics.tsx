@@ -3,6 +3,7 @@
 import Script from "next/script";
 import { useEffect, useState } from "react";
 import { sha256 } from "@/lib/browser-hash";
+import { initLogRocket } from "@/lib/logrocket";
 
 const DEFER_MS = 3000;
 
@@ -45,11 +46,19 @@ export function DeferredAnalytics() {
     loadHashedEmail();
   }, []);
 
+  // LogRocket is the session-replay + product-intelligence layer (replaced
+  // Microsoft Clarity on 2026-05-14). Galileo AI watches every session; see
+  // AGENTS.md LogRocket SOP. Init lazy-loads the SDK chunk so it stays out
+  // of the main bundle until DeferredAnalytics arms.
+  useEffect(() => {
+    if (!armed) return;
+    initLogRocket();
+  }, [armed]);
+
   if (!armed) return null;
 
   const gaId = process.env.NEXT_PUBLIC_GA_ID;
   const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
-  const clarityId = process.env.NEXT_PUBLIC_CLARITY_ID;
 
   return (
     <>
@@ -83,11 +92,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         {`!function(b,e,v){var t=b.createElement(e);t.async=!0;t.src=v;var s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','2276705169443313'${hashedEmail ? `,{em:'${hashedEmail}'}` : ""});fbq('track','PageView');`}
       </Script>
 
-      {clarityId ? (
-        <Script id="ms-clarity" strategy="lazyOnload">
-          {`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${clarityId}");`}
-        </Script>
-      ) : null}
     </>
   );
 }

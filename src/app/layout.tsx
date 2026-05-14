@@ -78,10 +78,11 @@ export default function RootLayout({
 
           Step 2 (<DeferredAnalytics />, mounts after 3s OR first user
           interaction): swaps the network <script> tags for GTM, GA4,
-          Google Ads, Meta Pixel, and Clarity. When fbevents.js / gtag.js
-          load, they read the queued calls from f._fbq.queue and
-          window.dataLayer respectively, so all earlier events fire
-          retroactively with their correct payload.
+          Google Ads, Meta Pixel, and lazy-imports LogRocket (the session
+          replay + Galileo AI intelligence layer that replaced Clarity on
+          2026-05-14). When fbevents.js / gtag.js load, they read the queued
+          calls from f._fbq.queue and window.dataLayer respectively, so all
+          earlier events fire retroactively with their correct payload.
 
           This split keeps the 12.7s mobile TTI measured on 2026-05-05 from
           blocking the catalog grid for paid-traffic landings, without
