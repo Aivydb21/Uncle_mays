@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  params: { sessionId: string };
-  searchParams: { t?: string };
+  params: Promise<{ sessionId: string }>;
+  searchParams: Promise<{ t?: string }>;
 }
 
 interface OrderData {
@@ -134,8 +134,8 @@ function statusIndex(status: OrderStatus): number {
 }
 
 export default async function OrderTrackingPage({ params, searchParams }: PageProps) {
-  const { sessionId } = params;
-  const token = searchParams.t ?? "";
+  const { sessionId } = await params;
+  const { t: token = "" } = await searchParams;
 
   if (!verifyTrackingToken(sessionId, token)) {
     return (

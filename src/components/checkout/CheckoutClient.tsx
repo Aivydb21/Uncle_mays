@@ -229,7 +229,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       eventType: "session_start",
       metadata: {
         cartSize: lines.length,
-        cartValue: pricing?.totalCents || 0,
+        cartValue: pricing?.ok ? pricing.totalCents : 0,
       },
     });
   }, [cartHydrated, lines.length]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -605,7 +605,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
                   sessionId={sessionId}
                   paymentIntentId={paymentIntentId}
                   abTestVariant={abTestVariant}
-                  totalAmount={pricing?.totalCents || 0}
+                  totalAmount={pricing?.ok ? pricing.totalCents : 0}
                   onSuccess={() => {
                     // Track checkout completion for A/B test
                     trackABTestEvent({
@@ -614,7 +614,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
                       eventType: "checkout_complete",
                       metadata: {
                         paymentIntentId,
-                        totalCents: pricing?.totalCents || 0,
+                        totalCents: pricing?.ok ? pricing.totalCents : 0,
                       },
                     });
 

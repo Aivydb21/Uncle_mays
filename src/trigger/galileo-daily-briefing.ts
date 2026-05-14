@@ -25,6 +25,10 @@ import { sendInternalAlert } from "../lib/email/resend";
  *   LOGROCKET_PAT      = "pat:<org>:<app>:<token>"
  *   RESEND_API_KEY     = existing
  *   RESEND_FROM_EMAIL  = existing
+ *   PAPERCLIP_API_URL  = http://localhost:3100/api (or production URL)
+ *   PAPERCLIP_API_KEY  = API key for creating issues
+ *   PAPERCLIP_COMPANY_ID = company UUID
+ *   PAPERCLIP_CRO_AGENT_ID = CRO agent UUID (0df6fe9a-9676-41e7-89e9-724d05272a51)
  */
 export const galileoDailyBriefing = schedules.task({
   id: "galileo-daily-briefing",
@@ -67,6 +71,9 @@ export const galileoDailyBriefing = schedules.task({
         { name: "date", value: todayIso },
       ],
     });
+
+    // Create a Paperclip task for the CRO to review and dollarize
+    await createCroPaperclipTask(todayIso, answers);
 
     return {
       date: todayIso,
@@ -141,4 +148,92 @@ function renderText(date: string, answers: Array<{ prompt: GalileoPrompt; result
     )
     .join("\n\n---\n\n");
   return `Galileo Daily Briefing — ${date}\n\n${sections}\n`;
+}
+
+/**
+ * Create a Paperclip issue for the CRO to review the Galileo briefing and
+ * dollarize revenue-impact issues.
+ */
+async function createCroPaperclipTask(
+  date: string,
+  answers: Array<{ prompt: GalileoPrompt; result: GalileoResult }>
+): Promise<void> {
+  const apiUrl = process.env.PAPERCLIP_API_URL;
+  const apiKey = process.env.PAPERCLIP_API_KEY;
+  const companyId = process.env.PAPERCLIP_COMPANY_ID;
+  const croAgentId = process.env.PAPERCLIP_CRO_AGENT_ID;
+
+  if (!apiUrl || !apiKey || !companyId || !croAgentId) {
+    console.warn(
+      "Skipping Paperclip task creation: PAPERCLIP_* env vars not fully configured"
+    );
+    return;
+  }
+
+  // Build the task description with briefing summary
+  const description = buildPaperclipDescription(date, answers);
+
+  try {
+    const response = await fetch(`${apiUrl}/companies/${companyId}/issues`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: `Review Galileo Daily Briefing — ${date}`,
+        description,
+        assigneeAgentId: croAgentId,
+        status: "todo",
+        priority: "high",
+        labels: ["galileo", "daily-briefing", "revenue-impact"],
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "");
+      console.error(
+        `Failed to create Paperclip task for CRO: ${response.status} ${errorText}`
+      );
+    } else {
+      const issue = await response.json();
+      console.log(`Created Paperclip task for CRO: ${issue.identifier || issue.id}`);
+    }
+  } catch (err) {
+    console.error(`Error creating Paperclip task:`, err);
+  }
+}
+
+function buildPaperclipDescription(
+  date: string,
+  answers: Array<{ prompt: GalileoPrompt; result: GalileoResult }>
+): string {
+  const sections = answers
+    .map(({ prompt, result }) => {
+      const links = result.links.length
+        ? `\n\n**Session Links:**\n${result.links.map((u) => `- ${u}`).join("\n")}`
+        : "";
+      return `### ${prompt.id}\n\n**Prompt:** ${prompt.text}\n\n**Galileo's Answer:**\n\n${result.text}${links}`;
+    })
+    .join("\n\n---\n\n");
+
+  return `# Galileo Daily Briefing — ${date}
+
+Review the Galileo AI briefing below and create follow-up tasks for revenue-impacting issues.
+
+For each issue Galileo flags:
+1. **Dollarize** the revenue impact (estimated $ lost per day/week if unfixed)
+2. **Assign ownership** (CTO for technical fixes, Growth & Conversion for UX/funnel, etc.)
+3. **Set priority** based on impact and effort
+4. **Create a Paperclip task** with clear acceptance criteria
+
+Do not paraphrase Galileo's findings — cite session URLs and preserve Galileo's language when creating tasks.
+
+---
+
+${sections}
+
+---
+
+**Source:** \`galileo-daily-briefing\` Trigger.dev task (scheduled 12:00 UTC daily)`;
 }
