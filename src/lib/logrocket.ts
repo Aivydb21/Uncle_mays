@@ -13,6 +13,8 @@
  *
  * Galileo AI watches every session and is the source of truth for user
  * behavior — see AGENTS.md LogRocket Standing Operating Procedure (2026-05-14).
+ *
+ * App ID: mk3nrx/uncle_mays (set via NEXT_PUBLIC_LOGROCKET_APP_ID)
  */
 
 type LRTraits = Record<string, string | number | boolean>;
