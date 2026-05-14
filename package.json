@@ -13,7 +13,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@stripe/react-stripe-js": "^6.1.0",
     "@stripe/stripe-js": "^9.1.0",
-    "@trigger.dev/sdk": "4.4.4",
+    "@trigger.dev/sdk": "4.4.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.24",

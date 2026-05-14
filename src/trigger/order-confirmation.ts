@@ -4,6 +4,7 @@ import { sendTransactional } from "../lib/email/resend";
 import { formatPreferredSlotLabel } from "../lib/delivery-windows";
 import { hashEmail } from "../lib/mailchimp";
 import { formatCents } from "../lib/format";
+import { buildTrackingUrl } from "../lib/order-tracking";
 
 const MAILCHIMP_DC = "us19";
 const MAILCHIMP_LIST_ID = "2645503d11";
@@ -88,6 +89,18 @@ function buildConfirmationEmail(params: {
     ? `Billing: ${formattedAmount} / ${billingInterval || "month"} — renews automatically`
     : `Payment: ${formattedAmount} (one-time)`;
   const hasLines = Array.isArray(lineItems) && lineItems.length > 0;
+  // Tokenized self-service tracking URL. Customers can refresh this until
+  // delivery completes. Replaces the "we'll email you again later with a
+  // window" promise that used to leave customers in the dark between
+  // confirmation and delivery day.
+  let trackingUrl: string | null = null;
+  try {
+    trackingUrl = buildTrackingUrl(sessionId);
+  } catch (err) {
+    // Missing ORDER_TRACKING_SECRET — log and continue without the link
+    // rather than failing the whole confirmation email.
+    console.warn("[OrderConfirmation] buildTrackingUrl failed:", err instanceof Error ? err.message : err);
+  }
   const subscriptionNote = isSubscription
     ? `<p style="font-size:14px;color:#666;line-height:1.6;">
         Your subscription renews automatically each ${billingInterval || "month"}.
@@ -159,32 +172,42 @@ function buildConfirmationEmail(params: {
       <p style="margin:0;font-size:12px;color:#999;">Order ID: ${sessionTag}</p>
     </div>
 
-    <p style="font-size:16px;line-height:1.6;font-weight:bold;">What happens next:</p>
-    <ul style="font-size:15px;line-height:1.8;color:#333;padding-left:20px;">
-      <li>Our team will prepare your produce box with care.</li>
-      <li>You will receive a delivery confirmation with your scheduled window.</li>
-      <li>Fresh produce delivered to your door, ready for your kitchen.</li>
-    </ul>
     ${
-      preferredSlotLabel && fulfillmentMode === "delivery"
-        ? `<div style="background:#fff8e1;border:1px solid #f0c36d;border-radius:8px;padding:14px 16px;margin:16px 0;">
-            <p style="margin:0 0 6px 0;font-size:14px;font-weight:bold;color:#7a5a00;">A note on your delivery window</p>
-            <p style="margin:0;font-size:14px;line-height:1.6;color:#5a4500;">
-              You picked <strong>${preferredSlotLabel}</strong>. Thank you for sharing your preferred window.
-              For this week, your box ships <strong>Wednesday</strong> while we finish rolling out every-day delivery citywide.
-              We will reach out as soon as your chosen window opens, and your preference is on file for future orders.
+      trackingUrl
+        ? `<div style="text-align:center;margin:24px 0;">
+            <a href="${trackingUrl}" style="display:inline-block;background:#2d7a2d;color:#ffffff;text-decoration:none;padding:14px 28px;border-radius:8px;font-size:16px;font-weight:bold;">Track your order →</a>
+            <p style="margin:10px 0 0 0;font-size:13px;color:#777;">
+              Bookmark this link. Refresh it any time to see where your order is in the process.
             </p>
            </div>`
         : ""
     }
 
+    <p style="font-size:16px;line-height:1.6;font-weight:bold;margin-bottom:6px;">What happens next:</p>
+    <ol style="font-size:15px;line-height:1.7;color:#333;padding-left:22px;margin-top:4px;">
+      ${
+        fulfillmentMode === "pickup"
+          ? `<li><strong>Today.</strong> Your order is confirmed. No further action needed on your end.</li>
+             <li><strong>The day before pickup.</strong> We pack your order with that morning's harvest.</li>
+             <li><strong>At your pickup window.</strong> Come to the location above. We'll have your name and order ready.</li>`
+          : `<li><strong>Today.</strong> Your order is confirmed. No further action needed on your end.</li>
+             <li><strong>The day before delivery.</strong> We pack your box with that morning's harvest. You'll get an email reminder with the time window.</li>
+             <li><strong>Delivery day.</strong> Your driver texts the phone number on file when your box is on the way. No need to be home — we leave coolers at the door if you're out.</li>`
+      }
+    </ol>
+
     ${subscriptionNote}
 
-    <p style="font-size:15px;line-height:1.6;color:#333;">
-      Questions about your order? We are here.<br>
-      Call or text: <strong>(312) 972-2595</strong><br>
-      Email: <a href="mailto:info@unclemays.com" style="color:#2d7a2d;">info@unclemays.com</a>
-    </p>
+    <div style="background:#f9f9f9;border-radius:8px;padding:16px 20px;margin:24px 0;">
+      <p style="margin:0 0 6px 0;font-size:15px;font-weight:bold;">Need to change something?</p>
+      <p style="margin:0 0 8px 0;font-size:14px;line-height:1.6;color:#555;">
+        For same-day changes (address tweak, delivery instructions, swap an item), text us — that's the fastest path. We usually reply within the hour during business hours.
+      </p>
+      <p style="margin:0;font-size:15px;line-height:1.8;color:#333;">
+        Call or text: <strong>(312) 972-2595</strong><br>
+        Email: <a href="mailto:info@unclemays.com" style="color:#2d7a2d;">info@unclemays.com</a>
+      </p>
+    </div>
 
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0;" />
     <p style="font-size:12px;color:#999;line-height:1.6;">
@@ -215,10 +238,20 @@ function buildConfirmationEmail(params: {
       ? `\nDelivery: address on file`
       : "";
 
-  const preferredText =
-    preferredSlotLabel && fulfillmentMode === "delivery"
-      ? `\n\nA NOTE ON YOUR DELIVERY WINDOW\nYou picked ${preferredSlotLabel}. Thank you for sharing your preferred window. For this week, your box ships Wednesday while we finish rolling out every-day delivery citywide. We will reach out as soon as your chosen window opens, and your preference is on file for future orders.\n`
-      : "";
+  const trackingText = trackingUrl
+    ? `\nTRACK YOUR ORDER:\n${trackingUrl}\n(Bookmark this. Refresh any time to see status.)\n`
+    : "";
+
+  const whatNextText =
+    fulfillmentMode === "pickup"
+      ? `\nWHAT HAPPENS NEXT:
+1. Today. Your order is confirmed. No further action on your end.
+2. The day before pickup. We pack your order with that morning's harvest.
+3. At your pickup window. Come to the location above. We'll have your name and order ready.`
+      : `\nWHAT HAPPENS NEXT:
+1. Today. Your order is confirmed. No further action on your end.
+2. The day before delivery. We pack your box with that morning's harvest. You'll get an email reminder with the time window.
+3. Delivery day. Your driver texts the phone number on file when your box is on the way. No need to be home — we leave coolers at the door if you're out.`;
 
   const text = `Hi ${firstName},
 
@@ -227,15 +260,14 @@ Thank you for your order. We have received your payment and your Uncle May's ord
 ORDER SUMMARY
 ${orderLinesText}${fulfillmentText}
 Order ID: ${sessionTag}
+${trackingText}${whatNextText}
 
-WHAT HAPPENS NEXT:
-- Our team will prepare your produce box with care.
-- You will receive a delivery confirmation with your scheduled window.
-- Fresh produce delivered to your door, ready for your kitchen.${preferredText}
+NEED TO CHANGE SOMETHING?
+For same-day changes (address tweak, delivery instructions, swap an item), text us — that's the fastest path. We usually reply within the hour during business hours.
+Call or text: (312) 972-2595
+Email: info@unclemays.com
 
-${isSubscription ? `Your subscription renews automatically each ${billingInterval || "month"}. To manage or cancel, reply to this email or call (312) 972-2595.\n\n` : ""}Questions? Call or text: (312) 972-2595 | info@unclemays.com
-
----
+${isSubscription ? `Your subscription renews automatically each ${billingInterval || "month"}. To manage or cancel, reply to this email or call (312) 972-2595.\n\n` : ""}---
 Uncle May's Produce | Hyde Park, Chicago, IL
 unclemays.com`;
 
