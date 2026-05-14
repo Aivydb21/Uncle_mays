@@ -13,10 +13,14 @@ import { formatCents } from "@/lib/format";
 import { MIN_SUBTOTAL_CENTS } from "@/lib/cart-pricing-constants";
 import { sha256, hashPhone } from "@/lib/browser-hash";
 import { getFbAttribution } from "@/lib/fb-attribution";
+import { lrIdentify, lrTrack } from "@/lib/logrocket";
 import {
   DeliveryScheduler,
   type DeliverySchedulerSelection,
 } from "@/components/checkout/DeliveryScheduler";
+import { PaymentRequestButton } from "@/components/checkout/PaymentRequestButton";
+import { assignVariant, trackABTestEvent, getAssignedVariant } from "@/lib/ab-test";
+import { APPLE_PAY_TEST } from "@/lib/ab-test-config";
 
 // localStorage keys for hashed identity — written at InitiateCheckout, read
 // by Purchase (order-success) and AddToCart (returning users) pixel events.
@@ -110,6 +114,22 @@ async function fireBeginCheckout(value: number, items: { sku: string; name: stri
       if (hashedPhone) localStorage.setItem(LS_PH, hashedPhone);
     } catch { /* ignore storage errors */ }
 
+    // LogRocket: identify by hashed email (same value used for Meta CAPI
+    // Advanced Matching). Tag with cart value + item count so Galileo can
+    // segment friction patterns by cart size in its session summaries.
+    if (hashedEmail) {
+      lrIdentify(hashedEmail, {
+        cartValueUsd: value,
+        cartItems: items.length,
+        stage: "begin_checkout",
+      });
+    }
+    lrTrack("begin_checkout", {
+      value,
+      itemCount: items.length,
+      contentIds,
+    });
+
     // Meta Pixel (browser). The fbq stub queues if fbevents.js hasn't
     // loaded; the queue replays automatically when it does.
     if (w.fbq) {
@@ -190,8 +210,29 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [preparingPayment, setPreparingPayment] = useState(false);
+  const [abTestVariant, setAbTestVariant] = useState<string>("control");
 
   const fulfillmentMode: FulfillmentMode = cartFulfillment ?? "delivery";
+
+  // A/B Test: Assign variant on mount and track session_start
+  useEffect(() => {
+    if (!cartHydrated || lines.length === 0) return;
+
+    // Assign variant (deterministic based on session ID)
+    const variant = assignVariant(APPLE_PAY_TEST);
+    setAbTestVariant(variant.id);
+
+    // Track session_start event
+    trackABTestEvent({
+      testId: APPLE_PAY_TEST.id,
+      variantId: variant.id,
+      eventType: "session_start",
+      metadata: {
+        cartSize: lines.length,
+        cartValue: pricing?.totalCents || 0,
+      },
+    });
+  }, [cartHydrated, lines.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (
@@ -563,7 +604,20 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
                 <PaymentSection
                   sessionId={sessionId}
                   paymentIntentId={paymentIntentId}
+                  abTestVariant={abTestVariant}
+                  totalAmount={pricing?.totalCents || 0}
                   onSuccess={() => {
+                    // Track checkout completion for A/B test
+                    trackABTestEvent({
+                      testId: APPLE_PAY_TEST.id,
+                      variantId: abTestVariant,
+                      eventType: "checkout_complete",
+                      metadata: {
+                        paymentIntentId,
+                        totalCents: pricing?.totalCents || 0,
+                      },
+                    });
+
                     useCartStore.getState().clear();
                     router.push(`/order-success?pi=${paymentIntentId ?? ""}`);
                   }}
@@ -1113,10 +1167,14 @@ function Row({
 function PaymentSection({
   sessionId,
   paymentIntentId,
+  abTestVariant,
+  totalAmount,
   onSuccess,
 }: {
   sessionId: string | null;
   paymentIntentId: string | null;
+  abTestVariant: string;
+  totalAmount: number;
   onSuccess: () => void;
 }) {
   const stripe = useStripe();
@@ -1124,6 +1182,7 @@ function PaymentSection({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [elementsReady, setElementsReady] = useState(false);
+  const [walletPaymentAttempted, setWalletPaymentAttempted] = useState(false);
 
   void paymentIntentId;
 
@@ -1164,8 +1223,22 @@ function PaymentSection({
       redirect: "if_required",
     });
     if (stripeError) {
-      setError(stripeError.message ?? "Payment failed.");
+      const errorMsg = stripeError.message ?? "Payment failed.";
+      setError(errorMsg);
       setSubmitting(false);
+
+      // Track payment error for A/B test
+      trackABTestEvent({
+        testId: APPLE_PAY_TEST.id,
+        variantId: abTestVariant,
+        eventType: "payment_error",
+        metadata: {
+          errorCode: stripeError.code,
+          errorMessage: errorMsg,
+          paymentMethod: walletPaymentAttempted ? "wallet" : "card",
+        },
+      });
+
       return;
     }
     if (paymentIntent && paymentIntent.status === "succeeded") {
@@ -1191,6 +1264,61 @@ function PaymentSection({
     setSubmitting(false);
   }
 
+  // Handle wallet payment (Apple Pay / Google Pay)
+  async function handleWalletPayment(paymentMethodId: string) {
+    if (!stripe || !paymentIntentId) return;
+    setSubmitting(true);
+    setError(null);
+    setWalletPaymentAttempted(true);
+
+    try {
+      const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+        clientSecret: paymentIntentId,
+        redirect: "if_required",
+      });
+
+      if (confirmError) {
+        throw new Error(confirmError.message);
+      }
+
+      if (paymentIntent && paymentIntent.status === "succeeded") {
+        if (sessionId) {
+          try {
+            await fetch("/api/checkout/session", {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                sessionId,
+                paymentIntentId: paymentIntent.id,
+                completedAt: new Date().toISOString(),
+              }),
+            });
+          } catch {
+            // never block redirect on session patch
+          }
+        }
+        onSuccess();
+      } else {
+        throw new Error("Payment did not complete");
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : "Wallet payment failed";
+      setError(errorMsg);
+      setSubmitting(false);
+
+      // Track payment error
+      trackABTestEvent({
+        testId: APPLE_PAY_TEST.id,
+        variantId: abTestVariant,
+        eventType: "payment_error",
+        metadata: {
+          errorMessage: errorMsg,
+          paymentMethod: "wallet",
+        },
+      });
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <h2 className="text-xl font-semibold">Payment</h2>
@@ -1203,7 +1331,28 @@ function PaymentSection({
         <span>🔒 Secure checkout · Your information is encrypted and secure</span>
       </div>
 
-      <div className="relative">
+      {/* A/B Test Treatment: Show Payment Request Button (Apple Pay / Google Pay) */}
+      {abTestVariant === "treatment" && totalAmount > 0 && (
+        <PaymentRequestButton
+          amount={totalAmount}
+          onSuccess={handleWalletPayment}
+          onError={(err) => {
+            setError(err);
+            // Track payment error
+            trackABTestEvent({
+              testId: APPLE_PAY_TEST.id,
+              variantId: abTestVariant,
+              eventType: "payment_error",
+              metadata: {
+                errorMessage: err,
+                paymentMethod: "wallet",
+              },
+            });
+          }}
+        />
+      )}
+
+      <div className="relative" data-private="redact">
         <PaymentElement
           onReady={() => setElementsReady(true)}
           onLoadError={(event) => {
