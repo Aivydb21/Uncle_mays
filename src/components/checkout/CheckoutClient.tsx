@@ -210,6 +210,12 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [preparingPayment, setPreparingPayment] = useState(false);
+  // UNC-1094: intentError is distinct from submitError so the payment slot
+  // can render an inline retry CTA when /api/checkout/intent fails, instead
+  // of falling through to a blank null branch. Also gates the auto-prep
+  // useEffect to prevent an infinite retry loop when intent prep fails
+  // deterministically (Stripe outage, promo validation, slot capacity, etc.)
+  const [intentError, setIntentError] = useState<string | null>(null);
   const [abTestVariant, setAbTestVariant] = useState<string>("control");
 
   const fulfillmentMode: FulfillmentMode = cartFulfillment ?? "delivery";
@@ -414,13 +420,26 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
     }
   }
 
-  // Auto-prepare payment intent when form is complete (single-page checkout)
+  // Auto-prepare payment intent when form is complete (single-page checkout).
+  // UNC-1094: guard on !intentError so a deterministic failure (Stripe
+  // outage, slot capacity, promo validation) doesn't spin in an infinite
+  // retry loop. The user must explicitly click "Try again" to retry.
   useEffect(() => {
-    if (canProceed && !clientSecret && !preparingPayment) {
+    if (canProceed && !clientSecret && !preparingPayment && !intentError) {
       preparePaymentIntent();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canProceed, clientSecret, preparingPayment]);
+  }, [canProceed, clientSecret, preparingPayment, intentError]);
+
+  // UNC-1094: when the user edits the form after an intent error, clear
+  // the error so the auto-prep can retry. Otherwise the recovery experience
+  // is "fix your address → still see error → unclear what to do".
+  useEffect(() => {
+    if (intentError) {
+      setIntentError(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartFingerprint, contact.email, contact.firstName, contact.lastName, cartPickupSlot, deliverySelection]);
 
   if (!cartHydrated) {
     return (
@@ -440,6 +459,16 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
     if (clientSecret) return; // Already prepared
     setPreparingPayment(true);
     setSubmitError(null);
+    setIntentError(null);
+    // UNC-1094: trace the intent-prep flow in LogRocket so Galileo can tell
+    // whether a "blank payment form" session got stuck before/after the
+    // intent call. Without these we can only see the PaymentElement
+    // load-timeout, which fires too late and only inside Elements.
+    lrTrack("checkout_intent_prep_start", {
+      fulfillmentMode,
+      totalCents: pricing.totalCents,
+      hasPromo: Boolean(pricing.appliedPromoCode),
+    });
     try {
       const sessionRes = await fetch("/api/checkout/session", {
         method: "POST",
@@ -574,6 +603,10 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       }
       setClientSecret(intentJson.clientSecret as string);
       setPaymentIntentId(intentJson.paymentIntentId as string);
+      lrTrack("checkout_intent_prep_success", {
+        paymentIntentId: intentJson.paymentIntentId as string,
+        totalCents: pricing.totalCents,
+      });
 
       // Persist email so AddToCart CAPI events can include em (Advanced Matching)
       // on return visits or if the user navigates back to /shop mid-session.
@@ -583,7 +616,10 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       const { fbc: checkoutFbc, fbp: checkoutFbp } = getFbAttribution();
       fireBeginCheckout(pricing.totalCents / 100, pricing.lineItems, contact.email.trim(), contact.phone.trim() || undefined, checkoutFbc, checkoutFbp);
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : "Unknown error");
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      setSubmitError(msg);
+      setIntentError(msg);
+      lrTrack("checkout_intent_prep_failed", { reason: msg });
     } finally {
       setPreparingPayment(false);
     }
@@ -672,16 +708,74 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
               </Elements>
             </div>
           ) : preparingPayment ? (
-            <div className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
+            <div id="payment-section" className="flex items-center justify-center gap-2 py-8 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
               Preparing payment…
             </div>
-          ) : !canProceed ? (
-            <div className="py-4 text-sm text-muted-foreground">
-              {pricing && !pricing.ok && ["out_of_zone", "missing_zip"].includes(pricing.code ?? "")
-                ? pricing.message
-                : "Please complete all required fields above to continue."}
+          ) : intentError ? (
+            // UNC-1094: previously this fell through to `null` when the
+            // intent endpoint errored, leaving the user staring at a page
+            // with no payment form and only a small "submit error" line
+            // far above. Now we render an inline error panel with a clear
+            // retry CTA in the same slot the payment form would occupy.
+            <div id="payment-section" className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 space-y-3">
+              <div>
+                <p className="font-semibold text-destructive">We couldn&apos;t load the payment form.</p>
+                <p className="mt-1 text-sm text-muted-foreground">{intentError}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIntentError(null);
+                  setSubmitError(null);
+                  preparePaymentIntent();
+                }}
+                className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Try again
+              </button>
+              <p className="text-xs text-muted-foreground">
+                Still stuck? Email{" "}
+                <a href="mailto:info@unclemays.com" className="underline">info@unclemays.com</a>{" "}
+                or call (312) 972-2595 and we&apos;ll send a payment link.
+              </p>
             </div>
+          ) : !canProceed ? (
+            // UNC-1094: render a specific missing-field nudge in the
+            // payment slot rather than a generic "complete fields above".
+            // The mobile sticky bar already had this affordance — desktop
+            // users were left guessing what's still required.
+            (() => {
+              const nextStep = nextRequiredStep();
+              if (pricing && !pricing.ok && ["out_of_zone", "missing_zip"].includes(pricing.code ?? "")) {
+                return (
+                  <div id="payment-section" className="py-4 text-sm text-muted-foreground">
+                    {pricing.message}
+                  </div>
+                );
+              }
+              if (nextStep) {
+                return (
+                  <div id="payment-section" className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      One more step before payment.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => scrollAndFocus(nextStep.targetId)}
+                      className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+                    >
+                      {nextStep.label}
+                    </button>
+                  </div>
+                );
+              }
+              return (
+                <div id="payment-section" className="py-4 text-sm text-muted-foreground">
+                  Please complete all required fields above to continue.
+                </div>
+              );
+            })()
           ) : null}
         </div>
       </div>
@@ -1448,10 +1542,25 @@ function PaymentSection({
           onReady={() => {
             setElementsReady(true);
             setLoadTimedOut(false);
+            // UNC-1094: pair with checkout_payment_element_load_timeout so
+            // Galileo can compute a ready-vs-timeout rate per browser/UA
+            // instead of only seeing the failure tail.
+            try {
+              lrTrack("checkout_payment_element_ready", {
+                ...(paymentIntentId ? { paymentIntentId } : {}),
+              });
+            } catch { /* analytics never blocks */ }
           }}
           onLoadError={(event) => {
-            setError(event.error.message || "Payment form failed to load. Please refresh and try again.");
+            const msg = event.error.message || "Payment form failed to load. Please refresh and try again.";
+            setError(msg);
             setElementsReady(false);
+            try {
+              lrTrack("checkout_payment_element_load_error", {
+                reason: msg,
+                ...(paymentIntentId ? { paymentIntentId } : {}),
+              });
+            } catch { /* analytics never blocks */ }
           }}
         />
         {!elementsReady && !loadTimedOut && (

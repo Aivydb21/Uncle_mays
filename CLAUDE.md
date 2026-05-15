@@ -3,14 +3,16 @@
 > ### 🟢 Customer-facing single source of truth: [`customer-facts.md`](./customer-facts.md)
 > Delivery day, pricing, active promo codes, cutoff times, and brand positioning that customers can see live on the site live in `customer-facts.md`. **Any agent writing ads, emails, social posts, or landing-page copy MUST read `customer-facts.md` first.** Do not use older planning docs (`emergency-promotion-*`, `promo-launch-offer-*`, `AD-COPY-TEMPLATES.md`, etc.) as authoritative — they contain retired promo codes (WELCOME20, LAUNCH20, FREESHIP, first-order $30) that are no longer live.
 
-> ### 🛑 Standing Order — Marketing & Advertising Infrastructure (effective 2026-04-29)
-> **No agent (Paperclip, Claude Code, or otherwise) may change, pause, launch, or otherwise impact marketing or advertising infrastructure without explicit board approval (CEO: Anthony Ivy).**
+> ### 🛑 Standing Order — Marketing & Advertising Infrastructure (effective 2026-05-15, supersedes 2026-04-29)
+> **The CRO may change marketing and advertising infrastructure at will. Board approval (CEO: Anthony Ivy) is required only when the change is a net-new spend commitment.**
 >
-> **In scope (touching requires board approval first):** Meta (FB/IG) + Google Ads accounts and everything in them (campaigns, ad sets, creatives, audiences, budgets, schedules, conversion events, pixel/tag config); Mailchimp newsletter audience changes, campaign drafts, scheduled sends; promo codes (`FRESH10`, `FRESH30`, future codes) AND the underlying Stripe coupon registry (`fresh*-apr-2026`); marketing landing pages (any future ad-funnel variants — both code and copy; the `/ask` page referenced in earlier docs no longer exists, current ads route to `/shop`); organic social posts on owned accounts (FB Page 755316477673748, Uncle May's IG, LinkedIn company); attribution wiring tied to the above (UTM parameters used in marketing URLs, Meta Pixel + CAPI, Google Ads conversion tracking, GA4 events feeding ad optimization).
+> **Requires board approval (net-new spend only):** raising an ad budget on Meta or Google Ads; signing up for a new paid tool, SaaS subscription, or data product used for marketing; committing to an agency, freelancer, or creative retainer; any one-shot or recurring dollar outflow that didn't exist before. Loop in CFO + Bookkeeper on the same approval thread.
 >
-> **Out of scope (touch freely):** transactional emails (order confirmation, payment failed, shipping); core product pages (`/`, `/shop`, `/faq`, `/about`) unless changes are part of an active ad test; investor / BD outreach via Apollo (that is BD/IR, not consumer marketing); internal-only analytics dashboards.
+> **CRO-at-will (no approval, audit trail only):** campaign pause / launch / scheduling within an existing budget; creative swaps, audience changes, ad copy edits, A/B test toggles; Mailchimp newsletter audience changes, campaign drafts, scheduled sends; promo code creation / rotation within the existing Stripe coupon registry; attribution wiring fixes (UTM parameters, Meta Pixel + CAPI, Google Ads conversion tracking, GA4 events) provided no new vendor is added; marketing landing pages — both code and copy; organic social posts on owned accounts (FB Page 755316477673748, Uncle May's IG, LinkedIn company).
 >
-> **Compliance path:** open a Paperclip issue describing the proposed change + impact + rollback plan, file a board approval (`POST /api/companies/{companyId}/approvals` with `type: "request_board_approval"`), link the issue, wait for resolution. Do not make the change preemptively — code commits to marketing assets are in scope. If urgent (campaign wasting spend), pause at the platform and mark the issue `blocked` with `priority: critical` plus `@CEO`. Do not ship autonomous code changes to fix it. The same standing order is appended to all 12 active Paperclip agent `AGENTS.md` files.
+> **Out of scope (always touch freely):** transactional emails (order confirmation, payment failed, shipping); core product pages (`/`, `/shop`, `/faq`, `/about`); investor / BD outreach via Apollo; internal-only analytics dashboards.
+>
+> **Audit trail:** for CRO-at-will changes, open a Paperclip issue describing the change + expected impact + rollback path. No approval gate, but the trail is required. For net-new spend: open the Paperclip issue, then file a board approval (`POST /api/companies/{companyId}/approvals` with `type: "request_board_approval"`), link the issue, wait for resolution before committing the spend. The same standing order is appended to all 12 active Paperclip agent `AGENTS.md` files.
 
 > ### 🚢 Deploy target: `uncle-mays` Vercel project (ONLY)
 > - Production domain: **unclemays.com** → aliased to the `uncle-mays` Vercel project (`prj_jwMT8iMOmaEdETzwnsKYBrg2lPoI`).
@@ -439,6 +441,43 @@ curl -X POST 'https://api.firecrawl.dev/v2/map' \
 - **For scoring scripts:** When `prioritize-contacts.py` or `prioritize-linkedin.py` identifies a high-score contact, use Firecrawl to enrich with fund thesis data before outreach
 - **Load config from:** `~/.claude/firecrawl-config.json` (same pattern as Apollo, Stripe, etc.)
 
+## US Census Bureau Data API (ACS)
+
+- **Key env var:** `CENSUS_API_KEY` (in `~/Desktop/um_website/.env`)
+- **Base URL:** `https://api.census.gov/data`
+- **Auth:** `?key=<api_key>` query param (free key required as of 2025)
+- **Key registration:** https://api.census.gov/data/key_signup.html (free; activation email sent by Census Bureau)
+- **Purpose:** ZIP-level demographic enrichment for ML conversion model — median household income, median age, total population, household size, and race/ethnicity composition (% Black, % White, % Hispanic households) by ZCTA
+- **Ingest script:** `ml/ingest/census.py`
+- **Dataset:** ACS 5-year estimates (currently pinned to vintage `2022`; bump `ACS_VINTAGE` in the script when a newer vintage ships)
+- **Variables pulled:** `B19013_001E` (income), `B01003_001E` (population), `B01002_001E` (median age), `B25010_001E` (household size), `B02001_003E` (Black pop), `B02001_002E` (White pop), `B03003_003E` (Hispanic pop)
+- **ZIP scope:** Service-area ZIPs hardcoded in script + any additional ZIPs that appear in Stripe extracts
+- **Output:** `ml/data/raw/census_acs_zip_<timestamp>.parquet`
+- **Cadence:** Annual re-pull (ACS 5-year data changes once per year). Do not run weekly.
+- **Active data on disk:** `ml/data/raw/census_acs_zip_20260502T183716Z.parquet` (pulled 2026-05-02)
+
+### Census API Usage
+
+```bash
+# Manual one-shot pull (run from ml/ directory with .env loaded)
+python -m ingest.census
+
+# Or directly
+python ml/ingest/census.py
+```
+
+### Census Integration Rules
+
+- **Annual cadence only.** ACS 5-year data is released once per year; re-pulling more frequently wastes credits and returns identical data.
+- **Key activation lag.** After registering, the Census Bureau sends an activation email. The key will return a 302 redirect (→ `missing_key.html`) until activated — this is not a code bug.
+- **Key invalidity sentinel.** The Census API returns a 302 redirect to `invalid_key.html` or `missing_key.html` instead of an HTTP 401. The ingest script detects this and raises a clear `EnvironmentError`.
+- **Sentinel values.** Census uses `-666666666` for suppressed/missing numeric fields. The ingest script nullifies these automatically; downstream models must handle `null` gracefully.
+- **No cost.** The Census Data API is free with a registered key. No budget approval needed for re-pulls.
+
+---
+
+> **Standing pattern — new third-party credentials:** When a new API key or service credential is added to `~/Desktop/um_website/.env`, **notify the CIO** so this capability registry stays current. Add an entry here following the pattern above (service name, env var, key location, purpose, ingest script if any, cadence, auth notes).
+
 ## Domain Authentication (verified 2026-04-04)
 - **SPF:** `v=spf1 include:_spf.google.com -all` (hardfail) — PASSING
 - **DKIM:** `google._domainkey` configured with RSA key — PASSING
@@ -449,7 +488,9 @@ curl -X POST 'https://api.firecrawl.dev/v2/map' \
 
 ## LogRocket + Galileo AI (ACTIVE as of 2026-05-14)
 
-> **This is the central observability + product-intelligence layer.** Every Paperclip agent has a "Galileo-first" standing rule (see each AGENTS.md, LogRocket SOP block marked `LOGROCKET-CLAUSE-2026-05-14`). When you need to know what users are doing on unclemays.com, the first action is a Galileo MCP query — not a BigQuery scan, not a manual replay watch, not a heuristic. BigQuery is the durable journal; Galileo is the lens.
+> **This is the central observability + product-intelligence layer.** Every Paperclip agent has a "Galileo-first" standing rule (see each AGENTS.md, LogRocket SOP block marked `LOGROCKET-CLAUSE-2026-05-15`). When you need to know what users are doing on unclemays.com, the first action is a Galileo MCP query — not a BigQuery scan, not a manual replay watch, not a heuristic. BigQuery is the durable journal; Galileo is the lens.
+>
+> **Workflow (updated 2026-05-15):** The Galileo daily briefing lands with the **CTO** first. CTO triages and ships LogRocket-driven fixes — funnel and non-funnel — immediately, with no CEO/board approval required. When a fix touches active marketing or advertising surfaces, the CTO posts a one-line Paperclip comment to the CRO so the CRO can flag conflicts with a live campaign. The CRO can also pull revenue-impact data directly via `galileo-on-demand` whenever they want it; any agent can. The reverse-direction handoff (CRO triages first, then loops in CTO) is retired.
 
 - **Config:** `~/.claude/logrocket-config.json` (PAT, app slug, base URLs)
 - **Browser SDK:** [src/lib/logrocket.ts](src/lib/logrocket.ts) — lazy-imports the `logrocket` npm package once `DeferredAnalytics` arms; queues `identify` / `track` calls so the rest of the app can call them at any time
@@ -490,7 +531,8 @@ curl -sS 'https://r.logrocket.io/v1/orgs/mk3nrx/apps/uncle_mays/insights?limit=5
 - **Galileo-first.** When asked about user behavior, query Galileo before forming an opinion. Cite the Galileo query ID + session URL — same standard as every other external claim.
 - **Do not re-derive what Galileo classified.** Use Galileo's labels for frustration patterns; do not invent parallel taxonomies.
 - **BigQuery is the journal, not the lens.** Persist Galileo's outputs to `logrocket_galileo.*` (Phase 5) and join to revenue. Do not re-interpret raw events when Galileo has an answer.
-- **Standing Order amendment (auto-ship lane):** Non-funnel fixes Galileo flags (anything NOT on `/`, `/shop`, `/checkout/*`, `/order-success`, `/subscribe/*`, `/api/checkout`, `/api/webhook`, files in `src/components/checkout/`, `src/page-content/Index.tsx`, ad-landing variants, or analytics/pixel wiring) may be self-merged via PR with a LogRocket session link. Funnel fixes still require board approval per the existing Standing Order.
+- **Auto-ship lane (effective 2026-05-15):** All LogRocket-driven fixes — funnel and non-funnel — auto-ship via PR with a LogRocket session link in the description. No CEO/board approval required. CTO is the primary ship owner. For fixes touching marketing/ad surfaces (`/`, `/shop`, `/checkout/*`, `/order-success`, `/subscribe/*`, `/api/checkout`, `/api/webhook`, ad-landing variants, or analytics/pixel wiring), CTO leaves a one-line Paperclip comment for the CRO so they can flag conflicts with an active campaign and revert if needed.
+- **Self-serve revenue impact.** Any agent may invoke `galileo-on-demand` directly to pull revenue-impact data on a flagged issue. No need to route through the Decision Scientist for ad-hoc dollarization.
 - **PII hygiene.** Identify uses hashed email only. Never pass raw PII to `lrIdentify` or `lrTrack`. New form fields that capture sensitive data must inherit input masking or wear `data-private="redact"`.
 - **Disagreement protocol.** If your read of replay evidence conflicts with Galileo's conclusion, file a Paperclip task with both views — do not silently overrule.
 
@@ -671,6 +713,7 @@ This section exists because Paperclip CRO-style agents that can't read the repo 
 - **Delivery validation lives inside `CheckoutClient`.** Chicago service-area check uses [src/lib/service-area.ts](src/lib/service-area.ts). Out-of-area visitors get an inline waitlist capture that posts to `/api/capture-email`.
 - **Address autocomplete (Google Places) is wired in `CheckoutClient` only.** [src/hooks/use-address-autocomplete.ts](src/hooks/use-address-autocomplete.ts) attaches Places Autocomplete to the street address field. Requires `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`; gracefully degrades to manual entry when missing.
 - **Promo registry lives in [src/lib/promo.ts](src/lib/promo.ts).** `FRESH10` is the active code (`customer-facts.md` is authoritative on what's live). Verify against `Pricing.tsx` and `CheckoutClient.tsx` before asserting a code is or isn't surfaced in the UI.
+- **Payment slot is never blank (UNC-1094, 2026-05-15).** [src/components/checkout/CheckoutClient.tsx](src/components/checkout/CheckoutClient.tsx) always renders *something* where Stripe Elements would mount: `<Elements>` when `clientSecret` is set; a "Preparing payment…" spinner during intent prep; an inline retry-CTA panel when `/api/checkout/intent` errors (state: `intentError`); or a "one more step" nudge with a scroll-to-field button when `canProceed` is false. The auto-prep `useEffect` is gated on `!intentError` to prevent an infinite retry loop on deterministic failures; the error auto-clears when the user edits any form field. LogRocket diagnostic events emitted: `checkout_intent_prep_start`, `checkout_intent_prep_success`, `checkout_intent_prep_failed` (with `reason`), `checkout_payment_element_ready`, `checkout_payment_element_load_error`, `checkout_payment_element_load_timeout`.
 - **FAQ section renders visually on the homepage.** [src/page-content/Index.tsx](src/page-content/Index.tsx) renders an accordion FAQ. The FAQ JSON in [src/app/page.tsx](src/app/page.tsx) is JSON-LD schema markup for SEO; the visual component is separate.
 
 If you are a CRO/audit agent without filesystem access, flag items at the **file path** level ("please verify X in file Y") rather than asserting specific line numbers you cannot see.
