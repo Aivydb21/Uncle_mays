@@ -104,10 +104,22 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
       aria-busy={!hydrated}
       className={`inline-flex w-full items-center justify-center gap-2 rounded-xl ${
         variant === "compact" ? "h-9 px-3 text-sm" : "h-10 px-4 text-sm"
-      } font-semibold border-2 border-primary bg-background text-primary transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-60 disabled:cursor-progress`}
+      } font-semibold border-2 border-primary bg-background text-primary transition-colors hover:bg-primary hover:text-primary-foreground disabled:!bg-muted disabled:!border-muted-foreground/30 disabled:!text-muted-foreground disabled:cursor-progress`}
     >
-      <Plus className="h-4 w-4" />
-      {hydrated ? "Add to cart" : "Loading…"}
+      {hydrated ? (
+        <>
+          <Plus className="h-4 w-4" />
+          Add to cart
+        </>
+      ) : (
+        <>
+          <span
+            aria-hidden="true"
+            className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground"
+          />
+          Loading…
+        </>
+      )}
     </button>
   );
 }
