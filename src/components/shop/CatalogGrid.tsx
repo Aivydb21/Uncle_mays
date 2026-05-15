@@ -174,6 +174,23 @@ function CategoryNavBar({
 
   if (present.length <= 1) return null;
 
+  // Programmatic scroll instead of a bare hash-anchor: Galileo's 2026-05-15
+  // briefing (UNC-1083) flagged these chips as unresponsive in ~9 of 25
+  // sessions, primarily in Facebook/Instagram in-app webviews where
+  // <a href="#anchor"> navigation is unreliable and instant jumps go
+  // unnoticed. scrollIntoView({ behavior: "smooth" }) works in those
+  // webviews and gives a visible animation so users see the action.
+  const handleJump = (cat: CatalogCategory) => {
+    const slug = slugForCategory(cat);
+    const el = typeof document !== "undefined" ? document.getElementById(slug) : null;
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    if (typeof window !== "undefined" && window.history?.replaceState) {
+      window.history.replaceState({}, "", `#${slug}`);
+    }
+  };
+
   return (
     <nav
       aria-label="Catalog categories"
@@ -184,16 +201,18 @@ function CategoryNavBar({
           const isActive = active === cat;
           return (
             <li key={cat} className="shrink-0">
-              <a
-                href={`#${slugForCategory(cat)}`}
-                className={`inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold transition-colors ${
+              <button
+                type="button"
+                onClick={() => handleJump(cat)}
+                aria-current={isActive ? "true" : undefined}
+                className={`inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold transition-colors active:scale-[0.97] ${
                   isActive
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border bg-background text-foreground hover:border-primary/50 hover:text-primary"
                 }`}
               >
                 {cat}
-              </a>
+              </button>
             </li>
           );
         })}
