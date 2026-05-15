@@ -10,6 +10,10 @@ export function ShopHeader() {
         <strong>Chicago-area delivery</strong> 7 days a week with a window of
         your choice, or free pickup at Polsky Center in Hyde Park.
       </p>
+      <div className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-xs font-semibold text-primary">
+        <span aria-hidden="true">📍</span>
+        <span>Chicago delivery only — confirm your ZIP at checkout</span>
+      </div>
     </header>
   );
 }
