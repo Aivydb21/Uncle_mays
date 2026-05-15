@@ -107,10 +107,10 @@ SUBJECTS: dict[str, dict] = {
     "spruce-branches-bag":           {"style_kind":"loose",   "subject":"a small bundle of fresh fragrant green spruce evergreen branches with short needles, tied with twine"},
 
     # Protein
-    "chicken-pastured-whole-lb":     {"style_kind":"single",  "subject":"a whole raw plucked pastured chicken, dressed and oven-ready, about 4 to 5 pounds"},
-    "beef-short-ribs-bone-in-lb":    {"style_kind":"package", "subject":"a one-pound package of raw bone-in beef short ribs in clear vacuum-sealed plastic, deep red marbled meat"},
-    "beef-short-ribs-boneless-lb":   {"style_kind":"package", "subject":"a one-pound package of raw boneless beef short ribs in clear vacuum-sealed plastic, deep red meat"},
-    "lamb-chops-lb":                 {"style_kind":"loose",   "subject":"two raw lamb rib chops with bone-in, deep pink meat with white fat trim"},
+    "chicken-pastured-whole-lb":     {"style_kind":"single",  "subject":"a whole raw pastured chicken trussed with butcher's twine, legs tied together, presented on a clean piece of brown parchment butcher paper, garnished with a small sprig of fresh rosemary and a few sprigs of thyme, golden-pale skin, plump and well-dressed for retail sale, about 4 to 5 pounds"},
+    "beef-short-ribs-bone-in-lb":    {"style_kind":"single",  "subject":"two raw bone-in beef short ribs, deep red marbled meat, plated on brown parchment butcher paper, garnished with a sprig of fresh rosemary and cracked black pepper, retail butcher presentation"},
+    "beef-short-ribs-boneless-lb":   {"style_kind":"single",  "subject":"two raw boneless beef short ribs, deep red marbled meat, plated on brown parchment butcher paper, garnished with a sprig of fresh thyme and cracked black pepper, retail butcher presentation"},
+    "lamb-chops-lb":                 {"style_kind":"single",  "subject":"two raw lamb rib chops with bone-in, deep pink meat with white fat trim, plated on brown parchment butcher paper, garnished with a sprig of fresh rosemary, retail butcher presentation"},
     "eggs-farm-fresh-dozen":         {"style_kind":"package", "subject":"a dozen brown farm-fresh eggs in an open recyclable paper egg carton"},
 }
 
