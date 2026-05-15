@@ -28,7 +28,10 @@ THRESHOLDS: list[tuple[str, float, str]] = [
     ("ga4_events", 26, "daily +2h buffer"),
     ("ga4_session_summary", 26, "daily +2h buffer"),
     # Apollo — 2-day cadence with buffer
-    ("apollo_contacts", 50, "2-day cadence +2h buffer"),
+    # 48h nominal cadence + 12h buffer for timing drift and skip-day scheduling jitter
+    # Raised from 54h → 60h (UNC-1069): 54h was too tight; daily runs with --skip-apollo
+    # can land the file at T+48h+delay, reliably exceeding 54h.
+    ("apollo_contacts", 60, "2-day cadence +12h buffer"),
     # Stripe — daily
     ("stripe_payment_intents", 26, "daily"),
     ("stripe_charges", 26, "daily"),
@@ -57,12 +60,22 @@ THRESHOLDS: list[tuple[str, float, str]] = [
 ]
 
 
-def _latest_mtime(prefix: str) -> datetime | None:
-    """Return the mtime of the newest parquet file matching the prefix."""
+_EMPTY_PARQUET_BYTES = 1024  # files under 1 KB have 0 useful rows
+
+
+def _latest_mtime(prefix: str) -> tuple[datetime | None, bool]:
+    """Return (mtime, is_empty) for the newest parquet matching the prefix.
+
+    is_empty is True when the file exists but is smaller than the minimum
+    meaningful size (i.e. it was written as an error placeholder).
+    """
     files = sorted(DATA_RAW.glob(f"{prefix}_*.parquet"))
     if not files:
-        return None
-    return datetime.fromtimestamp(files[-1].stat().st_mtime, tz=timezone.utc)
+        return None, False
+    latest = files[-1]
+    mtime = datetime.fromtimestamp(latest.stat().st_mtime, tz=timezone.utc)
+    is_empty = latest.stat().st_size < _EMPTY_PARQUET_BYTES
+    return mtime, is_empty
 
 
 def check_freshness() -> list[dict]:
@@ -70,10 +83,13 @@ def check_freshness() -> list[dict]:
     now = datetime.now(timezone.utc)
     results = []
     for prefix, max_age_h, note in THRESHOLDS:
-        mtime = _latest_mtime(prefix)
+        mtime, is_empty = _latest_mtime(prefix)
         if mtime is None:
             age_h = None
             status = "MISSING"
+        elif is_empty:
+            age_h = (now - mtime).total_seconds() / 3600
+            status = "EMPTY"  # file written but contains 0 useful rows (API error)
         else:
             age_h = (now - mtime).total_seconds() / 3600
             status = "STALE" if age_h > max_age_h else "OK"
@@ -97,7 +113,7 @@ def _markdown_table(results: list[dict]) -> str:
     for r in results:
         ts = r["last_updated"][:16].replace("T", " ") if r["last_updated"] else "—"
         age = f"{r['age_hours']:.1f}" if r["age_hours"] is not None else "—"
-        flag = "STALE" if r["status"] == "STALE" else ("MISSING" if r["status"] == "MISSING" else "ok")
+        flag = {"STALE": "STALE", "MISSING": "MISSING", "EMPTY": "EMPTY"}.get(r["status"], "ok")
         rows.append(f"| {r['source']} | {ts} | {age} | {r['threshold_hours']} | {flag} |")
     return "\n".join([header, sep] + rows)
 
@@ -109,7 +125,7 @@ def main() -> int:
     args = parser.parse_args()
 
     results = check_freshness()
-    violations = [r for r in results if r["status"] in ("STALE", "MISSING")]
+    violations = [r for r in results if r["status"] in ("STALE", "MISSING", "EMPTY")]
 
     if args.as_json:
         print(json.dumps({"results": results, "violations": violations}, indent=2))

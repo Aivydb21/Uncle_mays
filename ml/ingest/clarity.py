@@ -54,11 +54,11 @@ def extract(num_of_days: int = 3) -> Path:
         params = {"numOfDays": num_of_days, "dimension1": "URL"}
         r = cli.get(f"{base}/project-live-insights", params=params)
         if r.status_code != 200:
-            print(f"[clarity] returned {r.status_code}: {r.text[:300]}")
-            df = pl.DataFrame(schema={"url": pl.Utf8})
-            out = raw_path("clarity_url_metrics")
-            df.write_parquet(out)
-            return out
+            body_snippet = r.text[:300] if r.text else "<empty body>"
+            raise RuntimeError(
+                f"[clarity] API returned {r.status_code}: {body_snippet}\n"
+                "Not writing parquet — last-good file preserved for freshness check."
+            )
 
         body = r.json()
         # Body is a list of metric objects, each with a `metricName` and an
