@@ -367,6 +367,53 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
         address.street.trim() &&
         /^\d{5}$/.test(address.zip));
 
+  // Mobile dead-click fix (UNC-1085): When the form is incomplete, the mobile
+  // sticky "Place order" button used to render as a disabled button with no
+  // feedback. LogRocket flagged users repeatedly tapping it with no response.
+  // Instead, surface what's missing so the button is always actionable.
+  function nextRequiredStep(): { label: string; targetId: string } | null {
+    if (!pricing?.ok) {
+      if (pricing && !pricing.ok && pricing.code === "below_minimum") {
+        return { label: "Add $20 minimum to cart", targetId: "checkout-summary" };
+      }
+      return null;
+    }
+    if (contact.email.trim().length <= 3) {
+      return { label: "Enter your email", targetId: "checkout-email" };
+    }
+    if (!contact.firstName.trim() || !contact.lastName.trim()) {
+      return { label: "Enter your name", targetId: "checkout-firstname" };
+    }
+    if (fulfillmentMode === "pickup") {
+      if (!cartPickupSlot) {
+        return { label: "Pick a pickup time", targetId: "checkout-pickup" };
+      }
+    } else {
+      if (!deliverySelection) {
+        return { label: "Pick a delivery day", targetId: "checkout-delivery-scheduler" };
+      }
+      if (!address.street.trim()) {
+        return { label: "Add a delivery address", targetId: "checkout-street" };
+      }
+      if (!/^\d{5}$/.test(address.zip)) {
+        return { label: "Add your ZIP code", targetId: "checkout-zip" };
+      }
+    }
+    return null;
+  }
+
+  function scrollAndFocus(targetId: string) {
+    if (typeof document === "undefined") return;
+    const el = document.getElementById(targetId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+      // Focus after the scroll begins; small delay so iOS lifts the keyboard
+      // *after* the section is in view (avoids a jarring double-scroll).
+      setTimeout(() => el.focus(), 250);
+    }
+  }
+
   // Auto-prepare payment intent when form is complete (single-page checkout)
   useEffect(() => {
     if (canProceed && !clientSecret && !preparingPayment) {
@@ -565,7 +612,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
           />
           {fulfillmentMode === "delivery" ? (
             <>
-              <section>
+              <section id="checkout-delivery-scheduler" className="scroll-mt-24">
                 <h2 className="mb-4 text-xl font-semibold">Schedule delivery</h2>
                 <DeliveryScheduler
                   value={deliverySelection}
@@ -643,46 +690,62 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
         <OrderSummary pricing={pricing} loading={pricingLoading} />
       </aside>
 
-      {/* Mobile sticky total bar - always visible */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border bg-card/95 backdrop-blur-sm shadow-lg">
-        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Total
-            </p>
-            <p className="text-lg font-bold text-foreground">
-              {pricing && pricing.ok ? formatCents(pricing.totalCents) : "—"}
-            </p>
+      {/* Mobile sticky total bar - always visible.
+          UNC-1085: When the form is incomplete, instead of rendering a
+          disabled "Place order" button (which LogRocket flagged as a
+          dead-click pattern), we render an enabled CTA that scrolls to
+          and focuses the next required field. */}
+      {(() => {
+        const nextStep = !canProceed && !clientSecret ? nextRequiredStep() : null;
+        const buttonEnabled = (canProceed || nextStep !== null) && !preparingPayment;
+        return (
+          <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden border-t border-border bg-card/95 backdrop-blur-sm shadow-lg">
+            <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Total
+                </p>
+                <p className="text-lg font-bold text-foreground">
+                  {pricing && pricing.ok ? formatCents(pricing.totalCents) : "—"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (canProceed && !clientSecret) {
+                    preparePaymentIntent();
+                  } else if (clientSecret) {
+                    document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' });
+                  } else if (nextStep) {
+                    scrollAndFocus(nextStep.targetId);
+                  }
+                }}
+                disabled={!buttonEnabled}
+                className={`inline-flex h-11 items-center justify-center rounded-xl px-6 text-sm font-semibold transition-colors whitespace-nowrap ${
+                  buttonEnabled
+                    ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                    : "cursor-not-allowed bg-muted text-muted-foreground"
+                }`}
+              >
+                {preparingPayment ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Loading…
+                  </>
+                ) : clientSecret ? (
+                  "Continue to payment"
+                ) : canProceed ? (
+                  "Place order"
+                ) : nextStep ? (
+                  nextStep.label
+                ) : (
+                  "Place order"
+                )}
+              </button>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (canProceed && !clientSecret) {
-                preparePaymentIntent();
-              } else if (clientSecret) {
-                document.getElementById('payment-section')?.scrollIntoView({ behavior: 'smooth' });
-              }
-            }}
-            disabled={!canProceed || preparingPayment}
-            className={`inline-flex h-11 items-center justify-center rounded-xl px-6 text-sm font-semibold transition-colors whitespace-nowrap ${
-              canProceed && !preparingPayment
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "cursor-not-allowed bg-muted text-muted-foreground"
-            }`}
-          >
-            {preparingPayment ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Loading…
-              </>
-            ) : clientSecret ? (
-              "Continue to payment"
-            ) : (
-              "Place order"
-            )}
-          </button>
-        </div>
-      </div>
+        );
+      })()}
     </div>
   );
 }
@@ -761,6 +824,7 @@ function ContactSection({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Email" required>
           <input
+            id="checkout-email"
             type="email"
             value={contact.email}
             onChange={(e) => setContact({ ...contact, email: e.target.value })}
@@ -777,6 +841,7 @@ function ContactSection({
         </Field>
         <Field label="First name" required>
           <input
+            id="checkout-firstname"
             type="text"
             value={contact.firstName}
             onChange={(e) =>
@@ -873,6 +938,7 @@ function DeliverySection({
         <div className="sm:col-span-4">
           <Field label="Street address" required>
             <input
+              id="checkout-street"
               ref={addressRef}
               type="text"
               value={address.street}
@@ -919,6 +985,7 @@ function DeliverySection({
         <div className="sm:col-span-2">
           <Field label="ZIP" required>
             <input
+              id="checkout-zip"
               type="text"
               value={address.zip}
               onChange={(e) =>
@@ -963,7 +1030,7 @@ function PickupSection({
     );
   }
   return (
-    <section>
+    <section id="checkout-pickup" className="scroll-mt-24">
       <h2 className="mb-2 text-xl font-semibold">Pick a pickup window</h2>
       <p className="mb-4 text-sm text-muted-foreground">
         Polsky Center, 1452 E 53rd St, Hyde Park (lobby reception). Bring an ID
@@ -1182,9 +1249,33 @@ function PaymentSection({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [elementsReady, setElementsReady] = useState(false);
+  const [loadTimedOut, setLoadTimedOut] = useState(false);
   const [walletPaymentAttempted, setWalletPaymentAttempted] = useState(false);
 
   void paymentIntentId;
+
+  // UNC-1085: In Facebook/Instagram in-app browsers Stripe's PaymentElement
+  // `onReady` / `onLoadError` callbacks frequently never fire, leaving the
+  // form stuck behind a "Loading payment form…" spinner forever. After 10s
+  // without a `ready` signal, surface a recovery panel so the user has a
+  // path forward and emit a LogRocket custom event so Galileo can quantify
+  // the in-app-browser hit rate.
+  useEffect(() => {
+    if (elementsReady) return;
+    const timer = window.setTimeout(() => {
+      if (elementsReady) return;
+      setLoadTimedOut(true);
+      try {
+        const props: Record<string, string | number | boolean> = {};
+        if (paymentIntentId) props.paymentIntentId = paymentIntentId;
+        if (typeof navigator !== "undefined") props.userAgent = navigator.userAgent;
+        lrTrack("checkout_payment_element_load_timeout", props);
+      } catch {
+        // analytics never blocks
+      }
+    }, 10_000);
+    return () => window.clearTimeout(timer);
+  }, [elementsReady, paymentIntentId]);
 
   // Fire add_payment_info event when payment form is visible
   useEffect(() => {
@@ -1354,18 +1445,50 @@ function PaymentSection({
 
       <div className="relative" data-private="redact">
         <PaymentElement
-          onReady={() => setElementsReady(true)}
+          onReady={() => {
+            setElementsReady(true);
+            setLoadTimedOut(false);
+          }}
           onLoadError={(event) => {
             setError(event.error.message || "Payment form failed to load. Please refresh and try again.");
             setElementsReady(false);
           }}
         />
-        {!elementsReady && (
+        {!elementsReady && !loadTimedOut && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" />
               Loading payment form…
             </div>
+          </div>
+        )}
+        {!elementsReady && loadTimedOut && (
+          <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            <p className="font-semibold">Payment form is taking too long to load.</p>
+            <p className="mt-1">
+              This often happens inside the Facebook or Instagram in-app browser.
+              Try one of these:
+            </p>
+            <ul className="mt-2 list-disc pl-5 space-y-1">
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== "undefined") window.location.reload();
+                  }}
+                  className="font-semibold underline hover:no-underline"
+                >
+                  Refresh this page
+                </button>
+              </li>
+              <li>
+                Tap the <span className="font-semibold">⋯</span> menu and choose
+                <span className="font-semibold"> &quot;Open in Chrome / Safari&quot;</span>
+              </li>
+              <li>
+                Or email <a href="mailto:info@unclemays.com" className="font-semibold underline">info@unclemays.com</a> and we&apos;ll send a payment link
+              </li>
+            </ul>
           </div>
         )}
       </div>
