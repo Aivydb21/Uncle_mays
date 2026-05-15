@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
-import { useHydratedCart, useCartStore } from "@/lib/cart/store";
+import { useCartHydrated, useCartStore } from "@/lib/cart/store";
 import { sha256 } from "@/lib/browser-hash";
 import { getFbAttribution } from "@/lib/fb-attribution";
 import type { CatalogItem } from "@/lib/catalog/types";
@@ -13,11 +13,16 @@ interface Props {
 }
 
 export function AddToCartButton({ item, variant = "full" }: Props) {
-  const lines = useHydratedCart((s) => s.lines);
+  const hydrated = useCartHydrated();
+  const lines = useCartStore((s) => s.lines);
   const addLine = useCartStore((s) => s.addLine);
   const setQuantity = useCartStore((s) => s.setQuantity);
 
-  const inCart = lines?.find((l) => l.sku === item.sku);
+  // Until persist rehydrates from localStorage, reads of `lines` are not
+  // authoritative — treat as "no item in cart" so the qty stepper doesn't
+  // flicker. Writes are gated below in handleAdd so pre-hydration clicks
+  // are not silently overwritten when persist replays the stored cart.
+  const inCart = hydrated ? lines.find((l) => l.sku === item.sku) : undefined;
   const qty = inCart?.quantity ?? 0;
 
   const [pulse, setPulse] = useState(false);
@@ -40,6 +45,11 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
   }
 
   function handleAdd() {
+    // Pre-hydration writes get overwritten when persist replays from
+    // localStorage. The button is also disabled in this state, but guard
+    // here as belt-and-suspenders for touch dispatch races on slow mobile
+    // in-app browsers.
+    if (!hydrated) return;
     const addQty = Math.max(1, Math.floor(item.defaultAddQty || 1));
     addLine(item.sku, addQty);
     bump();
@@ -90,12 +100,14 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
     <button
       type="button"
       onClick={handleAdd}
+      disabled={!hydrated}
+      aria-busy={!hydrated}
       className={`inline-flex w-full items-center justify-center gap-2 rounded-xl ${
         variant === "compact" ? "h-9 px-3 text-sm" : "h-10 px-4 text-sm"
-      } font-semibold border-2 border-primary bg-background text-primary transition-colors hover:bg-primary hover:text-primary-foreground`}
+      } font-semibold border-2 border-primary bg-background text-primary transition-colors hover:bg-primary hover:text-primary-foreground disabled:opacity-60 disabled:cursor-progress`}
     >
       <Plus className="h-4 w-4" />
-      Add to cart
+      {hydrated ? "Add to cart" : "Loading…"}
     </button>
   );
 }
