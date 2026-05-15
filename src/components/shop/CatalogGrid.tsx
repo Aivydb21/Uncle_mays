@@ -267,17 +267,22 @@ function NoResultsMessage({ onClear }: { onClear: () => void }) {
 }
 
 function CatalogCard({ item }: { item: CatalogItem }) {
+  // Track image load failures so a timed-out or 404'd image falls back to a
+  // name-only tile instead of a blank muted box. Galileo 2026-05-15 daily
+  // briefing flagged this gap as the #1 friction pattern (UNC-1082).
+  const [imageFailed, setImageFailed] = useState(false);
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-soft transition-shadow hover:shadow-medium">
       <div className="relative aspect-square w-full bg-muted">
-        {item.imageUrl ? (
+        {item.imageUrl && !imageFailed ? (
           <Image
             src={item.imageUrl}
             alt={item.name}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 16vw"
             className="object-cover"
-            unoptimized
+            quality={70}
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center px-2 text-center text-xs text-muted-foreground">
