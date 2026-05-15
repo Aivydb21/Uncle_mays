@@ -42,6 +42,26 @@ const SKU_IMAGE_OVERRIDES: Readonly<Record<string, string>> = {
   "chicken-pastured-whole-lb": "/photos/heritage-chicken.jpg",
 };
 
+// Scan public/catalog/ at module load for AI portion photos named
+// `{sku}.jpg`. These ship in the Vercel build artifact, so they paint
+// instantly on first viewport — Airtable attachment URLs frequently
+// stall or time out on mobile in-app browsers (Galileo UNC-1091).
+// Falls back silently if the directory is unreadable.
+const LOCAL_CATALOG_IMAGE_SKUS: ReadonlySet<string> = (() => {
+  try {
+    const dir = path.join(process.cwd(), "public", "catalog");
+    const files = fs.readdirSync(dir);
+    const skus = new Set<string>();
+    for (const f of files) {
+      const m = f.match(/^(.+)\.(jpg|jpeg|png|webp)$/i);
+      if (m) skus.add(m[1]);
+    }
+    return skus;
+  } catch {
+    return new Set<string>();
+  }
+})();
+
 interface AirtableRecord {
   id: string;
   fields: Record<string, unknown>;
@@ -117,7 +137,9 @@ function mapRecord(record: AirtableRecord): CatalogItemInternal | null {
     costCents: Math.round(costCents),
     active,
     availableQty: asNumber(f.AvailableQty),
-    imageUrl: SKU_IMAGE_OVERRIDES[sku] ?? asString(f.ImageURL),
+    imageUrl:
+      SKU_IMAGE_OVERRIDES[sku] ??
+      (LOCAL_CATALOG_IMAGE_SKUS.has(sku) ? `/catalog/${sku}.jpg` : asString(f.ImageURL)),
     sortOrder: asNumber(f.SortOrder) ?? 999,
     taxCategory,
     freshnessLabel: asString(f.FreshnessLabel),
