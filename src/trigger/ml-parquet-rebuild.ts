@@ -16,8 +16,10 @@ import { spawnSync } from "child_process";
 import { existsSync } from "fs";
 import { join } from "path";
 
-const ML_ROOT = join(process.cwd(), "ml");
-const WEBSITE_ROOT = process.cwd();
+// Resolve relative to this file so the path is correct regardless of
+// the directory trigger dev is started from (UNC-1118).
+const WEBSITE_ROOT = join(__dirname, "..", "..");
+const ML_ROOT = join(WEBSITE_ROOT, "ml");
 
 export interface ParquetRebuildPayload {
   /** Re-run Stripe ingest before rebuilding. Defaults to true. */
