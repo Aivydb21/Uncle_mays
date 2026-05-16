@@ -37,10 +37,11 @@ export const galileoDailyBriefing = schedules.task({
   // 12:00 UTC on 2026-05-16 so the Tailscale-hosted Paperclip API is up when
   // the briefing posts the CTO task.
   cron: "0 14 * * *",
-  // Override the project-wide 60s default in trigger.config.ts. Galileo MCP
-  // answers for the 3 daily prompts normally take 4-5 minutes end-to-end;
-  // 60s would always time out. Give it 10 minutes of headroom.
-  maxDuration: 600,
+  // Override the project-wide 60s default. The briefing must complete and
+  // post to Paperclip every day even if Galileo is slow — getting the
+  // information pull is the whole point. Generous 1h ceiling per CEO
+  // directive (2026-05-16: "give as much time as needed").
+  maxDuration: 3600,
   run: async () => {
     const started = Date.now();
 

@@ -79,7 +79,10 @@ export const ceoDailyDigest = schedules.task({
   // the Tailscale-hosted Paperclip API on the CEO's laptop is reachable.
   // Runs 7 days a week per CEO directive (2026-05-16).
   cron: "0 14 * * *",
-  maxDuration: 300,
+  // Generous ceiling per CEO directive (2026-05-16): completing the daily
+  // information pull matters more than wall time. 1h is more than enough
+  // headroom for GitHub + Mailchimp + Paperclip queries even on slow days.
+  maxDuration: 3600,
   run: async () => {
     const now = new Date();
     const windowStart = new Date(now.getTime() - 24 * 60 * 60 * 1000);
