@@ -12,10 +12,13 @@
 
 import { schedules, task } from "@trigger.dev/sdk/v3";
 import { spawnSync, SpawnSyncReturns } from "child_process";
+import { join } from "path";
 
-const WEBSITE_ROOT = process.cwd();
-const ML_ROOT = `${WEBSITE_ROOT}/ml`;
-const DBT_PROJECT = `${ML_ROOT}/dbt/uncle_mays`;
+// Resolve relative to this file so the path is correct regardless of
+// the directory trigger dev is started from (UNC-1118).
+const WEBSITE_ROOT = join(__dirname, "..", "..");
+const ML_ROOT = join(WEBSITE_ROOT, "ml");
+const DBT_PROJECT = join(ML_ROOT, "dbt", "uncle_mays");
 
 interface StepResult {
   step: string;
