@@ -75,9 +75,10 @@ interface SectionResult<T> {
 
 export const ceoDailyDigest = schedules.task({
   id: "ceo-daily-digest",
-  // 12:00 UTC = 07:00 CDT (summer) / 06:00 CST (winter). Same slot as the
-  // Galileo briefing. Runs 7 days a week per CEO directive (2026-05-16).
-  cron: "0 12 * * *",
+  // 14:00 UTC = 09:00 CDT (summer) / 08:00 CST (winter). Working hours so
+  // the Tailscale-hosted Paperclip API on the CEO's laptop is reachable.
+  // Runs 7 days a week per CEO directive (2026-05-16).
+  cron: "0 14 * * *",
   maxDuration: 300,
   run: async () => {
     const now = new Date();
