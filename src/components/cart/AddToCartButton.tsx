@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Minus } from "lucide-react";
-import { useCartHydrated, useCartStore } from "@/lib/cart/store";
+import { useCartStore } from "@/lib/cart/store";
 import { sha256 } from "@/lib/browser-hash";
 import { getFbAttribution } from "@/lib/fb-attribution";
 import type { CatalogItem } from "@/lib/catalog/types";
@@ -13,16 +13,18 @@ interface Props {
 }
 
 export function AddToCartButton({ item, variant = "full" }: Props) {
-  const hydrated = useCartHydrated();
+  // Reads of `lines` pre-rehydration are not authoritative (empty initial
+  // state) but the custom `merge` in store.ts combines pre-hydration writes
+  // with persisted state when replay lands, so we can drop the hydration
+  // gate. Previously gating writes here caused silent Add-to-Cart failures
+  // in FB/IG WebView when storage replay stalled behind throttled JS, the
+  // button stayed in the disabled-spinner state, and users kept tapping
+  // a no-op. (UNC-1121.)
   const lines = useCartStore((s) => s.lines);
   const addLine = useCartStore((s) => s.addLine);
   const setQuantity = useCartStore((s) => s.setQuantity);
 
-  // Until persist rehydrates from localStorage, reads of `lines` are not
-  // authoritative — treat as "no item in cart" so the qty stepper doesn't
-  // flicker. Writes are gated below in handleAdd so pre-hydration clicks
-  // are not silently overwritten when persist replays the stored cart.
-  const inCart = hydrated ? lines.find((l) => l.sku === item.sku) : undefined;
+  const inCart = lines.find((l) => l.sku === item.sku);
   const qty = inCart?.quantity ?? 0;
 
   const [pulse, setPulse] = useState(false);
@@ -45,11 +47,6 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
   }
 
   function handleAdd() {
-    // Pre-hydration writes get overwritten when persist replays from
-    // localStorage. The button is also disabled in this state, but guard
-    // here as belt-and-suspenders for touch dispatch races on slow mobile
-    // in-app browsers.
-    if (!hydrated) return;
     const addQty = Math.max(1, Math.floor(item.defaultAddQty || 1));
     addLine(item.sku, addQty);
     bump();
@@ -100,26 +97,12 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
     <button
       type="button"
       onClick={handleAdd}
-      disabled={!hydrated}
-      aria-busy={!hydrated}
       className={`inline-flex w-full items-center justify-center gap-2 rounded-xl ${
         variant === "compact" ? "h-9 px-3 text-sm" : "h-10 px-4 text-sm"
-      } font-semibold border-2 border-primary bg-background text-primary transition-colors hover:bg-primary hover:text-primary-foreground disabled:!bg-muted disabled:!border-muted-foreground/30 disabled:!text-muted-foreground disabled:cursor-progress`}
+      } font-semibold border-2 border-primary bg-background text-primary transition-colors hover:bg-primary hover:text-primary-foreground`}
     >
-      {hydrated ? (
-        <>
-          <Plus className="h-4 w-4" />
-          Add to cart
-        </>
-      ) : (
-        <>
-          <span
-            aria-hidden="true"
-            className="h-4 w-4 animate-spin rounded-full border-2 border-muted-foreground/30 border-t-muted-foreground"
-          />
-          Loading…
-        </>
-      )}
+      <Plus className="h-4 w-4" />
+      Add to cart
     </button>
   );
 }
