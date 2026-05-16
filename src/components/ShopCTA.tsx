@@ -42,9 +42,14 @@ export async function ShopCTA() {
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
             Build Your Own Box
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Shop the catalog
-          </h2>
+          <Link
+            href="/shop"
+            className="inline-block transition-opacity hover:opacity-80"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              Shop the catalog
+            </h2>
+          </Link>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Pick the produce, pantry items, and protein you actually want.
             Sourced from our Black farmer partners. $20 minimum.
