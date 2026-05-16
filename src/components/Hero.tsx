@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Truck } from "lucide-react";
 import Link from "next/link";
@@ -8,6 +8,10 @@ import Image from "next/image";
 const heroImage = "/images/hero-produce.jpg";
 
 export const Hero = () => {
+  const reduceMotion = useReducedMotion();
+  const fadeUp = reduceMotion
+    ? { initial: { opacity: 1, y: 0 }, animate: { opacity: 1, y: 0 } }
+    : { initial: { opacity: 0, y: 30 }, animate: { opacity: 1, y: 0 } };
   return (
     <section className="relative min-h-[90vh] flex items-center overflow-hidden">
       <div className="absolute inset-0 z-0">
@@ -28,8 +32,8 @@ export const Hero = () => {
       <div className="container relative z-10 px-6 py-20">
         <div className="max-w-3xl">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={fadeUp.initial}
+            animate={fadeUp.animate}
             transition={{ duration: 0.8 }}
           >
             {/* Delivery badge */}
@@ -76,8 +80,8 @@ export const Hero = () => {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={fadeUp.initial}
+            animate={fadeUp.animate}
             transition={{ duration: 0.8, delay: 0.4 }}
             className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground/70"
           >
