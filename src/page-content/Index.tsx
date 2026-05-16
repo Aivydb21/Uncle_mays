@@ -3,6 +3,7 @@
 import { Suspense, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 import { Hero } from "@/components/Hero";
 import { HomeEmailCapture } from "@/components/HomeEmailCapture";
@@ -69,24 +70,32 @@ const Index = ({ productSection }: { productSection: ReactNode }) => {
             <p className="mt-2 text-foreground/70">Real photos from recent Uncle May&rsquo;s deliveries.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border/50 shadow-soft bg-muted">
+            <Link
+              href="/shop"
+              className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border/50 shadow-soft bg-muted block group"
+              aria-label="Shop the catalog"
+            >
               <Image
                 src="/photos/produce-box.jpg"
                 alt="A single Uncle May's Fresh Produce box, packed and ready for delivery"
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover"
+                className="object-cover transition-transform group-hover:scale-105"
               />
-            </div>
-            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border/50 shadow-soft bg-muted">
+            </Link>
+            <Link
+              href="/shop"
+              className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border/50 shadow-soft bg-muted block group"
+              aria-label="Shop the catalog"
+            >
               <Image
                 src="/photos/market-table.jpg"
                 alt="Three Uncle May's produce boxes lined up on a covered market table"
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover"
+                className="object-cover transition-transform group-hover:scale-105"
               />
-            </div>
+            </Link>
           </div>
         </div>
       </section>
