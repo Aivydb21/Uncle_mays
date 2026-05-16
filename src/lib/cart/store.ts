@@ -84,9 +84,48 @@ export const useCartStore = create<CartState>()(
         shippingZip: state.shippingZip,
         promoCode: state.promoCode,
       }),
+      // Combine persisted state with any in-memory writes that happened before
+      // rehydration finished. Default zustand-persist `merge` is a shallow
+      // overwrite — persisted.lines would clobber pre-hydration adds.
+      //
+      // In FB/IG WebView the JS thread is heavily throttled and storage replay
+      // can take seconds, during which users tap Add-to-Cart against an
+      // ungated button (see AddToCartButton). Without this merge those clicks
+      // are silently dropped when rehydration finally lands. (UNC-1121.)
+      merge: (persistedState, currentState) => {
+        const persisted = (persistedState as Partial<CartState> | undefined) || {};
+        const persistedLines = persisted.lines || [];
+        const currentLines = currentState.lines || [];
+        const byKey = new Map<string, CartLine>();
+        for (const l of persistedLines) byKey.set(l.sku, { ...l });
+        for (const l of currentLines) {
+          const existing = byKey.get(l.sku);
+          if (existing) {
+            byKey.set(l.sku, {
+              ...existing,
+              quantity: Math.min(99, existing.quantity + l.quantity),
+            });
+          } else {
+            byKey.set(l.sku, { ...l });
+          }
+        }
+        return {
+          ...currentState,
+          ...persisted,
+          lines: Array.from(byKey.values()),
+        };
+      },
     }
   )
 );
+
+// If rehydration hasn't fired within this window we treat the store as
+// hydrated anyway. Real localStorage replays are sub-100ms on every browser
+// we test; the long tail belongs to FB/IG WebView with throttled JS or
+// restricted storage. Holding the cart drawer / qty stepper hostage past
+// this threshold causes more harm (silent Add-to-Cart) than the brief
+// risk of double-counting that the custom `merge` above already mitigates.
+const HYDRATION_TIMEOUT_MS = 1500;
 
 export function useCartHydrated(): boolean {
   const [hydrated, setHydrated] = useState(() =>
@@ -97,8 +136,18 @@ export function useCartHydrated(): boolean {
       setHydrated(true);
       return;
     }
-    const unsub = useCartStore.persist.onFinishHydration(() => setHydrated(true));
-    return unsub;
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      setHydrated(true);
+    };
+    const unsub = useCartStore.persist.onFinishHydration(finish);
+    const t = window.setTimeout(finish, HYDRATION_TIMEOUT_MS);
+    return () => {
+      unsub();
+      window.clearTimeout(t);
+    };
   }, []);
   return hydrated;
 }
