@@ -634,7 +634,18 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
             sees the total before investing time in the form. Desktop
             uses the right-rail summary instead. */}
         <div className="lg:hidden mb-6">
-          <MobileCollapsibleSummary pricing={pricing} loading={pricingLoading} />
+          <MobileCollapsibleSummary
+            pricing={pricing}
+            loading={pricingLoading}
+            onScrollToZip={() => scrollAndFocus("checkout-zip")}
+            onSelectPickup={() => {
+              setFulfillmentMode("pickup");
+              setTimeout(
+                () => scrollAndFocus("checkout-pickup"),
+                100,
+              );
+            }}
+          />
         </div>
 
         <div className="space-y-8">
@@ -781,7 +792,15 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       </div>
 
       <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start">
-        <OrderSummary pricing={pricing} loading={pricingLoading} />
+        <OrderSummary
+          pricing={pricing}
+          loading={pricingLoading}
+          onScrollToZip={() => scrollAndFocus("checkout-zip")}
+          onSelectPickup={() => {
+            setFulfillmentMode("pickup");
+            setTimeout(() => scrollAndFocus("checkout-pickup"), 100);
+          }}
+        />
       </aside>
 
       {/* Mobile sticky total bar - always visible.
@@ -847,9 +866,13 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
 function MobileCollapsibleSummary({
   pricing,
   loading,
+  onScrollToZip,
+  onSelectPickup,
 }: {
   pricing: PricingResponse | null;
   loading: boolean;
+  onScrollToZip?: () => void;
+  onSelectPickup?: () => void;
 }) {
   const [open, setOpen] = useState(true);
   const total =
@@ -858,6 +881,20 @@ function MobileCollapsibleSummary({
     pricing && pricing.ok
       ? pricing.lineItems.reduce((s, l) => s + l.quantity, 0)
       : 0;
+
+  // UNC-1117: replace the ambiguous "Calculating…" header with the actual
+  // gating reason when pricing is in an error state. Galileo flagged this
+  // text as a dead-click target on mobile.
+  const headerSubtitle =
+    pricing && pricing.ok
+      ? `${lineCount} ${lineCount === 1 ? "item" : "items"} · ${total}`
+      : pricing && !pricing.ok && pricing.code === "missing_zip"
+        ? "Add ZIP to see total"
+        : pricing && !pricing.ok && pricing.code === "out_of_zone"
+          ? "Switch to pickup to continue"
+          : pricing && !pricing.ok && pricing.code === "below_minimum"
+            ? "Add more items to reach $20"
+            : "Calculating…";
 
   return (
     <div className="rounded-xl border border-border bg-card shadow-soft">
@@ -871,9 +908,7 @@ function MobileCollapsibleSummary({
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Order summary
           </p>
-          <p className="text-base font-bold text-foreground">
-            {lineCount > 0 ? `${lineCount} ${lineCount === 1 ? "item" : "items"} · ${total}` : "Calculating…"}
-          </p>
+          <p className="text-base font-bold text-foreground">{headerSubtitle}</p>
         </div>
         <span className="text-sm font-semibold text-primary">
           {open ? "Hide" : "Show details"}
@@ -881,7 +916,13 @@ function MobileCollapsibleSummary({
       </button>
       {open && (
         <div className="border-t border-border p-4">
-          <OrderSummary pricing={pricing} loading={loading} compact />
+          <OrderSummary
+            pricing={pricing}
+            loading={loading}
+            compact
+            onScrollToZip={onScrollToZip}
+            onSelectPickup={onSelectPickup}
+          />
         </div>
       )}
     </div>
@@ -1197,10 +1238,18 @@ function OrderSummary({
   pricing,
   loading,
   compact,
+  onScrollToZip,
+  onSelectPickup,
 }: {
   pricing: PricingResponse | null;
   loading: boolean;
   compact?: boolean;
+  // UNC-1117: Galileo flagged dead-clicks on the static "Enter a valid ZIP…"
+  // message in this slot. When provided, the missing_zip / out_of_zone
+  // messages render as buttons that jump to the ZIP input or switch the
+  // fulfillment mode to pickup.
+  onScrollToZip?: () => void;
+  onSelectPickup?: () => void;
 }) {
   const wrapperClass = compact
     ? ""
@@ -1265,7 +1314,28 @@ function OrderSummary({
       )}
       {pricing && !pricing.ok && (
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">{pricing.message}</p>
+          {pricing.code === "missing_zip" && onScrollToZip ? (
+            <button
+              type="button"
+              onClick={onScrollToZip}
+              className="block w-full rounded-lg border border-primary bg-primary/5 px-3 py-2 text-left text-sm font-medium text-primary hover:bg-primary/10"
+            >
+              {pricing.message} <span aria-hidden="true">↓</span>
+            </button>
+          ) : pricing.code === "out_of_zone" && onSelectPickup ? (
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">{pricing.message}</p>
+              <button
+                type="button"
+                onClick={onSelectPickup}
+                className="inline-flex h-9 items-center rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
+              >
+                Switch to free pickup
+              </button>
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">{pricing.message}</p>
+          )}
           {pricing.code === "below_minimum" && (
             <Link
               href="/shop"

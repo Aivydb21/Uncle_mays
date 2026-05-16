@@ -17,9 +17,10 @@ import { sendInternalAlert } from "../lib/email/resend";
  *   3. Return the structured payload so it can later be journaled to
  *      BigQuery `logrocket_galileo.briefings` (Phase 5).
  *
- * No agent paraphrasing — the email body is Galileo's verbatim text. A
- * Paperclip agent (CRO) is expected to read this email and post the
- * accompanying revenue-impact + ownership annotation as a Paperclip task.
+ * No agent paraphrasing — the email body is Galileo's verbatim text. The
+ * CTO Paperclip agent is the primary recipient: it triages and ships
+ * LogRocket-driven fixes immediately, and soft-notifies the CRO when a
+ * fix touches active marketing or advertising surfaces.
  *
  * Required env (Trigger.dev project env, NOT just Vercel):
  *   LOGROCKET_PAT      = "pat:<org>:<app>:<token>"
@@ -28,35 +29,46 @@ import { sendInternalAlert } from "../lib/email/resend";
  *   PAPERCLIP_API_URL  = http://localhost:3100/api (or production URL)
  *   PAPERCLIP_API_KEY  = API key for creating issues
  *   PAPERCLIP_COMPANY_ID = company UUID
- *   PAPERCLIP_CRO_AGENT_ID = CRO agent UUID (0df6fe9a-9676-41e7-89e9-724d05272a51)
+ *   PAPERCLIP_CTO_AGENT_ID = CTO agent UUID (3f827c01-38a9-435b-826c-64192188a8cb)
  */
 export const galileoDailyBriefing = schedules.task({
   id: "galileo-daily-briefing",
-  // 12:00 UTC daily — ~07:00 CDT (summer) / 06:00 CST (winter).
-  cron: "0 12 * * *",
+  // 14:00 UTC daily — ~09:00 CDT (summer) / 08:00 CST (winter). Shifted from
+  // 12:00 UTC on 2026-05-16 so the Tailscale-hosted Paperclip API is up when
+  // the briefing posts the CTO task.
+  cron: "0 14 * * *",
+  // Override the project-wide 60s default. The briefing must complete and
+  // post to Paperclip every day even if Galileo is slow — getting the
+  // information pull is the whole point. Generous 1h ceiling per CEO
+  // directive (2026-05-16: "give as much time as needed").
+  maxDuration: 3600,
   run: async () => {
     const started = Date.now();
-    const answers: Array<{ prompt: GalileoPrompt; result: GalileoResult }> = [];
 
-    for (const prompt of DAILY_BRIEFING_PROMPTS) {
-      try {
-        const result = await askGalileo(prompt.text, { promptVersion: prompt.version });
-        answers.push({ prompt, result });
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err);
-        answers.push({
-          prompt,
-          result: {
-            status: "error",
-            text: `Error querying Galileo: ${message}`,
-            links: [],
-            rawMessages: [],
-            durationMs: 0,
-            promptVersion: prompt.version,
-          },
-        });
-      }
-    }
+    // Run all 3 Galileo prompts in parallel so the wall time is bounded by
+    // the slowest single query, not the sum. Each prompt independently
+    // tolerates failure so a single Galileo error doesn't kill the briefing.
+    const answers = await Promise.all(
+      DAILY_BRIEFING_PROMPTS.map(async (prompt) => {
+        try {
+          const result = await askGalileo(prompt.text, { promptVersion: prompt.version });
+          return { prompt, result };
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          return {
+            prompt,
+            result: {
+              status: "error" as const,
+              text: `Error querying Galileo: ${message}`,
+              links: [],
+              rawMessages: [],
+              durationMs: 0,
+              promptVersion: prompt.version,
+            },
+          };
+        }
+      })
+    );
 
     const todayIso = new Date().toISOString().slice(0, 10);
     const html = renderHtml(todayIso, answers);
@@ -72,8 +84,8 @@ export const galileoDailyBriefing = schedules.task({
       ],
     });
 
-    // Create a Paperclip task for the CRO to review and dollarize
-    await createCroPaperclipTask(todayIso, answers);
+    // Create a Paperclip task for the CTO to triage and ship
+    await createCtoPaperclipTask(todayIso, answers);
 
     return {
       date: todayIso,
@@ -121,8 +133,9 @@ function renderHtml(date: string, answers: Array<{ prompt: GalileoPrompt; result
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:680px;margin:0 auto">
       <h1 style="font-size:20px;color:#111;margin:0 0 6px">Galileo Daily Briefing — ${esc(date)}</h1>
       <p style="font-size:13px;color:#666;margin:0 0 24px">
-        Verbatim from Galileo AI on unclemays.com. The CRO agent should post
-        revenue-impact + ownership annotations as a Paperclip task. Do not
+        Verbatim from Galileo AI on unclemays.com. The CTO agent triages and
+        ships LogRocket-driven fixes immediately; the CRO is consulted via
+        soft-notify when a fix touches marketing or advertising. Do not
         paraphrase or filter — Galileo is the source of truth.
       </p>
       ${sections}
@@ -151,19 +164,19 @@ function renderText(date: string, answers: Array<{ prompt: GalileoPrompt; result
 }
 
 /**
- * Create a Paperclip issue for the CRO to review the Galileo briefing and
- * dollarize revenue-impact issues.
+ * Create a Paperclip issue for the CTO to triage the Galileo briefing and
+ * ship LogRocket-driven fixes immediately.
  */
-async function createCroPaperclipTask(
+async function createCtoPaperclipTask(
   date: string,
   answers: Array<{ prompt: GalileoPrompt; result: GalileoResult }>
 ): Promise<void> {
   const apiUrl = process.env.PAPERCLIP_API_URL;
   const apiKey = process.env.PAPERCLIP_API_KEY;
   const companyId = process.env.PAPERCLIP_COMPANY_ID;
-  const croAgentId = process.env.PAPERCLIP_CRO_AGENT_ID;
+  const ctoAgentId = process.env.PAPERCLIP_CTO_AGENT_ID;
 
-  if (!apiUrl || !apiKey || !companyId || !croAgentId) {
+  if (!apiUrl || !apiKey || !companyId || !ctoAgentId) {
     console.warn(
       "Skipping Paperclip task creation: PAPERCLIP_* env vars not fully configured"
     );
@@ -181,9 +194,9 @@ async function createCroPaperclipTask(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        title: `Review Galileo Daily Briefing — ${date}`,
+        title: `Triage Galileo Daily Briefing — ${date}`,
         description,
-        assigneeAgentId: croAgentId,
+        assigneeAgentId: ctoAgentId,
         status: "todo",
         priority: "high",
         labels: ["galileo", "daily-briefing", "revenue-impact"],
@@ -193,11 +206,11 @@ async function createCroPaperclipTask(
     if (!response.ok) {
       const errorText = await response.text().catch(() => "");
       console.error(
-        `Failed to create Paperclip task for CRO: ${response.status} ${errorText}`
+        `Failed to create Paperclip task for CTO: ${response.status} ${errorText}`
       );
     } else {
       const issue = await response.json();
-      console.log(`Created Paperclip task for CRO: ${issue.identifier || issue.id}`);
+      console.log(`Created Paperclip task for CTO: ${issue.identifier || issue.id}`);
     }
   } catch (err) {
     console.error(`Error creating Paperclip task:`, err);
@@ -219,15 +232,15 @@ function buildPaperclipDescription(
 
   return `# Galileo Daily Briefing — ${date}
 
-Review the Galileo AI briefing below and create follow-up tasks for revenue-impacting issues.
+You (CTO) are the primary owner of LogRocket-driven fixes. Triage the briefing below and ship immediately — no CEO or board approval required for fixes Galileo recommends.
 
 For each issue Galileo flags:
-1. **Dollarize** the revenue impact (estimated $ lost per day/week if unfixed)
-2. **Assign ownership** (CTO for technical fixes, Growth & Conversion for UX/funnel, etc.)
-3. **Set priority** based on impact and effort
-4. **Create a Paperclip task** with clear acceptance criteria
+1. **Triage** — engineering fix, copy/UX, marketing-adjacent, or no action.
+2. **Ship the fix in the same turn.** Funnel and non-funnel paths both auto-ship under the LogRocket lane.
+3. **Soft-notify the CRO** via a one-line Paperclip comment when the change touches \`/\`, \`/shop\`, \`/checkout/*\`, \`/order-success\`, \`/subscribe/*\`, ad-landing variants, or analytics/pixel wiring. CRO can flag/revert if it conflicts with an active campaign.
+4. **Pull revenue impact yourself** when you need it: call \`galileo-on-demand\` directly. No need to route through the Decision Scientist.
 
-Do not paraphrase Galileo's findings — cite session URLs and preserve Galileo's language when creating tasks.
+Do not paraphrase Galileo's findings — cite session URLs and preserve Galileo's language in PR descriptions and any follow-up tasks.
 
 ---
 
