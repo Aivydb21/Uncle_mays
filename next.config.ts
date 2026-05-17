@@ -3,6 +3,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
+    // Cap device sizes at 1920. The Next.js default tops out at 3840w and is
+    // used to populate both the srcset and the bare `src` URL. Older mobile
+    // WebViews (notably Facebook/Instagram in-app browsers and some Android
+    // Chrome builds) ignore the srcset and fetch the bare `src` at the largest
+    // variant — Galileo UNC-1149 showed this caused ~3-4% of /shop sessions
+    // to time out on cellular with status 0, with 0% checkout completion in
+    // that cohort. Catalog tiles render at ≤320px CSS so 1920 is already 6×
+    // the largest displayed size at DPR=3.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     // Catalog images come from Airtable as absolute URLs on our own domain
     // (https://unclemays.com/catalog/*.jpg). Without these remotePatterns,
     // the /_next/image optimizer rejects them with INVALID_IMAGE_OPTIMIZE_REQUEST

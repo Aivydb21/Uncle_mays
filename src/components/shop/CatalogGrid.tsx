@@ -109,12 +109,19 @@ export function CatalogGrid({
         <NoResultsMessage onClear={() => setSearch("")} />
       ) : (
         <div className="space-y-10 pb-32 sm:pb-10">
-          {grouped.map(({ category, items }) => (
+          {grouped.map(({ category, items }, sectionIdx) => (
             <section key={category} id={slugForCategory(category)} className="scroll-mt-32">
               <h2 className="mb-3 text-xl font-bold text-foreground">{category}</h2>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-                {items.map((item) => (
-                  <CatalogCard key={item.sku} item={item} />
+                {items.map((item, itemIdx) => (
+                  // Preload the first row of the first section (above the fold
+                  // on every viewport). Galileo UNC-1149 showed the LCP image
+                  // request was waiting for hydration on cellular mobile.
+                  <CatalogCard
+                    key={item.sku}
+                    item={item}
+                    priority={sectionIdx === 0 && itemIdx < 6}
+                  />
                 ))}
               </div>
             </section>
@@ -285,7 +292,7 @@ function NoResultsMessage({ onClear }: { onClear: () => void }) {
   );
 }
 
-function CatalogCard({ item }: { item: CatalogItem }) {
+function CatalogCard({ item, priority = false }: { item: CatalogItem; priority?: boolean }) {
   // Track image load failures so a timed-out or 404'd image falls back to a
   // name-only tile instead of a blank muted box. Galileo 2026-05-15 daily
   // briefing flagged this gap as the #1 friction pattern (UNC-1082).
@@ -301,6 +308,7 @@ function CatalogCard({ item }: { item: CatalogItem }) {
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, (max-width: 1536px) 20vw, 16vw"
             className="object-cover"
             quality={70}
+            priority={priority}
             onError={() => setImageFailed(true)}
           />
         ) : (
