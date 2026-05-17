@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -53,14 +53,44 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
   );
 }
 
+function ShopCTASkeleton() {
+  return (
+    <section className="py-24 bg-muted/30" aria-hidden="true">
+      <div className="container px-6">
+        <div className="text-center">
+          <div className="mx-auto h-7 w-40 rounded-full bg-primary/10" />
+          <div className="mx-auto mt-6 h-10 w-72 rounded-lg bg-muted" />
+          <div className="mx-auto mt-4 h-5 w-80 max-w-full rounded bg-muted/70" />
+        </div>
+        <div className="mx-auto mt-12 grid max-w-4xl grid-cols-2 gap-4 md:grid-cols-4">
+          {[0, 1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="rounded-2xl border border-border bg-card p-4"
+            >
+              <div className="aspect-square w-full rounded-xl bg-muted" />
+              <div className="mt-3 h-4 w-3/4 rounded bg-muted" />
+              <div className="mt-2 h-3 w-1/2 rounded bg-muted/70" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 const Index = ({ productSection }: { productSection: ReactNode }) => {
+  const reduceMotion = useReducedMotion();
   return (
     <>
       <Hero />
 
       {/* Shop CTA + 4-tile catalog preview. Provided by the parent server
-          page (src/app/page.tsx) so the catalog fetch happens server-side. */}
-      <Suspense>{productSection}</Suspense>
+          page (src/app/page.tsx) so the catalog fetch happens server-side.
+          Skeleton fallback lets the initial HTML response finish immediately
+          while ShopCTA streams in — without it, a hung upstream fetch held
+          the response open and presented as a frozen page (UNC-1123). */}
+      <Suspense fallback={<ShopCTASkeleton />}>{productSection}</Suspense>
 
       {/* Real photos: a single Uncle May's box, and a market-table set of three. */}
       <section className="py-12 bg-background">
@@ -108,8 +138,10 @@ const Index = ({ productSection }: { productSection: ReactNode }) => {
               {TESTIMONIALS.map((t) => (
                 <motion.figure
                   key={t.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={
+                    reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+                  }
+                  whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.6 }}
                   className="bg-card rounded-2xl p-8 shadow-soft border border-border/50"

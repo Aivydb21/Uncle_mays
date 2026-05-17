@@ -152,6 +152,13 @@ function mapRecord(record: AirtableRecord): CatalogItemInternal | null {
   };
 }
 
+// Per-request Airtable timeout. The homepage Suspense boundary streams
+// from the server, so a hung upstream connection leaves the HTML response
+// open indefinitely — observed as a 20-minute "frozen" homepage in
+// LogRocket session 6-019e2cd1 (UNC-1123). On timeout we throw, the outer
+// fetchInternalCatalogUncached catch falls back to the on-disk snapshot.
+const AIRTABLE_FETCH_TIMEOUT_MS = 8_000;
+
 async function fetchAllRecords(): Promise<AirtableRecord[]> {
   const { pat, baseId, tableName } = getEnv();
   const out: AirtableRecord[] = [];
@@ -162,10 +169,21 @@ async function fetchAllRecords(): Promise<AirtableRecord[]> {
     );
     url.searchParams.set("pageSize", "100");
     if (offset) url.searchParams.set("offset", offset);
-    const res = await fetch(url.toString(), {
-      headers: { Authorization: `Bearer ${pat}` },
-      cache: "no-store",
-    });
+    const controller = new AbortController();
+    const timer = setTimeout(
+      () => controller.abort(),
+      AIRTABLE_FETCH_TIMEOUT_MS
+    );
+    let res: Response;
+    try {
+      res = await fetch(url.toString(), {
+        headers: { Authorization: `Bearer ${pat}` },
+        cache: "no-store",
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timer);
+    }
     if (!res.ok) {
       throw new Error(
         `Airtable catalog fetch failed: ${res.status} ${res.statusText}`
