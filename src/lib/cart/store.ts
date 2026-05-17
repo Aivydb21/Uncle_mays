@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { CartLine, FulfillmentMode } from "@/lib/catalog/types";
+import { safeLocal } from "@/lib/safe-storage";
 
 const STORAGE_KEY = "um-cart-v1";
 
@@ -76,7 +77,13 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: STORAGE_KEY,
-      storage: createJSONStorage(() => localStorage),
+      // Use safeLocal instead of raw window.localStorage. FB/IG WebViews can
+      // throw NotSupportedError or QuotaExceededError on setItem; the safe
+      // wrapper catches, falls back to in-memory for the rest of the session,
+      // and emits a cart_storage_unavailable diagnostic. Without this the
+      // exception used to halt the entire Add-to-Cart click handler. (UNC-1121
+      // follow-up after recurrence in Galileo briefing 2026-05-17.)
+      storage: createJSONStorage(() => safeLocal as unknown as Storage),
       partialize: (state) => ({
         lines: state.lines,
         fulfillmentMode: state.fulfillmentMode,

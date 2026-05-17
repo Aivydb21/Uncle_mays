@@ -5,6 +5,7 @@ import { Plus, Minus } from "lucide-react";
 import { useCartStore } from "@/lib/cart/store";
 import { sha256 } from "@/lib/browser-hash";
 import { getFbAttribution } from "@/lib/fb-attribution";
+import { trackDiagnostic } from "@/lib/diagnostics";
 import type { CatalogItem } from "@/lib/catalog/types";
 
 interface Props {
@@ -48,7 +49,19 @@ export function AddToCartButton({ item, variant = "full" }: Props) {
 
   function handleAdd() {
     const addQty = Math.max(1, Math.floor(item.defaultAddQty || 1));
-    addLine(item.sku, addQty);
+    // addLine flows through Zustand persist → safeLocal. safeLocal swallows
+    // storage exceptions, but defense-in-depth: any future change that
+    // reintroduces a throwing path must NOT kill the rest of this handler.
+    // UI bump + price cache + analytics must fire either way so the funnel
+    // signal reaches Meta + GA4 even in restricted-storage WebViews.
+    try {
+      addLine(item.sku, addQty);
+    } catch (e) {
+      trackDiagnostic("cart_add_failed", {
+        sku: item.sku,
+        error: e instanceof Error ? e.name : "unknown",
+      });
+    }
     bump();
     cachePrice();
     fireAnalytics(item, qty + addQty);
