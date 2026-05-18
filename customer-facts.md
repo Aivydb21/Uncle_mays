@@ -28,7 +28,7 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 | Delivery fee | $7.99 flat rate inside the service area. Free pickup at Polsky Center. |
 | Missed delivery policy | 100% freshness guarantee — full refund, no questions asked |
 
-> **Operational note (do not put in customer copy):** The customer-facing promise is "every day, citywide, pick your window." Real driver routing still operates against whichever subset the team can actually serve in any given week — see EXP-002 painted-door experiment (`ml/experiments/EXP-002_delivery_window_painted_door.md`). The order-confirmation email currently includes an honest-reveal note that the first delivery may ship Wednesday while we roll out every-day fulfillment; remove that caveat once daily fulfillment is fully live.
+> **Operational note (do not put in customer copy):** The customer-facing promise is "every day, in our service area, pick your window." Real driver routing still operates against whichever subset the team can actually serve in any given week — see EXP-002 painted-door experiment (`ml/experiments/EXP-002_delivery_window_painted_door.md`). The order-confirmation email currently includes an honest-reveal note that the first delivery may ship Wednesday while we roll out every-day fulfillment; remove that caveat once daily fulfillment is fully live.
 
 ---
 
@@ -71,8 +71,8 @@ Typical first-time cart lands $30–$60 (produce + one protein). No upper limit.
 | Fact | Value |
 |------|-------|
 | Tagline | Cleaner than Whole Foods. Cheaper than Aldi. |
-| Short description | Black-farmed seasonal produce, delivered across the Chicago metro area every day of the week. |
-| Who it's for | Chicago metro households (1–4 people, citywide) who want fresh, ethically sourced produce without a long-term commitment |
+| Short description | Black-farmed seasonal produce, delivered across south-side Chicago and the south suburbs, every day of the week. |
+| Who it's for | Chicago south-side and south-suburb households (1–4 people) within our service area who want fresh, ethically sourced produce without a long-term commitment |
 | Sourcing claim | Sourced directly from Run A Way Buckers Club (Pembroke, IL) and our growing network of Black farmer partners |
 | Guarantee | 100% freshness guarantee — if it's off, full refund, no questions asked |
 

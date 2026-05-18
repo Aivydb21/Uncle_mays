@@ -268,7 +268,7 @@ export function DeliveryScheduler({ value, onChange, className }: Props) {
           Pick your delivery date & time
         </h3>
         <span className="text-xs text-muted-foreground">
-          Citywide · 7 days a week
+          7 days a week
         </span>
       </div>
 

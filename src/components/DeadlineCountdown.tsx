@@ -33,7 +33,7 @@ export function DeadlineCountdown({ variant = "box" }: Props) {
         <span className="text-2xl" aria-hidden="true">📦</span>
         <div className="flex-1">
           <p className="text-sm font-semibold text-primary">
-            Citywide delivery, every day of the week
+            Delivery 7 days a week — pick your window
           </p>
           <p className="mt-1 text-xs text-muted-foreground">
             Pick the day and window that works for you when you check out.

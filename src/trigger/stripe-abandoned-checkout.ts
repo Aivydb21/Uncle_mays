@@ -212,16 +212,16 @@ Uncle May's Produce · Hyde Park, Chicago, IL
 unclemays.com · info@unclemays.com`;
   } else if (emailNumber === 2) {
     // Email 2: cutoff reminder (48h post-expiry)
-    subjectLine = "Pick your delivery day, citywide";
+    subjectLine = "Pick your delivery day & window";
     htmlContent = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="font-family:Arial,sans-serif;color:#1a1a1a;background:#fff;margin:0;padding:0;">
   <div style="max-width:600px;margin:0 auto;padding:32px 24px;">
-    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Pick your delivery day, citywide</h2>
+    <h2 style="font-size:22px;margin-bottom:16px;color:#2d7a2d;">Pick your delivery day & window</h2>
     <p style="font-size:16px;line-height:1.6;">Hi ${firstName},</p>
     <p style="font-size:16px;line-height:1.6;">
-      We now deliver across the Chicago metro every day of the week. Pick the
+      We deliver across south-side Chicago and the south suburbs, every day of the week. Pick the
       day and the time-of-day window that works for you at checkout, mornings
       through after-work.
     </p>
@@ -245,7 +245,7 @@ unclemays.com · info@unclemays.com`;
 </html>`;
     plainText = `Hi ${firstName},
 
-We now deliver across the Chicago metro every day of the week. Pick the day and the time-of-day window that works for you at checkout, mornings through after-work.
+We deliver across south-side Chicago and the south suburbs, every day of the week. Pick the day and the time-of-day window that works for you at checkout, mornings through after-work.
 
 Code FRESH10 still works on your first order ($20 minimum).
 
