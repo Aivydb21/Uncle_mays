@@ -4,21 +4,22 @@
 // delivery pages and the customer-facts.md "Service area" line both
 // derive from this list.
 //
-// Coverage as of 2026-05-09: every Chicago city ZIP in the 606xx range,
-// plus the special-case Chicago ZIPs (60290 PO Box, 60707 Galewood/Mont
-// Clare), plus the south-suburban cluster (604xx, 608xx) added in the
-// 2026-04-26 expansion. Earlier this list was south-side only; we
-// discovered during the EXP-002 painted-door rollout that customers in
-// north-side ZIPs (e.g. 60614 Lincoln Park, 60622 Wicker Park) were
-// getting "out_of_zone" at checkout because the pricing engine still
-// gated on this list. Expanded to all-Chicago to match the painted door's
-// "citywide, every day" promise.
+// Coverage as of 2026-05-18 (UNC-1180 contraction): south-side Chicago
+// ZIPs in the 606xx range plus the Loop / Near North core, the Pilsen /
+// Little Village corridor (60608, 60623) that is operationally adjacent
+// to the south-side route, the special-case PO box (60290), and the
+// south-suburban cluster (604xx, 608xx) added in the 2026-04-26
+// expansion. The north-side ZIPs added during the EXP-002 painted-door
+// rollout were removed on 2026-05-18 after Karen Straka's 60631 Edison
+// Park order had to be refunded ($61.14 lost) because the Wednesday ops
+// route cannot reach the far-north or far-west of the city. Far-west
+// ZIPs (60612 / 60624 / 60644 / 60651) were also dropped for safety.
+// CEO approved this contraction on UNC-1179 (Option 1).
 //
-// Operational note: the painted door does not commit us to fulfilling
-// every ZIP on Wednesday. Real driver routing still operates against
-// whichever subset the team can actually serve in any given week. The
-// honest-reveal copy in the order-confirmation email handles the
-// expectation gap.
+// Operational note: customers in dropped ZIPs will now receive
+// `out_of_zone` at checkout (no charge) instead of being charged and
+// later refunded. The home/shop ZIP gate uses this same list so they
+// will not enter the funnel in the first place.
 
 export const SERVICE_AREA_ZIPS: readonly string[] = [
   // Chicago city — Loop / Near North / River North
@@ -35,34 +36,9 @@ export const SERVICE_AREA_ZIPS: readonly string[] = [
   "60610", // Old Town, Near North, Cabrini
   "60642", // West Town, Noble Square
 
-  // Chicago city — North side
-  "60613", // Lakeview, Wrigleyville
-  "60614", // Lincoln Park
-  "60618", // North Center, Roscoe Village, Avondale
-  "60622", // Wicker Park, Bucktown, Ukrainian Village
-  "60625", // Lincoln Square, Albany Park, Ravenswood
-  "60626", // Rogers Park
-  "60630", // Jefferson Park, Forest Glen, Norwood Park East
-  "60631", // Edison Park, Norwood Park, O'Hare
-  "60634", // Belmont Cragin, Dunning, Portage Park
-  "60639", // Belmont Cragin, Hermosa
-  "60640", // Uptown, Sheridan Park
-  "60641", // Hermosa, Logan Square, Belmont Cragin
-  "60645", // West Ridge, West Rogers Park
-  "60646", // Forest Glen, Sauganash, North Park
-  "60647", // Logan Square, Bucktown
-  "60656", // Norwood Park, O'Hare
-  "60657", // Lakeview, Boystown
-  "60659", // West Ridge, North Park
-  "60660", // Edgewater, Andersonville
-
-  // Chicago city — West side
+  // Chicago city — West side (ops-adjacent to south-side route)
   "60608", // Pilsen, Heart of Chicago, Lower West Side
-  "60612", // East / West Garfield Park, West Town
   "60623", // Little Village, North Lawndale
-  "60624", // West Garfield Park, East Garfield Park
-  "60644", // Austin
-  "60651", // Humboldt Park, Austin
   "60707", // Galewood, Mont Clare
 
   // Chicago city — South + Southeast (all 606xx)

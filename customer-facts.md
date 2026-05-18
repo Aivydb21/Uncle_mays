@@ -4,7 +4,7 @@
 > Website, emails, ads, Mailchimp campaigns, and agent-generated copy must match this doc.
 > If any of these facts change, update this file FIRST, then propagate to every surface.
 
-**Last updated:** 2026-05-10 (citywide every-day delivery, customer-picked window)
+**Last updated:** 2026-05-18 (service area contracted to south-side + Loop + Pilsen corridor; north and far-west Chicago ZIPs removed per UNC-1180)
 **Owner:** Anthony Ivy
 
 ---
@@ -24,7 +24,7 @@ Produce is supplied by our farmer partner **Run A Way Buckers Club (Pembroke, IL
 | Delivery cadence | **Every day, 7 days a week** (Mon–Sun) |
 | Delivery window | **Customer picks at checkout** — Morning (8am–11am), Midday (11am–2pm), Afternoon (2pm–5pm), or Evening (5pm–8pm), all CT |
 | Order cutoff | **No weekly cutoff.** Customer chooses any delivery date at checkout. Earliest delivery: tomorrow. Booking horizon: 30 days. |
-| Service area | **Entire Chicago metro** — every Chicago city ZIP (all 606xx, plus 60290 and 60707) plus the south-suburban cluster (Blue Island, Calumet City, Chicago Heights, Dolton, Flossmoor, Harvey, Hazel Crest, Homewood, Lansing, Markham, Matteson, Olympia Fields, Posen, Richton Park, Riverdale, South Holland). Authoritative ZIP list: [`src/lib/service-area.ts`](./src/lib/service-area.ts). |
+| Service area | **South-side Chicago + Loop / Near North + Pilsen / Little Village corridor + south suburbs.** Includes the Loop and Near North core (60601–60607, 60610, 60611, 60642, 60654, 60661), the Pilsen / Little Village corridor (60608, 60623), Galewood/Mont Clare (60707), the south-side 606xx range (60609, 60615–60617, 60619–60621, 60628, 60629, 60632, 60633, 60636–60638, 60643, 60649, 60652, 60653, 60655), the 60290 PO box, and the south-suburban cluster (Blue Island, Calumet City, Chicago Heights, Dolton, Flossmoor, Harvey, Hazel Crest, Homewood, Lansing, Markham, Matteson, Olympia Fields, Posen, Richton Park, Riverdale, South Holland). **North-side ZIPs and far-west ZIPs (Lincoln Park, Lakeview, Edison Park, Austin, etc.) are NOT in the service area** as of 2026-05-18 (UNC-1180). Authoritative ZIP list: [`src/lib/service-area.ts`](./src/lib/service-area.ts). |
 | Delivery fee | $7.99 flat rate inside the service area. Free pickup at Polsky Center. |
 | Missed delivery policy | 100% freshness guarantee — full refund, no questions asked |
 
