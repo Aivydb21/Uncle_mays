@@ -1,94 +1,50 @@
 # Uncle May's Produce, Chicago Flagship
 
-*Single-asset, SBA-leveraged, operator-led grocery deal. $400K preferred equity raise.*
+**Single-asset, SBA-leveraged, operator-led grocery deal. $400K preferred equity raise.**
+*Confidential and Proprietary, May 2026*
 
-**Confidential and Proprietary, May 2026**
+### Investment Highlights
+- **Proven $8M+ revenue location**, three consecutive years at this Hyde Park, Chicago address. Not a greenfield bet.
+- **$2,007K SBA 7(a) facility** from Busey Bank, conditionally approved. Equity tranche close activates senior debt.
+- **University of Chicago anchor:** $100K TI commitment plus Polsky and Rustandy referral paths.
+- **Named operator team:** GM with two prior Chicago grocery exits; CFO with 20+ years IB and M&A at BofA; CEO with PE/M&A background, Booth MBA.
+- **Clean preferred structure:** 8 to 10 percent accruing pref, 3.0 to 3.2x cash-on-cash sweep, no participation, no ratchets, no conversion.
+- **Base case 23.3 percent IRR / 2.5x CoC** at the asset level, 4.8x stabilized DSCR, revenue held flat from Year 4.
 
----
+### Deal Snapshot
+| | | | |
+|---|---|---|---|
+| **Asset** | Hyde Park, Chicago, 10,000 sq ft | **Senior debt** | $2,007K SBA 7(a), Busey (conditional) |
+| **Site revenue history** | $8M+ annual, three consecutive years | **Equity raise** | $400K preferred (min to activate SBA) |
+| **Hold** | Ten-year operating | **UChicago TI commitment** | $100K, secured |
+| **Sector** | Specialty / cultural grocery retail | **Total capitalization** | $2,507K |
+| **Operator-CEO** | Anthony Ivy, Booth MBA, prior PE / M&A | **Minimum check** | $25K |
 
-## Deal Snapshot
+### Sources and Uses ($K)
+| Sources | $K | | Uses | $K |
+|---|---|---|---|---|
+| SBA 7(a) senior debt | 2,007 | | Initial store build-out | 1,460 |
+| Preferred equity (this raise) | 400 | | Soft costs (A&E, permits, legal) | 445 |
+| UChicago TI commitment | 100 | | SG&A operating reserve | 417 |
+| | | | Initial inventory | 250 |
+| | | | Pre-opening expenses | 60 |
+| | | | Initial AP offset | (125) |
+| **Total** | **2,507** | | **Total** | **2,507** |
 
-| | |
-|---|---|
-| **Type** | Self-funded searcher, single-asset operating deal |
-| **Sector** | Specialty / cultural grocery retail |
-| **Asset** | Hyde Park, Chicago, 10,000 sq ft, transit-connected |
-| **Site revenue history** | $8M+ annual at this address for three consecutive years |
-| **Hold** | Ten-year operating hold |
-| **Operator-CEO** | Anthony Ivy, Chicago Booth MBA, prior PE and M&A |
-| **General Manager** | Matt Weschler, two prior Chicago grocery exits |
-| **Senior debt** | $2,007K SBA 7(a), Busey Bank, conditional approval in place |
-| **Equity to raise** | $400K preferred (minimum to activate SBA) |
-| **Additional equity-equivalent** | $100K University of Chicago tenant improvement commitment |
-| **Total capitalization** | $2,507K |
-
----
-
-## Capital Structure
-
-| Source | $K | Comment |
-|---|---|---|
-| SBA 7(a) senior | 2,007 | Conditional approval, Busey Bank |
-| Preferred equity (target) | 400 to 750 | $400K minimum activates SBA; $750K target provides operating depth |
-| UChicago TI commitment | 100 | Already secured |
-| **Total** | **2,507 to 2,857** | |
-
-**Preferred terms (clean, operator-aligned):**
-
-- 8 to 10 percent accruing preferred return, non-mandatory cash pay
-- Distributable cash flow swept to investors until cumulative realized cash return of 3.0 to 3.2x invested capital
-- After threshold: sweep terminates, residual equity continues pro rata
-- No participating preferred, no ratchets, no conversion mechanics
-
----
-
-## Returns (single-asset base case)
-
+### Returns (single-asset, asset-level)
 | Scenario | Horizon | IRR | Cash-on-Cash |
 |---|---|---|---|
 | Conservative | 5-year | 18.4% | 1.8x |
 | Base | 10-year | 23.3% | 2.5x |
-| Upside (regional cluster, externally capitalized) | 7-year | 80%+ / 35x+ (sensitivity, not base case) | |
 
-**Coverage and discipline**
+Upside sensitivity (3 to 5 unit regional cluster, externally capitalized): 80%+ IRR / 35x+ CoC over 7 years. Sensitivity only, not base case. DSCR 4.9x Y1 / 4.8x stabilized. Margin expansion is sourcing-driven (COGS 70.5 to 64.9 percent via direct sourcing and private label).
 
-- DSCR 4.9x in Year 1, stabilizes at 4.8x
-- Revenue held flat from Year 4 onward (no aggressive same-store-sales assumption)
-- Margin expansion is sourcing-driven (COGS compresses 70.5 to 64.9 percent via direct sourcing and private label, not pricing)
+### Why It Underwrites
+Existing $8M+ revenue location with refrigeration and infrastructure in place; only 40 percent of footprint utilized today. Hyde Park demographic underserved by culturally aligned grocery, transit-connected. SBA conditional commitment in place. Single-asset concentration mitigated by three years of site revenue. Operator execution mitigated by a named GM with two prior Chicago grocery exits and an IB-trained CFO. Construction overrun mitigated by $417K SG&A reserve and SBA-supervised draw schedule.
 
----
+### Process
+Decision sought by **2026-06-15** to align with SBA equity tranche close. Target close Q3 2026. Diligence package under NDA: pitchbook, 18-page unit model, sources and uses, SBA conditional commitment letter, lease term sheet.
 
-## Why the Asset Underwrites
+**Anthony Ivy**, Founder and CEO  ·  anthony@unclemays.com  ·  (312) 972-2595
 
-- **Existing $8M+ revenue location**, not a greenfield bet. Refrigeration, mechanical, and infrastructure already in place.
-- **40 percent currently utilized**, providing meaningful selling-area expansion within the existing footprint.
-- **Hyde Park demographic** is underserved by culturally aligned grocery; transit-connected with high foot traffic.
-- **Named, experienced GM** in Matt Weschler, with two prior Chicago grocery exits and current GM experience at Wild Onion.
-- **SBA conditional commitment** in place; equity tranche close activates the senior facility.
-- **University of Chicago institutional support** through the Polsky Center and Rustandy Center, plus the $100K tenant improvement commitment.
-
----
-
-## Why This Operator
-
-Anthony Ivy, Booth MBA, prior PE and M&A. Ten-year operating commitment to the asset, with personal guarantee posture consistent with SBA 7(a) underwriting. Surrounded by a category-relevant team: Jua Mitchell, CFO (20+ years investment banking and M&A at Bank of America, Booth MBA); Matt Weschler, GM (two prior Chicago grocery exits); plus operations and marketing advisors with prior Amazon Retail ($3B P&L) and Unilever / P&G global marketing experience.
-
----
-
-## Process
-
-- Decision sought by **2026-06-15** to align with the SBA equity tranche close timeline.
-- Full pitchbook, unit model (18-page institutional financial model), sources and uses, and SBA conditional commitment letter available under NDA.
-- Polsky Center and Rustandy Center referral paths confirmed.
-
----
-
-## Contact
-
-**Anthony Ivy**, Founder and CEO
-anthony@unclemays.com
-(312) 972-2595
-
----
-
-*This one-pager is confidential and proprietary. It is provided solely for the purpose of evaluating a potential investment in Uncle May's Produce LLC. By accepting this document, the recipient agrees to maintain the confidentiality of the information contained herein.*
+*Confidential and proprietary. Provided solely for the purpose of evaluating a potential investment in Uncle May's Produce LLC. Does not constitute an offer to sell or a solicitation of an offer to buy any security. Any such offer or solicitation will be made only by means of definitive offering documents.*
