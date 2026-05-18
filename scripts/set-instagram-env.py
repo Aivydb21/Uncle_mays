@@ -13,8 +13,11 @@ Usage:
 import argparse
 import json
 import os
+import shutil
 import subprocess
 import sys
+
+VERCEL_BIN = shutil.which("vercel") or shutil.which("vercel.cmd") or "vercel"
 
 IG_CONFIG = os.path.expanduser("~/.claude/instagram-config.json")
 META_CONFIG = os.path.expanduser("~/.claude/meta-config.json")
@@ -62,7 +65,7 @@ def vercel_set(name, value, env):
     """
     try:
         subprocess.run(
-            ["vercel", "env", "rm", name, env, "--yes"],
+            [VERCEL_BIN, "env", "rm", name, env, "--yes"],
             capture_output=True,
             text=True,
             timeout=30,
@@ -71,7 +74,7 @@ def vercel_set(name, value, env):
         pass
 
     result = subprocess.run(
-        ["vercel", "env", "add", name, env],
+        [VERCEL_BIN, "env", "add", name, env],
         input=value,
         capture_output=True,
         text=True,
