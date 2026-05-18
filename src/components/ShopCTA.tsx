@@ -39,14 +39,14 @@ export async function ShopCTA() {
     <section id="boxes" className="py-24 bg-muted/30 relative" style={{ zIndex: 1 }}>
       <div className="container px-6">
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-6">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-8">
             Build Your Own Box
           </div>
           <Link
             href="/shop"
             className="inline-block transition-opacity hover:opacity-80"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
               Shop the catalog
             </h2>
           </Link>
