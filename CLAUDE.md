@@ -562,6 +562,75 @@ curl "https://graph.facebook.com/v21.0/{page-id}/posts?access_token=$META_TOKEN"
 curl "https://graph.facebook.com/v21.0/act_{ad-account-id}/insights?access_token=$META_TOKEN"
 ```
 
+## Instagram API with Instagram Login (ACTIVE as of 2026-05-18)
+
+> **This is a SEPARATE auth flow from the Meta/Facebook config above.** The Instagram API with Instagram Login uses `IGAA…`-prefixed tokens issued directly by `graph.instagram.com`, not by `graph.facebook.com`. Do not mix them. Use this for **organic Instagram posting** to `@unclemaysproduce`. The Meta config above is still used for ad campaigns, Facebook Page management, and Meta Pixel / CAPI.
+
+- **Config:** `~/.claude/instagram-config.json` (app ID, app secret, long-lived access token, IG user ID, account metadata, current permissions)
+- **Base URL:** `https://graph.instagram.com/v21.0`
+- **Auth:** Long-lived bearer token, 60-day expiry, refreshable any time after 24h via `GET /refresh_access_token` (each refresh extends 60 days from the refresh date)
+- **App ID:** `1013355604610346`
+- **Account:** `@unclemaysproduce` (BUSINESS type)
+- **Instagram User ID:** `17841476675230743` (used for `/me/media` and `/me/media_publish` posting endpoints)
+- **App-scoped ID:** `26798938846412829`
+- **Permissions granted (all 5):** `instagram_business_basic`, `instagram_business_content_publish`, `instagram_business_manage_comments`, `instagram_business_manage_messages`, `instagram_business_manage_insights`
+- **Token expiry:** Tracked in config under `token_expires_at`. Auto-refresh runs monthly via Trigger.dev task `instagram-token-refresh` ([src/trigger/instagram-token-refresh.ts](src/trigger/instagram-token-refresh.ts)).
+
+### Env vars (required for Trigger.dev tasks and Next.js runtime)
+
+Both Vercel (Next.js + API routes) and Trigger.dev (worker tasks) need these — they are separate env-var systems:
+
+```
+INSTAGRAM_ACCESS_TOKEN=IGAA...
+INSTAGRAM_USER_ID=17841476675230743
+INSTAGRAM_APP_ID=1013355604610346
+INSTAGRAM_APP_SECRET=362ac026184aec33fa11c0d517d401e0
+```
+
+### Instagram API Usage
+
+```bash
+# Verify the active token
+curl "https://graph.instagram.com/v21.0/me?fields=id,username,account_type,user_id&access_token=$IG_TOKEN"
+
+# Refresh long-lived token (run >=24h after issue; extends 60d from refresh date)
+curl "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=$IG_TOKEN"
+
+# Post a single image (two steps: create container, then publish)
+curl -X POST "https://graph.instagram.com/v21.0/17841476675230743/media" \
+  -d "image_url=https://unclemays.com/social/example.jpg" \
+  -d "caption=Caption text" \
+  -d "access_token=$IG_TOKEN"
+# returns {"id": "CONTAINER_ID"}; wait for status_code=FINISHED, then:
+curl -X POST "https://graph.instagram.com/v21.0/17841476675230743/media_publish" \
+  -d "creation_id=CONTAINER_ID" -d "access_token=$IG_TOKEN"
+```
+
+### Helper script
+
+`scripts/post-to-instagram.py` is the canonical CLI for posting:
+
+```bash
+py scripts/post-to-instagram.py --whoami
+py scripts/post-to-instagram.py --refresh-token
+py scripts/post-to-instagram.py --image-url <https-url> --caption "..."
+py scripts/post-to-instagram.py --carousel <url1> <url2> ... --caption "..."
+py scripts/post-to-instagram.py --reel-url <https-url> --caption "..."
+py scripts/post-to-instagram.py --image-url <url> --caption "..." --also-facebook
+```
+
+The `--also-facebook` flag cross-posts the same image and caption to the Uncle May's Facebook Page (`755316477673748`) using the existing Meta config.
+
+### Instagram Integration Rules
+
+- **Media must be at a public HTTPS URL.** Instagram does not accept binary uploads; their servers fetch the URL. Upload to Vercel Blob, S3, or `/public/social/` on unclemays.com before posting.
+- **Container readiness.** After creating a container, poll `GET /{container-id}?fields=status_code` until `status_code=FINISHED` (images: ~3-10s; reels: up to 60s). Do not call `media_publish` against a non-FINISHED container.
+- **Monthly auto-refresh.** [src/trigger/instagram-token-refresh.ts](src/trigger/instagram-token-refresh.ts) runs on the 1st of every month at 09:00 CT. It refreshes the token via the IG Graph API, then emails the new token to `anthony@unclemays.com` via `sendInternalAlert` for manual paste into Vercel + Trigger.dev env vars. The notification is the source of truth for the new token; if the email is missed the existing token still works for ~30 more days (60-day rolling buffer).
+- **Use the helper module, not raw `fetch`.** All TypeScript callers should use [src/lib/instagram.ts](src/lib/instagram.ts) for `postSingleImage`, `postCarousel`, `postReel`, `refreshAccessToken`, and `whoami`. The helper handles container polling, retries, and error normalization.
+- **Posting is CRO-at-will, audit trail only.** Per the standing order, organic posting to owned Instagram is CRO-at-will (no board approval). File a Paperclip issue describing the post + expected impact for the audit trail.
+
+
+
 ## Google Ads API
 
 - **Config:** `~/.claude/google-ads-config.json` (developer token + OAuth client + refresh token + customer ID)
