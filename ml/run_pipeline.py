@@ -20,7 +20,6 @@ from ml.ingest import (
     bigquery_stripe_loader,
     census,
     checkout_store,
-    clarity,
     google_ads,
     mailchimp,
     meta_ads,
@@ -38,7 +37,6 @@ def main() -> None:
     p.add_argument("--skip-census", action="store_true")
     p.add_argument("--skip-meta-ads", action="store_true")
     p.add_argument("--skip-google-ads", action="store_true")
-    p.add_argument("--skip-clarity", action="store_true")
     p.add_argument("--skip-airtable", action="store_true")
     p.add_argument("--skip-bq-load", action="store_true",
                    help="Skip loading parquets to BigQuery warehouse")
@@ -62,8 +60,6 @@ def main() -> None:
         steps.append(("meta_ads", meta_ads.extract))
     if not args.skip_google_ads:
         steps.append(("google_ads", google_ads.extract))
-    if not args.skip_clarity:
-        steps.append(("clarity", clarity.extract))
     if not args.skip_airtable:
         steps.append(("airtable", airtable_ingest.extract))
 

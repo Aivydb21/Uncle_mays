@@ -36,7 +36,11 @@ def extract(path: str | Path | None = None) -> Path:
         or DEFAULT_PATH
     ).resolve()
     if not target.exists():
-        raise FileNotFoundError(f"checkout-sessions.json not found at {target}")
+        print(f"[checkout_store] WARN: {target} not found — writing 0-row parquet (Vercel-ephemeral; Stripe is the spine)")
+        df = pl.DataFrame(schema={"session_id": pl.Utf8})
+        out = raw_path("checkout_store")
+        df.write_parquet(out)
+        return out
 
     raw = json.loads(target.read_text())
     sessions = raw.get("sessions", [])

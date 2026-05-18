@@ -45,16 +45,12 @@ THRESHOLDS: list[tuple[str, float, str]] = [
     ("airtable_catalog", 26, "daily"),
     ("airtable_pickup_slots", 26, "daily"),
     ("airtable_suppliers", 26, "daily"),
-    # Clarity — daily
-    ("clarity_url_metrics", 26, "daily"),
     # Ads — daily
     ("google_ads_campaign_insights", 26, "daily"),
     ("meta_campaign_insights", 26, "daily"),
     ("meta_campaigns", 26, "daily"),
     # Resend — daily
     ("resend_emails", 26, "daily"),
-    # Checkout store — daily
-    ("checkout_store", 26, "daily"),
     # Census ACS — weekly (8 days = 192h)
     ("census_acs_zip", 192, "weekly +1day buffer"),
 ]
