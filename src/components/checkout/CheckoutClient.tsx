@@ -9,6 +9,7 @@ import { Loader2 } from "lucide-react";
 import { useHydratedCart, useCartStore, useCartHydrated } from "@/lib/cart/store";
 import { getUTMParams } from "@/lib/utm";
 import { useAddressAutocomplete } from "@/hooks/use-address-autocomplete";
+import { WaitlistCapture } from "@/components/WaitlistCapture";
 import { formatCents } from "@/lib/format";
 import { MIN_SUBTOTAL_CENTS } from "@/lib/cart-pricing-constants";
 import { sha256, hashPhone } from "@/lib/browser-hash";
@@ -254,15 +255,26 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
     if (address.zip) setShippingZip(address.zip);
   }, [address.zip, setShippingZip]);
 
+  // UNC-1211: Coerce 1-4 digit partial ZIPs to "" so /api/cart/quote
+  // does not fire on every keystroke (which returned 400 missing_zip
+  // and flickered the error message while the user typed "6" / "60" /
+  // "606" / "6061" before the full "60619"). Only complete (5-digit)
+  // or empty ZIPs reach the API. Backspacing past 5 digits also lands
+  // here, so the user gets one stable error state rather than four.
+  const quoteShippingZip = useMemo(() => {
+    const raw = (address.zip || cartShippingZip || "").trim();
+    return /^\d{1,4}$/.test(raw) ? "" : raw;
+  }, [address.zip, cartShippingZip]);
+
   const cartFingerprint = useMemo(
     () =>
       JSON.stringify({
         lines: lines.map((l) => [l.sku, l.quantity]),
         fulfillmentMode,
-        zip: address.zip || cartShippingZip,
+        zip: quoteShippingZip,
         promoCode,
       }),
-    [lines, fulfillmentMode, address.zip, cartShippingZip, promoCode]
+    [lines, fulfillmentMode, quoteShippingZip, promoCode]
   );
 
   useEffect(() => {
@@ -278,7 +290,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
       body: JSON.stringify({
         cart: lines,
         fulfillmentMode,
-        shippingZip: address.zip || cartShippingZip,
+        shippingZip: quoteShippingZip,
         promoCode,
       }),
     })
@@ -300,7 +312,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
     return () => {
       cancelled = true;
     };
-  }, [cartFingerprint, lines, fulfillmentMode, address.zip, cartShippingZip, promoCode]);
+  }, [cartFingerprint, lines, fulfillmentMode, quoteShippingZip, promoCode]);
 
   const addressInputRef = useAddressAutocomplete((parsed) => {
     setAddress((cur) => ({
@@ -637,6 +649,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
           <MobileCollapsibleSummary
             pricing={pricing}
             loading={pricingLoading}
+            userZip={address.zip || cartShippingZip || ""}
             onScrollToZip={() => scrollAndFocus("checkout-zip")}
             onSelectPickup={() => {
               setFulfillmentMode("pickup");
@@ -795,6 +808,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
         <OrderSummary
           pricing={pricing}
           loading={pricingLoading}
+          userZip={address.zip || cartShippingZip || ""}
           onScrollToZip={() => scrollAndFocus("checkout-zip")}
           onSelectPickup={() => {
             setFulfillmentMode("pickup");
@@ -866,11 +880,13 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
 function MobileCollapsibleSummary({
   pricing,
   loading,
+  userZip,
   onScrollToZip,
   onSelectPickup,
 }: {
   pricing: PricingResponse | null;
   loading: boolean;
+  userZip?: string;
   onScrollToZip?: () => void;
   onSelectPickup?: () => void;
 }) {
@@ -896,13 +912,38 @@ function MobileCollapsibleSummary({
             ? "Add more items to reach $20"
             : "Calculating…";
 
+  // UNC-1211: when the header subtitle is "Add ZIP to see total", users
+  // tap the text expecting the ZIP input to focus — but the header just
+  // toggled the expand/collapse state, leaving them stuck. Route the tap
+  // through onScrollToZip in that state. Same for the out-of-zone "Switch
+  // to pickup" subtitle — that hint is only useful if tapping it actually
+  // switches the mode for them.
+  const missingZip =
+    Boolean(pricing && !pricing.ok && pricing.code === "missing_zip");
+  const outOfZone =
+    Boolean(pricing && !pricing.ok && pricing.code === "out_of_zone");
+  const headerAction =
+    missingZip && onScrollToZip
+      ? onScrollToZip
+      : outOfZone && onSelectPickup
+        ? onSelectPickup
+        : () => setOpen((v) => !v);
+  const headerHint =
+    missingZip && onScrollToZip
+      ? "Add ZIP ↓"
+      : outOfZone && onSelectPickup
+        ? "Pickup →"
+        : open
+          ? "Hide"
+          : "Show details";
+
   return (
     <div className="rounded-xl border border-border bg-card shadow-soft">
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={headerAction}
         className="flex w-full items-center justify-between gap-3 p-4 text-left"
-        aria-expanded={open}
+        aria-expanded={!missingZip && !outOfZone ? open : undefined}
       >
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
@@ -911,7 +952,7 @@ function MobileCollapsibleSummary({
           <p className="text-base font-bold text-foreground">{headerSubtitle}</p>
         </div>
         <span className="text-sm font-semibold text-primary">
-          {open ? "Hide" : "Show details"}
+          {headerHint}
         </span>
       </button>
       {open && (
@@ -920,6 +961,7 @@ function MobileCollapsibleSummary({
             pricing={pricing}
             loading={loading}
             compact
+            userZip={userZip}
             onScrollToZip={onScrollToZip}
             onSelectPickup={onSelectPickup}
           />
@@ -1238,12 +1280,16 @@ function OrderSummary({
   pricing,
   loading,
   compact,
+  userZip,
   onScrollToZip,
   onSelectPickup,
 }: {
   pricing: PricingResponse | null;
   loading: boolean;
   compact?: boolean;
+  // UNC-1211: pass the user's ZIP through so the out-of-zone branch
+  // can attach it to the waitlist signup (tag becomes `zip-<NYC ZIP>`).
+  userZip?: string;
   // UNC-1117: Galileo flagged dead-clicks on the static "Enter a valid ZIP…"
   // message in this slot. When provided, the missing_zip / out_of_zone
   // messages render as buttons that jump to the ZIP input or switch the
@@ -1323,15 +1369,31 @@ function OrderSummary({
               {pricing.message} <span aria-hidden="true">↓</span>
             </button>
           ) : pricing.code === "out_of_zone" && onSelectPickup ? (
-            <div className="space-y-2">
+            // UNC-1211: out-of-zone customers (e.g. NYC 10468) previously
+            // got a dead-end "We don't deliver there yet" + a pickup button
+            // that's only useful if they're geographically near Hyde Park.
+            // Pair the pickup CTA with a waitlist signup so far-out-of-zone
+            // users have a path that doesn't end with them deleting their
+            // cart and bouncing.
+            <div className="space-y-3">
               <p className="text-sm text-muted-foreground">{pricing.message}</p>
               <button
                 type="button"
                 onClick={onSelectPickup}
                 className="inline-flex h-9 items-center rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
               >
-                Switch to free pickup
+                Switch to free Hyde Park pickup
               </button>
+              <div className="rounded-md border border-border bg-muted/30 p-3">
+                <p className="text-xs font-semibold text-foreground">
+                  Not near Chicago?
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Drop your email and we&apos;ll let you know when we deliver to
+                  {userZip ? ` ${userZip}` : " your area"}.
+                </p>
+                <WaitlistCapture zip={userZip || "unknown"} />
+              </div>
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">{pricing.message}</p>
