@@ -31,6 +31,8 @@ export const galileoIncidentAlert = schedules.task({
   id: "galileo-incident-alert",
   // Every 30 minutes
   cron: "*/30 * * * *",
+  // Galileo polling can take up to 10 min (30 polls × 20s); match galileo-on-demand budget
+  maxDuration: 660,
   run: async () => {
     const started = Date.now();
     const timestamp = new Date().toISOString();
