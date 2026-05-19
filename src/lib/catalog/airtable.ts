@@ -86,7 +86,17 @@ function getEnv() {
 function asString(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
+  if (trimmed.length === 0) return null;
+  // Defend against Airtable text cells that literally contain the strings
+  // "null" or "undefined" (a not-uncommon copy-paste artifact). Without this
+  // normalization, downstream code that uses a truthy check on imageUrl will
+  // pass "null" through, the catalog tile renders <img src="null">, and the
+  // browser resolves that to /<current-path>/null returning a 404 — observed
+  // as the /null and /subscribe/null 404 cluster in LogRocket session
+  // 6-019e3cac-5ae6-7927-85e0-b4005dbdc02e (Galileo, UNC-1202).
+  const lowered = trimmed.toLowerCase();
+  if (lowered === "null" || lowered === "undefined") return null;
+  return trimmed;
 }
 
 function asNumber(value: unknown): number | null {
@@ -100,6 +110,20 @@ function asNumber(value: unknown): number | null {
 
 function asBoolean(value: unknown): boolean {
   return value === true;
+}
+
+// Last-line defense against an imageUrl that would render as a broken image
+// or 404. Only relative paths beginning with "/" or absolute http(s) URLs are
+// allowed; anything else (a stray identifier, the literal string "null", a
+// data: URL, etc.) becomes null so the catalog tile falls back to the name
+// placeholder instead of firing a 404 request. Pairs with the asString()
+// normalization above and the readSnapshot() re-normalization below
+// (UNC-1202).
+function normalizeImageUrl(value: string | null | undefined): string | null {
+  if (!value) return null;
+  if (value.startsWith("/")) return value;
+  if (value.startsWith("http://") || value.startsWith("https://")) return value;
+  return null;
 }
 
 function mapRecord(record: AirtableRecord): CatalogItemInternal | null {
@@ -137,9 +161,12 @@ function mapRecord(record: AirtableRecord): CatalogItemInternal | null {
     costCents: Math.round(costCents),
     active,
     availableQty: asNumber(f.AvailableQty),
-    imageUrl:
+    imageUrl: normalizeImageUrl(
       SKU_IMAGE_OVERRIDES[sku] ??
-      (LOCAL_CATALOG_IMAGE_SKUS.has(sku) ? `/catalog/${sku}.jpg` : asString(f.ImageURL)),
+        (LOCAL_CATALOG_IMAGE_SKUS.has(sku)
+          ? `/catalog/${sku}.jpg`
+          : asString(f.ImageURL)),
+    ),
     sortOrder: asNumber(f.SortOrder) ?? 999,
     taxCategory,
     freshnessLabel: asString(f.FreshnessLabel),
@@ -200,7 +227,14 @@ function readSnapshot(): CatalogItemInternal[] | null {
   try {
     const raw = fs.readFileSync(SNAPSHOT_PATH, "utf-8");
     const parsed = JSON.parse(raw) as CatalogItemInternal[];
-    return Array.isArray(parsed) ? parsed : null;
+    if (!Array.isArray(parsed)) return null;
+    // Re-run the imageUrl normalizer on snapshot data so a snapshot written
+    // before the UNC-1202 fix can't leak a literal "null" string back to the
+    // tile renderer. Cheap pass — one allocation per record.
+    return parsed.map((item) => ({
+      ...item,
+      imageUrl: normalizeImageUrl(item.imageUrl),
+    }));
   } catch {
     return null;
   }
@@ -239,7 +273,7 @@ async function fetchInternalCatalogUncached(): Promise<CatalogItemInternal[]> {
 
 const getInternalCatalogCached = unstable_cache(
   fetchInternalCatalogUncached,
-  ["catalog-internal-v8-photo-overrides"],
+  ["catalog-internal-v9-imageurl-null-guard"],
   { revalidate: CATALOG_REVALIDATE_SECONDS, tags: [CATALOG_TAG] }
 );
 
