@@ -59,8 +59,7 @@ Typical first-time cart lands $30–$60 (produce + one protein). No upper limit.
 
 - **Build-your-own catalog only.** No fixed Spring Box / Full Harvest Box / Community Box. No subscription tier.
 - **$20 minimum** cart. Customers under $20 see a "add a few more items to reach $20" gate at the cart drawer; checkout is blocked.
-- **`FRESH10`** is the primary promo code: $10 off the first order ($20 minimum). Customer enters it in the cart drawer or on the checkout page; we do **not** auto-apply it from `?promo=` URL params anymore.
-- **`FRESH30`** is the social-ask promo on `/ask` (35% off, capped). Both codes can coexist; they are separate Stripe coupons in `src/lib/promo.ts`.
+- **No active promo codes** as of 2026-05-18. Catalog prices are the prices customers pay. `ACTIVE_PROMOS` in `src/lib/promo.ts` is empty; the promo-input UI is removed from the cart drawer and the FRESH10 callouts are gone from the Hero, /shop header, and homepage ShopCTA. To re-introduce a promo: add an entry to `ACTIVE_PROMOS`, surface the entry point in the cart drawer or a banner, and update this doc in the same change.
 - Customer-facing display rule: portion size is shown in the unit label on every catalog card (e.g. "$2.50 / 1/4 lb"). The customer-facing visual is the AI-generated portion photo at `/catalog/{sku}.jpg`.
 - Doina has a **grandfathered $55/wk subscription** through Stripe directly. She is the only active subscription customer; we are not signing up new subscriptions until further notice.
 
@@ -124,7 +123,7 @@ Every claim on these pages must match this doc. Files marked DELETED were remove
 - `src/trigger/order-confirmation.ts`
 - `src/trigger/abandoned-checkout.ts`
 - `src/trigger/stripe-abandoned-checkout.ts`
-- `src/lib/promo.ts` (FRESH10, FRESH30 entries)
+- `src/lib/promo.ts` (`ACTIVE_PROMOS` is empty as of 2026-05-18 — no codes grant a discount)
 - DELETED: `src/lib/products.ts` (legacy fixed-box catalog)
 - DELETED: `src/app/checkout/[product]/*` (legacy per-box checkout, now redirects to /shop)
 - DELETED: `src/app/subscribe/[product]/*` (legacy subscription flow)
@@ -141,8 +140,8 @@ Every claim on these pages must match this doc. Files marked DELETED were remove
 - ❌ "Choice of protein included" / "chicken included with the box" / any in-box protein claim. Protein is a separate catalog SKU.
 - ❌ Old per-lb produce prices: $9.38/lb asparagus, $10/lb kale, $5.63/lb sweet potato, $39.38 whole chicken. These were deprecated when portions were right-sized 2026-05-03.
 - ❌ Collards, tomatoes, cucumbers, strawberries, zucchini, snap peas, beets, spring onions, shishito peppers, eggplant, turnips, broccoli florets (not in current RAB supply). **Ramps and microgreens are now in the catalog** (added 2026-05-03), so the old "no ramps" rule is retired.
-- ❌ `WELCOME20`, `LAUNCH20`, `FREESHIP`, "$30 first order" / "Starter Box from $30" / "First box from $30". Only `FRESH10` and `FRESH30` are live.
-- ❌ Auto-applied promo codes via `?promo=CODE` URL params. The customer must type the code in the cart drawer or on /checkout.
+- ❌ `WELCOME20`, `LAUNCH20`, `FREESHIP`, "$30 first order" / "Starter Box from $30" / "First box from $30", **`FRESH10`** ($10 off first order), **`FRESH30`** (35% social-ask). All retired 2026-05-18 — no active promo codes; catalog prices are the prices paid.
+- ❌ Auto-applied promo codes via `?promo=CODE` URL params. Promo-input UI was removed from the cart drawer; `?promo=` params on incoming links are now no-ops (the server still parses them so old ad links don't 500, but `ACTIVE_PROMOS` is empty so no discount applies).
 - ❌ "Thursday delivery" / "Thursday 2–6pm" / "Order by Thursday for Wednesday delivery".
 - ❌ "Now delivering in Hyde Park" alone (service area is Chicago-wide; Hyde Park is the flagship neighborhood).
 - ❌ **"Wednesday-only delivery"** / "We deliver every Wednesday" / "Order by Sunday for Wednesday delivery" / "Wednesday 5–8pm window." Replaced 2026-05-10 with "every day, citywide, pick your window at checkout." Customer chooses delivery date and time-of-day window during checkout.
