@@ -146,7 +146,21 @@ export async function PATCH(req: NextRequest) {
     }
     const updated = updateSession(sessionId, patch);
     if (!updated) {
-      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+      // UNC-1204: the checkout-store is filesystem-backed via process.cwd(),
+      // which on Vercel is read-only outside /tmp and ephemeral per-lambda.
+      // Cold starts (and the read-only FS itself) cause writes to silently
+      // drop and subsequent PATCHes to miss. Returning 404 here generated
+      // noise in LogRocket/Vercel logs and broke fire-and-forget markers
+      // (SMS-confirmation, completedAt) without any value — Stripe is the
+      // source of truth for completed payments and the webhook fans out the
+      // post-payment side effects directly. Treat missing-session as a
+      // benign "lost" state and let callers proceed. A durable backing store
+      // (KV / Upstash / Stripe metadata) is the real fix; tracked in the
+      // UNC-1204 follow-up issue and gated on board approval (net-new infra).
+      console.warn(
+        `[checkout/session PATCH] session not found (likely cold-start / ephemeral FS); sessionId=${sessionId}`
+      );
+      return NextResponse.json({ session: null, lost: true, sessionId });
     }
 
     if (patch.completedAt && updated.email) {
