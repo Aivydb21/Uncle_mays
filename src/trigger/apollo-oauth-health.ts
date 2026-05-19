@@ -1,4 +1,4 @@
-import { schedules, task } from "@trigger.dev/sdk/v3";
+import { task } from "@trigger.dev/sdk/v3";
 
 // --- Apollo API helpers ---
 
@@ -289,10 +289,10 @@ function generateHealthReport(
 
 // --- Scheduled task: runs daily at 9 AM Central (14:00 UTC) ---
 
-export const apolloOAuthHealthCheck = schedules.task({
+// Apollo OAuth is fully revoked (all accounts); schedule removed 2026-05-19
+// to free a Trigger.dev schedule slot. Task kept as on-demand-only.
+export const apolloOAuthHealthCheck = task({
   id: "apollo-oauth-health-check",
-  // Runs daily at 9:00 AM Central Time (14:00 UTC)
-  cron: "0 14 * * *",
   run: async () => {
     const apolloKey = process.env.APOLLO_API_KEY;
     if (!apolloKey) {
