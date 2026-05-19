@@ -93,14 +93,31 @@ async function mcpCall(method: string, params: unknown, requestId = 1): Promise<
   return JSON.parse(dataLines[dataLines.length - 1]) as McpEnvelope;
 }
 
-function extractTextAndLinks(envelope: McpEnvelope): { text: string; links: string[]; messages: unknown[] } {
+/**
+ * Galileo "meta-narration" prefixes: progress updates that are NOT findings.
+ * When the stream contains only these, Galileo hasn't finished yet.
+ */
+const META_NARRATION_RE = /^(Watching Sessions?:|Building Metric:|Querying|Analyzing|Fetching|Loading|Investigating|Looking at)/i;
+
+function extractTextAndLinks(envelope: McpEnvelope): {
+  text: string;
+  links: string[];
+  messages: unknown[];
+  /** True when at least one message with isTerminalMessage:true was found. */
+  hasTerminal: boolean;
+} {
   // The MCP returns content as an array of { type, text } items. The text
   // may be a JSON-encoded object (the structured result) OR plain prose.
   // Be tolerant of both shapes.
   const content = envelope.result?.content ?? [];
   const messages: unknown[] = [];
-  let text = "";
   const links: string[] = [];
+
+  // Galileo's actual shape (verified against MCP probe 2026-05-14):
+  //   { type: "system", messageContent: "...prose...", toolType, messageID, isTerminalMessage }
+  // We collect ALL inner messages but only surface the terminal one as `text`.
+  let terminalText: string | null = null;
+  const nonTerminalTexts: string[] = [];
 
   for (const item of content) {
     if (item.type !== "text" || typeof item.text !== "string") continue;
@@ -108,8 +125,9 @@ function extractTextAndLinks(envelope: McpEnvelope): { text: string; links: stri
     try {
       parsed = JSON.parse(item.text);
     } catch {
-      // Plain text content — treat as the answer body.
-      text = (text ? text + "\n\n" : "") + item.text;
+      // Plain text content (non-JSON) — treat as a terminal answer body since
+      // it came directly from the MCP without the thinking-message wrapper.
+      terminalText = (terminalText !== null ? terminalText + "\n\n" : "") + item.text;
       continue;
     }
     messages.push(parsed);
@@ -117,18 +135,43 @@ function extractTextAndLinks(envelope: McpEnvelope): { text: string; links: stri
     const innerMessages = p.messages ?? p.result?.messages;
     if (Array.isArray(innerMessages)) {
       for (const m of innerMessages) {
-        // Galileo's actual shape (verified against MCP probe 2026-05-14):
-        //   { type: "system", messageContent: "...prose...", toolType, messageID, isTerminalMessage }
-        // We tolerate `text` / `content` as fallbacks in case the schema shifts.
-        const mm = m as { messageContent?: string; text?: string; content?: string };
+        const mm = m as {
+          messageContent?: string;
+          text?: string;
+          content?: string;
+          isTerminalMessage?: boolean;
+        };
         const body = mm.messageContent ?? mm.text ?? mm.content;
-        if (body) text = (text ? text + "\n\n" : "") + body;
+        if (!body) continue;
+        if (mm.isTerminalMessage) {
+          // Only the terminal message is the real answer — overwrite any earlier one.
+          terminalText = body;
+        } else {
+          nonTerminalTexts.push(body);
+        }
       }
     } else if (p.text) {
-      text = (text ? text + "\n\n" : "") + p.text;
+      // Top-level text without inner messages — treat as terminal if it's the
+      // only signal we have.
+      if (terminalText === null) terminalText = p.text;
     } else if (p.result?.text) {
-      text = (text ? text + "\n\n" : "") + p.result.text;
+      if (terminalText === null) terminalText = p.result.text;
     }
+  }
+
+  let text: string;
+  let hasTerminal: boolean;
+
+  if (terminalText !== null) {
+    // We have a definitive Galileo answer.
+    text = terminalText;
+    hasTerminal = true;
+  } else {
+    // No terminal message yet. Only surface non-meta-narration prose so we
+    // don't mistake Galileo's progress narration for a real answer.
+    const meaningful = nonTerminalTexts.filter((t) => !META_NARRATION_RE.test(t.trim()));
+    text = meaningful.join("\n\n");
+    hasTerminal = false;
   }
 
   // Galileo's contract: every URL in the answer must be surfaced. Extract
@@ -137,7 +180,7 @@ function extractTextAndLinks(envelope: McpEnvelope): { text: string; links: stri
   const found = text.match(linkRegex) ?? [];
   for (const url of found) if (!links.includes(url)) links.push(url);
 
-  return { text, links, messages };
+  return { text, links, messages, hasTerminal };
 }
 
 function extractChatId(envelope: McpEnvelope): string | undefined {
@@ -187,9 +230,10 @@ function extractStatus(envelope: McpEnvelope): "completed" | "thinking" | undefi
  */
 export async function askGalileo(query: string, opts?: { promptVersion?: string }): Promise<GalileoResult> {
   const started = Date.now();
-  const messages: unknown[] = [];
-  let textBuf = "";
+  const rawMessages: unknown[] = [];
   const linksBuf: string[] = [];
+  // Only keep the terminal answer text — never accumulate meta-narration.
+  let terminalText: string | null = null;
 
   const initial = await mcpCall("tools/call", {
     name: "use_logrocket",
@@ -206,9 +250,9 @@ export async function askGalileo(query: string, opts?: { promptVersion?: string 
     };
   }
   const first = extractTextAndLinks(initial);
-  textBuf = first.text;
+  rawMessages.push(...first.messages);
+  if (first.hasTerminal) terminalText = first.text;
   for (const l of first.links) if (!linksBuf.includes(l)) linksBuf.push(l);
-  messages.push(...first.messages);
 
   let chatID = extractChatId(initial);
   let status = extractStatus(initial) ?? "completed";
@@ -225,29 +269,36 @@ export async function askGalileo(query: string, opts?: { promptVersion?: string 
     if (next.error) {
       return {
         status: "error",
-        text: textBuf + `\n\n[poll error ${next.error.code}: ${next.error.message}]`,
+        text: terminalText ?? `[poll error ${next.error.code}: ${next.error.message}]`,
         links: linksBuf,
         chatID,
-        rawMessages: [...messages, next],
+        rawMessages: [...rawMessages, next],
         durationMs: Date.now() - started,
         promptVersion: opts?.promptVersion,
       };
     }
     const step = extractTextAndLinks(next);
-    if (step.text) textBuf = (textBuf ? textBuf + "\n\n" : "") + step.text;
+    rawMessages.push(...step.messages);
+    // Only overwrite the answer when a terminal message is present.
+    if (step.hasTerminal) terminalText = step.text;
     for (const l of step.links) if (!linksBuf.includes(l)) linksBuf.push(l);
-    messages.push(...step.messages);
     status = extractStatus(next) ?? status;
     const nextChat = extractChatId(next);
     if (nextChat) chatID = nextChat;
   }
 
+  // If status is still "thinking" after the poll cap — or if we never received
+  // a terminal message even though the outer status says "completed" — mark the
+  // result as "thinking" so callers know the answer is incomplete.
+  const resolvedStatus: GalileoResult["status"] =
+    terminalText !== null ? "completed" : "thinking";
+
   return {
-    status: status === "thinking" ? "thinking" : "completed",
-    text: textBuf.trim() || "(Galileo returned an empty answer)",
+    status: resolvedStatus,
+    text: terminalText?.trim() ?? "",
     links: linksBuf,
     chatID,
-    rawMessages: messages,
+    rawMessages,
     durationMs: Date.now() - started,
     promptVersion: opts?.promptVersion,
   };

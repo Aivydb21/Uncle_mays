@@ -84,6 +84,22 @@ export const galileoDailyBriefing = schedules.task({
       ],
     });
 
+    // Alert the CTO when any prompt did not reach a terminal answer — these
+    // rows are incomplete and should not be treated as Galileo's findings.
+    const incompletePrompts = answers.filter(({ result }) => result.status !== "completed");
+    if (incompletePrompts.length > 0) {
+      const names = incompletePrompts.map(({ prompt, result }) => `${prompt.id} (${result.status})`).join(", ");
+      await sendInternalAlert({
+        subject: `[Galileo Alert] ${todayIso} — ${incompletePrompts.length} prompt(s) did NOT complete`,
+        html: `<p>The following Galileo prompts did not reach a terminal answer on ${todayIso}:</p><ul>${incompletePrompts.map(({ prompt, result }) => `<li><strong>${prompt.id}</strong> — status: <code>${result.status}</code></li>`).join("")}</ul><p>These briefing rows contain Galileo meta-narration, not findings. The daily briefing email was sent but these sections should be disregarded until re-queried.</p>`,
+        text: `Galileo alert for ${todayIso}:\n\nThe following prompts did not complete: ${names}.\n\nThese rows contain Galileo meta-narration, not findings.`,
+        tags: [
+          { name: "type", value: "galileo_incomplete_alert" },
+          { name: "date", value: todayIso },
+        ],
+      });
+    }
+
     // Create a Paperclip task for the CTO to triage and ship
     await createCtoPaperclipTask(todayIso, answers);
 
@@ -226,7 +242,16 @@ function buildPaperclipDescription(
       const links = result.links.length
         ? `\n\n**Session Links:**\n${result.links.map((u) => `- ${u}`).join("\n")}`
         : "";
-      return `### ${prompt.id}\n\n**Prompt:** ${prompt.text}\n\n**Galileo's Answer:**\n\n${result.text}${links}`;
+      const statusBanner =
+        result.status !== "completed"
+          ? `\n\n> **Warning:** Galileo did not reach a terminal answer for this prompt (status: \`${result.status}\`). The content below is incomplete — do NOT act on it as a finding. Re-run \`galileo-on-demand\` with promptId \`${prompt.id}\` when Galileo is available.\n`
+          : "";
+      const answerBody = result.status === "completed" && result.text
+        ? result.text
+        : result.status !== "completed"
+          ? "_(No terminal answer — Galileo timed out or is still thinking)_"
+          : result.text;
+      return `### ${prompt.id}\n\n**Prompt:** ${prompt.text}${statusBanner}\n\n**Galileo's Answer:**\n\n${answerBody}${links}`;
     })
     .join("\n\n---\n\n");
 
