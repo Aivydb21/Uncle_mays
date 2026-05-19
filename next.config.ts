@@ -53,11 +53,17 @@ const nextConfig: NextConfig = {
       { source: "/checkout/community", destination: "/shop", permanent: false },
       { source: "/checkout/:product/delivery", destination: "/shop", permanent: false },
       { source: "/checkout/:product/payment", destination: "/shop", permanent: false },
-      // Legacy /subscribe/[product]/{delivery,payment} subroutes were deleted
-      // 2026-05-02. Parent /subscribe/[product] still serves the "paused"
-      // banner so deep-linked confirmation emails still resolve.
-      { source: "/subscribe/:product/delivery", destination: "/subscribe/:product", permanent: false },
-      { source: "/subscribe/:product/payment", destination: "/subscribe/:product", permanent: false },
+      // /subscribe/* — subscriptions are paused (Doina is the only grandfathered
+      // customer and her billing happens in Stripe, not via this URL). UNC-1210
+      // (Part B of UNC-1203) makes this server-side so cached share-links, AI
+      // summaries, bookmarks, and any future stray ad creative land on /shop
+      // with attribution preserved. Next.js redirects() forwards query params
+      // by default, so utm_*, gclid, fbclid, fbp, fbc, ga_client_id, and
+      // promo=FRESH10 all pass through. permanent:true emits HTTP 308. The
+      // catch-all also supersedes the legacy /subscribe/:product/{delivery,
+      // payment} entries that were deleted in 2026-05-02 cleanup.
+      { source: "/subscribe", destination: "/shop", permanent: true },
+      { source: "/subscribe/:path*", destination: "/shop", permanent: true },
     ];
   },
 };
