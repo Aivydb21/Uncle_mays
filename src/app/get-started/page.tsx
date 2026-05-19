@@ -12,7 +12,6 @@ export default async function GetStartedPage({
   searchParams: Promise<Record<string, string>>;
 }) {
   const params = await searchParams;
-  const merged = { promo: "FRESH10", ...params };
-  const qs = new URLSearchParams(merged).toString();
-  redirect(`/shop?${qs}`);
+  const qs = new URLSearchParams(params).toString();
+  redirect(qs ? `/shop?${qs}` : "/shop");
 }

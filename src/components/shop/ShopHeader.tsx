@@ -1,17 +1,14 @@
 // Static informational header above the catalog.
-// The inline ZIP-check expander was removed 2026-05-18 — service area is
-// validated at checkout instead, so the catalog header stays a clean
-// informational block. Customers who type a ZIP at checkout get the same
-// in-zone / out-of-zone messaging powered by `SERVICE_AREA_ZIPS` in
-// src/lib/service-area.ts (still the single source of truth).
+// "Build Your Own Box" pill removed 2026-05-18 — it created visual crowding
+// with the headline and didn't carry weight after the cart-based catalog
+// replaced the fixed boxes. The ZIP-check expander was removed the same day;
+// service area is validated at checkout via SERVICE_AREA_ZIPS in
+// src/lib/service-area.ts.
 
 export function ShopHeader() {
   return (
     <header className="mb-10 text-center">
-      <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary">
-        Build Your Own Box
-      </div>
-      <h1 className="mt-5 text-4xl font-bold leading-tight md:text-5xl">
+      <h1 className="text-4xl font-bold leading-tight md:text-5xl">
         Shop the catalog
       </h1>
       <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">

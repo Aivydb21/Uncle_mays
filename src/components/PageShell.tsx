@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { MobileCTA } from "@/components/MobileCTA";
-import { PromoStrip } from "@/components/PromoStrip";
 
 // Routes that suppress global navigation and footer (dedicated ad landing
 // pages). Currently empty: /shop and /starter-box used to be here but are
@@ -25,10 +24,6 @@ export function PageShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname() ?? "/";
   const isLandingPage = LANDING_PAGE_PATHS.includes(pathname);
   const inFunnel = isInCheckoutFunnel(pathname);
-  // Hide the FRESH10 promo strip on the checkout page itself — by then the
-  // customer is at the totals stage and the discount input lives next to the
-  // tally. The banner up top is for top-of-funnel traffic, not the close.
-  const showPromoStrip = !isLandingPage && pathname !== "/checkout" && !inFunnel;
   // MobileCTA is the "Shop the catalog" thumb-reach button used on top-of-
   // funnel pages (home, faq, about). It must NOT render on /shop (the
   // catalog page renders its own MobileCartTotal which links to /checkout
@@ -40,7 +35,6 @@ export function PageShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {showPromoStrip && <PromoStrip />}
       {!isLandingPage && <Navigation />}
       <main className="flex-1">{children}</main>
       {!isLandingPage && (

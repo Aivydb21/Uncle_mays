@@ -71,7 +71,7 @@ const faqs = [
   },
   {
     q: "How does ordering work?",
-    a: "Browse the catalog at unclemays.com/shop, fill your cart with the items you want (any quantity), and check out. $20 minimum. Use code FRESH10 for $10 off your first order.",
+    a: "Browse the catalog at unclemays.com/shop, fill your cart with the items you want (any quantity), and check out. $20 minimum.",
   },
   {
     q: "How does delivery work?",

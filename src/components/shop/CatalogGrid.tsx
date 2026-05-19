@@ -176,11 +176,7 @@ export function CatalogGrid({
 
   return (
     <>
-      {useGrouped && availableCategories.length > 1 && (
-        <SectionJumpNav availableCategories={availableCategories} />
-      )}
-
-      <div className="mt-6 mb-3">
+      <div className="mb-3">
         <SearchBar
           value={search}
           onChange={setSearch}
@@ -245,88 +241,6 @@ export function CatalogGrid({
       {/* Mobile-only floating cart total bar at bottom of viewport. */}
       <MobileCartTotal />
     </>
-  );
-}
-
-function SectionJumpNav({
-  availableCategories,
-}: {
-  availableCategories: CatalogCategory[];
-}) {
-  // Highlight the chip whose section is currently in the viewport.
-  const [active, setActive] = useState<CatalogCategory | null>(null);
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort(
-            (a, b) =>
-              a.target.getBoundingClientRect().top -
-              b.target.getBoundingClientRect().top
-          );
-        if (visible.length > 0) {
-          const id = visible[0].target.id;
-          const cat = availableCategories.find(
-            (c) => slugForCategory(c) === id
-          );
-          if (cat) setActive(cat);
-        }
-      },
-      { rootMargin: "-30% 0px -50% 0px", threshold: 0 }
-    );
-    for (const c of availableCategories) {
-      const el = document.getElementById(slugForCategory(c));
-      if (el) observer.observe(el);
-    }
-    return () => observer.disconnect();
-  }, [availableCategories]);
-
-  // Programmatic scroll instead of a bare hash-anchor: Galileo's 2026-05-15
-  // briefing (UNC-1083) flagged these chips as unresponsive in ~9 of 25
-  // sessions, primarily in Facebook/Instagram in-app webviews where
-  // <a href="#anchor"> navigation is unreliable and instant jumps go
-  // unnoticed. scrollIntoView({ behavior: "smooth" }) works in those
-  // webviews and gives a visible animation so users see the action.
-  const handleJump = (cat: CatalogCategory) => {
-    const slug = slugForCategory(cat);
-    const el =
-      typeof document !== "undefined" ? document.getElementById(slug) : null;
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    if (typeof window !== "undefined" && window.history?.replaceState) {
-      window.history.replaceState({}, "", `#${slug}`);
-    }
-  };
-
-  return (
-    <nav
-      aria-label="Jump to category"
-      className="sticky top-16 z-40 -mx-6 border-b border-border bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/80"
-    >
-      <ul className="flex gap-2 overflow-x-auto py-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {availableCategories.map((cat) => {
-          const isActive = active === cat;
-          return (
-            <li key={cat} className="shrink-0">
-              <button
-                type="button"
-                onClick={() => handleJump(cat)}
-                aria-current={isActive ? "true" : undefined}
-                className={`inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold transition-colors active:scale-[0.97] ${
-                  isActive
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-foreground hover:border-primary/50 hover:text-primary"
-                }`}
-              >
-                {cat}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
   );
 }
 

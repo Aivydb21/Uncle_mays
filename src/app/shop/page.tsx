@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { fetchCatalog } from "@/lib/catalog/airtable";
 import { CatalogGrid } from "@/components/shop/CatalogGrid";
 import { ShopHeader } from "@/components/shop/ShopHeader";
-import { PromoBanner } from "@/components/shop/PromoBanner";
 import type { CatalogItem } from "@/lib/catalog/types";
 
 // Note: <Navigation /> and <Footer /> are rendered by PageShell at the
@@ -18,7 +17,6 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 interface ShopPageSearchParams {
-  promo?: string;
   cart?: string;
 }
 
@@ -35,13 +33,13 @@ export default async function ShopPage({
     unavailable = true;
   }
 
-  const sp = await searchParams;
-  const promo = sp?.promo || null;
+  // searchParams resolution is still awaited so Next.js doesn't warn about
+  // the unused promise, but no params currently feed into render.
+  await searchParams;
 
   return (
     <div className="container mx-auto px-6 py-10">
       <ShopHeader />
-      {promo && <PromoBanner code={promo} />}
       {unavailable ? (
         <UnavailableMessage />
       ) : catalog.length === 0 ? (

@@ -14,20 +14,13 @@ export interface PromoEntry {
   appliesTo: Array<"one-time" | "subscription">;
 }
 
-export const ACTIVE_PROMOS: Record<string, PromoEntry> = {
-  FRESH10: {
-    couponId: "fresh10-apr-2026",
-    amountOffCents: 1000,
-    label: "$10 off your first box",
-    appliesTo: ["one-time", "subscription"],
-  },
-  FRESH30: {
-    couponId: "fresh30-apr-2026",
-    percentOff: 30,
-    label: "30% off your first box",
-    appliesTo: ["one-time", "subscription"],
-  },
-};
+// Active promo registry. Emptied 2026-05-18 — the FRESH10 / 10%-off
+// infrastructure was stripped from the customer-facing site so listed
+// catalog prices are the prices people pay. Server-side validation,
+// abandoned-cart triggers, and cart-pricing math all still run; they just
+// resolve to "no valid code" for every input now. To re-enable a promo:
+// add the entry here, surface it in the UI, and refresh customer-facts.md.
+export const ACTIVE_PROMOS: Record<string, PromoEntry> = {};
 
 // Resolve a promo entry to a discount amount in cents, given the base amount
 // in cents (line subtotal before discount). Percent codes scale with the base;

@@ -39,9 +39,6 @@ export async function ShopCTA() {
     <section id="boxes" className="py-24 bg-muted/30 relative" style={{ zIndex: 1 }}>
       <div className="container px-6">
         <div className="text-center">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2 text-sm font-semibold text-primary mb-8">
-            Build Your Own Box
-          </div>
           <Link
             href="/shop"
             className="inline-block transition-opacity hover:opacity-80"
@@ -54,13 +51,6 @@ export async function ShopCTA() {
             Pick the produce, pantry items, and protein you actually want.
             Sourced from our Black farmer partners. $20 minimum.
           </p>
-          <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
-            Use code{" "}
-            <span className="bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs font-bold tracking-wider">
-              FRESH10
-            </span>{" "}
-            for $10 off your first order
-          </div>
         </div>
 
         {preview.length > 0 && (

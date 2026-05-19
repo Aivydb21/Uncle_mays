@@ -27,16 +27,10 @@ export function CartDrawer() {
   const setQuantity = useCartStore((s) => s.setQuantity);
   const removeLine = useCartStore((s) => s.removeLine);
   const addLine = useCartStore((s) => s.addLine);
-  const setPromoCode = useCartStore((s) => s.setPromoCode);
 
   const [pricing, setPricing] = useState<PricingResponse | null>(null);
   const [loading, setLoading] = useState(false);
-  const [promoInput, setPromoInput] = useState(promoCode || "");
   const [popular, setPopular] = useState<CatalogItem[] | null>(null);
-
-  useEffect(() => {
-    setPromoInput(promoCode || "");
-  }, [promoCode]);
 
   const cartFingerprint = useMemo(
     () =>
@@ -200,12 +194,6 @@ export function CartDrawer() {
         {!isEmpty && (
           <div className="border-t border-border bg-muted/40 px-6 py-5">
             <Totals pricing={pricing} loading={loading} />
-            <PromoDisclosure
-              promoInput={promoInput}
-              setPromoInput={setPromoInput}
-              setPromoCode={setPromoCode}
-              applied={pricing && pricing.ok ? pricing.appliedPromoCode : null}
-            />
             {!meetsMin && pricing && pricing.ok && (
               <p className="mt-2 text-xs text-amber-700">
                 Add {formatCents(Math.max(0, MIN_SUBTOTAL_CENTS - subtotalCents))}{" "}
@@ -432,54 +420,6 @@ function EmptyCartContent({
             </div>
           ))}
         </div>
-      )}
-    </div>
-  );
-}
-
-function PromoDisclosure({
-  promoInput,
-  setPromoInput,
-  setPromoCode,
-  applied,
-}: {
-  promoInput: string;
-  setPromoInput: (v: string) => void;
-  setPromoCode: (v: string | null) => void;
-  applied: string | null;
-}) {
-  const [open, setOpen] = useState(Boolean(applied));
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="mt-3 text-xs font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
-      >
-        Have a promo code?
-      </button>
-    );
-  }
-  return (
-    <div className="mt-3 space-y-2">
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={promoInput}
-          onChange={(e) => setPromoInput(e.target.value.toUpperCase())}
-          placeholder="Enter code"
-          className="h-9 flex-1 rounded-md border border-border bg-background px-3 text-sm"
-        />
-        <button
-          type="button"
-          onClick={() => setPromoCode(promoInput.trim() || null)}
-          className="rounded-md border border-primary px-3 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground"
-        >
-          Apply
-        </button>
-      </div>
-      {applied && (
-        <p className="text-xs text-primary">{applied} applied</p>
       )}
     </div>
   );
