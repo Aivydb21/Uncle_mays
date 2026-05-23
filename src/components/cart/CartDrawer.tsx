@@ -137,6 +137,10 @@ export function CartDrawer() {
           )}
 
           {!isEmpty && resolvedLineItems && (
+            <LeadTimeBanner lineItems={resolvedLineItems} />
+          )}
+
+          {!isEmpty && resolvedLineItems && (
             <ul className="space-y-4">
               {resolvedLineItems.map((item) => (
                 <li
@@ -148,6 +152,11 @@ export function CartDrawer() {
                     <p className="text-xs text-muted-foreground">
                       {formatCents(item.unitPriceCents)} / {item.unitLabel || item.unit}
                     </p>
+                    {item.blackOwnedSupplier && (
+                      <p className="mt-0.5 text-[10px] font-bold uppercase tracking-wide text-foreground">
+                        Black-owned
+                      </p>
+                    )}
                     <div className="mt-2 flex items-center gap-2">
                       <button
                         type="button"
@@ -330,6 +339,40 @@ function SaveCartCapture({
         <p className="basis-full text-xs text-destructive">{err}</p>
       )}
     </form>
+  );
+}
+
+// Shows a soft callout above the cart line items when any item has a lead
+// time > 0. The earliest delivery date a customer can pick at checkout is
+// today + max(leadTimeDays) + 1 (for our staging + transit). This banner
+// surfaces that math before the customer reaches checkout so there are no
+// surprises on the delivery-date step.
+function LeadTimeBanner({ lineItems }: { lineItems: { name: string; leadTimeDays: number }[] }) {
+  const maxLead = lineItems.reduce(
+    (m, l) => (l.leadTimeDays > m ? l.leadTimeDays : m),
+    0
+  );
+  if (maxLead <= 0) return null;
+  const flagged = lineItems.filter((l) => l.leadTimeDays > 0);
+  // +1 day staging + transit on top of the max vendor lead time.
+  const earliest = new Date();
+  earliest.setDate(earliest.getDate() + maxLead + 1);
+  const earliestLabel = earliest.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+  return (
+    <div className="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900">
+      <p className="font-semibold">
+        Earliest delivery: {earliestLabel}
+      </p>
+      <p className="mt-1">
+        {flagged.length === 1
+          ? `${flagged[0].name} ships in ${flagged[0].leadTimeDays} business days from your order.`
+          : `${flagged.length} items in your cart are made to order. We place the supplier PO the day after you check out, then deliver as soon as it arrives.`}
+      </p>
+    </div>
   );
 }
 

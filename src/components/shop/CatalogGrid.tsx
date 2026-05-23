@@ -18,12 +18,29 @@ import { useCartStore } from "@/lib/cart/store";
 import { lrTrack } from "@/lib/logrocket";
 import type { CatalogCategory, CatalogItem } from "@/lib/catalog/types";
 
+// Customer-facing display order across all waves. Categories with zero
+// active SKUs are filtered out by availableCategories below, so an entry
+// here is inert until inventory lands in Airtable. Adjust this order with
+// the merchandiser before any Wave goes live.
 const CATEGORY_ORDER: CatalogCategory[] = [
   "Greens",
   "Roots",
   "Microgreens",
-  "Pantry",
+  "Vegetables",
+  "Fruit",
+  "Meat & Seafood",
   "Protein",
+  "Dairy",
+  "Eggs",
+  "Bakery",
+  "Pantry",
+  "Spices & Condiments",
+  "Snacks",
+  "Beverages",
+  "Frozen Foods",
+  "Prepared Foods",
+  "Personal Care",
+  "Hair Care",
 ];
 
 type SortMode = "default" | "price-asc" | "price-desc" | "name-asc";
@@ -528,7 +545,7 @@ function CatalogCard({ item, priority = false }: { item: CatalogItem; priority?:
             {item.name}
           </div>
         )}
-        {(item.freshnessLabel || item.scarcityNote) && (
+        {(item.freshnessLabel || item.scarcityNote || item.blackOwnedSupplier) && (
           <div className="absolute top-2 left-2 right-2 flex flex-col items-start gap-1">
             {item.freshnessLabel && (
               <span className="rounded-md bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary-foreground shadow-sm">
@@ -538,6 +555,22 @@ function CatalogCard({ item, priority = false }: { item: CatalogItem; priority?:
             {item.scarcityNote && (
               <span className="rounded-md bg-amber-500 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">
                 {item.scarcityNote}
+              </span>
+            )}
+            {item.blackOwnedSupplier && (
+              <span
+                className="rounded-md bg-foreground px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-background shadow-sm"
+                title="This SKU is sourced from a Black-owned supplier."
+              >
+                Black-owned
+              </span>
+            )}
+            {item.leadTimeDays > 1 && (
+              <span
+                className="rounded-md bg-blue-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm"
+                title={`This SKU is ordered in from the supplier after you place your order. Add ${item.leadTimeDays} business days to your usual delivery time.`}
+              >
+                Ships in {item.leadTimeDays}d
               </span>
             )}
           </div>

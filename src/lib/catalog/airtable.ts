@@ -14,12 +14,32 @@ const SNAPSHOT_PATH = path.join(process.cwd(), "data", "catalog-snapshot.json");
 const CATALOG_TAG = "catalog";
 const CATALOG_REVALIDATE_SECONDS = 300;
 
+// Whitelist must stay in lock-step with CatalogCategory in types.ts. New
+// entries here without the type union (or vice versa) silently drop rows in
+// mapRecord, which is the failure mode the product mix reset is trying to
+// avoid. When adding a category, also add the single-select option to the
+// Airtable Catalog table's Category field.
 const VALID_CATEGORIES: ReadonlySet<CatalogCategory> = new Set([
+  // Wave A
   "Greens",
   "Roots",
-  "Pantry",
-  "Protein",
   "Microgreens",
+  "Vegetables",
+  "Fruit",
+  "Meat & Seafood",
+  "Protein",
+  "Dairy",
+  "Eggs",
+  "Bakery",
+  "Pantry",
+  "Spices & Condiments",
+  "Snacks",
+  "Beverages",
+  "Frozen Foods",
+  "Prepared Foods",
+  // Wave E
+  "Personal Care",
+  "Hair Care",
 ]);
 
 const VALID_UNITS: ReadonlySet<CatalogUnit> = new Set([
@@ -29,6 +49,17 @@ const VALID_UNITS: ReadonlySet<CatalogUnit> = new Set([
   "dozen",
   "pint",
   "oz",
+  "jar",
+  "bottle",
+  "gallon",
+  "half_gallon",
+  "loaf",
+  "bag",
+  "can",
+  "box",
+  "tub",
+  "bar",
+  "tube",
 ]);
 
 // Local product photos served from /public/photos/. Keyed by SKU.
@@ -176,7 +207,28 @@ function mapRecord(record: AirtableRecord): CatalogItemInternal | null {
       defaultAddQty != null && defaultAddQty > 0
         ? Math.floor(defaultAddQty)
         : 1,
+    // BlackOwnedSupplier is an Airtable lookup field that mirrors the linked
+    // Supplier row's Black-owned checkbox. Airtable serializes lookups as an
+    // array (e.g. [true] or [false]) even for single-link references; flatten
+    // and default false when missing.
+    blackOwnedSupplier: resolveBlackOwned(f.BlackOwnedSupplier),
+    // Per-SKU lead time in business days. Falls back to 0 (stocked, default
+    // delivery promise). Operator sets a positive integer for any SKU that
+    // requires a vendor PO before fulfillment.
+    leadTimeDays: resolveLeadTimeDays(f.LeadTimeDays),
   };
+}
+
+function resolveBlackOwned(value: unknown): boolean {
+  if (value === true) return true;
+  if (Array.isArray(value) && value.length > 0 && value[0] === true) return true;
+  return false;
+}
+
+function resolveLeadTimeDays(value: unknown): number {
+  const n = asNumber(value);
+  if (n == null || n < 0) return 0;
+  return Math.floor(n);
 }
 
 // Per-request Airtable timeout. The homepage Suspense boundary streams

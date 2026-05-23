@@ -20,6 +20,10 @@ interface Props {
   value: DeliverySchedulerSelection | null;
   onChange: (selection: DeliverySchedulerSelection | null) => void;
   className?: string;
+  // Minimum day offset from today the customer can book. Defaults to 1
+  // (earliest = tomorrow). Made-to-order SKUs push this higher: a 5-day
+  // lead-time SKU sets minDayOffset to 6 (5 vendor + 1 transit).
+  minDayOffset?: number;
 }
 
 type GtagWindow = Window & { gtag?: (...args: unknown[]) => void };
@@ -92,7 +96,8 @@ function buildCalendarGrid(
   year: number,
   month: number,
   today: Date,
-  maxDate: Date
+  maxDate: Date,
+  minDate: Date
 ): CalendarCell[] {
   const first = startOfMonth(year, month);
   const leadingBlanks = first.getDay();
@@ -115,13 +120,18 @@ function buildCalendarGrid(
     const isToday = isoDate(d) === isoDate(today);
     const isPast = d < new Date(today.getFullYear(), today.getMonth(), today.getDate());
     const isFuture = d > maxDate;
+    const isBeforeMin = d < new Date(
+      minDate.getFullYear(),
+      minDate.getMonth(),
+      minDate.getDate()
+    );
     cells.push({
       isoDate: isoDate(d),
       date: d,
       inMonth: true,
       // Same-day not offered (overpromise risk); past disabled; beyond
-      // booking horizon disabled.
-      selectable: !isPast && !isToday && !isFuture,
+      // booking horizon disabled; before lead-time-derived minDate disabled.
+      selectable: !isPast && !isToday && !isFuture && !isBeforeMin,
       isToday,
     });
   }
@@ -147,7 +157,12 @@ function dayOffsetFromToday(target: Date, today: Date): number {
   return Math.round((a.getTime() - b.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export function DeliveryScheduler({ value, onChange, className }: Props) {
+export function DeliveryScheduler({
+  value,
+  onChange,
+  className,
+  minDayOffset = 1,
+}: Props) {
   // Lock today on mount so a long-open tab past midnight does not silently
   // re-disable the user's already-selected day.
   const today = useMemo(() => new Date(), []);
@@ -156,6 +171,11 @@ export function DeliveryScheduler({ value, onChange, className }: Props) {
     d.setDate(d.getDate() + MAX_DAY_OFFSET);
     return d;
   }, [today]);
+  const minDate = useMemo(() => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + Math.max(1, minDayOffset));
+    return d;
+  }, [today, minDayOffset]);
 
   // Calendar shows the month containing the user's selected day, falling
   // back to the current month.
@@ -172,8 +192,8 @@ export function DeliveryScheduler({ value, onChange, className }: Props) {
   const [selectedIso, setSelectedIso] = useState<string | null>(value?.isoDate ?? null);
 
   const cells = useMemo(
-    () => buildCalendarGrid(viewYear, viewMonth, today, maxDate),
-    [viewYear, viewMonth, today, maxDate]
+    () => buildCalendarGrid(viewYear, viewMonth, today, maxDate, minDate),
+    [viewYear, viewMonth, today, maxDate, minDate]
   );
 
   // Allow navigating to the next month if any day in it is still within the
@@ -364,7 +384,9 @@ export function DeliveryScheduler({ value, onChange, className }: Props) {
           </div>
 
           <p className="mt-3 text-[11px] text-muted-foreground">
-            Earliest delivery: tomorrow. Book up to 30 days out.
+            {minDayOffset > 1
+              ? `Earliest delivery: ${minDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} (made-to-order items in your cart need ${minDayOffset - 1} business day${minDayOffset - 1 === 1 ? "" : "s"} to come in). Book up to 30 days out.`
+              : "Earliest delivery: tomorrow. Book up to 30 days out."}
           </p>
         </div>
 

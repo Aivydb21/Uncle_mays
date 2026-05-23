@@ -4,8 +4,18 @@
 > Website, emails, ads, Mailchimp campaigns, and agent-generated copy must match this doc.
 > If any of these facts change, update this file FIRST, then propagate to every surface.
 
-**Last updated:** 2026-05-18 (service area contracted to south-side + Loop + Pilsen corridor; north and far-west Chicago ZIPs removed per UNC-1180)
+**Last updated:** 2026-05-23 (product mix reset code support landed; types and badges ready for Wave A-E SKU loads. No customer-visible change until Airtable Catalog is populated.)
 **Owner:** Anthony Ivy
+
+---
+
+## Reality Check — Product Mix Reset (2026-05-23)
+
+> **Catalog is currently 43 active SKUs (47 total) in Airtable base `appm6F6H9obydzAM2`, table `Catalog`.** Narrow assortment is the live customer reality. The product mix reset is in motion; the website code now accepts the full Wave A through Wave E category and unit set, but SKUs land in waves over the next 8-14 weeks via sourcing outreach. Categories and units with zero active SKUs do not render — empty rails are filtered out by `CATEGORY_ORDER` in [`src/components/shop/CatalogGrid.tsx`](./src/components/shop/CatalogGrid.tsx).
+>
+> **Paid ads remain paused.** No new paid creative against the current narrow assortment. The relaunch un-pause is gated on Phase 6 in [`research/product-mix-2026-05-16/05-code-and-relaunch-plan.md`](./research/product-mix-2026-05-16/05-code-and-relaunch-plan.md): at least one Wave live (Wave A's 11 Tier-1 SKUs in the Catalog table with photos, prices, availableQty), funnel readiness checks passed, refreshed creative, board sign-off because the offer has changed materially.
+>
+> **Black-owned badge is wired but inert.** Catalog cards and cart line items will surface a "Black-owned" badge automatically when the linked Suppliers row has the Black-owned checkbox set. Source of truth: `Catalog.BlackOwnedSupplier` (lookup field that mirrors `Catalog.Supplier → Suppliers.Black-owned`). No SKU currently renders a badge.
 
 ---
 

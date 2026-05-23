@@ -88,6 +88,8 @@ export async function priceCart(input: PriceCartInput): Promise<PricingResponse>
       quantity: line.quantity,
       unitPriceCents: item.priceCents,
       lineTotalCents,
+      blackOwnedSupplier: item.blackOwnedSupplier,
+      leadTimeDays: item.leadTimeDays,
     });
     subtotalCents += lineTotalCents;
   }

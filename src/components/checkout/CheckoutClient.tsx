@@ -677,6 +677,19 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
                 <DeliveryScheduler
                   value={deliverySelection}
                   onChange={setDeliverySelection}
+                  minDayOffset={
+                    pricing?.ok && pricing.lineItems.length > 0
+                      ? Math.max(
+                          1,
+                          // Vendor lead time + 1 day for staging and transit.
+                          pricing.lineItems.reduce(
+                            (m, li) =>
+                              li.leadTimeDays > m ? li.leadTimeDays : m,
+                            0
+                          ) + 1
+                        )
+                      : 1
+                  }
                 />
               </section>
               <DeliverySection
