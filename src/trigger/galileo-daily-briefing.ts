@@ -182,6 +182,12 @@ function renderText(date: string, answers: Array<{ prompt: GalileoPrompt; result
 /**
  * Create a Paperclip issue for the CTO to triage the Galileo briefing and
  * ship LogRocket-driven fixes immediately.
+ *
+ * Failures here used to swallow silently with `console.error`, which is how
+ * UNC-1336 caught 5 missing-day triage gaps (5/18, 5/21–5/24) before anyone
+ * noticed. We now retry once and escalate via internal alert email when the
+ * call fails, so a Paperclip-side outage never silently kills the triage
+ * loop again.
  */
 async function createCtoPaperclipTask(
   date: string,
@@ -193,43 +199,85 @@ async function createCtoPaperclipTask(
   const ctoAgentId = process.env.PAPERCLIP_CTO_AGENT_ID;
 
   if (!apiUrl || !apiKey || !companyId || !ctoAgentId) {
+    const missing = [
+      !apiUrl && "PAPERCLIP_API_URL",
+      !apiKey && "PAPERCLIP_API_KEY",
+      !companyId && "PAPERCLIP_COMPANY_ID",
+      !ctoAgentId && "PAPERCLIP_CTO_AGENT_ID",
+    ]
+      .filter(Boolean)
+      .join(", ");
     console.warn(
-      "Skipping Paperclip task creation: PAPERCLIP_* env vars not fully configured"
+      `Skipping Paperclip task creation: env vars not configured: ${missing}`
     );
+    await sendInternalAlert({
+      subject: `[Galileo Briefing] ${date} — Paperclip task SKIPPED (env vars missing)`,
+      html: `<p>The daily Galileo briefing ran and the briefing email was sent, but no Paperclip triage task was created because the following env vars are not configured in Trigger.dev: <code>${esc(missing)}</code>.</p><p>Triage the Galileo answers manually from this morning's briefing email until the env is fixed.</p>`,
+      text: `Galileo briefing ${date}: Paperclip task SKIPPED — env vars missing: ${missing}. Triage manually from the briefing email.`,
+      tags: [
+        { name: "type", value: "galileo_paperclip_skip" },
+        { name: "date", value: date },
+      ],
+    }).catch((alertErr) => console.error("sendInternalAlert (skip) failed:", alertErr));
     return;
   }
 
   // Build the task description with briefing summary
   const description = buildPaperclipDescription(date, answers);
+  const body = JSON.stringify({
+    title: `Triage Galileo Daily Briefing — ${date}`,
+    description,
+    assigneeAgentId: ctoAgentId,
+    status: "todo",
+    priority: "high",
+    labels: ["galileo", "daily-briefing", "revenue-impact"],
+  });
 
-  try {
-    const response = await fetch(`${apiUrl}/companies/${companyId}/issues`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: `Triage Galileo Daily Briefing — ${date}`,
-        description,
-        assigneeAgentId: ctoAgentId,
-        status: "todo",
-        priority: "high",
-        labels: ["galileo", "daily-briefing", "revenue-impact"],
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => "");
-      console.error(
-        `Failed to create Paperclip task for CTO: ${response.status} ${errorText}`
-      );
-    } else {
-      const issue = await response.json();
-      console.log(`Created Paperclip task for CTO: ${issue.identifier || issue.id}`);
+  const maxAttempts = 3;
+  let lastErr = "";
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const response = await fetch(`${apiUrl}/companies/${companyId}/issues`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body,
+      });
+      if (response.ok) {
+        const issue = await response.json();
+        console.log(`Created Paperclip task for CTO: ${issue.identifier || issue.id} (attempt ${attempt})`);
+        return;
+      }
+      lastErr = `HTTP ${response.status}: ${await response.text().catch(() => "")}`;
+    } catch (err) {
+      lastErr = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     }
-  } catch (err) {
-    console.error(`Error creating Paperclip task:`, err);
+    if (attempt < maxAttempts) {
+      // Linear backoff: 5s, 10s. Galileo briefing isn't time-critical to the
+      // second; we'd rather wait than miss the task.
+      await new Promise((r) => setTimeout(r, attempt * 5_000));
+    }
+  }
+
+  // All attempts failed — escalate loudly so the missing-day gap is visible
+  // the day it happens, not in a retrospective audit a week later.
+  console.error(`Failed to create Paperclip task after ${maxAttempts} attempts: ${lastErr}`);
+  try {
+    await sendInternalAlert({
+      subject: `[Galileo Briefing] ${date} — Paperclip task creation FAILED`,
+      html: `<p>The daily Galileo briefing ran successfully and the briefing email was sent, but the CTO Paperclip task could not be created after ${maxAttempts} attempts.</p><p><strong>Last error:</strong> <code>${esc(lastErr)}</code></p><p>Likely cause: <code>PAPERCLIP_API_URL</code> (<code>${esc(apiUrl)}</code>) is not reachable from Trigger.dev's hosted workers, or the API key is rejected. Triage the Galileo answers manually from the briefing email until this is fixed.</p>`,
+      text: `Galileo briefing ${date}: Paperclip task creation FAILED after ${maxAttempts} attempts. Last error: ${lastErr}. Likely cause: PAPERCLIP_API_URL (${apiUrl}) unreachable from Trigger.dev workers, or auth rejected. Triage manually from the briefing email.`,
+      tags: [
+        { name: "type", value: "galileo_paperclip_fail" },
+        { name: "date", value: date },
+      ],
+    });
+  } catch (alertErr) {
+    // Last-ditch — at this point both Paperclip and Resend are unreachable.
+    // Trigger.dev's run log will still carry the console.error trail.
+    console.error("sendInternalAlert (fail) also failed:", alertErr);
   }
 }
 
