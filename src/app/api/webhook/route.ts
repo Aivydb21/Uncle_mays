@@ -111,6 +111,58 @@ async function trackGA4Purchase(params: {
   }
 }
 
+// GA4 Measurement Protocol — refund event. transaction_id must match the
+// purchase's transaction_id (we use the PaymentIntent id, same as the
+// embedded-checkout purchase path) so GA4 nets revenue against the
+// original purchase.
+async function trackGA4Refund(params: {
+  transactionId: string;
+  value: number;
+  currency: string;
+  clientId?: string;
+}) {
+  const measurementId = process.env.GA4_MEASUREMENT_ID;
+  const apiSecret = process.env.GA4_API_SECRET;
+
+  if (!measurementId || !apiSecret) {
+    console.warn("[GA4] Measurement ID or API Secret not configured, skipping refund tracking");
+    return;
+  }
+
+  try {
+    const payload = {
+      client_id: params.clientId || `stripe.${params.transactionId}`,
+      events: [
+        {
+          name: "refund",
+          params: {
+            transaction_id: params.transactionId,
+            value: params.value,
+            currency: params.currency,
+          },
+        },
+      ],
+    };
+
+    const response = await fetch(
+      `https://www.google-analytics.com/mp/collect?measurement_id=${measurementId}&api_secret=${apiSecret}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
+
+    if (response.ok) {
+      console.log(`[GA4] Refund tracked: ${params.transactionId} = $${params.value}`);
+    } else {
+      console.error(`[GA4] Refund tracking failed: ${response.status} ${await response.text()}`);
+    }
+  } catch (error) {
+    console.error("[GA4] Error tracking refund:", error);
+  }
+}
+
 export async function POST(req: NextRequest) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -1036,6 +1088,46 @@ export async function POST(req: NextRequest) {
           `[WEBHOOK] TRIGGER_SECRET_KEY not set — payment failure notification skipped for invoice ${invoice.id}`
         );
       }
+      break;
+    }
+
+    case "charge.refunded": {
+      const charge = event.data.object as Stripe.Charge;
+      const previousAttrs = event.data.previous_attributes as
+        | Partial<Stripe.Charge>
+        | undefined;
+      const previousRefunded =
+        typeof previousAttrs?.amount_refunded === "number"
+          ? previousAttrs.amount_refunded
+          : 0;
+      const cumulativeRefunded = charge.amount_refunded ?? 0;
+      const refundDeltaCents =
+        cumulativeRefunded > previousRefunded
+          ? cumulativeRefunded - previousRefunded
+          : cumulativeRefunded;
+      const piId =
+        typeof charge.payment_intent === "string"
+          ? charge.payment_intent
+          : (charge.payment_intent as Stripe.PaymentIntent | null)?.id ?? null;
+      // transaction_id must match the original purchase's transaction_id so
+      // GA4 attributes the refund. Embedded checkout + subscription flows
+      // use the PaymentIntent id as transaction_id (see trackGA4Purchase
+      // call sites above). For the legacy Stripe-hosted Checkout path
+      // (cs_…) we fall back to the charge id; those refunds will not net
+      // against the original purchase in GA4 — historically a thin slice
+      // of volume.
+      const transactionId = piId || charge.id;
+
+      console.log(
+        `[WEBHOOK] charge.refunded | charge=${charge.id} pi=${piId ?? "none"} delta=$${(refundDeltaCents / 100).toFixed(2)} total_refunded=$${(cumulativeRefunded / 100).toFixed(2)}`
+      );
+
+      trackGA4Refund({
+        transactionId,
+        value: refundDeltaCents / 100,
+        currency: (charge.currency || "usd").toUpperCase(),
+      }).catch((err) => console.error("[GA4] Refund error:", err));
+
       break;
     }
 

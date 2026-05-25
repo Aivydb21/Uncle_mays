@@ -238,7 +238,7 @@ Anthony manages Apollo outreach through Claude. Full workflow doc: `investor-out
 ### Stripe Webhook (configured 2026-04-09)
 - **Destination ID:** `we_1TKR53G67LsNxpToffON5rbo`
 - **Endpoint URL:** `https://unclemays.com/api/webhook`
-- **Events:** `checkout.session.completed`, `checkout.session.expired`, `payment_intent.succeeded`, `payment_intent.payment_failed`
+- **Events:** `checkout.session.completed`, `checkout.session.expired`, `payment_intent.succeeded`, `payment_intent.payment_failed`, `customer.subscription.created`, `customer.subscription.deleted`, `customer.subscription.updated`, `invoice.payment_succeeded`, `invoice.payment_failed`, `charge.refunded` (last one added 2026-05-25 for GA4 server-side refund tracking)
 - **Signing secret:** Set in `um_website/.env` as `STRIPE_WEBHOOK_SECRET`
 - **Handler:** `um_website/src/app/api/webhook/route.ts`
 - **Note:** Requires SSR deployment (Vercel, not static export) for the API route to be reachable
