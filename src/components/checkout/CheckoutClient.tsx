@@ -12,6 +12,7 @@ import { useAddressAutocomplete } from "@/hooks/use-address-autocomplete";
 import { WaitlistCapture } from "@/components/WaitlistCapture";
 import { formatCents } from "@/lib/format";
 import { MIN_SUBTOTAL_CENTS } from "@/lib/cart-pricing-constants";
+import { MIN_LEAD_DAYS } from "@/lib/delivery-windows";
 import { sha256, hashPhone } from "@/lib/browser-hash";
 import { getFbAttribution } from "@/lib/fb-attribution";
 import { lrIdentify, lrTrack } from "@/lib/logrocket";
@@ -680,7 +681,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
                   minDayOffset={
                     pricing?.ok && pricing.lineItems.length > 0
                       ? Math.max(
-                          1,
+                          MIN_LEAD_DAYS,
                           // Vendor lead time + 1 day for staging and transit.
                           pricing.lineItems.reduce(
                             (m, li) =>
@@ -688,7 +689,7 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
                             0
                           ) + 1
                         )
-                      : 1
+                      : MIN_LEAD_DAYS
                   }
                 />
               </section>

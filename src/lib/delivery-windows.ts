@@ -5,6 +5,11 @@
 // Real fulfillment is still Wednesday-only; the selected slot is captured as
 // a preference and surfaced honestly in the order-confirmation email.
 
+// Platform-wide minimum lead time, in days. Customers cannot select a
+// delivery date earlier than today + MIN_LEAD_DAYS. Made-to-order SKUs
+// with their own vendor lead time push this higher per-cart.
+export const MIN_LEAD_DAYS = 4;
+
 export type WindowKey = "morning" | "midday" | "afternoon" | "evening";
 
 export interface DeliveryWindow {
@@ -63,9 +68,10 @@ function isoDate(d: Date): string {
 }
 
 // Returns the next 7 calendar days starting today. Day offsets 0..6.
-// Earliest selectable day is tomorrow (offset 1) since same-day delivery
-// would over-promise. Index 0 (today) is included for display continuity
-// but should be marked unavailable by the caller.
+// Earliest selectable day is today + MIN_LEAD_DAYS so we have time to
+// place the supplier PO, receive, stage, and route. Earlier offsets are
+// included for display continuity but should be marked unavailable by the
+// caller.
 export function nextSevenDays(now: Date = new Date()): DeliveryDay[] {
   const out: DeliveryDay[] = [];
   for (let i = 0; i < 7; i++) {

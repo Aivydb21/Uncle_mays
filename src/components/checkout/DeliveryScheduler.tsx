@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DELIVERY_WINDOWS, type WindowKey } from "@/lib/delivery-windows";
+import { DELIVERY_WINDOWS, MIN_LEAD_DAYS, type WindowKey } from "@/lib/delivery-windows";
 
 // Calendly-style monthly calendar with time-window slots. EXP-002 painted
 // door (2026-05-09): every selectable date appears available; the order
@@ -20,9 +20,10 @@ interface Props {
   value: DeliverySchedulerSelection | null;
   onChange: (selection: DeliverySchedulerSelection | null) => void;
   className?: string;
-  // Minimum day offset from today the customer can book. Defaults to 1
-  // (earliest = tomorrow). Made-to-order SKUs push this higher: a 5-day
-  // lead-time SKU sets minDayOffset to 6 (5 vendor + 1 transit).
+  // Minimum day offset from today the customer can book. Defaults to
+  // MIN_LEAD_DAYS (the platform-wide floor for staging + transit).
+  // Made-to-order SKUs push this higher: a 5-day lead-time SKU sets
+  // minDayOffset to 6 (5 vendor + 1 transit).
   minDayOffset?: number;
 }
 
@@ -161,7 +162,7 @@ export function DeliveryScheduler({
   value,
   onChange,
   className,
-  minDayOffset = 1,
+  minDayOffset = MIN_LEAD_DAYS,
 }: Props) {
   // Lock today on mount so a long-open tab past midnight does not silently
   // re-disable the user's already-selected day.
@@ -173,7 +174,7 @@ export function DeliveryScheduler({
   }, [today]);
   const minDate = useMemo(() => {
     const d = new Date(today);
-    d.setDate(d.getDate() + Math.max(1, minDayOffset));
+    d.setDate(d.getDate() + Math.max(MIN_LEAD_DAYS, minDayOffset));
     return d;
   }, [today, minDayOffset]);
 
@@ -384,9 +385,9 @@ export function DeliveryScheduler({
           </div>
 
           <p className="mt-3 text-[11px] text-muted-foreground">
-            {minDayOffset > 1
+            {minDayOffset > MIN_LEAD_DAYS
               ? `Earliest delivery: ${minDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} (made-to-order items in your cart need ${minDayOffset - 1} business day${minDayOffset - 1 === 1 ? "" : "s"} to come in). Book up to 30 days out.`
-              : "Earliest delivery: tomorrow. Book up to 30 days out."}
+              : `Earliest delivery: ${minDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} (we need ${MIN_LEAD_DAYS} days to source and route your order). Book up to 30 days out.`}
           </p>
         </div>
 
