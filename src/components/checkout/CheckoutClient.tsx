@@ -739,7 +739,12 @@ export function CheckoutClient({ slots }: { slots: PickupSlot[] }) {
                     });
 
                     useCartStore.getState().clear();
-                    router.push(`/order-success?pi=${paymentIntentId ?? ""}`);
+                    // UNC-1304: include amount + product so /order-success can fire
+                    // the gtag('event','purchase')/Pixel/Google Ads conversion. Without
+                    // these query params, OrderSuccessContent's PI branch skips the fire
+                    // and we get 0/N GA4 purchase events (catalog-era regression).
+                    const totalDollars = pricing?.ok ? (pricing.totalCents / 100).toFixed(2) : "0";
+                    router.push(`/order-success?pi=${paymentIntentId ?? ""}&amount=${totalDollars}&product=custom_cart`);
                   }}
                 />
               </Elements>
