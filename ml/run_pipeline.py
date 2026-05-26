@@ -8,24 +8,76 @@
 from __future__ import annotations
 
 import argparse
+import os
+import sys
 import time
 import traceback
+from pathlib import Path
 
 from ml.features import build_dataset
 from ml.ingest import (
     apollo,
     airtable as airtable_ingest,
     bigquery_ads_loader,
+    bigquery_crm_loader,
     bigquery_ga4,
+    bigquery_logrocket_loader,
+    bigquery_galileo_fix_tracking,
     bigquery_stripe_loader,
     census,
     checkout_store,
     google_ads,
+    logrocket as logrocket_ingest,
     mailchimp,
     meta_ads,
     resend as resend_ingest,
     stripe as stripe_ingest,
 )
+
+
+_LOCK_FILE = Path(__file__).parent / "data" / ".pipeline.lock"
+
+
+def _acquire_lock() -> None:
+    """Abort if another pipeline instance is already running.
+
+    Uses atomic O_CREAT|O_EXCL file creation — safe on Windows and Unix.
+    Clears stale locks (process no longer running) before checking.
+    """
+    if _LOCK_FILE.exists():
+        try:
+            stale_pid = int(_LOCK_FILE.read_text().strip())
+            # Check if that process is still alive
+            try:
+                os.kill(stale_pid, 0)
+                # Process is alive — another pipeline is running
+                print(
+                    f"[run_pipeline] ABORT: another pipeline instance is running "
+                    f"(PID {stale_pid}, lock={_LOCK_FILE}). "
+                    "Concurrent Galileo calls cause hangs. Exiting."
+                )
+                sys.exit(1)
+            except (ProcessLookupError, PermissionError):
+                # Stale lock — process is gone, safe to remove
+                print(f"[run_pipeline] removing stale lock (PID {stale_pid} is gone)")
+                _LOCK_FILE.unlink(missing_ok=True)
+        except (ValueError, OSError):
+            _LOCK_FILE.unlink(missing_ok=True)
+
+    try:
+        fd = os.open(str(_LOCK_FILE), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        os.write(fd, str(os.getpid()).encode())
+        os.close(fd)
+    except FileExistsError:
+        print(
+            f"[run_pipeline] ABORT: lock file appeared between check and create "
+            f"({_LOCK_FILE}). Another run just started. Exiting."
+        )
+        sys.exit(1)
+
+
+def _release_lock() -> None:
+    _LOCK_FILE.unlink(missing_ok=True)
 
 
 def main() -> None:
@@ -38,10 +90,20 @@ def main() -> None:
     p.add_argument("--skip-meta-ads", action="store_true")
     p.add_argument("--skip-google-ads", action="store_true")
     p.add_argument("--skip-airtable", action="store_true")
+    p.add_argument("--skip-logrocket", action="store_true",
+                   help="Skip LogRocket + Galileo ingest (each prompt ~10 min)")
     p.add_argument("--skip-bq-load", action="store_true",
                    help="Skip loading parquets to BigQuery warehouse")
     args = p.parse_args()
 
+    _acquire_lock()
+    try:
+        _run(args)
+    finally:
+        _release_lock()
+
+
+def _run(args: argparse.Namespace) -> None:
     steps: list[tuple[str, callable]] = [
         ("checkout_store", checkout_store.extract),
         ("stripe", stripe_ingest.extract),
@@ -62,6 +124,10 @@ def main() -> None:
         steps.append(("google_ads", google_ads.extract))
     if not args.skip_airtable:
         steps.append(("airtable", airtable_ingest.extract))
+    # LogRocket / Galileo: slow (each prompt ~10 min via MCP polling).
+    # Excluded from fast/ad-hoc runs; include in daily pipeline explicitly.
+    if not args.skip_logrocket:
+        steps.append(("logrocket", lambda: logrocket_ingest.extract(session_summary=True)))
 
     for name, fn in steps:
         t0 = time.time()
@@ -78,6 +144,9 @@ def main() -> None:
         for name, fn in [
             ("bq_stripe_loader", bigquery_stripe_loader.load_all),
             ("bq_ads_loader", bigquery_ads_loader.load_all),
+            ("bq_crm_loader", bigquery_crm_loader.load_all),
+            ("bq_logrocket_loader", bigquery_logrocket_loader.load_all),
+            ("bq_galileo_fix_tracking", bigquery_galileo_fix_tracking.sync),
         ]:
             t0 = time.time()
             try:

@@ -2,11 +2,16 @@
 
 Sources:
   1. LogRocket Sessions API  — `/v1/{org}/{app}/sessions` — daily aggregates
+                               NOTE: REST API returns 404 (UNC-1221). Use
+                               --session-summary mode instead (Galileo-derived).
   2. Galileo daily prompts   — call the same prompts as galileo-daily-briefing.ts
                                and persist answers to parquet for BQ journaling
+  3. Galileo session summary — --session-summary mode: 1 structured row per UTC
+                               day in logrocket_raw.sessions for CVR reconciliation
 
 Two output parquets (raw/):
-  logrocket_sessions_<ts>.parquet    — one row per session in the trailing window
+  logrocket_sessions_<ts>.parquet    — one row per session (REST, if available) or
+                                       one summary row per day (--session-summary)
   logrocket_galileo_<ts>.parquet     — one row per Galileo prompt answer
 
 Auth:
@@ -21,20 +26,24 @@ BigQuery load:
   The bigquery_logrocket_loader.py (companion script) does the BQ write.
 
 Usage:
-  python -m ml.ingest.logrocket          # pull last 2 days (default)
-  python -m ml.ingest.logrocket --days 7 # pull last 7 days
-  python -m ml.ingest.logrocket --skip-galileo  # sessions only (faster)
+  python -m ml.ingest.logrocket                     # pull last 2 days (default)
+  python -m ml.ingest.logrocket --days 7            # pull last 7 days
+  python -m ml.ingest.logrocket --skip-galileo      # sessions only (faster)
+  python -m ml.ingest.logrocket --session-summary   # Galileo-derived daily summary
+  python -m ml.ingest.logrocket --session-summary --days 7  # 7-day summary
 """
 
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import polars as pl
@@ -84,6 +93,101 @@ GALILEO_PROMPTS = [
 MCP_URL = "https://mcp.logrocket.com/mcp"
 MAX_POLLS = 30
 POLL_INTERVAL_S = 20
+# Wall-clock timeout for a single MCP HTTP call (socket timeout alone is
+# insufficient because SSE keep-alives prevent the socket from going idle).
+MCP_CALL_TIMEOUT_S = 90
+
+# Session summary prompt — used by --session-summary mode (UNC-1221).
+# Asks Galileo for one day's worth of structured session data since the
+# LogRocket REST /sessions endpoint returns 404.
+_SESSION_SUMMARY_PROMPT_TMPL = (
+    "For unclemays.com on {date} (UTC), please provide the following numbers. "
+    "Format each answer on its own line with a clear label so I can parse them:\n"
+    "1. TOTAL_SESSIONS: total number of sessions recorded\n"
+    "2. MOBILE_SESSIONS: sessions on mobile devices\n"
+    "3. DESKTOP_SESSIONS: sessions on desktop/tablet devices\n"
+    "4. HOME_SESSIONS: sessions where the entry page was the home page (/)\n"
+    "5. SHOP_SESSIONS: sessions where the entry page was the shop page (/shop)\n"
+    "6. CHECKOUT_SESSIONS: sessions where the entry page was the checkout page (/checkout)\n"
+    "7. OTHER_SESSIONS: sessions with any other entry page\n"
+    "8. FRUSTRATED_USERS: number of users classified as frustrated\n"
+    "9. RAGE_CLICKS: total number of rage clicks recorded\n"
+    "If data is unavailable for a specific field, write 0."
+)
+
+_INT_PATTERN = re.compile(r"(\d[\d,]*)")
+
+
+def _parse_int(text: str, label: str) -> int | None:
+    """Extract the integer following `label:` in text (case-insensitive)."""
+    pattern = re.compile(rf"{re.escape(label)}\s*[:\-]?\s*(\d[\d,]*)", re.IGNORECASE)
+    m = pattern.search(text)
+    if m:
+        return int(m.group(1).replace(",", ""))
+    return None
+
+
+def _build_session_summary_row(date_str: str, answer: str, chat_id: str) -> dict:
+    """Parse Galileo's prose answer into a structured sessions row.
+
+    All numeric fields default to None when Galileo does not provide them,
+    so the dbt model can filter on `source = 'galileo_summary'` and handle
+    nulls explicitly.
+
+    The synthetic session_id = 'summary_YYYY-MM-DD' makes the row unique
+    so bigquery_logrocket_loader.py dedup by session_id works correctly.
+    """
+    total = _parse_int(answer, "TOTAL_SESSIONS")
+    mobile = _parse_int(answer, "MOBILE_SESSIONS")
+    desktop = _parse_int(answer, "DESKTOP_SESSIONS")
+    home = _parse_int(answer, "HOME_SESSIONS")
+    shop = _parse_int(answer, "SHOP_SESSIONS")
+    checkout = _parse_int(answer, "CHECKOUT_SESSIONS")
+    other_pages = _parse_int(answer, "OTHER_SESSIONS")
+    frustrated = _parse_int(answer, "FRUSTRATED_USERS")
+    rage_clicks = _parse_int(answer, "RAGE_CLICKS")
+
+    device_breakdown: dict = {}
+    if mobile is not None:
+        device_breakdown["mobile"] = mobile
+    if desktop is not None:
+        device_breakdown["desktop"] = desktop
+
+    entry_page_breakdown: dict = {}
+    if home is not None:
+        entry_page_breakdown["/"] = home
+    if shop is not None:
+        entry_page_breakdown["/shop"] = shop
+    if checkout is not None:
+        entry_page_breakdown["/checkout"] = checkout
+    if other_pages is not None:
+        entry_page_breakdown["other"] = other_pages
+
+    return {
+        "session_id":              f"summary_{date_str}",
+        "user_id":                 "",
+        "started_at_ms":           date_str,       # date string, not ms epoch
+        "duration_ms":             None,
+        "page_count":              None,
+        "error_count":             None,
+        "rage_click_count":        str(rage_clicks) if rage_clicks is not None else None,
+        "first_url":               None,
+        "os_name":                 None,
+        "browser_name":            None,
+        "country_code":            None,
+        "device_type":             None,
+        "is_identified":           None,
+        # Summary-specific fields
+        "source":                  "galileo_summary",
+        "summary_date":            date_str,
+        "session_count":           total,
+        "device_type_breakdown":   json.dumps(device_breakdown),
+        "entry_page_breakdown":    json.dumps(entry_page_breakdown),
+        "frustrated_user_count":   frustrated,
+        "galileo_chat_id":         chat_id,
+        "galileo_raw_answer":      answer,
+        "pulled_at":               datetime.now(timezone.utc).isoformat(),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -185,6 +289,13 @@ def _pull_sessions(cfg: dict, window_days: int, max_rows: int) -> list[dict]:
 # ---------------------------------------------------------------------------
 
 def _mcp_call(pat: str, method: str, params: dict, request_id: int = 1) -> dict:
+    """Make a single Galileo MCP HTTP call with a hard wall-clock timeout.
+
+    The socket-level timeout alone is insufficient for SSE streams: the server
+    can keep the connection alive indefinitely with heartbeat bytes while
+    "thinking", bypassing the per-read socket deadline.  We wrap the call in a
+    thread so we can enforce a true wall-clock limit (MCP_CALL_TIMEOUT_S).
+    """
     body = json.dumps({"jsonrpc": "2.0", "id": request_id, "method": method, "params": params}).encode()
     req = urllib.request.Request(
         MCP_URL,
@@ -195,17 +306,29 @@ def _mcp_call(pat: str, method: str, params: dict, request_id: int = 1) -> dict:
             "Accept": "application/json, text/event-stream",
         },
     )
-    with urllib.request.urlopen(req, timeout=60) as r:
-        raw = r.read().decode()
-    # Parse SSE or plain JSON
+
+    def _do_request() -> str:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return r.read().decode()
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(_do_request)
+        try:
+            raw = future.result(timeout=MCP_CALL_TIMEOUT_S)
+        except concurrent.futures.TimeoutError:
+            raise TimeoutError(
+                f"Galileo MCP call timed out after {MCP_CALL_TIMEOUT_S}s "
+                "(wall-clock; SSE keep-alive bypassed socket timeout)"
+            )
+
+    # Parse SSE or plain JSON — take the LAST data: line (MCP may emit multiple)
     envelope: dict = {}
-    for line in raw.splitlines():
-        if line.startswith("data:"):
-            try:
-                envelope = json.loads(line[5:].strip())
-                break
-            except json.JSONDecodeError:
-                pass
+    data_lines = [l[5:].strip() for l in raw.splitlines() if l.startswith("data:") and l[5:].strip()]
+    if data_lines:
+        try:
+            envelope = json.loads(data_lines[-1])
+        except json.JSONDecodeError:
+            pass
     if not envelope:
         try:
             envelope = json.loads(raw)
@@ -214,8 +337,88 @@ def _mcp_call(pat: str, method: str, params: dict, request_id: int = 1) -> dict:
     return envelope
 
 
+def _parse_mcp_envelope(envelope: dict) -> tuple[str | None, str, list[str], list[dict]]:
+    """Extract (chat_id, status, links, messages) from a Galileo MCP envelope.
+
+    The MCP wraps the actual response as a JSON string inside
+    result.content[].text — we must parse that inner JSON to get chatID,
+    status, and the messages array.  This mirrors extractTextAndLinks +
+    extractChatId + extractStatus in src/lib/galileo.ts.
+
+    Returns (chat_id, status, links, messages) where:
+      chat_id   — UUID string for follow-up poll calls, or None
+      status    — "thinking" | "completed" | "error"
+      links     — list of URLs found in message text
+      messages  — list of raw message objects from inner JSON
+    """
+    result = envelope.get("result") or {}
+    content = result.get("content") or []
+
+    chat_id: str | None = result.get("chatID")
+    status: str = "completed"
+    messages: list[dict] = []
+    raw_texts: list[str] = []
+
+    for item in content:
+        if not isinstance(item, dict) or item.get("type") != "text":
+            continue
+        raw_text = item.get("text", "")
+        if not raw_text:
+            continue
+        # Try to parse the inner JSON envelope (the MCP's actual payload)
+        try:
+            inner = json.loads(raw_text)
+        except (json.JSONDecodeError, TypeError):
+            # Plain prose — treat as final answer text
+            raw_texts.append(raw_text)
+            continue
+
+        # Extract chatID from inner JSON if not already found
+        if not chat_id and inner.get("chatID"):
+            chat_id = str(inner["chatID"])
+
+        # Extract status
+        inner_status = inner.get("status") or (inner.get("result") or {}).get("status")
+        if inner_status in ("thinking", "completed", "error"):
+            status = inner_status
+
+        # Extract messages array (Galileo's actual content)
+        inner_msgs = inner.get("messages") or (inner.get("result") or {}).get("messages") or []
+        if isinstance(inner_msgs, list):
+            messages.extend(inner_msgs)
+
+    # Build final text from messages: Galileo's shape is
+    #   { messageContent: "...", type: "system"|"assistant", isTerminalMessage: bool }
+    # Use ALL messages for thinking state (partial progress), but for completed
+    # prefer the last non-empty messageContent.
+    text_parts: list[str] = []
+    for msg in messages:
+        if isinstance(msg, dict):
+            body = msg.get("messageContent") or msg.get("text") or msg.get("content") or ""
+            if body and isinstance(body, str):
+                text_parts.append(body)
+    if raw_texts:
+        text_parts.extend(raw_texts)
+
+    # Extract HTTP links from all text
+    import re
+    link_pattern = re.compile(r"https?://[^\s)\]]+")
+    links: list[str] = []
+    for t in text_parts:
+        for url in link_pattern.findall(t):
+            if url not in links:
+                links.append(url)
+
+    return chat_id, status, links, messages
+
+
 def _ask_galileo(pat: str, query: str, prompt_id: str, prompt_version: str) -> dict:
-    """Call Galileo MCP with polling. Returns answer dict."""
+    """Call Galileo MCP with polling. Returns answer dict with verbatim Galileo prose.
+
+    Key fix (2026-05-19, UNC-1217): the MCP wraps its payload as a JSON string
+    inside result.content[].text — we parse that inner JSON to get chatID +
+    status + messages rather than reading the outer result dict directly.
+    """
     started = time.time()
 
     envelope = _mcp_call(pat, "tools/call", {
@@ -223,67 +426,133 @@ def _ask_galileo(pat: str, query: str, prompt_id: str, prompt_version: str) -> d
         "arguments": {"query": query},
     })
 
-    result = (envelope.get("result") or {})
-    status = result.get("status", "completed")
-    chat_id = result.get("chatID")
-    messages = result.get("messages", [])
+    if envelope.get("error"):
+        err = envelope["error"]
+        return {
+            "prompt_id":      prompt_id,
+            "prompt_version": prompt_version,
+            "query":          query,
+            "answer":         f"Galileo MCP error {err.get('code')}: {err.get('message')}",
+            "status":         "error",
+            "chat_id":        "",
+            "duration_ms":    int((time.time() - started) * 1000),
+            "pulled_at":      datetime.now(timezone.utc).isoformat(),
+        }
+
+    chat_id, status, links, messages = _parse_mcp_envelope(envelope)
 
     polls = 0
     while status == "thinking" and chat_id and polls < MAX_POLLS:
         time.sleep(POLL_INTERVAL_S)
         polls += 1
-        envelope = _mcp_call(pat, "tools/call", {
+        print(f"[logrocket.galileo] {prompt_id}: poll {polls}/{MAX_POLLS} (chatID={chat_id[:8]}...)")
+        poll_env = _mcp_call(pat, "tools/call", {
             "name": "use_logrocket",
             "arguments": {"query": query, "chatID": chat_id, "pollForResult": True},
-        })
-        result = (envelope.get("result") or {})
-        status = result.get("status", "completed")
-        messages = result.get("messages", messages)
-
-    # Extract text from last assistant message
-    text = ""
-    links: list[str] = []
-    for msg in reversed(messages or []):
-        content = msg.get("text") or msg.get("content") or ""
-        if content:
-            text = content
+        }, request_id=polls + 1)
+        if poll_env.get("error"):
             break
+        new_chat_id, new_status, new_links, new_messages = _parse_mcp_envelope(poll_env)
+        if new_chat_id:
+            chat_id = new_chat_id
+        if new_status:
+            status = new_status
+        for lnk in new_links:
+            if lnk not in links:
+                links.append(lnk)
+        if new_messages:
+            messages = new_messages  # replace with latest full message list
 
-    # Also check content array
-    if not text:
-        for item in (result.get("content") or []):
-            if isinstance(item, dict) and item.get("type") == "text":
-                text = item.get("text", "")
-                break
+    if status == "thinking":
+        print(f"[logrocket.galileo] {prompt_id}: WARN still thinking after {polls} polls — saving partial answer")
+
+    # Build the final answer: concatenate all messageContent strings, preserving
+    # Galileo's verbatim prose (no paraphrasing per LOGROCKET-CLAUSE-2026-05-15).
+    text_parts: list[str] = []
+    for msg in messages:
+        if isinstance(msg, dict):
+            body = msg.get("messageContent") or msg.get("text") or msg.get("content") or ""
+            if body and isinstance(body, str):
+                text_parts.append(body.strip())
+    answer = "\n\n".join(text_parts).strip() or "(Galileo returned an empty answer)"
 
     return {
         "prompt_id":      prompt_id,
         "prompt_version": prompt_version,
         "query":          query,
-        "answer":         text,
+        "answer":         answer,
         "status":         status,
         "chat_id":        chat_id or "",
+        "links":          json.dumps(links),
+        "poll_count":     polls,
         "duration_ms":    int((time.time() - started) * 1000),
         "pulled_at":      datetime.now(timezone.utc).isoformat(),
     }
 
 
 # ---------------------------------------------------------------------------
+# Session summary (Galileo-derived, UNC-1221)
+# ---------------------------------------------------------------------------
+
+def _pull_session_summaries(pat: str, window_days: int) -> list[dict]:
+    """Ask Galileo for 1 structured summary row per UTC calendar day.
+
+    Each row has `source='galileo_summary'` and a synthetic
+    `session_id='summary_YYYY-MM-DD'` so the bigquery_logrocket_loader
+    dedup on session_id keeps exactly one row per day.
+    """
+    rows: list[dict] = []
+    today = datetime.now(timezone.utc).date()
+    for delta in range(window_days):
+        target_date = today - timedelta(days=delta)
+        date_str = target_date.isoformat()
+        query = _SESSION_SUMMARY_PROMPT_TMPL.format(date=date_str)
+        print(f"[logrocket.session_summary] querying Galileo for {date_str} ...")
+        try:
+            result = _ask_galileo(pat, query, f"session_summary.{date_str}", "2026-05-v1")
+            row = _build_session_summary_row(date_str, result["answer"], result.get("chat_id", ""))
+            rows.append(row)
+            sc = row.get("session_count")
+            print(f"[logrocket.session_summary] {date_str}: session_count={sc} status={result['status']}")
+        except Exception as exc:
+            print(f"[logrocket.session_summary] {date_str}: FAILED — {exc}")
+            rows.append(_build_session_summary_row(date_str, f"ERROR: {exc}", ""))
+    return rows
+
+
+# ---------------------------------------------------------------------------
 # Public extract()
 # ---------------------------------------------------------------------------
 
-def extract(window_days: int = SESSIONS_WINDOW_DAYS, skip_galileo: bool = False) -> dict[str, Path]:
+def extract(window_days: int = SESSIONS_WINDOW_DAYS, skip_galileo: bool = False,
+            session_summary: bool = True) -> dict[str, Path]:
     """Pull LogRocket sessions + Galileo answers to parquet.
+
+    When session_summary=True, skips the REST API entirely and asks Galileo
+    for 1 structured summary row per UTC day (UNC-1221 workaround).
 
     Returns dict of table_name -> parquet path.
     """
     load_dotenv_if_present()
     cfg = _cfg()
+    pat = cfg.get("pat", cfg.get("api_token", ""))
     out: dict[str, Path] = {}
 
-    # --- Sessions ---
-    print(f"[logrocket.sessions] pulling last {window_days} days ...")
-    session_rows = _pull_sessions(cfg, window_days, MAX_SESSIONS)
+    # --- Sessions (REST or Galileo-derived summary) ---
+    session_rows: list[dict] = []
+    if session_summary:
+        if not pat:
+            print("[logrocket.session_summary] SKIP: no PAT in config")
+        else:
+            print(f"[logrocket.session_summary] building Galileo-derived summary for last {window_days} day(s) ...")
+            session_rows = _pull_session_summaries(pat, window_days)
+            print(f"[logrocket.session_summary] {len(session_rows)} summary row(s) built")
+    else:
+        print(f"[logrocket.sessions] pulling last {window_days} days via REST ...")
+        session_rows = _pull_sessions(cfg, window_days, MAX_SESSIONS)
+        if not session_rows:
+            print("[logrocket.sessions] WARNING: 0 sessions returned (REST API 404 — use --session-summary instead)")
+
     if session_rows:
         df = pl.DataFrame(session_rows, infer_schema_length=len(session_rows))
     else:
@@ -304,7 +573,6 @@ def extract(window_days: int = SESSIONS_WINDOW_DAYS, skip_galileo: bool = False)
             "is_identified": pl.Series([], dtype=pl.Boolean),
             "pulled_at": pl.Series([], dtype=pl.Utf8),
         })
-        print(f"[logrocket.sessions] WARNING: 0 sessions returned (API may be filtering or returning different schema)")
 
     sessions_path = raw_path("logrocket_sessions")
     df.write_parquet(sessions_path)
@@ -315,7 +583,6 @@ def extract(window_days: int = SESSIONS_WINDOW_DAYS, skip_galileo: bool = False)
     if skip_galileo:
         return out
 
-    pat = cfg.get("pat", cfg.get("api_token", ""))
     if not pat:
         print("[logrocket.galileo] SKIP: no PAT in config")
         return out
@@ -336,6 +603,8 @@ def extract(window_days: int = SESSIONS_WINDOW_DAYS, skip_galileo: bool = False)
                 "answer": "",
                 "status": "error",
                 "chat_id": "",
+                "links": "[]",
+                "poll_count": 0,
                 "duration_ms": 0,
                 "pulled_at": datetime.now(timezone.utc).isoformat(),
             })
@@ -355,5 +624,13 @@ if __name__ == "__main__":
                         help="Trailing days of sessions to pull")
     parser.add_argument("--skip-galileo", action="store_true",
                         help="Skip Galileo prompts (sessions only)")
+    parser.add_argument("--no-session-summary", dest="session_summary", action="store_false",
+                        help=(
+                            "Use REST API instead of Galileo-derived session summary. "
+                            "NOTE: REST /sessions returns 404 (UNC-1221). Only use for "
+                            "debugging. Default is Galileo-derived summary (--session-summary)."
+                        ))
+    parser.set_defaults(session_summary=True)
     args = parser.parse_args()
-    extract(window_days=args.days, skip_galileo=args.skip_galileo)
+    extract(window_days=args.days, skip_galileo=args.skip_galileo,
+            session_summary=args.session_summary)
