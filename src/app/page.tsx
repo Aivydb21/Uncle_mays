@@ -14,8 +14,8 @@ const localBusinessSchema = {
   description:
     "Premium produce, pantry staples, and pasture-raised protein sourced directly from Black farmers. Build your own grocery order from the catalog. Chicago delivery or free pickup at the Polsky Center in Hyde Park. $20 minimum, no subscription required.",
   url: "https://unclemays.com",
-  logo: "https://www.unclemays.com/uncle-mays-logo.png",
-  image: "https://www.unclemays.com/uncle-mays-logo.png",
+  logo: "https://www.unclemays.com/icon-512.png",
+  image: "https://www.unclemays.com/icon-512.png",
   address: {
     "@type": "PostalAddress",
     streetAddress: "73 W Monroe Ave #3002",
@@ -74,7 +74,7 @@ const storeSchema = {
   description:
     "Build your own grocery order from Uncle May's curated catalog. Premium produce, pantry staples, and pasture-raised protein from Black farmers. $20 minimum.",
   url: "https://unclemays.com/shop",
-  image: "https://www.unclemays.com/uncle-mays-logo.png",
+  image: "https://www.unclemays.com/icon-512.png",
   priceRange: "$$",
   paymentAccepted: "Credit Card",
   hasOfferCatalog: {

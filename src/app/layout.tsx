@@ -53,9 +53,12 @@ export const metadata: Metadata = {
     images: ["https://www.unclemays.com/og-social.png"],
   },
   icons: {
-    icon: "/uncle-mays-logo.png",
-    apple: "/uncle-mays-logo.png",
-    shortcut: "/uncle-mays-logo.png",
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-512.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: "/apple-touch-icon.png",
+    shortcut: "/favicon.ico",
   },
 };
 
