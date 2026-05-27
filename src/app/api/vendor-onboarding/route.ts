@@ -18,7 +18,7 @@ const AIRTABLE_SUPPLIERS_TABLE = "Suppliers";
 
 interface SubmissionBody {
   businessName?: string;
-  blackOwnedSelfAttested?: boolean;
+  blackOwnedStatus?: string;
   supplierType?: string;
   firstName?: string;
   lastName?: string;
@@ -30,15 +30,23 @@ interface SubmissionBody {
   categories?: string[];
   productsOffered?: string;
   certifications?: string[];
+  seasonality?: string;
+  seasonMonths?: string[];
   leadTimeDays?: string;
   orderBatchingCadence?: string;
   minOrderQty?: string;
   coldChainRequired?: boolean;
   dropShipCapable?: boolean;
+  retailPricePerUnit?: string;
+  caseSize?: string;
+  caseWholesalePrice?: string;
+  pricingNegotiable?: boolean;
   wholesalePricingNotes?: string;
   paymentTerms?: string;
   scaleCapacityNotes?: string;
   sampleAvailable?: boolean;
+  transportationMethods?: string[];
+  pickupAddress?: string;
   transportationNotes?: string;
   additionalNotes?: string;
 }
@@ -47,8 +55,14 @@ function clean(s: string | undefined): string {
   return (s ?? "").trim();
 }
 
+const BLACK_OWNED_ANSWERS = ["Yes", "No", "Prefer not to say"] as const;
+
 function validate(body: SubmissionBody): string | null {
   if (!clean(body.businessName)) return "Missing business name.";
+  const blackOwned = clean(body.blackOwnedStatus);
+  if (!blackOwned) return "Missing Black-owned answer.";
+  if (!BLACK_OWNED_ANSWERS.includes(blackOwned as (typeof BLACK_OWNED_ANSWERS)[number]))
+    return "Invalid Black-owned answer.";
   if (!clean(body.supplierType)) return "Missing supplier type.";
   if (!clean(body.firstName)) return "Missing first name.";
   if (!clean(body.lastName)) return "Missing last name.";
@@ -63,11 +77,34 @@ function validate(body: SubmissionBody): string | null {
   if (!Number.isFinite(lt) || lt < 0) return "Invalid lead time.";
   if (!clean(body.orderBatchingCadence)) return "Missing batching cadence.";
   if (!clean(body.minOrderQty)) return "Missing minimum order quantity.";
+  if (!clean(body.seasonality)) return "Missing seasonality.";
+  if (
+    body.seasonality === "Seasonal" &&
+    (!body.seasonMonths || body.seasonMonths.length === 0)
+  )
+    return "Missing season months for seasonal vendor.";
+  if (!clean(body.caseSize)) return "Missing case size.";
+  const cwp = Number(body.caseWholesalePrice);
+  if (!Number.isFinite(cwp) || cwp < 0) return "Invalid wholesale case price.";
   if (!clean(body.wholesalePricingNotes)) return "Missing wholesale pricing notes.";
   if (!clean(body.paymentTerms)) return "Missing payment terms.";
   if (!clean(body.scaleCapacityNotes)) return "Missing scale capacity notes.";
-  if (!clean(body.transportationNotes)) return "Missing transportation notes.";
+  if (!body.transportationMethods || body.transportationMethods.length === 0)
+    return "Missing transportation methods.";
+  if (
+    body.transportationMethods.includes("We pick up at their location") &&
+    !clean(body.pickupAddress)
+  )
+    return "Missing pickup address.";
   return null;
+}
+
+function dollarsToCents(dollars: string | undefined): number | undefined {
+  const s = clean(dollars);
+  if (!s) return undefined;
+  const n = Number(s);
+  if (!Number.isFinite(n) || n < 0) return undefined;
+  return Math.round(n * 100);
 }
 
 function buildAirtableFields(body: SubmissionBody): Record<string, unknown> {
@@ -79,6 +116,14 @@ function buildAirtableFields(body: SubmissionBody): Record<string, unknown> {
   const productsOffered = notesBlock
     ? `${productsBlock}\n\nAdditional notes:\n${notesBlock}`
     : productsBlock;
+
+  const retailCents = dollarsToCents(body.retailPricePerUnit);
+  const caseCents = dollarsToCents(body.caseWholesalePrice);
+  const seasonality = clean(body.seasonality);
+  const seasonMonths =
+    seasonality === "Seasonal" ? body.seasonMonths ?? [] : [];
+  const blackOwnedAnswer = clean(body.blackOwnedStatus);
+  const blackOwnedSelfAttested = blackOwnedAnswer === "Yes";
 
   return {
     "Business Name": clean(body.businessName),
@@ -94,19 +139,28 @@ function buildAirtableFields(body: SubmissionBody): Record<string, unknown> {
     Certifications: body.certifications ?? [],
     "Min Order Qty": clean(body.minOrderQty),
     Website: clean(body.website) || undefined,
-    "Black-owned": Boolean(body.blackOwnedSelfAttested),
-    BlackOwnedSelfAttested: Boolean(body.blackOwnedSelfAttested),
+    "Black-owned": blackOwnedSelfAttested,
+    BlackOwnedSelfAttested: blackOwnedSelfAttested,
+    BlackOwnedAttestation: blackOwnedAnswer || undefined,
     LeadTimeDays: Number(body.leadTimeDays),
     PaymentTerms: clean(body.paymentTerms),
     OrderBatchingCadence: clean(body.orderBatchingCadence),
     DropShipCapable: Boolean(body.dropShipCapable),
     ColdChainRequired: Boolean(body.coldChainRequired),
     SampleAvailable: Boolean(body.sampleAvailable),
+    Seasonality: seasonality || undefined,
+    SeasonMonths: seasonMonths,
+    CaseSize: clean(body.caseSize) || undefined,
+    RetailPricePerUnitCents: retailCents,
+    CaseWholesalePriceCents: caseCents,
+    PricingNegotiable: Boolean(body.pricingNegotiable),
     WholesalePricingNotes: clean(body.wholesalePricingNotes),
+    TransportationMethods: body.transportationMethods ?? [],
+    PickupAddress: clean(body.pickupAddress) || undefined,
     ScaleCapacityNotes:
       clean(body.scaleCapacityNotes) +
       (clean(body.transportationNotes)
-        ? `\n\nTransportation: ${clean(body.transportationNotes)}`
+        ? `\n\nLogistics notes: ${clean(body.transportationNotes)}`
         : ""),
     OnboardingStatus: "Form returned",
   };
@@ -181,6 +235,14 @@ function internalAlertHtml(
     ? `https://airtable.com/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_SUPPLIERS_TABLE)}/${recordId}`
     : `https://airtable.com/${AIRTABLE_BASE_ID}`;
   const cats = (body.categories ?? []).join(", ") || "(none picked)";
+  const transport = (body.transportationMethods ?? []).join(", ") || "(none picked)";
+  const months = (body.seasonMonths ?? []).join(", ");
+  const seasonality = clean(body.seasonality);
+  const seasonalityDisplay =
+    seasonality === "Seasonal" && months ? `Seasonal (${months})` : seasonality || "(not set)";
+  const retail = clean(body.retailPricePerUnit) ? `$${clean(body.retailPricePerUnit)}` : "(not given)";
+  const caseWholesale = clean(body.caseWholesalePrice) ? `$${clean(body.caseWholesalePrice)}` : "(not given)";
+  const caseSize = clean(body.caseSize) || "(not given)";
   return `
     <div style="font-family:-apple-system,Segoe UI,sans-serif;max-width:600px">
       <h2 style="margin:0 0 8px">New vendor application</h2>
@@ -191,11 +253,21 @@ function internalAlertHtml(
         <tr><td style="padding:4px 8px;color:#666">Contact</td><td style="padding:4px 8px">${escapeHtml(clean(body.firstName))} ${escapeHtml(clean(body.lastName))} &middot; ${escapeHtml(clean(body.email))}${body.phone ? " &middot; " + escapeHtml(clean(body.phone)) : ""}</td></tr>
         <tr><td style="padding:4px 8px;color:#666">Location</td><td style="padding:4px 8px">${escapeHtml(clean(body.city))}, ${escapeHtml(clean(body.state))}</td></tr>
         <tr><td style="padding:4px 8px;color:#666">Categories</td><td style="padding:4px 8px">${escapeHtml(cats)}</td></tr>
-        <tr><td style="padding:4px 8px;color:#666">Black-owned (self-attested)</td><td style="padding:4px 8px">${body.blackOwnedSelfAttested ? "Yes" : "No"}</td></tr>
+        <tr><td style="padding:4px 8px;color:#666">Availability</td><td style="padding:4px 8px">${escapeHtml(seasonalityDisplay)}</td></tr>
+        <tr><td style="padding:4px 8px;color:#666">Black-owned (self-attested)</td><td style="padding:4px 8px">${escapeHtml(clean(body.blackOwnedStatus) || "(not answered)")}</td></tr>
         <tr><td style="padding:4px 8px;color:#666">Lead time</td><td style="padding:4px 8px">${escapeHtml(clean(body.leadTimeDays))} business days</td></tr>
         <tr><td style="padding:4px 8px;color:#666">Cadence</td><td style="padding:4px 8px">${escapeHtml(clean(body.orderBatchingCadence))}</td></tr>
         <tr><td style="padding:4px 8px;color:#666">Min order</td><td style="padding:4px 8px">${escapeHtml(clean(body.minOrderQty))}</td></tr>
+        <tr><td style="padding:4px 8px;color:#666">Case size</td><td style="padding:4px 8px">${escapeHtml(caseSize)}</td></tr>
+        <tr><td style="padding:4px 8px;color:#666">Retail / unit</td><td style="padding:4px 8px">${escapeHtml(retail)}</td></tr>
+        <tr><td style="padding:4px 8px;color:#666">Wholesale / case</td><td style="padding:4px 8px"><strong>${escapeHtml(caseWholesale)}</strong>${body.pricingNegotiable ? " &middot; negotiable on volume" : ""}</td></tr>
         <tr><td style="padding:4px 8px;color:#666">Payment terms</td><td style="padding:4px 8px">${escapeHtml(clean(body.paymentTerms))}</td></tr>
+        <tr><td style="padding:4px 8px;color:#666">Transportation</td><td style="padding:4px 8px">${escapeHtml(transport)}</td></tr>
+        ${
+          clean(body.pickupAddress)
+            ? `<tr><td style="padding:4px 8px;color:#666">Pickup address</td><td style="padding:4px 8px">${escapeHtml(clean(body.pickupAddress))}</td></tr>`
+            : ""
+        }
         <tr><td style="padding:4px 8px;color:#666">Drop-ship</td><td style="padding:4px 8px">${body.dropShipCapable ? "Yes" : "No"}</td></tr>
         <tr><td style="padding:4px 8px;color:#666">Cold chain</td><td style="padding:4px 8px">${body.coldChainRequired ? "Required" : "Shelf-stable"}</td></tr>
         <tr><td style="padding:4px 8px;color:#666">Sample available</td><td style="padding:4px 8px">${body.sampleAvailable ? "Yes" : "No"}</td></tr>

@@ -42,6 +42,8 @@ const CATEGORIES = [
 
 const SUPPLIER_TYPES = ["Farm", "Vendor", "Both", "Other"] as const;
 
+const BLACK_OWNED_ANSWERS = ["Yes", "No", "Prefer not to say"] as const;
+
 const CADENCES = [
   "On-demand (each order)",
   "Daily",
@@ -62,9 +64,23 @@ const PAYMENT_TERMS = [
 
 const CERTIFICATIONS = ["GAP", "PSA", "Other", "No Certification"] as const;
 
+const TRANSPORTATION_METHODS = [
+  "They ship to us (they pay freight)",
+  "They ship to us (we pay freight)",
+  "We pick up at their location",
+  "They deliver to Chicago (own truck)",
+  "Drop-ship direct to customer",
+] as const;
+
+const SEASONALITY_OPTIONS = ["Year-round", "Seasonal"] as const;
+
+const MONTHS = [
+  "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec",
+] as const;
+
 export interface VendorOnboardingFormState {
   businessName: string;
-  blackOwnedSelfAttested: boolean;
+  blackOwnedStatus: (typeof BLACK_OWNED_ANSWERS)[number] | "";
   supplierType: (typeof SUPPLIER_TYPES)[number] | "";
   firstName: string;
   lastName: string;
@@ -76,22 +92,30 @@ export interface VendorOnboardingFormState {
   categories: string[];
   productsOffered: string;
   certifications: string[];
+  seasonality: (typeof SEASONALITY_OPTIONS)[number] | "";
+  seasonMonths: string[];
   leadTimeDays: string;
   orderBatchingCadence: (typeof CADENCES)[number] | "";
   minOrderQty: string;
   coldChainRequired: boolean;
   dropShipCapable: boolean;
+  retailPricePerUnit: string;
+  caseSize: string;
+  caseWholesalePrice: string;
+  pricingNegotiable: boolean;
   wholesalePricingNotes: string;
   paymentTerms: (typeof PAYMENT_TERMS)[number] | "";
   scaleCapacityNotes: string;
   sampleAvailable: boolean;
+  transportationMethods: string[];
+  pickupAddress: string;
   transportationNotes: string;
   additionalNotes: string;
 }
 
 const INITIAL_STATE: VendorOnboardingFormState = {
   businessName: "",
-  blackOwnedSelfAttested: false,
+  blackOwnedStatus: "",
   supplierType: "",
   firstName: "",
   lastName: "",
@@ -103,15 +127,23 @@ const INITIAL_STATE: VendorOnboardingFormState = {
   categories: [],
   productsOffered: "",
   certifications: [],
+  seasonality: "",
+  seasonMonths: [],
   leadTimeDays: "",
   orderBatchingCadence: "",
   minOrderQty: "",
   coldChainRequired: false,
   dropShipCapable: false,
+  retailPricePerUnit: "",
+  caseSize: "",
+  caseWholesalePrice: "",
+  pricingNegotiable: false,
   wholesalePricingNotes: "",
   paymentTerms: "",
   scaleCapacityNotes: "",
   sampleAvailable: false,
+  transportationMethods: [],
+  pickupAddress: "",
   transportationNotes: "",
   additionalNotes: "",
 };
@@ -131,7 +163,10 @@ export function VendorOnboardingForm() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function toggleArrayValue(key: "categories" | "certifications", value: string) {
+  function toggleArrayValue(
+    key: "categories" | "certifications" | "transportationMethods" | "seasonMonths",
+    value: string
+  ) {
     setForm((prev) => {
       const current = prev[key];
       const next = current.includes(value)
@@ -143,6 +178,7 @@ export function VendorOnboardingForm() {
 
   function validate(): string | null {
     if (!form.businessName.trim()) return "Business name is required.";
+    if (!form.blackOwnedStatus) return "Tell us whether your business is Black-owned.";
     if (!form.supplierType) return "Pick what kind of business you are.";
     if (!form.firstName.trim()) return "First name is required.";
     if (!form.lastName.trim()) return "Last name is required.";
@@ -153,17 +189,28 @@ export function VendorOnboardingForm() {
       return "Pick at least one product category.";
     if (!form.productsOffered.trim())
       return "Tell us about the products you want us to consider.";
+    if (!form.seasonality) return "Tell us if your products are year-round or seasonal.";
+    if (form.seasonality === "Seasonal" && form.seasonMonths.length === 0)
+      return "Pick the months when your seasonal products are available.";
     if (!form.leadTimeDays.trim() || Number.isNaN(Number(form.leadTimeDays)))
       return "Lead time in business days is required (a number).";
     if (!form.orderBatchingCadence) return "Pick an order batching cadence.";
     if (!form.minOrderQty.trim()) return "Minimum order quantity is required.";
+    if (!form.caseSize.trim()) return "Tell us your case or pack size.";
+    if (!form.caseWholesalePrice.trim() || Number.isNaN(Number(form.caseWholesalePrice)))
+      return "Wholesale price per case is required (a number, in dollars).";
     if (!form.wholesalePricingNotes.trim())
-      return "Tell us about your wholesale pricing.";
+      return "Tell us about your wholesale pricing tiers.";
     if (!form.paymentTerms) return "Pick a payment term you accept.";
     if (!form.scaleCapacityNotes.trim())
       return "Tell us about your scale capacity.";
-    if (!form.transportationNotes.trim())
-      return "Tell us how you prefer to ship to our Chicago hub.";
+    if (form.transportationMethods.length === 0)
+      return "Pick at least one way you can get product to us.";
+    if (
+      form.transportationMethods.includes("We pick up at their location") &&
+      !form.pickupAddress.trim()
+    )
+      return "Pickup address is required when we pick up at your location.";
     return null;
   }
 
@@ -240,16 +287,33 @@ export function VendorOnboardingForm() {
           />
         </Field>
 
-        <Field label="Are you a Black-owned business?">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={form.blackOwnedSelfAttested}
-              onChange={(e) => set("blackOwnedSelfAttested", e.target.checked)}
-              className={CHECKBOX_CLS}
-            />
-            <span>Yes, our business is Black-owned.</span>
-          </label>
+        <Field
+          label="Are you a Black-owned business?"
+          required
+          help="We surface a Black-owned badge on the site for verified suppliers. Your answer is optional to be made public."
+        >
+          <div className="flex flex-wrap gap-2">
+            {BLACK_OWNED_ANSWERS.map((a) => (
+              <label
+                key={a}
+                className={`inline-flex h-9 cursor-pointer items-center rounded-full border px-3 text-sm font-semibold transition-colors ${
+                  form.blackOwnedStatus === a
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-foreground hover:border-primary/50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="blackOwnedStatus"
+                  value={a}
+                  className="sr-only"
+                  checked={form.blackOwnedStatus === a}
+                  onChange={() => set("blackOwnedStatus", a)}
+                />
+                {a}
+              </label>
+            ))}
+          </div>
         </Field>
 
         <Field label="What kind of business are you?" required>
@@ -381,6 +445,56 @@ export function VendorOnboardingForm() {
             })}
           </div>
         </Field>
+
+        <Field label="Availability" required>
+          <div className="flex flex-wrap gap-2">
+            {SEASONALITY_OPTIONS.map((s) => (
+              <label
+                key={s}
+                className={`inline-flex h-9 cursor-pointer items-center rounded-full border px-3 text-sm font-semibold transition-colors ${
+                  form.seasonality === s
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-foreground hover:border-primary/50"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="seasonality"
+                  value={s}
+                  className="sr-only"
+                  checked={form.seasonality === s}
+                  onChange={() => set("seasonality", s)}
+                />
+                {s}
+              </label>
+            ))}
+          </div>
+        </Field>
+
+        {form.seasonality === "Seasonal" && (
+          <Field label="Available months" required help="Pick every month your product is available.">
+            <div className="flex flex-wrap gap-2">
+              {MONTHS.map((m) => {
+                const checked = form.seasonMonths.includes(m);
+                return (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => toggleArrayValue("seasonMonths", m)}
+                    aria-pressed={checked}
+                    className={`inline-flex h-8 w-12 items-center justify-center rounded-full border px-2 text-xs font-semibold transition-colors ${
+                      checked
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background text-foreground hover:border-primary/50"
+                    }`}
+                  >
+                    {m}
+                  </button>
+                );
+              })}
+            </div>
+          </Field>
+        )}
       </Section>
 
       <Section title="Operations and fulfillment" subtitle="Lead times, minimums, and how we'd work together.">
@@ -455,10 +569,60 @@ export function VendorOnboardingForm() {
           </Field>
         </div>
 
+        <div className="grid gap-4 sm:grid-cols-3">
+          <Field label="Retail price per unit ($)" help="What an end customer pays.">
+            <input
+              type="number"
+              inputMode="decimal"
+              min={0}
+              step="0.01"
+              value={form.retailPricePerUnit}
+              onChange={(e) => set("retailPricePerUnit", e.target.value)}
+              className={INPUT_CLS}
+              placeholder="e.g. 20.00"
+            />
+          </Field>
+          <Field label="Case / pack size" required help="How you sell to wholesale buyers.">
+            <input
+              type="text"
+              required
+              value={form.caseSize}
+              onChange={(e) => set("caseSize", e.target.value)}
+              className={INPUT_CLS}
+              placeholder="e.g. 12 x 8oz, 5 lb box"
+            />
+          </Field>
+          <Field label="Wholesale price per case ($)" required>
+            <input
+              type="number"
+              required
+              inputMode="decimal"
+              min={0}
+              step="0.01"
+              value={form.caseWholesalePrice}
+              onChange={(e) => set("caseWholesalePrice", e.target.value)}
+              className={INPUT_CLS}
+              placeholder="e.g. 48.00"
+            />
+          </Field>
+        </div>
+
+        <Field label="Negotiable on volume?">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={form.pricingNegotiable}
+              onChange={(e) => set("pricingNegotiable", e.target.checked)}
+              className={CHECKBOX_CLS}
+            />
+            <span>Yes, wholesale pricing is negotiable based on committed volume.</span>
+          </label>
+        </Field>
+
         <Field
-          label="Wholesale pricing"
+          label="Volume tiers and other pricing notes"
           required
-          help="Describe your price tiers. Per-SKU prices come later &mdash; this is the structure."
+          help="Tier breaks, freight included thresholds, seasonal price swings &mdash; anything that affects the case price."
         >
           <textarea
             required
@@ -466,7 +630,7 @@ export function VendorOnboardingForm() {
             value={form.wholesalePricingNotes}
             onChange={(e) => set("wholesalePricingNotes", e.target.value)}
             className={`${INPUT_CLS} font-sans`}
-            placeholder="e.g. Case of 12 at $48/case at 1-4 cases; $44/case at 5+. Free shipping on orders $500+."
+            placeholder="e.g. $48/case at 1-4 cases; $44/case at 5+. Free shipping on orders $500+. Pricing reviewed every Jan 1."
           />
         </Field>
 
@@ -522,12 +686,57 @@ export function VendorOnboardingForm() {
         </Field>
 
         <Field
-          label="Transportation"
+          label="How can you get product to us?"
           required
-          help="How do you prefer to ship to our Chicago hub? (We pick up, you ship, either works.)"
+          help="Pick every option that works for you. We will sort out the best lane together."
+        >
+          <div className="flex flex-col gap-2">
+            {TRANSPORTATION_METHODS.map((m) => {
+              const checked = form.transportationMethods.includes(m);
+              return (
+                <label
+                  key={m}
+                  className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
+                    checked
+                      ? "border-primary bg-primary/5 text-foreground"
+                      : "border-border bg-background text-foreground hover:border-primary/50"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleArrayValue("transportationMethods", m)}
+                    className={CHECKBOX_CLS}
+                  />
+                  <span>{m}</span>
+                </label>
+              );
+            })}
+          </div>
+        </Field>
+
+        {form.transportationMethods.includes("We pick up at their location") && (
+          <Field
+            label="Pickup address"
+            required
+            help="Street address where we collect product. Used for route planning."
+          >
+            <textarea
+              required
+              rows={2}
+              value={form.pickupAddress}
+              onChange={(e) => set("pickupAddress", e.target.value)}
+              className={`${INPUT_CLS} font-sans`}
+              placeholder="e.g. 12345 County Road 681, Covert, MI 49043"
+            />
+          </Field>
+        )}
+
+        <Field
+          label="Logistics notes (optional)"
+          help="Anything else about shipping, lanes, cold-chain handoff, or scheduling we should know."
         >
           <textarea
-            required
             rows={2}
             value={form.transportationNotes}
             onChange={(e) => set("transportationNotes", e.target.value)}
