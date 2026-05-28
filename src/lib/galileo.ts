@@ -21,9 +21,38 @@ const MAX_POLLS = 30;        // 30 polls * 20s = 10 minutes total wait
 const POLL_INTERVAL_MS = 20_000;
 
 export interface GalileoResult {
-  status: "completed" | "thinking" | "error";
-  text: string;                  // Galileo's verbatim answer (latest message text)
+  /**
+   * Disposition of the run:
+   *   - "completed": Galileo emitted an `isTerminalMessage: true` message;
+   *     `text` is the verbatim answer.
+   *   - "completed_no_terminal": MCP stream closed normally (outer status flipped
+   *     to "completed") but no terminal message was ever emitted. This is the
+   *     "Galileo answered with charts, not prose" case — common when the run
+   *     built session-filter metrics and cited example sessions but never wrote
+   *     a prose conclusion. `text` is the meta-narration (Building Metric: /
+   *     Watching Sessions: lines) and `citedSessions` / `metricIds` carry the
+   *     structured signal a caller needs to disposition without scraping URLs.
+   *   - "thinking": Poll cap hit or the stream never finished — answer is
+   *     truly incomplete and the caller should NOT treat this as a finding.
+   *   - "error": Transport / RPC error from the MCP.
+   */
+  status: "completed" | "completed_no_terminal" | "thinking" | "error";
+  text: string;                  // Galileo's verbatim answer (terminal text) or, for completed_no_terminal, the joined meta-narration
   links: string[];               // Every link Galileo cited — preserve all (per MCP contract)
+  /**
+   * LogRocket session URLs cited by Galileo during the run (subset of `links`).
+   * Format: `https://app.logrocket.com/<org>/<app>/s/<sessionID>/<n>`.
+   * Use this to disposition Layer 3 rechecks: zero post-fix sessions cited
+   * after a fix ships is evidence the frustration pattern dropped.
+   */
+  citedSessions: string[];
+  /**
+   * IDs of metrics Galileo built or referenced during the run. Extracted from
+   * URLs (`/metrics/<id>`, `/charts/<id>`, `/m/<id>`) and from explicit
+   * `metricID` / `metricId` fields on the message stream. "Galileo built N
+   * session-filter metrics, no matching sessions" is a disposition signal.
+   */
+  metricIds: string[];
   chatID?: string;
   promptVersion?: string;        // Echo back the prompt version for journaling
   rawMessages: unknown[];        // Full message stream for the BigQuery journal
@@ -99,9 +128,28 @@ async function mcpCall(method: string, params: unknown, requestId = 1): Promise<
  */
 const META_NARRATION_RE = /^(Watching Sessions?:|Building Metric:|Querying|Analyzing|Fetching|Loading|Investigating|Looking at)/i;
 
+/**
+ * Matches a LogRocket session URL like
+ *   https://app.logrocket.com/<org>/<app>/s/6-<ULID>/0?t=...
+ * The `/s/<sessionID>/<n>` segment is the load-bearing identifier.
+ */
+const SESSION_URL_RE = /\/s\/[A-Za-z0-9_-]+\/\d+/;
+
+/**
+ * Pulls a metric/chart ID out of a Galileo-cited URL. Galileo surfaces these
+ * via `/metrics/<id>`, `/charts/<id>`, or `/m/<id>` (chart-builder links).
+ */
+function extractMetricIdFromUrl(url: string): string | null {
+  const m = url.match(/\/(?:metrics|charts|m)\/([A-Za-z0-9_-]+)/);
+  return m ? m[1] : null;
+}
+
 function extractTextAndLinks(envelope: McpEnvelope): {
   text: string;
+  narration: string;
   links: string[];
+  citedSessions: string[];
+  metricIds: string[];
   messages: unknown[];
   /** True when at least one message with isTerminalMessage:true was found. */
   hasTerminal: boolean;
@@ -112,6 +160,8 @@ function extractTextAndLinks(envelope: McpEnvelope): {
   const content = envelope.result?.content ?? [];
   const messages: unknown[] = [];
   const links: string[] = [];
+  const citedSessions: string[] = [];
+  const metricIds: string[] = [];
 
   // Galileo's actual shape (verified against MCP probe 2026-05-14):
   //   { type: "system", messageContent: "...prose...", toolType, messageID, isTerminalMessage }
@@ -140,7 +190,14 @@ function extractTextAndLinks(envelope: McpEnvelope): {
           text?: string;
           content?: string;
           isTerminalMessage?: boolean;
+          metricID?: string;
+          metricId?: string;
         };
+        // Explicit metric IDs on the message envelope take priority over URL parsing.
+        const explicitMetricId = mm.metricID ?? mm.metricId;
+        if (typeof explicitMetricId === "string" && !metricIds.includes(explicitMetricId)) {
+          metricIds.push(explicitMetricId);
+        }
         const body = mm.messageContent ?? mm.text ?? mm.content;
         if (!body) continue;
         if (mm.isTerminalMessage) {
@@ -160,7 +217,13 @@ function extractTextAndLinks(envelope: McpEnvelope): {
   }
 
   let text: string;
+  let narration: string;
   let hasTerminal: boolean;
+
+  // Narration is everything non-terminal Galileo emitted — including the
+  // `Building Metric:` / `Watching Sessions:` lines. Callers in the
+  // `completed_no_terminal` branch use this so they have something to cite.
+  narration = nonTerminalTexts.join("\n\n");
 
   if (terminalText !== null) {
     // We have a definitive Galileo answer.
@@ -174,13 +237,26 @@ function extractTextAndLinks(envelope: McpEnvelope): {
     hasTerminal = false;
   }
 
-  // Galileo's contract: every URL in the answer must be surfaced. Extract
-  // anything that looks like a LogRocket link out of the final text.
+  // Galileo's contract: every URL in the answer must be surfaced. Pull URLs
+  // from BOTH the terminal text (or filtered prose) and the narration, since
+  // chart-only finishes carry the load-bearing URLs in the narration only.
   const linkRegex = /https?:\/\/[^\s)\]]+/g;
-  const found = text.match(linkRegex) ?? [];
-  for (const url of found) if (!links.includes(url)) links.push(url);
+  const urlSources = [text, narration].filter(Boolean).join("\n");
+  const found = urlSources.match(linkRegex) ?? [];
+  for (const rawUrl of found) {
+    // Trim common trailing punctuation that the broad regex absorbs.
+    const url = rawUrl.replace(/[.,;:!?]+$/, "");
+    if (!links.includes(url)) links.push(url);
+    if (SESSION_URL_RE.test(url) && !citedSessions.includes(url)) {
+      citedSessions.push(url);
+    }
+    const metricId = extractMetricIdFromUrl(url);
+    if (metricId && !metricIds.includes(metricId)) {
+      metricIds.push(metricId);
+    }
+  }
 
-  return { text, links, messages, hasTerminal };
+  return { text, narration, links, citedSessions, metricIds, messages, hasTerminal };
 }
 
 function extractChatId(envelope: McpEnvelope): string | undefined {
@@ -221,19 +297,48 @@ function extractStatus(envelope: McpEnvelope): "completed" | "thinking" | undefi
 
 /**
  * Ask Galileo a question and wait for the completed answer. Returns the
- * verbatim text, the full link set, and the message stream — preserve all
- * three when journaling to BigQuery.
+ * verbatim text, the full link set, structured `citedSessions` / `metricIds`,
+ * and the message stream — preserve all five when journaling to BigQuery.
  *
  * The caller does not modify, paraphrase, or filter Galileo's output. The
  * agent layer adds business framing ("revenue impact + ownership"); it
  * does NOT edit Galileo's narrative or its links.
+ *
+ * ## Status semantics (UNC-1383)
+ *
+ * - `"completed"` — Galileo emitted `isTerminalMessage: true`. `text` is the
+ *   verbatim answer. Disposition normally.
+ * - `"completed_no_terminal"` — Outer MCP status flipped to `completed` but
+ *   no terminal message was ever sent. Galileo answered via the chart-builder
+ *   tool path. `text` carries the meta-narration (`Building Metric:` /
+ *   `Watching Sessions:` lines) so the caller has something to cite; the
+ *   load-bearing disposition signal is on `citedSessions` and `metricIds`.
+ *   Layer 3 LogRocket dispositioners can close on
+ *   `citedSessions.length === 0` (or all-pre-fix ULIDs) without scraping
+ *   chart URLs out of the narration. See
+ *   `feedback_logrocket_fix_verification.md`.
+ * - `"thinking"` — Poll cap hit (`MAX_POLLS * POLL_INTERVAL_MS` = 10 min) or
+ *   the stream never finished. `text` is empty. Do NOT treat as a finding.
+ * - `"error"` — Transport / RPC error from the MCP.
  */
 export async function askGalileo(query: string, opts?: { promptVersion?: string }): Promise<GalileoResult> {
   const started = Date.now();
   const rawMessages: unknown[] = [];
   const linksBuf: string[] = [];
+  const citedSessionsBuf: string[] = [];
+  const metricIdsBuf: string[] = [];
+  const narrationBuf: string[] = [];
   // Only keep the terminal answer text — never accumulate meta-narration.
   let terminalText: string | null = null;
+
+  const pushExtracted = (e: ReturnType<typeof extractTextAndLinks>) => {
+    rawMessages.push(...e.messages);
+    if (e.hasTerminal) terminalText = e.text;
+    if (e.narration) narrationBuf.push(e.narration);
+    for (const l of e.links) if (!linksBuf.includes(l)) linksBuf.push(l);
+    for (const s of e.citedSessions) if (!citedSessionsBuf.includes(s)) citedSessionsBuf.push(s);
+    for (const m of e.metricIds) if (!metricIdsBuf.includes(m)) metricIdsBuf.push(m);
+  };
 
   const initial = await mcpCall("tools/call", {
     name: "use_logrocket",
@@ -244,15 +349,14 @@ export async function askGalileo(query: string, opts?: { promptVersion?: string 
       status: "error",
       text: `Galileo MCP error ${initial.error.code}: ${initial.error.message}`,
       links: [],
+      citedSessions: [],
+      metricIds: [],
       rawMessages: [initial],
       durationMs: Date.now() - started,
       promptVersion: opts?.promptVersion,
     };
   }
-  const first = extractTextAndLinks(initial);
-  rawMessages.push(...first.messages);
-  if (first.hasTerminal) terminalText = first.text;
-  for (const l of first.links) if (!linksBuf.includes(l)) linksBuf.push(l);
+  pushExtracted(extractTextAndLinks(initial));
 
   let chatID = extractChatId(initial);
   let status = extractStatus(initial) ?? "completed";
@@ -271,32 +375,45 @@ export async function askGalileo(query: string, opts?: { promptVersion?: string 
         status: "error",
         text: terminalText ?? `[poll error ${next.error.code}: ${next.error.message}]`,
         links: linksBuf,
+        citedSessions: citedSessionsBuf,
+        metricIds: metricIdsBuf,
         chatID,
         rawMessages: [...rawMessages, next],
         durationMs: Date.now() - started,
         promptVersion: opts?.promptVersion,
       };
     }
-    const step = extractTextAndLinks(next);
-    rawMessages.push(...step.messages);
-    // Only overwrite the answer when a terminal message is present.
-    if (step.hasTerminal) terminalText = step.text;
-    for (const l of step.links) if (!linksBuf.includes(l)) linksBuf.push(l);
+    pushExtracted(extractTextAndLinks(next));
     status = extractStatus(next) ?? status;
     const nextChat = extractChatId(next);
     if (nextChat) chatID = nextChat;
   }
 
-  // If status is still "thinking" after the poll cap — or if we never received
-  // a terminal message even though the outer status says "completed" — mark the
-  // result as "thinking" so callers know the answer is incomplete.
-  const resolvedStatus: GalileoResult["status"] =
-    terminalText !== null ? "completed" : "thinking";
+  // Three-way resolution (UNC-1383):
+  //   - terminal message present       → "completed" with verbatim text
+  //   - no terminal, outer status done  → "completed_no_terminal" with narration
+  //     (Galileo answered via chart-builder; cited sessions + metric IDs are
+  //     the load-bearing signal — see citedSessions / metricIds fields)
+  //   - still in "thinking" (poll cap)  → "thinking" with empty text
+  let resolvedStatus: GalileoResult["status"];
+  let resolvedText: string;
+  if (terminalText !== null) {
+    resolvedStatus = "completed";
+    resolvedText = (terminalText as string).trim();
+  } else if (status === "completed") {
+    resolvedStatus = "completed_no_terminal";
+    resolvedText = narrationBuf.join("\n\n").trim();
+  } else {
+    resolvedStatus = "thinking";
+    resolvedText = "";
+  }
 
   return {
     status: resolvedStatus,
-    text: terminalText?.trim() ?? "",
+    text: resolvedText,
     links: linksBuf,
+    citedSessions: citedSessionsBuf,
+    metricIds: metricIdsBuf,
     chatID,
     rawMessages,
     durationMs: Date.now() - started,

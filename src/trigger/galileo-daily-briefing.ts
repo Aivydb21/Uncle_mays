@@ -33,10 +33,10 @@ import { sendInternalAlert } from "../lib/email/resend";
  */
 export const galileoDailyBriefing = schedules.task({
   id: "galileo-daily-briefing",
-  // 14:00 UTC daily — ~09:00 CDT (summer) / 08:00 CST (winter). Shifted from
-  // 12:00 UTC on 2026-05-16 so the Tailscale-hosted Paperclip API is up when
-  // the briefing posts the CTO task.
-  cron: "0 14 * * *",
+  // PAUSED 2026-05-28: LogRocket sub paused for ~2 weeks. Restore by uncommenting
+  // the cron line below and redeploying Trigger. Task body is intact and still
+  // works on manual trigger.
+  // cron: "0 14 * * *",
   // Override the project-wide 60s default. The briefing must complete and
   // post to Paperclip every day even if Galileo is slow — getting the
   // information pull is the whole point. Generous 1h ceiling per CEO
@@ -61,10 +61,12 @@ export const galileoDailyBriefing = schedules.task({
               status: "error" as const,
               text: `Error querying Galileo: ${message}`,
               links: [],
+              citedSessions: [],
+              metricIds: [],
               rawMessages: [],
               durationMs: 0,
               promptVersion: prompt.version,
-            },
+            } satisfies GalileoResult,
           };
         }
       })
@@ -86,7 +88,13 @@ export const galileoDailyBriefing = schedules.task({
 
     // Alert the CTO when any prompt did not reach a terminal answer — these
     // rows are incomplete and should not be treated as Galileo's findings.
-    const incompletePrompts = answers.filter(({ result }) => result.status !== "completed");
+    // `completed_no_terminal` is a *finished* run that answered via the
+    // chart-builder (citedSessions + metricIds are populated) — it's a valid
+    // disposition signal, not an "incomplete" failure. Only flag truly
+    // unfinished runs (status === "thinking" or "error").
+    const incompletePrompts = answers.filter(
+      ({ result }) => result.status !== "completed" && result.status !== "completed_no_terminal"
+    );
     if (incompletePrompts.length > 0) {
       const names = incompletePrompts.map(({ prompt, result }) => `${prompt.id} (${result.status})`).join(", ");
       await sendInternalAlert({
@@ -290,15 +298,29 @@ function buildPaperclipDescription(
       const links = result.links.length
         ? `\n\n**Session Links:**\n${result.links.map((u) => `- ${u}`).join("\n")}`
         : "";
-      const statusBanner =
-        result.status !== "completed"
-          ? `\n\n> **Warning:** Galileo did not reach a terminal answer for this prompt (status: \`${result.status}\`). The content below is incomplete — do NOT act on it as a finding. Re-run \`galileo-on-demand\` with promptId \`${prompt.id}\` when Galileo is available.\n`
-          : "";
-      const answerBody = result.status === "completed" && result.text
-        ? result.text
-        : result.status !== "completed"
-          ? "_(No terminal answer — Galileo timed out or is still thinking)_"
-          : result.text;
+      // Three distinct banner cases (UNC-1383):
+      //   completed              → no banner, render verbatim text
+      //   completed_no_terminal  → Galileo finished but answered via charts —
+      //                            surface the structured signal (sessions +
+      //                            metric IDs) so the CTO can disposition
+      //                            without scraping URLs from the narration
+      //   thinking/error         → truly incomplete, do not act on it
+      const sessionsLine = result.citedSessions.length
+        ? `\n- Cited sessions: ${result.citedSessions.length}`
+        : "\n- Cited sessions: 0";
+      const metricsLine = result.metricIds.length
+        ? `\n- Metrics built/referenced: ${result.metricIds.length} (${result.metricIds.join(", ")})`
+        : "\n- Metrics built/referenced: 0";
+      let statusBanner = "";
+      if (result.status === "completed_no_terminal") {
+        statusBanner = `\n\n> **Note:** Galileo finished without a prose answer for this prompt — it answered via the chart-builder. The narration below is meta-narration; the structured signal is:${sessionsLine}${metricsLine}\n`;
+      } else if (result.status !== "completed") {
+        statusBanner = `\n\n> **Warning:** Galileo did not reach a terminal answer for this prompt (status: \`${result.status}\`). The content below is incomplete — do NOT act on it as a finding. Re-run \`galileo-on-demand\` with promptId \`${prompt.id}\` when Galileo is available.\n`;
+      }
+      const answerBody =
+        result.status === "thinking" || result.status === "error"
+          ? "_(No terminal answer — Galileo timed out, errored, or is still thinking)_"
+          : result.text || "_(empty)_";
       return `### ${prompt.id}\n\n**Prompt:** ${prompt.text}${statusBanner}\n\n**Galileo's Answer:**\n\n${answerBody}${links}`;
     })
     .join("\n\n---\n\n");

@@ -118,6 +118,63 @@ describe("askGalileo — isTerminalMessage handling (UNC-1220)", () => {
     }
   });
 
+  it("returns completed_no_terminal with narration + citedSessions when status=completed but no terminal message (UNC-1383)", async () => {
+    // Galileo finished its tools (outer status flipped to "completed") but
+    // never emitted an isTerminalMessage:true — answered via chart-builder.
+    const messages = [
+      {
+        messageContent:
+          "Building Metric: drop_off_after_cart\nhttps://app.logrocket.com/mk3nrx/uncle_mays/charts/met_abc123",
+        isTerminalMessage: false,
+      },
+      {
+        messageContent:
+          "Watching Sessions: representative pre-fix sessions\n" +
+          "- https://app.logrocket.com/mk3nrx/uncle_mays/s/6-019e3f4a-08c2-77df-a6ad-d1bc9009c566/0\n" +
+          "- https://app.logrocket.com/mk3nrx/uncle_mays/s/6-019e3d24-2783-7b02-82c9-66d34ce24918/0",
+        isTerminalMessage: false,
+      },
+    ];
+
+    const envelope = makeEnvelope(messages, "completed");
+    globalThis.fetch = () => fakeFetchResponse(envelope);
+
+    const result = await askGalileo("Any post-fix sessions of the time-slot pattern?");
+
+    assert.equal(result.status, "completed_no_terminal", "outer status=completed + no terminal → completed_no_terminal");
+    assert.ok(result.text.length > 0, "text should hold the meta-narration so callers can cite it");
+    assert.ok(result.text.includes("Building Metric"), "narration is the load-bearing text");
+    assert.equal(result.citedSessions.length, 2, "session URLs surfaced in citedSessions");
+    assert.ok(
+      result.citedSessions.every((u) => /\/s\/[A-Za-z0-9_-]+\/\d+/.test(u)),
+      "every citedSessions entry matches the LogRocket session URL shape"
+    );
+    assert.ok(result.metricIds.includes("met_abc123"), "metric IDs extracted from /charts/<id> URLs");
+  });
+
+  it("still returns status=thinking when poll cap hit and outer status never flipped to completed", async () => {
+    // Stream stays in `thinking` indefinitely → completed_no_terminal must NOT fire.
+    const thinkingMessages = [
+      { messageContent: "Watching Sessions: still analyzing...", isTerminalMessage: false },
+    ];
+    const envelope = makeEnvelope(thinkingMessages, "thinking");
+    globalThis.fetch = () => fakeFetchResponse(envelope);
+
+    const originalSetTimeout = globalThis.setTimeout;
+    (globalThis as any).setTimeout = (fn: () => void, _ms: number) => {
+      fn();
+      return 0 as unknown as ReturnType<typeof setTimeout>;
+    };
+
+    try {
+      const result = await askGalileo("?");
+      assert.equal(result.status, "thinking");
+      assert.equal(result.text, "");
+    } finally {
+      globalThis.setTimeout = originalSetTimeout;
+    }
+  });
+
   it("uses the last terminal message when multiple appear in the stream", async () => {
     const messages = [
       { messageContent: "Watching Sessions: Starting analysis...", isTerminalMessage: false },

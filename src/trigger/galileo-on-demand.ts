@@ -26,6 +26,7 @@ import { findPrompt } from "./_galileo-prompts";
  */
 export const galileoOnDemand = task({
   id: "galileo-on-demand",
+  maxDuration: 660, // Galileo can take up to 10 min (30 polls × 20s); give 660s headroom
   retry: {
     maxAttempts: 3,
     factor: 2,
@@ -63,9 +64,16 @@ export const galileoOnDemand = task({
       promptId,
       promptVersion,
       query: queryText,
+      // status can be "completed" | "completed_no_terminal" | "thinking" | "error".
+      // Layer 3 LogRocket dispositioners: a "completed_no_terminal" with zero
+      // post-fix entries in `citedSessions` is sufficient to disposition `done`
+      // — no manual chart-link inspection required. See
+      // `feedback_logrocket_fix_verification.md`.
       status: result.status,
       text: result.text,
       links: result.links,
+      citedSessions: result.citedSessions,
+      metricIds: result.metricIds,
       chatID: result.chatID,
       durationMs: result.durationMs,
       originatingAgentId: payload.originatingAgentId,

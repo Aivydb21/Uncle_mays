@@ -29,8 +29,9 @@ import { sendInternalAlert } from "../lib/email/resend";
  */
 export const galileoIncidentAlert = schedules.task({
   id: "galileo-incident-alert",
-  // Every 30 minutes
-  cron: "*/30 * * * *",
+  // PAUSED 2026-05-28: LogRocket sub paused for ~2 weeks. Restore by uncommenting
+  // the cron line below and redeploying Trigger. Manual trigger still works.
+  // cron: "*/30 * * * *",
   // Galileo polling can take up to 10 min (30 polls × 20s); match galileo-on-demand budget
   maxDuration: 660,
   run: async () => {
@@ -61,6 +62,24 @@ export const galileoIncidentAlert = schedules.task({
         timestamp,
         status: "monitoring_error",
         error: message,
+        durationMs: Date.now() - started,
+      };
+    }
+
+    // Galileo finished via the chart-builder without writing prose
+    // (`completed_no_terminal` — UNC-1383). The text in that case is
+    // meta-narration ("Building Metric: ...", "Watching Sessions: ..."), not a
+    // finding. Treat it as "no actionable incident" — if there were truly a
+    // critical issue, Galileo would have written a prose terminal message.
+    if (result.status === "completed_no_terminal") {
+      return {
+        timestamp,
+        status: "no_incident_chart_only",
+        text: result.text,
+        links: result.links,
+        citedSessions: result.citedSessions,
+        metricIds: result.metricIds,
+        chatID: result.chatID,
         durationMs: Date.now() - started,
       };
     }
