@@ -23,6 +23,7 @@ from ml.ingest import (
     bigquery_ga4,
     bigquery_logrocket_loader,
     bigquery_galileo_fix_tracking,
+    bigquery_reconciliation_alert,
     bigquery_stripe_loader,
     census,
     checkout_store,
@@ -158,6 +159,17 @@ def _run(args: argparse.Namespace) -> None:
 
     print("\n--- building dataset ---")
     build_dataset.build()
+
+    # --- Reconciliation alert (after BQ loads + dataset build) ---
+    if not args.skip_bq_load:
+        print("\n--- reconciliation alert ---")
+        t0 = time.time()
+        try:
+            bigquery_reconciliation_alert.run()
+            print(f"[OK] reconciliation_alert in {time.time() - t0:.1f}s")
+        except Exception as e:
+            print(f"[FAIL] reconciliation_alert: {e}")
+            traceback.print_exc()
 
 
 if __name__ == "__main__":
