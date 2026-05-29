@@ -55,6 +55,13 @@ KNOWN_GAP_ISSUE_ID = "c7029e01-2725-423d-b0a8-745acfffe6ec"  # UNC-1430
 # Orders older than this many hours are considered "settled" for matching.
 GRACE_HOURS = 48
 
+# Backlog cutoff — orders before this timestamp are part of the UNC-1430 outage
+# window (Apr 30 – May 29).  GA4 purchase events cannot be retroactively backfilled
+# for that cohort, so reconciliation_status will be GA4_MISSING forever.  We exclude
+# them from alerting to prevent UNC-1435-style replay after the CTO closes the issue.
+# Set to the UNC-1430 "done" timestamp (UNC-1435 parent context).
+POST_FIX_CUTOFF = "2026-05-29 23:28:00 UTC"
+
 # ── BQ helpers ──────────────────────────────────────────────────────────────
 
 def _creds() -> service_account.Credentials:
@@ -134,7 +141,7 @@ SELECT
   attribution_gap_reason
 FROM `{BQ_PROJECT}.{BQ_DATASET}.{VIEW}`
 WHERE reconciliation_status = 'GA4_MISSING'
-  AND stripe_created_at >= TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL 7 DAY)
+  AND stripe_created_at >= TIMESTAMP '{POST_FIX_CUTOFF}'
   AND stripe_created_at < TIMESTAMP_SUB(CURRENT_TIMESTAMP(), INTERVAL {GRACE_HOURS} HOUR)
 ORDER BY stripe_created_at DESC
 """
