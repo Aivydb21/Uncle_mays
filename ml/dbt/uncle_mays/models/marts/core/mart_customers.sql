@@ -30,7 +30,7 @@ customer_agg as (
 
         -- Acquisition (first order)
         min(ordered_at)                                  as first_order_at,
-        date_trunc('month', min(ordered_at))             as acquisition_month,
+        {% if target.type == 'bigquery' %}DATE_TRUNC(CAST(MIN(ordered_at) AS DATE), MONTH){% else %}date_trunc('month', min(ordered_at)){% endif %} as acquisition_month,
 
         -- LTV
         count(*)                                         as total_orders,

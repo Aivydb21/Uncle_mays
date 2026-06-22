@@ -142,13 +142,17 @@ def _run(args: argparse.Namespace) -> None:
     # --- BigQuery warehouse load (after parquets are fresh) ---
     if not args.skip_bq_load:
         print("\n--- loading to BigQuery warehouse ---")
-        for name, fn in [
+        bq_steps = [
             ("bq_stripe_loader", bigquery_stripe_loader.load_all),
             ("bq_ads_loader", bigquery_ads_loader.load_all),
             ("bq_crm_loader", bigquery_crm_loader.load_all),
-            ("bq_logrocket_loader", bigquery_logrocket_loader.load_all),
-            ("bq_galileo_fix_tracking", bigquery_galileo_fix_tracking.sync),
-        ]:
+        ]
+        if not args.skip_logrocket:
+            bq_steps += [
+                ("bq_logrocket_loader", bigquery_logrocket_loader.load_all),
+                ("bq_galileo_fix_tracking", bigquery_galileo_fix_tracking.sync),
+            ]
+        for name, fn in bq_steps:
             t0 = time.time()
             try:
                 fn()

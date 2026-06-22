@@ -20,6 +20,16 @@ const WEBSITE_ROOT = join(__dirname, "..", "..");
 const ML_ROOT = join(WEBSITE_ROOT, "ml");
 const DBT_PROJECT = join(ML_ROOT, "dbt", "uncle_mays");
 
+// Use the Python 3.12 venv's dbt to avoid mashumaro incompatibility with Python 3.14
+// (system Python is 3.14; dbt-bigquery 1.11 requires Python ≤3.12). UNC-1361.
+const DBT_EXE = join(
+  ML_ROOT,
+  "dbt",
+  ".venv",
+  "Scripts",
+  process.platform === "win32" ? "dbt.exe" : "dbt"
+);
+
 interface StepResult {
   step: string;
   ok: boolean;
@@ -91,7 +101,7 @@ async function runDbt(): Promise<StepResult[]> {
   const steps: StepResult[] = [];
 
   // dbt deps first (idempotent; ensures packages are up-to-date)
-  const deps = runCmd("dbt", ["deps"], { cwd: DBT_PROJECT, timeoutMs: 120_000 });
+  const deps = runCmd(DBT_EXE, ["deps"], { cwd: DBT_PROJECT, timeoutMs: 120_000 });
   steps.push({ step: "dbt_deps", ...deps });
 
   if (!deps.ok) {
@@ -99,7 +109,7 @@ async function runDbt(): Promise<StepResult[]> {
     console.warn("[ml-weekly-pipeline] dbt deps failed (non-fatal); continuing to dbt run.");
   }
 
-  const run = runCmd("dbt", ["run", "--profiles-dir", ML_ROOT + "/dbt"], {
+  const run = runCmd(DBT_EXE, ["run", "--profiles-dir", ML_ROOT + "/dbt"], {
     cwd: DBT_PROJECT,
     timeoutMs: 600_000, // 10 min
   });
@@ -107,7 +117,7 @@ async function runDbt(): Promise<StepResult[]> {
 
   if (run.ok) {
     // Run dbt test after successful run.
-    const test = runCmd("dbt", ["test", "--profiles-dir", ML_ROOT + "/dbt"], {
+    const test = runCmd(DBT_EXE, ["test", "--profiles-dir", ML_ROOT + "/dbt"], {
       cwd: DBT_PROJECT,
       timeoutMs: 300_000,
     });

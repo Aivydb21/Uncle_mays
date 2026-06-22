@@ -158,6 +158,33 @@ models:
         tests:
           - not_null
 
+  - name: mart_logrocket_session_summary
+    description: >
+      Daily session summary derived from LogRocket via Galileo MCP (UNC-1221).
+      One row per UTC calendar day once ml/ingest/logrocket.py --session-summary runs.
+
+      Background: the LogRocket REST /sessions endpoint returns 404. As a workaround,
+      logrocket.py --session-summary asks Galileo for structured counts and writes
+      1 summary row per day (source = 'galileo_summary') to logrocket_raw.sessions.
+      This mart joins those rows with GA4 daily sessions for parity validation.
+
+      Key columns:
+        summary_date             — UTC date
+        session_count            — total sessions per Galileo
+        mobile_sessions          — mobile device sessions
+        desktop_sessions         — desktop/tablet sessions
+        frustrated_user_count    — users classified as frustrated
+        ga4_sessions             — GA4 session_start count for same day
+        session_count_vs_ga4_pct — % deviation (NULL if no GA4 data)
+
+      Acceptance criteria (UNC-1221): session_count within 30% of ga4_sessions.
+    columns:
+      - name: summary_date
+        description: UTC calendar date of the session summary
+        tests:
+          - unique
+          - not_null
+
   - name: mart_retention
     description: >
       Cohort-based retention analysis. One row per acquisition month.

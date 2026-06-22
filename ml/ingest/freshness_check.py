@@ -53,6 +53,8 @@ THRESHOLDS: list[tuple[str, float, str]] = [
     ("resend_emails", 26, "daily"),
     # Census ACS — weekly (8 days = 192h)
     ("census_acs_zip", 192, "weekly +1day buffer"),
+    # LogRocket — daily (replaced Clarity 2026-05-18)
+    ("logrocket_sessions", 26, "daily"),
 ]
 
 

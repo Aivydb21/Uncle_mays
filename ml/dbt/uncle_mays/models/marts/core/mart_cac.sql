@@ -28,7 +28,7 @@
 -- Aggregate Meta Ads spend to weekly totals
 with meta_weekly as (
     select
-        date_trunc('week', report_date)          as spend_week,
+        {% if target.type == 'bigquery' %}DATE_TRUNC(report_date, WEEK){% else %}date_trunc('week', report_date){% endif %} as spend_week,
         'meta_ads'                               as channel,
         sum(spend_usd)                           as spend_dollars
     from {{ ref('stg_meta_campaign_insights') }}
@@ -38,7 +38,7 @@ with meta_weekly as (
 -- Aggregate Google Ads spend to weekly totals
 gads_weekly as (
     select
-        date_trunc('week', report_date)          as spend_week,
+        {% if target.type == 'bigquery' %}DATE_TRUNC(report_date, WEEK){% else %}date_trunc('week', report_date){% endif %} as spend_week,
         'google_ads'                             as channel,
         sum(spend_usd)                           as spend_dollars
     from {{ ref('stg_gads_campaign_insights') }}
@@ -55,7 +55,7 @@ all_spend as (
 -- New customer acquisitions from attribution mart, weekly by channel
 new_customer_acquisitions as (
     select
-        order_week,
+        {% if target.type == 'bigquery' %}CAST(order_week AS DATE){% else %}order_week{% endif %} as order_week,
         channel,
         count(*)                                 as new_customers,
         sum(gross_revenue_dollars)               as new_customer_revenue_dollars
@@ -67,7 +67,7 @@ new_customer_acquisitions as (
 -- All-channel order stats (new + repeat) for ROAS denominator
 all_channel_orders as (
     select
-        order_week,
+        {% if target.type == 'bigquery' %}CAST(order_week AS DATE){% else %}order_week{% endif %} as order_week,
         channel,
         count(*)                                 as total_orders,
         sum(gross_revenue_dollars)               as total_revenue_dollars
@@ -78,7 +78,7 @@ all_channel_orders as (
 -- Build the full channel × week spine from both spend and orders
 channel_weeks as (
     select distinct spend_week as week, channel from all_spend
-    union
+    union distinct
     select distinct order_week as week, channel from new_customer_acquisitions
 ),
 

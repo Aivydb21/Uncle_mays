@@ -45,8 +45,18 @@ from ._common import load_dotenv_if_present
 
 BQ_PROJECT = "uncle-mays-automation"
 BQ_DATASET = "stripe_raw"
+BQ_MARTS_DATASET = "stripe_marts"
 BQ_LOCATION = "US"
 SA_PATH = os.environ.get("GA_SERVICE_ACCOUNT_PATH", "~/.claude/ga-service-account.json")
+
+# Emails that identify internal/test orders (Anthony + ops accounts).
+# Board-approved 2026-05-24 (approval 6ebc416c). Add here if new internal emails are used.
+INTERNAL_EMAIL_SET: frozenset[str] = frozenset(
+    {
+        "anthony@unclemays.com",
+        "anthonypivy@gmail.com",
+    }
+)
 
 # Map Polars dtype string prefixes -> BQ type
 # Polars Datetime variants look like "Datetime[μs, UTC]" so we use startswith.
@@ -72,6 +82,7 @@ STRIPE_TABLES: list[tuple[str, str, str]] = [
     ("charges", "stripe_charges_*.parquet", "charge_id"),
     ("subscriptions", "stripe_subscriptions_*.parquet", "subscription_id"),
     ("invoices", "stripe_invoices_*.parquet", "invoice_id"),
+    ("refunds", "stripe_refunds_*.parquet", "refund_id"),
 ]
 
 
@@ -304,6 +315,168 @@ def _merge_parquets(glob_pattern: str, primary_key: str) -> pl.DataFrame:
     return deduped
 
 
+def _ensure_marts_dataset(creds: service_account.Credentials) -> None:
+    url = (
+        f"https://bigquery.googleapis.com/bigquery/v2/projects/{BQ_PROJECT}"
+        f"/datasets/{BQ_MARTS_DATASET}"
+    )
+    req = urllib.request.Request(url, headers={"Authorization": f"Bearer {_token(creds)}"})
+    try:
+        with urllib.request.urlopen(req, timeout=30):
+            return
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            raise RuntimeError(f"Marts dataset check failed: {e.read().decode()[:300]}") from e
+    body = {
+        "datasetReference": {"projectId": BQ_PROJECT, "datasetId": BQ_MARTS_DATASET},
+        "location": BQ_LOCATION,
+        "description": "Analytics-ready Stripe mart views — built by bigquery_stripe_loader.py",
+    }
+    _bq_request(
+        creds,
+        f"https://bigquery.googleapis.com/bigquery/v2/projects/{BQ_PROJECT}/datasets",
+        body,
+    )
+    print(f"[stripe_loader] created dataset {BQ_PROJECT}.{BQ_MARTS_DATASET}")
+
+
+_STRIPE_CUSTOMER_SUMMARY_VIEW_SQL = f"""
+-- stripe_marts.stripe_daily_customer_summary
+-- Customer-only (non-internal) daily revenue + refund metrics.
+-- Internal orders excluded per board approval 2026-05-24 (approval 6ebc416c).
+-- Internal emails: {sorted(INTERNAL_EMAIL_SET)}
+SELECT
+  DATE(pi.created_at) AS order_date,
+  COUNT(*)                                                 AS orders,
+  SUM(pi.amount_received_cents)                            AS revenue_cents,
+  COUNTIF(c.refunded IS TRUE)                              AS refunded_orders,
+  SUM(CASE WHEN c.refunded IS TRUE THEN pi.amount_received_cents ELSE 0 END)
+                                                           AS refunded_revenue_cents,
+  ROUND(
+    SAFE_DIVIDE(
+      COUNTIF(c.refunded IS TRUE),
+      COUNT(*)
+    ) * 100,
+    1
+  )                                                        AS refund_rate_pct
+FROM `{BQ_PROJECT}.{BQ_DATASET}.payment_intents` pi
+LEFT JOIN `{BQ_PROJECT}.{BQ_DATASET}.charges` c
+  ON c.payment_intent_id = pi.payment_intent_id
+WHERE
+  pi.status = 'succeeded'
+  AND pi.is_internal_order IS FALSE
+GROUP BY 1
+ORDER BY 1 DESC
+"""
+
+
+def _create_stripe_customer_summary_view(creds: service_account.Credentials) -> None:
+    """Create or replace the stripe_daily_customer_summary view in stripe_marts."""
+    _ensure_marts_dataset(creds)
+    view_body = {
+        "tableReference": {
+            "projectId": BQ_PROJECT,
+            "datasetId": BQ_MARTS_DATASET,
+            "tableId": "stripe_daily_customer_summary",
+        },
+        "view": {"query": _STRIPE_CUSTOMER_SUMMARY_VIEW_SQL, "useLegacySql": False},
+        "description": (
+            "Daily customer order + refund summary. Excludes internal/test orders. "
+            "Source: stripe_raw.payment_intents JOIN stripe_raw.charges."
+        ),
+    }
+    url = (
+        f"https://bigquery.googleapis.com/bigquery/v2/projects/{BQ_PROJECT}"
+        f"/datasets/{BQ_MARTS_DATASET}/tables/stripe_daily_customer_summary"
+    )
+    # Try insert first; fall back to update (PATCH) if already exists
+    try:
+        _bq_request(
+            creds,
+            f"https://bigquery.googleapis.com/bigquery/v2/projects/{BQ_PROJECT}"
+            f"/datasets/{BQ_MARTS_DATASET}/tables",
+            view_body,
+        )
+        print("[stripe_loader] created stripe_marts.stripe_daily_customer_summary")
+    except RuntimeError as e:
+        if "Already Exists" in str(e) or "409" in str(e):
+            _bq_request(creds, url, view_body, method="PUT")
+            print("[stripe_loader] updated stripe_marts.stripe_daily_customer_summary")
+        else:
+            raise
+
+
+_SUBSCRIPTION_INCOMPLETE_ALERTS_SQL = f"""
+-- Subscriptions where status = incomplete_expired AND a related invoice was paid
+-- (customer charged but subscription never activated — the UNC-1293 bug pattern).
+-- Each row is one at-risk customer event; join to stripe_raw.customers for email.
+--
+-- Decision Scientist use: run daily post-reopen. Any new rows = active bug.
+-- Source: stripe_raw.subscriptions JOIN stripe_raw.invoices
+SELECT
+  s.subscription_id,
+  s.created_at                   AS subscription_created_at,
+  s.status                       AS subscription_status,
+  s.customer_id,
+  s.price_amount_cents,
+  s.price_interval,
+  i.invoice_id,
+  i.status                       AS invoice_status,
+  i.amount_paid_cents,
+  i.payment_intent_id,
+  i.customer_email,
+  i.email_hash,
+  CURRENT_TIMESTAMP()            AS report_generated_at
+FROM `{BQ_PROJECT}.{BQ_DATASET}.subscriptions` s
+LEFT JOIN `{BQ_PROJECT}.{BQ_DATASET}.invoices` i
+  ON i.subscription_id = s.subscription_id
+WHERE s.status = 'incomplete_expired'
+  AND i.amount_paid_cents > 0   -- invoice was actually paid
+ORDER BY s.created_at DESC
+"""
+
+
+def _create_subscription_incomplete_alerts_view(creds: service_account.Credentials) -> None:
+    """Create or replace stripe_marts.subscription_incomplete_alerts view.
+
+    Surfaces subscriptions that went incomplete_expired after a paid invoice —
+    the root cause of 22-38% of refunds per the 2026-05-24 analysis (UNC-1293).
+    Any rows post-reopen = active bug requiring engineering response.
+    """
+    _ensure_marts_dataset(creds)
+    view_body = {
+        "tableReference": {
+            "projectId": BQ_PROJECT,
+            "datasetId": BQ_MARTS_DATASET,
+            "tableId": "subscription_incomplete_alerts",
+        },
+        "view": {"query": _SUBSCRIPTION_INCOMPLETE_ALERTS_SQL, "useLegacySql": False},
+        "description": (
+            "Subscriptions status=incomplete_expired where a related invoice was paid. "
+            "Each row = customer charged but subscription never activated (UNC-1293 bug). "
+            "Run daily post-reopen; any new rows need immediate engineering triage."
+        ),
+    }
+    url = (
+        f"https://bigquery.googleapis.com/bigquery/v2/projects/{BQ_PROJECT}"
+        f"/datasets/{BQ_MARTS_DATASET}/tables/subscription_incomplete_alerts"
+    )
+    try:
+        _bq_request(
+            creds,
+            f"https://bigquery.googleapis.com/bigquery/v2/projects/{BQ_PROJECT}"
+            f"/datasets/{BQ_MARTS_DATASET}/tables",
+            view_body,
+        )
+        print("[stripe_loader] created stripe_marts.subscription_incomplete_alerts")
+    except RuntimeError as e:
+        if "Already Exists" in str(e) or "409" in str(e):
+            _bq_request(creds, url, view_body, method="PUT")
+            print("[stripe_loader] updated stripe_marts.subscription_incomplete_alerts")
+        else:
+            raise
+
+
 def load_all(dry_run: bool = False) -> None:
     """Bootstrap all Stripe tables into BigQuery.
 
@@ -316,6 +489,20 @@ def load_all(dry_run: bool = False) -> None:
     for bq_table, glob_pattern, pk in STRIPE_TABLES:
         try:
             df = _merge_parquets(glob_pattern, pk)
+
+            # Enrich payment_intents with is_internal_order flag (board-approved 2026-05-24)
+            if bq_table == "payment_intents":
+                internal_emails = [e.lower() for e in INTERNAL_EMAIL_SET]
+                df = df.with_columns(
+                    pl.col("email")
+                    .str.to_lowercase()
+                    .is_in(internal_emails)
+                    .fill_null(False)  # null email → not internal (default to customer)
+                    .alias("is_internal_order")
+                )
+                n_internal = int(df["is_internal_order"].sum())
+                print(f"[stripe_loader] payment_intents: {n_internal} internal orders flagged")
+
             results.append((bq_table, df))
             print(
                 f"[stripe_loader] {bq_table}: {df.shape[0]} rows, {df.shape[1]} cols  "
@@ -332,9 +519,14 @@ def load_all(dry_run: bool = False) -> None:
     for bq_table, df in results:
         _bq_load_job(creds, bq_table, df)
 
+    _create_stripe_customer_summary_view(creds)
+    _create_subscription_incomplete_alerts_view(creds)
+
     print(f"\n[stripe_loader] All Stripe tables loaded to {BQ_PROJECT}.{BQ_DATASET}")
     for bq_table, _ in results:
         print(f"  {BQ_PROJECT}.{BQ_DATASET}.{bq_table}")
+    print(f"  {BQ_PROJECT}.{BQ_MARTS_DATASET}.stripe_daily_customer_summary (view)")
+    print(f"  {BQ_PROJECT}.{BQ_MARTS_DATASET}.subscription_incomplete_alerts (view)")
 
 
 if __name__ == "__main__":

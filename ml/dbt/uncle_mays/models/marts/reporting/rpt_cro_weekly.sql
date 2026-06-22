@@ -41,7 +41,7 @@ with sessions as (
 
 orders as (
     select
-        order_week,
+        {% if target.type == 'bigquery' %}CAST(order_week AS DATE){% else %}order_week{% endif %} as order_week,
         count(*)                                  as orders,
         round(avg(gross_revenue_dollars), 2)       as aov,
         round(avg(case when is_first_order
@@ -60,18 +60,24 @@ orders as (
     group by 1
 ),
 
--- Top channel per week
+-- Top channel per week (subquery wraps GROUP BY so PARTITION BY can reference the already-cast column)
 channel_ranked as (
     select
         order_week,
         channel,
-        count(*)                                  as channel_orders,
+        channel_orders,
         row_number() over (
             partition by order_week
-            order by count(*) desc
+            order by channel_orders desc
         )                                         as _rn
-    from {{ ref('mart_orders') }}
-    group by 1, 2
+    from (
+        select
+            {% if target.type == 'bigquery' %}CAST(order_week AS DATE){% else %}order_week{% endif %} as order_week,
+            channel,
+            count(*)                              as channel_orders
+        from {{ ref('mart_orders') }}
+        group by 1, 2
+    ) grouped
 ),
 
 top_channels as (

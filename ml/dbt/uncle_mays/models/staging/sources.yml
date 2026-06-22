@@ -1,0 +1,158 @@
+version: 2
+
+sources:
+  - name: ga4
+    description: Google Analytics 4 BigQuery export
+    database: uncle-mays-automation
+    schema: analytics_494626869
+    tables:
+      - name: events_*
+        description: Daily-sharded GA4 event export
+        identifier: "events_*"
+        freshness:
+          warn_after: {count: 36, period: hour}
+          error_after: {count: 48, period: hour}
+        loaded_at_field: event_timestamp
+
+  - name: stripe_raw
+    description: Stripe data export
+    database: uncle-mays-automation
+    schema: stripe_raw
+    tables:
+      - name: stripe_charges
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 48, period: hour}
+        loaded_at_field: created_at
+      - name: stripe_checkout_sessions
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 48, period: hour}
+        loaded_at_field: created_at
+      - name: stripe_customers
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 48, period: hour}
+        loaded_at_field: created
+      - name: stripe_payment_intents
+        freshness:
+          warn_after: {count: 24, period: hour}
+          error_after: {count: 48, period: hour}
+        loaded_at_field: created_at
+
+  - name: ads_raw
+    description: Meta Ads and Google Ads daily snapshots
+    database: uncle-mays-automation
+    schema: ads_raw
+    tables:
+      - name: meta_campaign_insights
+        freshness:
+          warn_after: {count: 48, period: hour}
+          error_after: {count: 72, period: hour}
+        loaded_at_field: report_date
+      - name: google_ads_campaign_insights
+        freshness:
+          warn_after: {count: 48, period: hour}
+          error_after: {count: 72, period: hour}
+        loaded_at_field: report_date
+
+  - name: crm_raw
+    description: Mailchimp, Resend, and Apollo CRM snapshots
+    database: uncle-mays-automation
+    schema: crm_raw
+    tables:
+      - name: mailchimp_members
+        freshness:
+          warn_after: {count: 48, period: hour}
+          error_after: {count: 72, period: hour}
+        loaded_at_field: last_changed
+      - name: resend_emails
+        freshness:
+          warn_after: {count: 48, period: hour}
+          error_after: {count: 72, period: hour}
+        loaded_at_field: sent_at
+      - name: apollo_contacts
+        description: Apollo.io prospecting contacts (BD outreach targets)
+        freshness:
+          warn_after: {count: 72, period: hour}
+          error_after: {count: 120, period: hour}
+        loaded_at_field: null  # Apollo has no reliable timestamp column
+
+  - name: logrocket_raw
+    description: >
+      LogRocket session data loaded by bigquery_logrocket_loader.py.
+      The REST sessions API returns 404 (UNC-1221), so rows are currently
+      Galileo-derived daily summaries (source = 'galileo_summary') written
+      by ml/ingest/logrocket.py --session-summary.
+    database: uncle-mays-automation
+    schema: logrocket_raw
+    tables:
+      - name: sessions
+        description: >
+          One row per LogRocket session (REST mode) or one row per UTC calendar
+          day (Galileo summary mode, source = 'galileo_summary'). Summary rows
+          carry session_count, device_type_breakdown (JSON), entry_page_breakdown
+          (JSON), frustrated_user_count, and galileo_raw_answer.
+        freshness:
+          warn_after: {count: 48, period: hour}
+          error_after: {count: 72, period: hour}
+        loaded_at_field: pulled_at
+
+  - name: airtable_raw
+    description: Airtable operational data — catalog, pickup slots, suppliers
+    database: uncle-mays-automation
+    schema: airtable_raw
+    tables:
+      - name: catalog
+        description: 47-row product catalog with pricing and unit info (WRITE_TRUNCATE daily)
+        freshness:
+          warn_after: {count: 48, period: hour}
+          error_after: {count: 72, period: hour}
+        loaded_at_field: null  # no timestamp; check via ingest run logs
+      - name: pickup_slots
+        description: Upcoming pickup window slots with capacity and booking counts
+        freshness:
+          warn_after: {count: 48, period: hour}
+          error_after: {count: 72, period: hour}
+        loaded_at_field: null
+      - name: suppliers
+        description: Vendor/supplier prospecting records with onboarding status
+        freshness:
+          warn_after: {count: 72, period: hour}
+          error_after: {count: 120, period: hour}
+        loaded_at_field: null
+
+  - name: ops_raw
+    description: Operational reference tables — Census ACS zip demographics
+    database: uncle-mays-automation
+    schema: ops_raw
+    tables:
+      - name: census_acs_zip
+        description: ACS 5-year estimates by ZIP code (45 rows, local delivery area)
+        freshness:
+          warn_after: {count: 720, period: hour}   # monthly refresh is fine
+          error_after: {count: 2160, period: hour}
+        loaded_at_field: null
+      - name: checkout_store
+        description: >
+          Thin table of session IDs captured by the client-side checkout store
+          (2 rows). Used as a join bridge; low volume expected by design.
+        freshness:
+          warn_after: {count: 48, period: hour}
+          error_after: {count: 72, period: hour}
+        loaded_at_field: null
+
+  - name: logrocket_galileo
+    description: LogRocket Galileo AI on-demand briefings
+    database: uncle-mays-automation
+    schema: logrocket_galileo
+    tables:
+      - name: briefings
+        description: >
+          One row per Galileo on-demand query. 22 rows as of 2026-05-26.
+          answer column contains the Galileo narrative; links contains
+          session URLs cited by Galileo.
+        freshness:
+          warn_after: {count: 48, period: hour}
+          error_after: {count: 72, period: hour}
+        loaded_at_field: pulled_at

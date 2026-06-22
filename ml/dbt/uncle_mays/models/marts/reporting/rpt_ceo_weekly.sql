@@ -28,7 +28,7 @@
 
 with weekly_orders as (
     select
-        order_week,
+        {% if target.type == 'bigquery' %}CAST(order_week AS DATE){% else %}order_week{% endif %} as order_week,
         count(*)                                              as order_count,
         round(sum(gross_revenue_dollars), 2)                  as total_revenue,
         round(avg(gross_revenue_dollars), 2)                  as aov,
@@ -52,7 +52,7 @@ weekly_spend as (
 
 weekly_channel_revenue as (
     select
-        order_week,
+        {% if target.type == 'bigquery' %}CAST(order_week AS DATE){% else %}order_week{% endif %} as order_week,
         round(sum(case when channel = 'meta_ads'   then gross_revenue_dollars else 0 end), 2) as meta_revenue,
         round(sum(case when channel = 'google_ads' then gross_revenue_dollars else 0 end), 2) as google_revenue
     from {{ ref('mart_order_attribution') }}

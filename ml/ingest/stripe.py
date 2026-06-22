@@ -97,7 +97,7 @@ def _md_int(obj: dict, key: str) -> int | None:
 
 
 def extract(start_date: str | None = None, all_history: bool = True) -> dict[str, Path]:
-    """Pull PIs, Checkout Sessions, Customers, Charges, Subscriptions, Invoices.
+    """Pull PIs, Checkout Sessions, Customers, Charges, Subscriptions, Invoices, Refunds.
 
     `all_history=True` (default) pulls everything Stripe has ever recorded.
     Pass `start_date=YYYY-MM-DD` to override and use a `created[gte]` filter.
@@ -123,6 +123,7 @@ def extract(start_date: str | None = None, all_history: bool = True) -> dict[str
         out["stripe_charges"] = _extract_charges(cli, start_epoch)
         out["stripe_subscriptions"] = _extract_subscriptions(cli)
         out["stripe_invoices"] = _extract_invoices(cli, start_epoch)
+        out["stripe_refunds"] = _extract_refunds(cli, start_epoch)
     return out
 
 
@@ -408,6 +409,46 @@ def _extract_invoices(cli: httpx.Client, start_epoch: int | None) -> Path:
     out_path = raw_path("stripe_invoices")
     df.write_parquet(out_path)
     print(f"[stripe.invoices] {len(rows)} -> {out_path}")
+    return out_path
+
+
+def _extract_refunds(cli: httpx.Client, start_epoch: int | None) -> Path:
+    """Pull all refunds with enriched metadata from parent charge + payment_intent.
+
+    Captures the operator-entered free-text reason tags (refunds.metadata.note /
+    refunds.metadata.reason_detail) used by the Decision Scientist for refund
+    root-cause classification (2026-05-24 analysis, UNC-1293).
+    """
+    params: dict = {}
+    if start_epoch is not None:
+        params["created[gte]"] = start_epoch
+    items = _list_all(cli, "/refunds", params=params)
+    rows = []
+    for rf in items:
+        md = rf.get("metadata") or {}
+        rows.append(
+            {
+                "refund_id": rf.get("id"),
+                "created_at": _to_iso(rf.get("created")),
+                "amount_cents": rf.get("amount"),
+                "currency": rf.get("currency"),
+                "status": rf.get("status"),
+                "reason": rf.get("reason"),  # Stripe built-in reason (duplicate, fraudulent, customer_request)
+                "metadata_note": md.get("note"),
+                "metadata_reason_detail": md.get("reason_detail"),
+                "charge_id": rf.get("charge"),
+                "payment_intent_id": rf.get("payment_intent"),
+                "balance_transaction": rf.get("balance_transaction")
+                if isinstance(rf.get("balance_transaction"), str)
+                else (rf.get("balance_transaction") or {}).get("id"),
+                "failure_reason": rf.get("failure_reason"),
+                "receipt_number": rf.get("receipt_number"),
+            }
+        )
+    df = pl.from_dicts(rows, infer_schema_length=None) if rows else pl.DataFrame(schema={"refund_id": pl.Utf8})
+    out_path = raw_path("stripe_refunds")
+    df.write_parquet(out_path)
+    print(f"[stripe.refunds] {len(rows)} -> {out_path}")
     return out_path
 
 

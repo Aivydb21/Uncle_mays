@@ -226,3 +226,137 @@ models:
               values: ['sent', 'delivered', 'opened', 'clicked', 'bounced', 'complained', 'unsubscribed']
       - name: delivery_stage
         description: Numeric delivery ladder (3=clicked, 2=opened, 1=delivered, 0=sent, negatives=negative outcomes)
+
+  - name: stg_airtable__catalog
+    description: >
+      One row per catalog SKU. 47 rows as of 2026-05-26.
+      price_dollars = priceoverridecents / 100; cost_dollars = costcents / 100.
+      All rows retained (active + inactive) — marts apply is_active filter.
+    columns:
+      - name: catalog_id
+        description: Airtable record ID for the SKU
+        tests:
+          - unique
+          - not_null
+      - name: sku
+        description: Internal SKU identifier (e.g. KALE-BUNCH)
+        tests:
+          - not_null
+      - name: product_name
+        description: Customer-facing product name
+        tests:
+          - not_null
+      - name: price_dollars
+        description: Customer-facing price in USD (priceoverridecents / 100)
+        tests:
+          - not_null
+      - name: is_active
+        description: True if the SKU is active in the storefront
+        tests:
+          - not_null
+
+  - name: stg_airtable__pickup_slots
+    description: >
+      One row per pickup window slot. 12 rows as of 2026-05-26.
+      capacity_remaining = capacity - bookings; is_full = bookings >= capacity.
+    columns:
+      - name: slot_id
+        description: Airtable record ID for the pickup slot
+        tests:
+          - unique
+          - not_null
+      - name: is_active
+        description: True if the slot is still open for booking
+        tests:
+          - not_null
+      - name: bookings
+        description: Number of orders booked into this slot
+        tests:
+          - not_null
+      - name: capacity
+        description: Maximum orders this slot can accommodate
+        tests:
+          - not_null
+      - name: is_full
+        description: True when bookings >= capacity
+        tests:
+          - not_null
+
+  - name: stg_crm__apollo_contacts
+    description: >
+      One row per Apollo.io BD/prospecting contact. 3,347 rows as of 2026-05-26.
+      These are outreach targets, NOT customers. email_hash is the join key.
+    columns:
+      - name: apollo_id
+        description: Apollo contact ID
+        tests:
+          - unique
+          - not_null
+      - name: email_hash
+        description: SHA-256[:24] of contact email — stable join key
+        tests:
+          - not_null
+
+  - name: stg_logrocket__sessions
+    description: >
+      One row per LogRocket session (REST mode) or per day (Galileo summary mode).
+      3 rows as of 2026-05-26 — all Galileo summaries. Per-session rows will appear
+      once the LogRocket REST API issue (UNC-1221) is resolved.
+      is_summary = true for Galileo aggregate rows; false for per-session rows.
+    columns:
+      - name: session_source
+        description: Source of the row — 'galileo_summary' or 'rest'
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['galileo_summary', 'rest']
+      - name: is_summary
+        description: True for Galileo daily aggregate rows
+        tests:
+          - not_null
+      - name: pulled_at
+        description: Timestamp when data was pulled from LogRocket API (UTC)
+
+  - name: stg_logrocket__galileo_briefings
+    description: >
+      One row per Galileo on-demand query result. 22 rows as of 2026-05-26.
+      chat_id groups queries into a conversation thread.
+      is_complete = true when answer is populated.
+    columns:
+      - name: prompt_id
+        description: Unique identifier for this Galileo query
+        tests:
+          - unique
+          - not_null
+      - name: chat_id
+        description: Galileo conversation thread ID — groups related queries
+        tests:
+          - not_null
+      - name: status
+        description: Galileo query status
+        tests:
+          - not_null
+      - name: is_complete
+        description: True when Galileo returned an answer
+        tests:
+          - not_null
+      - name: pulled_at
+        description: Timestamp when briefing was fetched (UTC)
+        tests:
+          - not_null
+
+  - name: stg_ops__census_acs_zip
+    description: >
+      ACS 5-year census estimates by ZIP code. 45 rows covering Uncle May's
+      Chicago delivery area. Join key = zip → shipping_zip in stg_stripe_payment_intents.
+      Used for market-area segmentation. No PII.
+    columns:
+      - name: zip
+        description: 5-digit ZIP code
+        tests:
+          - unique
+          - not_null
+      - name: median_household_income
+        description: ACS median household income estimate for the ZIP
+      - name: total_population
+        description: ACS total population estimate for the ZIP

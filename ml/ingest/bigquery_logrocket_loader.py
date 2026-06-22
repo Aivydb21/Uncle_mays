@@ -57,10 +57,12 @@ _DTYPE_MAP: list[tuple[str, str]] = [
     ("Utf8", "STRING"),
 ]
 
-# (dataset, table, glob, dedup_key)
-LOGROCKET_TABLES: list[tuple[str, str, str, str]] = [
-    ("logrocket_raw",     "sessions",  "logrocket_sessions_*.parquet",  "session_id"),
-    ("logrocket_galileo", "briefings", "logrocket_galileo_*.parquet",   "prompt_id"),
+# (dataset, table, glob, dedup_keys)
+# briefings: dedup by (prompt_id, date_bucket) so history is preserved across
+# days — one row per prompt per UTC calendar day.
+LOGROCKET_TABLES: list[tuple[str, str, str, list[str]]] = [
+    ("logrocket_raw",     "sessions",  "logrocket_sessions_*.parquet",  ["session_id"]),
+    ("logrocket_galileo", "briefings", "logrocket_galileo_*.parquet",   ["prompt_id", "_date_bucket"]),
 ]
 
 
@@ -132,20 +134,21 @@ def _to_ndjson(df: pl.DataFrame) -> bytes:
     return "\n".join(lines).encode("utf-8")
 
 
-def _load_table(creds, dataset: str, table: str, df: pl.DataFrame, dry_run: bool) -> None:
+def _load_table(creds, dataset: str, table: str, df: pl.DataFrame, dry_run: bool, append: bool = False) -> None:
     """Upload df to BQ via multipart load job (WRITE_TRUNCATE)."""
     if df.is_empty():
         print(f"[logrocket_loader] {dataset}.{table}: 0 rows — skipping BQ write")
         return
 
     schema = _schema(df)
+    disposition = "WRITE_APPEND" if append else "WRITE_TRUNCATE"
     job_body = {
         "configuration": {
             "load": {
                 "destinationTable": {"projectId": BQ_PROJECT, "datasetId": dataset, "tableId": table},
                 "schema": {"fields": schema},
                 "sourceFormat": "NEWLINE_DELIMITED_JSON",
-                "writeDisposition": "WRITE_TRUNCATE",
+                "writeDisposition": disposition,
                 "createDisposition": "CREATE_IF_NEEDED",
             }
         }
@@ -204,8 +207,13 @@ def _load_table(creds, dataset: str, table: str, df: pl.DataFrame, dry_run: bool
     raise TimeoutError(f"BQ job {job_id} did not complete in 120s")
 
 
-def _merge_parquets(glob: str, dedup_key: str) -> pl.DataFrame:
-    """Merge all snapshots for a source, deduplicating by key (keep latest snapshot row)."""
+def _merge_parquets(glob: str, dedup_keys: list[str]) -> pl.DataFrame:
+    """Merge all snapshots for a source, deduplicating by the given keys.
+
+    For briefings, dedup_keys = ["prompt_id", "_date_bucket"] so we keep one
+    row per prompt per UTC calendar day (history is preserved across days).
+    For sessions, dedup_keys = ["session_id"] (unchanged behavior).
+    """
     from ._common import DATA_RAW
     files = sorted(DATA_RAW.glob(glob))
     if not files:
@@ -215,9 +223,21 @@ def _merge_parquets(glob: str, dedup_key: str) -> pl.DataFrame:
     for f in files:
         try:
             df = pl.read_parquet(f)
-            if not df.is_empty():
-                df = df.with_columns(pl.lit(f.name).alias("_snapshot_file"))
-                frames.append(df)
+            if df.is_empty():
+                continue
+            df = df.with_columns(pl.lit(f.name).alias("_snapshot_file"))
+            # Add _date_bucket from pulled_at (or snapshot filename timestamp)
+            if "pulled_at" in df.columns and "_date_bucket" not in df.columns:
+                df = df.with_columns(
+                    pl.col("pulled_at").str.slice(0, 10).alias("_date_bucket")
+                )
+            elif "_date_bucket" not in df.columns:
+                # Fall back to snapshot file timestamp (format: source_YYYYMMDDTHHMMSSZ.parquet)
+                stem = f.stem  # e.g. logrocket_galileo_20260516T145702Z
+                date_str = stem.split("_")[-1][:8]  # 20260516
+                date_fmt = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+                df = df.with_columns(pl.lit(date_fmt).alias("_date_bucket"))
+            frames.append(df)
         except Exception as exc:
             print(f"[logrocket_loader] skip {f.name}: {exc}")
 
@@ -225,11 +245,13 @@ def _merge_parquets(glob: str, dedup_key: str) -> pl.DataFrame:
         return pl.DataFrame()
 
     combined = pl.concat(frames, how="diagonal")
-    if dedup_key in combined.columns:
+    # Only dedup on keys that actually exist in the combined frame
+    active_keys = [k for k in dedup_keys if k in combined.columns]
+    if active_keys:
         combined = (
             combined
             .sort("_snapshot_file", descending=True)
-            .unique(subset=[dedup_key], keep="first")
+            .unique(subset=active_keys, keep="first")
         )
     combined = combined.drop("_snapshot_file", strict=False)
     return combined
@@ -239,9 +261,9 @@ def load_all(dry_run: bool = False) -> None:
     load_dotenv_if_present()
     creds = _creds()
 
-    for dataset, table, glob, dedup_key in LOGROCKET_TABLES:
+    for dataset, table, glob, dedup_keys in LOGROCKET_TABLES:
         _ensure_dataset(creds, dataset)
-        df = _merge_parquets(glob, dedup_key)
+        df = _merge_parquets(glob, dedup_keys)
         if df.is_empty():
             print(f"[logrocket_loader] {dataset}.{table}: no parquets found — skipping")
             continue
