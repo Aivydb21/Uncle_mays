@@ -180,6 +180,7 @@ async function fireAnalytics(item: CatalogItem, newQty: number) {
         quantity: newQty,
         eventId,
         email: capturedEmail || undefined,
+        hashedPhone: cachedPh || undefined,
         fbc,
         fbp,
       }),

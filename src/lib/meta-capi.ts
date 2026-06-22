@@ -10,6 +10,8 @@ function hashSHA256(value: string): string {
 export interface CapiUserData {
   email?: string;
   phone?: string;
+  /** Pre-computed SHA-256 hex of normalized phone digits. Used when the raw phone is not available (e.g. AddToCart from localStorage). Takes precedence over `phone` if both are provided. */
+  hashedPhone?: string;
   firstName?: string;
   lastName?: string;
   city?: string;
@@ -54,7 +56,9 @@ export async function sendCapiEvent(params: SendCapiEventParams): Promise<void> 
   if (params.userData.email) {
     userData.em = hashSHA256(params.userData.email);
   }
-  if (params.userData.phone) {
+  if (params.userData.hashedPhone && params.userData.hashedPhone.length === 64) {
+    userData.ph = params.userData.hashedPhone;
+  } else if (params.userData.phone) {
     const normalized = params.userData.phone.replace(/\D/g, "");
     if (normalized) userData.ph = hashSHA256(normalized);
   }
