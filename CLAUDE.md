@@ -1,5 +1,14 @@
 # Uncle May's Produce — Investor Outreach Workspace
 
+> ### 🛑 COMMUNICATION FREEZE — TEMPORARY, effective 2026-06-22 (CEO: Anthony Ivy)
+> **No outbound external communication leaves the organization without Anthony's explicit prior approval, until he lifts this notice.** This applies to every Paperclip agent and to any action taken from this workspace. For the duration of the freeze it overrides the "CRO-at-will" and "auto-ship" latitude in the standing orders below.
+>
+> **Frozen (needs approval first):** any email to anyone outside the company (investor / BD / partner / vendor / press / customer outreach, cold or warm, any path — Apollo, Gmail, Resend); launching / activating / resuming / scheduling / adding contacts to any Apollo campaign or sequence; Mailchimp newsletter or any broadcast; launching / activating / un-pausing / raising spend on any Meta or Google Ads campaign; organic social posts on owned accounts (IG @unclemaysproduce, FB Page 755316477673748, LinkedIn company); SMS / push / any bulk or net-new outbound.
+>
+> **Not frozen (continue normally):** automated, customer-triggered transactional email (order confirmation, payment-failed, shipping, subscription lifecycle, already-live abandoned-checkout recovery); all internal work; **drafting** — queue finished comms for Anthony's review so they ship the moment the freeze lifts. The freeze blocks *initiating new* outreach and *launching/activating* campaigns; it does not tear out live order-driven automation.
+>
+> **Mechanism / reversal:** a marked `COMM-FREEZE-2026-06-22` block sits at the top of every Paperclip agent's `SOUL.md` + `AGENTS.md`. Re-apply or lift with `python scripts/comm_freeze_2026_06_22.py [--lift]`. To lift the freeze entirely: run with `--lift` and delete this banner.
+
 > ### 🟢 Customer-facing single source of truth: [`customer-facts.md`](./customer-facts.md)
 > Delivery day, pricing, active promo codes, cutoff times, and brand positioning that customers can see live on the site live in `customer-facts.md`. **Any agent writing ads, emails, social posts, or landing-page copy MUST read `customer-facts.md` first.** Do not use older planning docs (`emergency-promotion-*`, `promo-launch-offer-*`, `AD-COPY-TEMPLATES.md`, etc.) as authoritative — they contain retired promo codes (WELCOME20, LAUNCH20, FREESHIP, first-order $30) that are no longer live.
 
@@ -19,7 +28,7 @@
 > - Local folder `um_website/` is linked to this project via `.vercel/project.json`. Every `git push` to `Aivydb21/Uncle_mays` main auto-deploys to production here.
 > - **Do NOT create another Vercel project under any circumstance without explicit CEO approval.** A stale `business` Vercel project was auto-created earlier and silently double-deployed every push; it has since been deleted. Keeping a single project prevents wasted build minutes, prevents confusion, and keeps logs/analytics in one place.
 > - If an agent or workflow appears to be trying to `vercel link` to a new project, `vercel project add`, or `vercel deploy` against a fresh name, **stop and escalate** to the CEO before proceeding.
-> - Paperclip, pm2 (`ecosystem.config.cjs`), and all scripts must point at `C:\Users\Anthony\Desktop\um_website\` — never `business/`, which has been archived to `_archive/business-2026-04-22/`.
+> - Paperclip, pm2 (`ecosystem.config.cjs`), and all scripts must point at `C:\Users\Anthony\Desktop\um_website\`, never `business/`. The former `business/` folder was archived and the archive (`_archive/`) was removed in the 2026-06-22 cleanup.
 
 ## Business
 Uncle May's Produce is the first data and distribution platform for Black food consumption. The company operates neighborhood-format grocery stores (7,500–12,000 sq ft) targeting historically Black American and culturally thriving urban communities with higher willingness to pay.
@@ -105,8 +114,8 @@ investor-outreach/
 - **Config:** `~/.claude/apollo-config.json` (API key + base URL)
 - **Base URL:** `https://api.apollo.io/api/v1`
 - **Auth:** `X-Api-Key` header
-- **Email accounts (6):** anthony@, invest@, investmentrelations@, rosalind@, timj@, denise@ (all @unclemays.com)
-- **Active campaigns (5 total, 604 + 87 = 691 contacts in flight):**
+- **Email accounts (5 connected as of 2026-05-29, ALL OAuth-revoked / idle):** anthony@, invest@, investmentrelations@, denise@ (cold outreach), plus hello@ (Resend transactional, **wrongly connected, remove it**). rosalind@ and timj@ are no longer connected to Apollo. Full per-account status in "Apollo Account Status" below.
+- **Campaigns (5 created; ALL IDLE as of 2026-05-29 due to OAuth revocation, 0 contacts actually in flight):**
   - "Tier 1 - Thesis Aligned Investors" (ID: `69d2a0b2c2e0c6000d1608d4`) — 87 contacts, 10/day from anthony@
   - "Tier 2A - Warm Investors (Denise)" (ID: `69d7dc2bf18bda002233eb04`) — 151 contacts from denise@
   - "Tier 2B - Warm Investors (Rosalind)" (ID: `69d7dc492a222a0019913520`) — 151 contacts from rosalind@
@@ -118,16 +127,28 @@ investor-outreach/
 - **Legacy campaigns:** 6 v1 sequences + "Investor Outreach v2" (all retired/inactive)
 - **Contacts:** 3,240 in Apollo database (full DB scored: 66 Tier 1, 612 Tier 2, 677 Tier 3, 1,753 excluded; LinkedIn Tier 1: 99 national)
 
-### Apollo Account Status (verified live via API on 2026-04-12)
-- **anthony@unclemays.com:** Active, sending Tier 1. 49 delivered out of 87 contacts. 1 open, 1 reply, 0 bounces. Daily limit 200, set to 50 in campaign step config. `revoked_at=2026-04-08` (historical; re-authed since, currently sending).
-- **rosalind@unclemays.com:** Active, sending Tier 2B. 71 delivered. Daily limit 200. `revoked_at=2026-04-09` (historical; re-authed since, currently sending).
-- **denise@unclemays.com:** Active, sending Tier 2A. 32 delivered. Daily limit 40. `revoked_at=2026-04-10` (historical; re-authed since, currently sending).
-- **investmentrelations@unclemays.com:** Active, sending CRE & HNW v2 (`69d9670d516fcc0011c0ee34`). 5 delivered. Daily limit 40. `revoked_at=2026-04-10` (historical; re-authed since, currently sending).
-- **invest@unclemays.com:** STALLED. Tier 2C campaign (`69d7dc68457595000d6b285d`) is `active=False`, 0 scheduled, 0 delivered. `revoked_at=2026-04-07` (before campaign was created on 2026-04-09; never re-authed). Campaign has no email account linked. **Needs Anthony to: (1) re-auth Gmail OAuth in Apollo Settings > Email Accounts, (2) re-add invest@ to Tier 2C campaign, (3) activate the campaign via UI.**
-- **timj@unclemays.com:** STALLED. Tier 2D campaign (`69d7dc86cfcc9800152117b7`) is `active=True` with 150 scheduled but 0 delivered. `revoked_at=2026-04-11` (yesterday). **Needs Anthony to re-auth Gmail OAuth in Apollo Settings > Email Accounts.** Wait 24h+ before re-authing other accounts to avoid bulk revocation by Google.
-- Apollo `revoked_at` field is historical — accounts can show `revoked_at` AND still be sending if they were re-authed after. Cross-reference with actual delivery counts to confirm health.
-- Apollo UI can show false healthy status — **always verify via API, not UI**
-- Warmbox warmup is independent from Apollo OAuth and continues sending on all 6 accounts
+### Apollo Account Status (re-verified live via API on 2026-05-29, ALL ACCOUNTS IDLE)
+> **🔴 Cold outreach is fully idle. Every connected mailbox shows an OAuth `revoked_at` and none are sending. This is a Google ↔ Apollo OAuth problem, NOT a DNS/DMARC problem. SPF, DKIM, and DMARC were re-verified healthy the same day (see Domain Authentication). No DNS change will make these accounts send.**
+
+Live `GET /email_accounts` snapshot (2026-05-29): 5 mailboxes connected, every one carrying a `revoked_at`:
+- **anthony@unclemays.com:** `revoked_at=2026-04-17`. Idle.
+- **invest@unclemays.com:** `revoked_at=2026-05-01`. Idle.
+- **investmentrelations@unclemays.com:** `revoked_at=2026-04-10`. Idle (Apollo `default=True`).
+- **denise@unclemays.com:** `revoked_at=2026-05-23`. Idle.
+- **hello@unclemays.com:** `revoked_at=2026-05-01`. **WRONGLY CONNECTED. This is the Resend transactional From mailbox; running cold outreach on it risks order-confirmation deliverability. Remove it from Apollo.**
+- **rosalind@ and timj@:** NO LONGER connected to Apollo (both were present on 2026-04-12, dropped since). Re-add after the OAuth fix.
+
+**Once-and-for-all fix (in order):**
+1. Google Workspace Admin → Security → Access and data control → API controls → App access control → Manage Third-Party App Access: add Apollo and set it to **Trusted**. This is what stops Google's automated security sweeps from revoking the tokens (the recurring root cause).
+2. Re-auth ONE mailbox, wait 24h+, then the next. Bulk re-auth in a short window trips Google anti-abuse and revokes them all together.
+3. Re-add rosalind@ and timj@; remove hello@.
+4. Verify warmup after re-auth (Apollo native warmup rides the same OAuth; Warmbox, if used, has its own connection to check separately).
+
+**Strategic durable fix (recommended):** run cold outreach from a separate lookalike domain with its own mailboxes and warmup, so OAuth churn and spam complaints never touch unclemays.com's transactional + newsletter reputation.
+
+- Apollo `revoked_at` can be historical: an account may show it and still send if re-authed afterward, so normally cross-reference delivery counts. On 2026-05-29 all accounts show `revoked_at` with zero sending, so they are genuinely down.
+- Apollo UI can show false healthy status: **always verify via API, not UI**.
+- Warmbox warmup, if used, is independent from Apollo OAuth and must be checked separately.
 - All Python clients hitting Apollo MUST set a `User-Agent` header (e.g. `curl/8.0`). Cloudflare blocks the default `Python-urllib/x.y` UA with a 403, error code 1010. `curl` works without an explicit header.
 
 ## Workflow — Claude-Managed
@@ -478,15 +499,16 @@ python ml/ingest/census.py
 
 > **Standing pattern — new third-party credentials:** When a new API key or service credential is added to `~/Desktop/um_website/.env`, **notify the CIO** so this capability registry stays current. Add an entry here following the pattern above (service name, env var, key location, purpose, ingest script if any, cadence, auth notes).
 
-## Domain Authentication (verified 2026-04-04)
-- **SPF:** `v=spf1 include:_spf.google.com -all` (hardfail) — PASSING
-- **DKIM:** `google._domainkey` configured with RSA key — PASSING
-- **DMARC:** `v=DMARC1; p=none; rua=mailto:anthony@unclemays.com` (monitoring mode) — WORKING
-- Google DMARC aggregate report received 2026-04-03: 70 emails, all passed SPF+DKIM, zero failures
-- DMARC will move to `p=quarantine` after warmup stabilizes
-- DMARC reports arrive as XML attachments; consider adding a DMARC monitoring service for automated parsing
+## Domain Authentication (re-verified live 2026-05-29)
+- **SPF:** `v=spf1 include:_spf.google.com include:apollo.io -all` (hardfail). PASSING: single record, resolves, under the 10-lookup limit. `include:apollo.io` was added by Apollo's setup wizard and is unnecessary for Gmail-OAuth sending (Google's servers are already covered by `_spf.google.com`) but harmless. Documented baseline before that addition was `v=spf1 include:_spf.google.com -all`.
+- **DKIM:** `google._domainkey` configured with a 2048-bit RSA key. PASSING.
+- **DMARC:** monitoring mode, `p=none` (no enforcement). CEO decision 2026-05-29: remove the `rua` and `ruf` report addresses (both were `anthony@unclemays.com`) to stop the daily XML report emails landing in the inbox. Target record: `v=DMARC1; p=none`. Prior record: `v=DMARC1; p=none; rua=mailto:anthony@unclemays.com; ruf=mailto:anthony@unclemays.com`. Trade-off: with reports off, no aggregate data is collected, so before ever tightening to `p=quarantine` later, point `rua` at a DMARC dashboard (dmarcian / EasyDMARC / Postmark) instead of the raw inbox.
+- **MX:** 5 standard Google records (`aspmx.l` + `alt1`-`alt4`). A rogue `smtp.google.com` MX at priority 1 (Google's newer single-record style, mixed in with the legacy 5) was flagged 2026-05-29 and should be deleted; mixing the two styles trips mail-health checkers.
+- SPF and DKIM both pass alignment for every @unclemays.com Gmail send. The Apollo "idle" problem is OAuth, not authentication, and is tracked under Apollo Account Status above.
 
-## LogRocket + Galileo AI (ACTIVE as of 2026-05-14)
+## LogRocket + Galileo AI (PAUSED 2026-05-28)
+
+> **🟡 PAUSED 2026-05-28 — subscription is off for ~2 weeks. Do not plan around `ask galileo`, the daily briefing, the incident-alert task, or `logrocket_galileo.*` BigQuery freshness until this banner is lifted. Revival is 1-step: re-add `NEXT_PUBLIC_LOGROCKET_APP_ID` and `LOGROCKET_PAT` to Vercel (prod + preview) and Trigger.dev project env vars, uncomment the `cron:` line in [src/trigger/galileo-daily-briefing.ts](src/trigger/galileo-daily-briefing.ts), [src/trigger/galileo-incident-alert.ts](src/trigger/galileo-incident-alert.ts), [src/trigger/logrocket-daily-ingest.ts](src/trigger/logrocket-daily-ingest.ts), then `npx trigger.dev@latest deploy`. Browser SDK, server lib, dbt models, BQ tables, and agent AGENTS.md clauses are all intact — only the env vars and the three cron lines are dark. Plan ref: `~/.claude/plans/looks-good-lets-switch-linked-crane.md`.**
 
 > **This is the central observability + product-intelligence layer.** Every Paperclip agent has a "Galileo-first" standing rule (see each AGENTS.md, LogRocket SOP block marked `LOGROCKET-CLAUSE-2026-05-15`). When you need to know what users are doing on unclemays.com, the first action is a Galileo MCP query — not a BigQuery scan, not a manual replay watch, not a heuristic. BigQuery is the durable journal; Galileo is the lens.
 >
@@ -794,6 +816,27 @@ If you are a CRO/audit agent without filesystem access, flag items at the **file
 - Targets affluent Black communities with higher economic capacity
 - Positioning: data-driven platform + distribution, not just retail grocery
 
+
+## ML Pipeline — dbt Runtime (UNC-1361)
+
+**System Python is 3.14; dbt-bigquery 1.11 requires Python ≤3.12.**
+
+A Python 3.12.13 venv lives at `ml/dbt/.venv` (created via `uv`). The Trigger.dev weekly pipeline (`src/trigger/ml-weekly-pipeline.ts`) calls dbt through this venv via the `DBT_EXE` constant. Do NOT call the system `dbt` directly — it will fail with a `mashumaro` serialization error.
+
+**Run dbt manually:**
+```bash
+# From ml/dbt/uncle_mays/
+../.venv/Scripts/dbt.exe run --profiles-dir ../
+../.venv/Scripts/dbt.exe test --profiles-dir ../
+```
+
+**venv locations:**
+- `ml/dbt/.venv` — Python 3.12.13, dbt-core 1.11.8, dbt-bigquery 1.11.1, dbt-duckdb 1.10.1 ✅
+- `ml/dbt/.venv-dbt` — Python 3.12.13, dbt-core 1.11.8, dbt-duckdb only (no bigquery)
+
+If dbt fails to start, check that the venv exists and was built with Python 3.12: `ml/dbt/.venv/Scripts/python.exe --version`.
+
+---
 
 <!-- TRIGGER.DEV basic START -->
 # Trigger.dev Basic Tasks (v4)
