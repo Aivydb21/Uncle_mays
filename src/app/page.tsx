@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import HomePageContent from "@/page-content/Index";
 import { ShopCTA } from "@/components/ShopCTA";
+import { StorePausedBanner } from "@/components/StorePausedBanner";
+import { PausedWaitlistForm } from "@/components/PausedWaitlistForm";
+import { getStoreStatus } from "@/lib/store-status";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -140,6 +143,28 @@ const faqSchema = {
 };
 
 export default function HomePage() {
+  const { paused } = getStoreStatus();
+  if (paused) {
+    // Paused mode: replace the live conversion path with a top-of-page
+    // banner + a focused email-capture hero. We deliberately do NOT render
+    // the existing Hero (which has a "Shop This Week's Produce" CTA) or
+    // the catalog preview tiles, because every visible "Shop" CTA on a
+    // paused store burns ad-acquired traffic. (UNC-1755)
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <StorePausedBanner source="home_paused_banner" />
+        <PausedHomeHero />
+      </>
+    );
+  }
   return (
     <>
       <script
@@ -160,5 +185,22 @@ export default function HomePage() {
       />
       <HomePageContent productSection={<ShopCTA />} />
     </>
+  );
+}
+
+function PausedHomeHero() {
+  return (
+    <section className="container mx-auto px-6 py-20 text-center">
+      <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-tight md:text-5xl">
+        Uncle May&rsquo;s is paused for a short window.
+      </h1>
+      <p className="mx-auto mt-6 max-w-xl text-lg text-foreground/75">
+        We&rsquo;ll reopen soon. Drop your email and we&rsquo;ll tell you the
+        moment we&rsquo;re back. No spam, just one note.
+      </p>
+      <div className="mt-8 flex justify-center">
+        <PausedWaitlistForm source="home_paused_hero" />
+      </div>
+    </section>
   );
 }

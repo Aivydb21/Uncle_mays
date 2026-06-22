@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSession, updateSession, getAbandonedSessions } from "@/lib/checkout-store";
 import { upsertContact, createCart, deleteCart, tagOrderCompleted } from "@/lib/mailchimp";
+import { getStoreStatus } from "@/lib/store-status";
 
 export async function POST(req: NextRequest) {
   try {
+    // Store-paused gate (UNC-1755). Block at the funnel entrypoint so we
+    // don't seed an abandoned-cart Trigger.dev run for a paused store.
+    const storeStatus = getStoreStatus();
+    if (storeStatus.paused) {
+      return NextResponse.json(
+        { error: "store_paused", paused: true, reason: storeStatus.reason },
+        { status: 409 }
+      );
+    }
+
     const body = await req.json();
     const {
       product,

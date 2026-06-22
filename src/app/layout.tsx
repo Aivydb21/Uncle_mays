@@ -8,6 +8,7 @@ import { PageShell } from "@/components/PageShell";
 import { FacebookPixelTracker } from "@/components/FacebookPixelTracker";
 import { UTMCapture } from "@/components/UTMCapture";
 import { DeferredAnalytics } from "@/components/DeferredAnalytics";
+import { getStoreStatus } from "@/lib/store-status";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -67,6 +68,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { paused } = getStoreStatus();
   return (
     <html lang="en" className={`${playfair.variable} ${workSans.variable}`}>
       <body>
@@ -119,7 +121,7 @@ export default function RootLayout({
           />
         </noscript>
 
-        <PageShell>{children}</PageShell>
+        <PageShell storePaused={paused}>{children}</PageShell>
         <Suspense fallback={null}><FacebookPixelTracker /></Suspense>
         <UTMCapture />
       </body>

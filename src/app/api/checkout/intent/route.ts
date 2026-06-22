@@ -7,11 +7,24 @@ import {
 import { getSlot } from "@/lib/catalog/pickup-slots";
 import type { CartLine, FulfillmentMode } from "@/lib/catalog/types";
 import { stripe } from "@/lib/stripe";
+import { getStoreStatus } from "@/lib/store-status";
 
 const STRIPE_METADATA_VALUE_LIMIT = 500;
 
 export async function POST(req: NextRequest) {
   try {
+    // Store-paused gate (UNC-1755). Defense in depth — the /shop and /
+    // banners suppress the Add-to-cart / Checkout CTAs, but a stale tab
+    // could still try to create a PaymentIntent. Reject before any Stripe
+    // call.
+    const status = getStoreStatus();
+    if (status.paused) {
+      return NextResponse.json(
+        { error: "store_paused", paused: true, reason: status.reason },
+        { status: 409 }
+      );
+    }
+
     const body = await req.json();
     const cart = sanitizeCart(body?.cart);
     const fulfillmentMode: FulfillmentMode =

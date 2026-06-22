@@ -219,6 +219,72 @@ export async function addSignupLead(email: string, source?: string): Promise<{ o
   }
 }
 
+// Add an email to the paused_waitlist tag while the store is closed
+// (UNC-1755). Reopen flow is a manual Mailchimp campaign targeted at this
+// tag — we deliberately do NOT auto-send on toggle-off, since broadcast
+// sends require operator review under the marketing standing order.
+// Idempotent: existing members get the tag added.
+export async function addPausedWaitlist(
+  email: string,
+  source?: string
+): Promise<{ ok: boolean; error?: string }> {
+  if (isSuppressed(email)) return { ok: true };
+  const config = getConfig();
+  if (!config) return { ok: false, error: "Mailchimp not configured" };
+  const hash = hashEmail(email);
+  const base = `https://${config.serverPrefix}.api.mailchimp.com/3.0/lists/${config.listId}/members/${hash}`;
+  try {
+    const subscribeRes = await fetch(base, {
+      method: "PUT",
+      headers: {
+        Authorization: authHeader(config.apiKey),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email_address: email,
+        status_if_new: "subscribed",
+      }),
+    });
+    if (!subscribeRes.ok) {
+      const body = await subscribeRes.text();
+      console.error(
+        "Mailchimp addPausedWaitlist subscribe error:",
+        subscribeRes.status,
+        body
+      );
+      return { ok: false, error: `Mailchimp returned ${subscribeRes.status}` };
+    }
+    const tags: { name: string; status: "active" }[] = [
+      { name: "paused_waitlist", status: "active" },
+    ];
+    if (source) tags.push({ name: `source:${source}`, status: "active" });
+    const tagRes = await fetch(`${base}/tags`, {
+      method: "POST",
+      headers: {
+        Authorization: authHeader(config.apiKey),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ tags }),
+    });
+    if (!tagRes.ok) {
+      const body = await tagRes.text();
+      console.error(
+        "Mailchimp addPausedWaitlist tag error:",
+        tagRes.status,
+        body
+      );
+      return { ok: false, error: `Mailchimp tag returned ${tagRes.status}` };
+    }
+    return { ok: true };
+  } catch (err) {
+    console.error("Mailchimp addPausedWaitlist error:", err);
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
 // Called after Stripe payment success. Adds order_completed and deactivates
 // checkout_started in one call so the recovery sequence stops immediately.
 export async function tagOrderCompleted(email: string): Promise<void> {

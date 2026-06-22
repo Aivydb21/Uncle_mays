@@ -20,7 +20,13 @@ function isInCheckoutFunnel(pathname: string): boolean {
   return pathname.startsWith("/checkout/") || pathname.startsWith("/subscribe/");
 }
 
-export function PageShell({ children }: { children: React.ReactNode }) {
+export function PageShell({
+  children,
+  storePaused = false,
+}: {
+  children: React.ReactNode;
+  storePaused?: boolean;
+}) {
   const pathname = usePathname() ?? "/";
   const isLandingPage = LANDING_PAGE_PATHS.includes(pathname);
   const inFunnel = isInCheckoutFunnel(pathname);
@@ -29,9 +35,15 @@ export function PageShell({ children }: { children: React.ReactNode }) {
   // catalog page renders its own MobileCartTotal which links to /checkout
   // — MobileCTA was overlaying it at z-50 > z-40 and re-routing customers
   // back to /shop, breaking the bottom-of-funnel conversion path) or on
-  // /checkout itself (where it would be nonsensical).
+  // /checkout itself (where it would be nonsensical). When the store is
+  // paused (UNC-1755), suppress it everywhere — a sticky "Shop" CTA on a
+  // closed store burns ad-acquired traffic.
   const showMobileCTA =
-    !isLandingPage && pathname !== "/shop" && pathname !== "/checkout" && !inFunnel;
+    !isLandingPage &&
+    pathname !== "/shop" &&
+    pathname !== "/checkout" &&
+    !inFunnel &&
+    !storePaused;
 
   return (
     <div className="flex min-h-screen flex-col">
