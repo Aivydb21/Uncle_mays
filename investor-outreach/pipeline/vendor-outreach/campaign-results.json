@@ -1,0 +1,250 @@
+{
+  "campaign_name": "Vendor Outreach - Wave A + E",
+  "campaign_id": "6a11e4344aa547000c6f4d5e",
+  "sender": "anthony@unclemays.com",
+  "max_per_day": 15,
+  "buckets": {
+    "verified": [
+      "We Sow We Grow",
+      "Faith Farms",
+      "Renaissance Farm",
+      "Jackson Family Farm",
+      "New Age Provisions Farms",
+      "Old City Acres",
+      "Prairie Hills Farm",
+      "Oakland Avenue Urban Farm",
+      "Smith Farm and Ranch",
+      "Foxfire Ranch",
+      "Muhammad Family Farm",
+      "Briarwood Cattle Farm",
+      "Brown Bass Farm",
+      "Royal Queens Farm",
+      "Taylor Stevenson Ranch",
+      "We the People Opportunity Farm",
+      "Nurturing Our Seeds",
+      "Jubilee Justice",
+      "Rollen\u2019s RAW Grains",
+      "Joppy Mommas Farm",
+      "Petit Jardin by Erica Sage",
+      "Chauncey'S",
+      "Long Walk Spring Farm",
+      "Il\u00e9wa Foods",
+      "Igotchu Seasonings",
+      "EXAU",
+      "Gustus Vitae",
+      "Earthly, Holistic & Organic Garden + *Thirdday Soaps Garden Wellness",
+      "Zizis Bee Company",
+      "Mystic Pine Farm",
+      "Hidden Gems Farm",
+      "AMBI Skincare",
+      "Elements of Nature",
+      "Hempress Farms",
+      "Out the Mud Farm",
+      "Perma-Pastures Farm"
+    ],
+    "unverified": [],
+    "catch_all": [],
+    "invalid": [],
+    "no_id": [],
+    "other": []
+  },
+  "vendors_added_to_campaign": [
+    {
+      "business_name": "We Sow We Grow",
+      "email": "info@wesowwegrow.org",
+      "apollo_id": "6a11e4157ea92900132b9f3c"
+    },
+    {
+      "business_name": "Faith Farms",
+      "email": "faithgaryin@gmail.com",
+      "apollo_id": "6a11e41682fb70001481c315"
+    },
+    {
+      "business_name": "Renaissance Farm",
+      "email": "cbblink@yahoo.com",
+      "apollo_id": "6a11e417c25c0200108b8cd6"
+    },
+    {
+      "business_name": "Jackson Family Farm",
+      "email": "orders@jacksonfamilyfarmblueberries.com",
+      "apollo_id": "6a11e418dba39100144e382c"
+    },
+    {
+      "business_name": "New Age Provisions Farms",
+      "email": "newageprovision@gmail.com",
+      "apollo_id": "6a11e4194bf743001c077a35"
+    },
+    {
+      "business_name": "Old City Acres",
+      "email": "oldcityacres@gmail.com",
+      "apollo_id": "6a11e41a7ea92900132b9f43"
+    },
+    {
+      "business_name": "Prairie Hills Farm",
+      "email": "Prairiehillsfarm@yahoo.com",
+      "apollo_id": "6a11e41b4bf743001c077a46"
+    },
+    {
+      "business_name": "Oakland Avenue Urban Farm",
+      "email": "info@oaklandurbanfarm.org",
+      "apollo_id": "6a11e41bd16c1d000c67a0f2"
+    },
+    {
+      "business_name": "Smith Farm and Ranch",
+      "email": "sfar.eden@gmail.com",
+      "apollo_id": "6a11e41c4bf743001c077c3f"
+    },
+    {
+      "business_name": "Foxfire Ranch",
+      "email": "foxfireranch@gmail.com",
+      "apollo_id": "6a11e41dc25c0200108b8d1b"
+    },
+    {
+      "business_name": "Muhammad Family Farm",
+      "email": "ourcommunityfarmersmarketbva01@gmail.com",
+      "apollo_id": "6a11e41ea10d990014a5d862"
+    },
+    {
+      "business_name": "Briarwood Cattle Farm",
+      "email": "briarwoodcattlefarm@gmail.com",
+      "apollo_id": "6a11e41fd16c1d000c67a0fc"
+    },
+    {
+      "business_name": "Brown Bass Farm",
+      "email": "brownbassfarm@gmail.com",
+      "apollo_id": "6a11e420a10d990014a5d866"
+    },
+    {
+      "business_name": "Royal Queens Farm",
+      "email": "grow@royalqueenfarms.com",
+      "apollo_id": "6a11e420dba39100144e3831"
+    },
+    {
+      "business_name": "Taylor Stevenson Ranch",
+      "email": "major@taylorstevensonranch.com",
+      "apollo_id": "6a11e4215026ca000ccb8429"
+    },
+    {
+      "business_name": "We the People Opportunity Farm",
+      "email": "melvinp@wtpof.org",
+      "apollo_id": "6a11e42295415b001c46bf23"
+    },
+    {
+      "business_name": "Nurturing Our Seeds",
+      "email": "management@nurturingourseeds.org",
+      "apollo_id": "6a11e423600522001059922a"
+    },
+    {
+      "business_name": "Jubilee Justice",
+      "email": "info@jubileejustice.org",
+      "apollo_id": "6a11e424fa2515001c7284c7"
+    },
+    {
+      "business_name": "Rollen\u2019s RAW Grains",
+      "email": "Mchalmers888@gmail.com",
+      "apollo_id": "6a11e4253a96e700102586fa"
+    },
+    {
+      "business_name": "Joppy Mommas Farm",
+      "email": "Info@joppymommas.org",
+      "apollo_id": "6a11e42695415b001c46bf33"
+    },
+    {
+      "business_name": "Petit Jardin by Erica Sage",
+      "email": "its.petit.jardin@gmail.com",
+      "apollo_id": "6a11e4270140140018f14fbc"
+    },
+    {
+      "business_name": "Chauncey'S",
+      "email": "eatmore@eatmorechaunceys.com",
+      "apollo_id": "6a11e428a1f29a0018b21471"
+    },
+    {
+      "business_name": "Long Walk Spring Farm",
+      "email": "howdy@longwalkspring.com",
+      "apollo_id": "6a11e429a1f29a0018b21478"
+    },
+    {
+      "business_name": "Il\u00e9wa Foods",
+      "email": "support@peoplefirsttourism.com",
+      "apollo_id": "6a11e42a0140140018f14fda"
+    },
+    {
+      "business_name": "Igotchu Seasonings",
+      "email": "igotchuseasonings@gmail.com",
+      "apollo_id": "6a11e42ba1f29a0018b21485"
+    },
+    {
+      "business_name": "EXAU",
+      "email": "info@exauoliveoil.com",
+      "apollo_id": "6a11e42ba1f29a0018b2148f"
+    },
+    {
+      "business_name": "Gustus Vitae",
+      "email": "hello@gustusvitae.com",
+      "apollo_id": "6a11e42c0140140018f14ffa"
+    },
+    {
+      "business_name": "Earthly, Holistic & Organic Garden + *Thirdday Soaps Garden Wellness",
+      "email": "thirddaysoapsgarden@gmail.com",
+      "apollo_id": "6a11e42d4aa547000c6f4d47"
+    },
+    {
+      "business_name": "Zizis Bee Company",
+      "email": "zizisbeecompany@yahoo.com",
+      "apollo_id": "6a11e42ea1f29a0018b21493"
+    },
+    {
+      "business_name": "Mystic Pine Farm",
+      "email": "mysticpinefarm@gmail.com",
+      "apollo_id": "6a11e42fc25c0200108b8f87"
+    },
+    {
+      "business_name": "Hidden Gems Farm",
+      "email": "hiddengemsfarmva@gmail.com",
+      "apollo_id": "6a11e42fa1f29a0018b21497"
+    },
+    {
+      "business_name": "AMBI Skincare",
+      "email": "consumer@etbrowne.com",
+      "apollo_id": "6a11e43095415b001c46bf55"
+    },
+    {
+      "business_name": "Elements of Nature",
+      "email": "elementsofnatureusa@gmail.com",
+      "apollo_id": "6a11e431224b600020f015ab"
+    },
+    {
+      "business_name": "Hempress Farms",
+      "email": "hempressfarmsllc@gmail.com",
+      "apollo_id": "6a11e432224b600020f015ae"
+    },
+    {
+      "business_name": "Out the Mud Farm",
+      "email": "monica@outthemudfarm.com",
+      "apollo_id": "6a11e43395415b001c46bf61"
+    },
+    {
+      "business_name": "Perma-Pastures Farm",
+      "email": "permapasturesfarm@gmail.com",
+      "apollo_id": "6a11e43395415b001c46bf64"
+    }
+  ],
+  "missing_from_airtable": [],
+  "archived_campaign_id": "6a11e7672319900018872aac",
+  "rebuild_steps": [
+    {
+      "position": 1,
+      "step_id": "6a11e767a985f8001a498256",
+      "tpl_id": "6a11e768a985f8001a49825b",
+      "touch_id": "6a11e768a985f8001a49825a"
+    },
+    {
+      "position": 2,
+      "step_id": "6a11e76f3e29d40018e0298c",
+      "tpl_id": "6a11e76feea6b4001c725061",
+      "touch_id": "6a11e76feea6b4001c725060"
+    }
+  ],
+  "note": "Reverted to original campaign (OLD_CID) because the rebuild attempt could not move contacts between campaigns via Apollo API. Old campaign templates have been cleaned (duplicate empty touches removed) and contain the full correct content."
+}

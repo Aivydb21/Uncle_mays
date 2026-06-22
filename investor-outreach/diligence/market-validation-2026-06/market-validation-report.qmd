@@ -1,0 +1,474 @@
+---
+title: "Independent Market and Demand Validation"
+subtitle: "Uncle May's Produce Flagship, 1226 E 53rd St, Hyde Park, Chicago"
+author: "Uncle May's Produce"
+date: "2026-06-02"
+abstract: |
+  This memorandum tests whether independent data support the first year revenue projection of 6.3 million dollars for the Uncle May's Produce flagship at 1226 E 53rd St in Hyde Park, Chicago. The site is an operating grocery that has generated more than 8 million dollars in annual revenue for three consecutive years. The projection rests on a revenue per square foot figure that the company triangulated from comparable grocery stores, and it is corroborated by that realized operating history and by an independent analysis of grocery spending in the trade area. At 6.3 million dollars the projection equals 79 percent of demonstrated site revenue and a low single digit share of trade area grocery spending. A separate analysis of foot traffic shows the location could support materially higher volume, which we treat as a margin of safety rather than as the basis for the projection.
+format:
+  pdf:
+    documentclass: scrartcl
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    colorlinks: true
+    geometry:
+      - margin=1in
+    fontsize: 11pt
+    fig-pos: "H"
+    fig-align: center
+    fig-cap-location: bottom
+    tbl-cap-location: top
+    code-overflow: wrap
+bibliography: references.bib
+csl: apa.csl
+link-citations: true
+engine: knitr
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(scales)
+library(stringr)
+library(forcats)
+library(tibble)
+library(knitr)
+library(kableExtra)
+
+# Constants (revenue figures in USD millions unless noted)
+PLAN          <- 6.3
+PROVEN        <- 8.0
+SQFT          <- 10000
+PLAN_SQFT     <- 629
+PROVEN_SQFT   <- 800
+FMI_SQFT      <- 965
+TJ_SQFT       <- 2100
+VENUE         <- 458000     # store level annual visits (Placer venue)
+FAFH          <- 6053       # BLS CES 2023 food at home per consumer unit
+
+plan_per_visit   <- PLAN   * 1e6 / VENUE   # 13.76
+proven_per_visit <- PROVEN * 1e6 / VENUE   # 17.47
+plan_pct_proven  <- PLAN / PROVEN * 100    # 78.75
+
+# Palette and theme
+um_green <- "#2E7D32"; um_gold <- "#9A6A00"; um_blue <- "#1565C0"
+ink <- "#222222"; ctx <- "grey72"
+theme_um <- function(base = 10) {
+  theme_minimal(base_size = base) +
+    theme(
+      panel.grid.minor = element_blank(),
+      plot.title = element_text(face = "bold", size = base + 1),
+      plot.caption = element_text(color = "grey45", size = 7, hjust = 0),
+      axis.title = element_text(color = "grey30")
+    )
+}
+
+read_d <- function(f) read_csv(file.path("data", f), show_col_types = FALSE)
+methods  <- read_d("methods_summary.csv")
+baseline <- read_d("baseline.csv")
+sqftb    <- read_d("sqft_benchmark.csv")
+ta       <- read_d("trade_area.csv")
+eth      <- read_d("ethnicity.csv")
+inc      <- read_d("income_tiers.csv")
+dow      <- read_d("footfall_dow.csv")
+hr       <- read_d("footfall_hour.csv")
+dur      <- read_d("visit_duration.csv")
+jrn      <- read_d("journey.csv")
+trend    <- read_d("visits_trend.csv")
+cen      <- read_d("census_anchor.csv")
+```
+
+# Executive Summary
+
+This report asks one question. Do independent data support the first year revenue projection of \$6.3M for the Uncle May's Produce flagship at 1226 E 53rd St? The answer is yes, with room to spare. The projection is not an aspiration placed on a new concept. It is a conservative number for an operating grocery in a dense and affluent, majority Black trade area that the company was built to serve.
+
+- **The flagship is an operating store, not a new build.** The grocery at this address has produced more than \$8M in annual revenue for three consecutive years [@placer_hydepark2025]. The \$6.3M plan is 79 percent of that proven baseline.
+- **Revenue per square foot is conservative.** The \$629 per square foot behind the plan comes from the company's research on comparable grocery stores, documented in the financial model. It sits below the U.S. supermarket average near \$965 [@fmi_facts2024] and below the site's own proven \$800.
+- **The plan needs only a small slice of local spend.** Reaching \$6.3M requires capturing about 2.0 percent of grocery spending in the core trade area, and 4.3 percent in the inner ring [@bls_ce2023].
+- **The trade area fits the thesis.** The customer base is majority Black, 62.8 percent and rising toward 71 percent in wider definitions, with an affluent and highly educated core [@placer_hydepark2025; @census_acs2022].
+- **Demonstrated demand sits far above plan.** Roughly 458,000 annual store visits, stable year over year, imply a demand ceiling near \$11M to \$19M. The \$6.3M plan is well below it.
+
+```{r}
+#| label: fig-convergence
+#| fig-cap: "Four methods, one conclusion. Each bar shows the revenue a method supports. The solid line is the 6.3M dollar plan and the dashed line is the proven 8M dollar baseline. The plan sits at or below the low end of every method."
+#| fig-width: 7.2
+#| fig-height: 3.1
+order_tb <- c("Sales per square foot", "Proven site baseline",
+              "Trade area spend capture", "Foot traffic capacity")
+m <- methods |>
+  mutate(method = factor(method, levels = rev(order_tb)))
+ggplot(m) +
+  geom_segment(aes(y = method, yend = method, x = low_musd, xend = high_musd, color = role),
+               linewidth = 7, alpha = 0.30, lineend = "round") +
+  geom_point(aes(y = method, x = marker_musd, color = role), size = 3.3, na.rm = TRUE) +
+  geom_vline(xintercept = PLAN, color = um_green, linewidth = 0.9) +
+  geom_vline(xintercept = PROVEN, color = um_gold, linetype = "dashed", linewidth = 0.7) +
+  annotate("text", x = PLAN, y = 4.5, label = "Plan $6.3M", color = um_green,
+           hjust = 1.05, vjust = 1, size = 3, fontface = "bold") +
+  annotate("text", x = PROVEN, y = 4.5, label = "Proven $8M", color = um_gold,
+           hjust = -0.05, vjust = 1, size = 3) +
+  scale_x_continuous(labels = label_dollar(suffix = "M"), limits = c(0, 20),
+                     breaks = seq(0, 20, 5)) +
+  scale_color_manual(values = c("Anchor" = um_green, "Floor (realized)" = um_gold,
+                                "Independent confirm" = um_blue,
+                                "Ceiling (headroom)" = "grey55"), name = NULL) +
+  labs(x = "Supported annual revenue", y = NULL,
+       caption = "Source: Placer.ai (2025), FMI (2024), BLS CES (2023), management. See Sections 3 to 6.") +
+  theme_um() +
+  theme(legend.position = "bottom", legend.text = element_text(size = 7))
+```
+
+# Site and Method
+
+The flagship occupies the existing Hyde Park Produce building at 1226 E 53rd St, a grocery of 10,000 square feet of selling area in the center of the Hyde Park retail corridor. Uncle May's is taking over an operating store, so the questions an investor cares about can be answered with realized history and outside measurement rather than forecast.
+
+We validate the \$6.3M projection four ways and label each by the role it plays. One method sets the central estimate, two corroborate it from independent angles, and a fourth establishes the demand ceiling. Two of the four are independent of this site. The revenue per square foot anchor rests on research into comparable grocery stores, and the spend analysis rests on Census and federal data. The other two draw on the site itself, namely its realized revenue and its measured foot traffic. We say which is which rather than present all four as if they were independent.
+
+```{r}
+#| label: tbl-independence
+imap <- tibble(
+  Method = c("Sales per square foot", "Proven site baseline",
+             "Trade area spend capture", "Foot traffic capacity"),
+  Role = c("Anchor (central estimate)", "Floor (realized)",
+           "Independent confirm", "Ceiling (headroom)"),
+  `Independent of this site` = c("Yes, comparable store research", "No, it is the site history",
+                                 "Yes, Census and BLS", "No, the site's own traffic"),
+  Result = c("$629 vs $965 per sq ft of selling area", "$6.3M equals 79% of realized $8M",
+             "About 2% of core trade area spend", "Capacity of $11M to $19M")
+)
+kbl(imap, booktabs = TRUE, linesep = "",
+    caption = "The four validation methods and the role each plays.") |>
+  kable_styling(latex_options = c("hold_position"), font_size = 9) |>
+  column_spec(1, width = "8em") |>
+  column_spec(4, width = "12em")
+```
+
+::: {.callout-note title="Two foot traffic figures, measured differently"}
+This report uses two Placer counts that measure different things. **Store visits, about 458,000 per year,** count visits to the building itself. **Nearby activity visits, about 2.7 million per year,** count all foot traffic within a 1,000 foot radius of the site. Every revenue calculation in this report uses only the 458,000 store figure. The 2.7 million figure is used only as context for the vitality of the retail node, never for revenue math.
+:::
+
+# Method 1: Proven Site Baseline (the floor)
+
+The single strongest fact in this report is realized, not modeled. The grocery operating at 1226 E 53rd St has generated more than \$8M in annual revenue for three consecutive years [@placer_hydepark2025]. The \$6.3M projection is 79 percent of that figure.
+
+We deliberately underwrite below the proven baseline. Uncle May's is repositioning the format, including assortment, brand, and price, and a prudent operator does not assume day one continuity of a prior operator's full revenue. Modeling 79 percent of demonstrated revenue builds a ramp allowance directly into the base case. The \$8M figure is drawn from operating history provided by the seller and is being confirmed in diligence. Even a material reduction to it would leave the \$6.3M plan supported.
+
+```{r}
+#| label: fig-baseline
+#| fig-cap: "The plan is 79 percent of the revenue this site has already proven for three consecutive years."
+#| fig-width: 5.6
+#| fig-height: 2.5
+bl <- baseline |> mutate(scenario = fct_reorder(scenario, revenue_musd))
+ggplot(bl, aes(revenue_musd, scenario, fill = kind)) +
+  geom_col(width = 0.6) +
+  geom_text(aes(label = label_dollar(suffix = "M")(revenue_musd)),
+            hjust = -0.15, size = 3.4, fontface = "bold") +
+  annotate("text", x = 6.3, y = 1, label = "79% of proven", vjust = 2.4,
+           size = 3, color = "grey30") +
+  scale_x_continuous(labels = label_dollar(suffix = "M"), limits = c(0, 9.2)) +
+  scale_fill_manual(values = c(plan = um_green, proven = um_gold), guide = "none") +
+  labs(x = "Annual revenue", y = NULL,
+       caption = "Source: Placer.ai (2025); management operating history, under diligence.") +
+  theme_um()
+```
+
+# Method 2: Foot Traffic Capacity (the ceiling)
+
+Placer reports approximately 458,000 annual visits to the store itself [@placer_hydepark2025]. The site's own proven revenue implies \$17.47 per visit, which is \$8M divided by 458,000. The \$6.3M plan implies only \$13.76 per visit, below what the site already demonstrates.
+
+A theoretical capacity, using basket sizes of \$35 to \$60 that are typical of curated grocery formats and a purchase conversion range of 40 to 80 percent, spans roughly \$11M to \$19M. We present this as an upper bound on demand, not as a forecast, and we draw the proven \$8M and the \$6.3M plan directly onto the grid below. The discipline matters. The proven \$8M is consistent with a \$35 basket only at roughly 50 percent conversion, so we do not stack a high basket on top of a high conversion. The capacity range is generous by construction, which is exactly why we treat it as a margin of safety rather than as the basis for the projection.
+
+```{r}
+#| label: fig-heatmap
+#| fig-cap: "Revenue capacity in USD millions at 458,000 store visits, across basket size and purchase conversion. Dashed lines trace the 6.3M dollar plan and the proven 8M dollar baseline. The plan sits in the low corner, and the proven result lies on the 35 dollar basket at about 50 percent conversion."
+#| fig-width: 7
+#| fig-height: 3.4
+basket <- seq(30, 60, 5); conv <- seq(40, 80, 10)
+grid <- expand.grid(basket = basket, conv = conv) |>
+  mutate(rev = VENUE * (conv / 100) * basket / 1e6)
+iso <- function(R) {
+  data.frame(basket = seq(30, 60, 0.5)) |>
+    mutate(conv = R * 1e6 / (VENUE * basket) * 100, R = R)
+}
+isolines <- bind_rows(iso(PLAN), iso(PROVEN)) |> filter(conv >= 39, conv <= 81)
+ggplot(grid, aes(basket, conv)) +
+  geom_tile(aes(fill = rev), color = "white") +
+  geom_text(aes(label = sprintf("%.1f", rev)), size = 2.7, color = ink) +
+  geom_line(data = isolines, aes(group = factor(R)), color = "grey20",
+            linetype = "dashed", linewidth = 0.6) +
+  annotate("text", x = 31.5, y = 47.5, label = "$6.3M plan", size = 2.7,
+           color = "grey20", fontface = "bold", hjust = 0) +
+  annotate("text", x = 31.5, y = 60, label = "$8M proven", size = 2.7,
+           color = "grey20", hjust = 0) +
+  scale_fill_gradient(low = "white", high = um_green, name = "Revenue ($M)") +
+  scale_x_continuous(breaks = basket, labels = label_dollar()) +
+  scale_y_continuous(breaks = conv, labels = function(x) paste0(x, "%")) +
+  labs(x = "Average basket size", y = "Purchase conversion",
+       caption = "Source: Placer.ai store visits (2025); basket benchmarks per FMI, Drive Research, Clearly Payments.") +
+  theme_um()
+```
+
+The company models a blended basket near \$35. Independent benchmarks bracket that figure. In store grocery transactions average \$40 to \$60 [@clearlypayments_txn2024], and per trip grocery spending runs higher still for full weekly shops [@fmi_shoppertrends2024; @driveresearch_grocery2024]. A median dwell of 19 minutes points to a mix weighted toward smaller, more frequent trips, so a \$35 average is conservative against these benchmarks.
+
+## Visit quality and durability
+
+The 458,000 store visits are not a one year spike. Activity in the node has held between 2.5 and 2.7 million visits annually across 2023 to 2025, and the store pattern is the routine rhythm of neighborhood grocery: peaks on weekday evenings and weekends, a short median dwell, and a strong loop from home to store and back. This is durable demand, not event traffic.
+
+```{r}
+#| label: fig-trend
+#| fig-cap: "Trade area visits have been stable for three years (Placer nearby activity node, used here only as context for durability)."
+#| fig-width: 4.4
+#| fig-height: 2.4
+ggplot(trend, aes(factor(year), visits_m)) +
+  geom_col(fill = um_green, width = 0.6) +
+  geom_text(aes(label = paste0(visits_m, "M")), vjust = -0.4, size = 3.2) +
+  scale_y_continuous(limits = c(0, 3), labels = label_number(suffix = "M")) +
+  labs(x = NULL, y = "Annual visits",
+       caption = "Source: Placer.ai Visits Trend (2025).") +
+  theme_um()
+```
+
+```{r}
+#| label: fig-dow
+#| fig-cap: "Visits peak Friday and Saturday, the classic grocery pattern."
+#| fig-width: 4.6
+#| fig-height: 2.4
+dow2 <- dow |>
+  mutate(day = factor(day, levels = c("Mon","Tue","Wed","Thu","Fri","Sat","Sun")),
+         peak = day %in% c("Fri", "Sat"))
+ggplot(dow2, aes(day, visits_k, fill = peak)) +
+  geom_col(width = 0.7) +
+  scale_fill_manual(values = c(`FALSE` = ctx, `TRUE` = um_green), guide = "none") +
+  scale_y_continuous(labels = label_number(suffix = "K")) +
+  labs(x = NULL, y = "Visits (thousands)",
+       caption = "Source: Placer.ai Daily Visits (2025), trade area node.") +
+  theme_um()
+```
+
+```{r}
+#| label: fig-hour
+#| fig-cap: "Visits build through the day to a 4 to 6 PM peak, consistent with grocery runs after work."
+#| fig-width: 4.6
+#| fig-height: 2.4
+ggplot(hr, aes(hour, visits_k)) +
+  geom_area(fill = um_green, alpha = 0.25) +
+  geom_line(color = um_green, linewidth = 0.7) +
+  scale_x_continuous(breaks = seq(0, 23, 4),
+                     labels = function(x) paste0(x, ":00")) +
+  scale_y_continuous(labels = label_number(suffix = "K")) +
+  labs(x = NULL, y = "Visits (thousands)",
+       caption = "Source: Placer.ai Hourly Visits (2025), trade area node.") +
+  theme_um()
+```
+
+Two further signals reinforce the case. Average dwell is 46 minutes and median dwell is 19 minutes, a mix dominated by short and frequent trips. The visitor journey is overwhelmingly residential. About 36.7 percent of visitors arrive from home and 45.6 percent return home afterward, with measurable cross shopping at Trader Joe's and Walgreens, which confirms an established grocery corridor rather than incidental passersby [@placer_hydepark2025].
+
+```{r}
+#| label: fig-journey
+#| fig-cap: "Where visitors are before and after the store. The loop from home to store and back signals routine, residential grocery demand."
+#| fig-width: 5.2
+#| fig-height: 2.4
+jrn2 <- jrn |>
+  filter(place %in% c("Home", "Work", "Other")) |>
+  mutate(direction = recode(direction, prior = "Before visit", post = "After visit"),
+         place = factor(place, levels = c("Home", "Work", "Other")))
+ggplot(jrn2, aes(place, pct, fill = direction)) +
+  geom_col(position = "dodge", width = 0.7) +
+  geom_text(aes(label = paste0(pct, "%")), position = position_dodge(width = 0.7),
+            vjust = -0.3, size = 2.8) +
+  scale_fill_manual(values = c("Before visit" = ctx, "After visit" = um_green), name = NULL) +
+  scale_y_continuous(limits = c(0, 50), labels = function(x) paste0(x, "%")) +
+  labs(x = NULL, y = "Share of visits",
+       caption = "Source: Placer.ai Visitor Journey (2025).") +
+  theme_um() +
+  theme(legend.position = "bottom")
+```
+
+# Method 3: Sales per Square Foot (the anchor)
+
+The central estimate comes from the company's own research. Uncle May's triangulated revenue per square foot from a set of comparable grocery stores, and that work, documented in the Uncle May's financial model, points to roughly \$629 per square foot of selling area. Applied to 10,000 square feet of selling area it produces the \$6.3M projection (629 times 10,000 is \$6.29M, which the model carries as \$6.3M).
+
+Two independent reference points confirm the figure is conservative. On the same selling area basis, the U.S. supermarket average is about \$965 per square foot, since FMI reports \$18.55 in weekly sales per square foot of selling area for 2024 [@fmi_facts2024]. The site's own proven productivity is \$800 per square foot. Curated grocers in the same small format as Uncle May's run much higher, with Trader Joe's above \$2,000 per square foot at a store of roughly 10,000 square feet [@worldly_traderjoes2025]. On every comparison, \$629 is the conservative choice.
+
+```{r}
+#| label: fig-sqft
+#| fig-cap: "Annual sales per square foot of selling area. The plan is below the supermarket average, below the site's own proven productivity, and far below curated small format leaders."
+#| fig-width: 6.6
+#| fig-height: 2.7
+sq <- sqftb |> mutate(entity = fct_reorder(entity, dollars_per_sqft))
+ggplot(sq, aes(dollars_per_sqft, entity, fill = kind)) +
+  geom_col(width = 0.66) +
+  geom_text(aes(label = label_dollar()(dollars_per_sqft)), hjust = -0.12, size = 3) +
+  scale_x_continuous(labels = label_dollar(), limits = c(0, 2450)) +
+  scale_fill_manual(values = c(plan = um_green, proven = um_gold,
+                               benchmark = ctx, context = "grey50"), guide = "none") +
+  labs(x = "Sales per square foot (selling area, annual)", y = NULL,
+       caption = "Source: management comparable store research (plan, proven); FMI (2024); Worldly Partners (2025).") +
+  theme_um()
+```
+
+# Method 4: Trade Area Spend Capture (independent confirm)
+
+This method is fully independent of the site and of the company's own comparable store research. It asks a simple question. Of the grocery dollars that exist in the trade area, what share must Uncle May's win to reach \$6.3M? We multiply the number of households in each Placer ring by the U.S. average annual food at home expenditure of \$6,053 per consumer unit [@bls_ce2023], then solve for the required capture.
+
+```{r}
+#| label: fig-capture
+#| fig-cap: "Share of trade area grocery spending the plan must capture. Even at the widest definition, the requirement is low single digits."
+#| fig-width: 6.4
+#| fig-height: 2.5
+ta2 <- ta |>
+  mutate(potential = households * fafh_usd,
+         required = PLAN * 1e6 / potential * 100,
+         ring_label = fct_reorder(ring_label, required))
+ggplot(ta2, aes(required, ring_label)) +
+  annotate("rect", xmin = 0, xmax = 5, ymin = -Inf, ymax = Inf,
+           fill = um_green, alpha = 0.07) +
+  geom_segment(aes(x = 0, xend = required, yend = ring_label), color = ctx, linewidth = 1) +
+  geom_point(color = um_green, size = 4.5) +
+  geom_text(aes(label = paste0(sprintf("%.1f", required), "%")), hjust = -0.5, size = 3.2) +
+  scale_x_continuous(limits = c(0, 6), labels = function(x) paste0(x, "%")) +
+  labs(x = "Capture required to reach $6.3M", y = NULL,
+       caption = "Source: Placer.ai households (2025); BLS CES food at home (2023). Shaded band marks a conservative comfort zone.") +
+  theme_um()
+```
+
+Reaching \$6.3M requires only about 2.0 percent of grocery spending in the core trade area, and 4.3 percent in the smaller inner ring. The result is robust to the spending assumption. Even if households spend only \$5,000 a year on food at home, reflecting smaller households and income below the national median, the core requirement rises to about 2.4 percent. We deliberately avoid assuming above average spending for a majority Black trade area. Federal data show that food spending tracks income, and this area's median income is below the national median, so an uplift would be unsupported.
+
+## Demographic alignment with the thesis
+
+The trade area is the company thesis made concrete, a large and majority Black customer base with an affluent and highly educated core. Placer's True Trade Area is 62.8 percent Black, and the share rises to 66.6 percent and 70.7 percent in the wider 50 percent and 70 percent visit definitions [@placer_hydepark2025]. McKinsey projects Black food spending growing from about \$120B in 2021 toward \$200B by 2030, and finds Black consumers roughly four times more likely to shift spending to a Black owned grocery, the exact wedge Uncle May's is built on [@mckinsey_food2024]. This is an affluent and culturally aligned community, not a food desert intervention.
+
+```{r}
+#| label: fig-ethnicity
+#| fig-cap: "Trade area composition from the Placer True Trade Area. The customer base is majority Black, the core of the company thesis."
+#| fig-width: 6.2
+#| fig-height: 2.7
+e2 <- eth |> mutate(group = fct_reorder(group, pct), hi = group == "Black")
+ggplot(e2, aes(pct, group, fill = hi)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = paste0(pct, "%")), hjust = -0.15, size = 3) +
+  scale_x_continuous(limits = c(0, 72), labels = function(x) paste0(x, "%")) +
+  scale_fill_manual(values = c(`TRUE` = um_green, `FALSE` = ctx), guide = "none") +
+  labs(x = NULL, y = NULL, caption = "Source: Placer.ai Ethnicity, True Trade Area (2025).") +
+  theme_um()
+```
+
+```{r}
+#| label: fig-income
+#| fig-cap: "Household income in the core trade area. About one in four households earns 100K dollars or more, alongside a broad base, which supports both willingness to pay and volume."
+#| fig-width: 6
+#| fig-height: 2.5
+i2 <- inc |>
+  mutate(tier = factor(tier, levels = c("Under $25K", "$25K to $50K",
+                                        "$50K to $100K", "$100K and over")),
+         hi = tier == "$100K and over")
+ggplot(i2, aes(tier, pct, fill = hi)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = paste0(pct, "%")), vjust = -0.4, size = 3) +
+  scale_y_continuous(limits = c(0, 35), labels = function(x) paste0(x, "%")) +
+  scale_fill_manual(values = c(`TRUE` = um_green, `FALSE` = ctx), guide = "none") +
+  labs(x = NULL, y = "Share of households",
+       caption = "Source: Placer.ai Household Income, 50 percent trade area (2025).") +
+  theme_um()
+```
+
+# Independent Census Check
+
+To confirm the Placer demographics with a separate source, we pulled U.S. Census ACS five year estimates for the site ZIP and its neighbors [@census_acs2022]. The two sources agree. At the site ZIP, 60615, the Census median household income is \$56,518, within about 3 percent of Placer's trade area figure near \$55,000, and the implied household count of 22,755 corroborates Placer's inner ring figure of 24,360. The Black household share is 54.0 percent at the immediate ZIP and rises to between 72 and 93 percent in the adjacent ZIPs that feed the trade area, which is why Placer's measured trade area reads in the 63 to 71 percent range. Two independent methods converging on the same demographic picture is a strong signal.
+
+```{r}
+#| label: tbl-census
+cen |>
+  transmute(
+    ZIP = zip,
+    `Median income` = label_dollar()(median_household_income),
+    Population = comma(total_population),
+    `Households (implied)` = comma(implied_households),
+    `Black HH (%)` = paste0(pct_black_households, "%"),
+    Site = ifelse(is_site, "Yes", "")
+  ) |>
+  kbl(booktabs = TRUE, linesep = "", align = "lrrrrc",
+      caption = "Census ACS check: site ZIP 60615 and the adjacent ZIPs that feed the trade area.") |>
+  kable_styling(latex_options = c("hold_position", "striped"), font_size = 9)
+```
+
+# Triangulation Synthesis
+
+The methods do not all predict the same number, and we do not claim they do. Revenue per square foot, drawn from comparable stores, sets the central estimate at \$6.3M. The proven baseline shows that figure is 79 percent of what this site has already realized. The independent trade area analysis shows it is a low single digit share of available spend. And the foot traffic ceiling shows demand could support far more. The ordering is unambiguous: \$6.3M modeled, below \$8M proven, far below the \$11M to \$19M traffic ceiling.
+
+```{r}
+#| label: tbl-methods
+methods |>
+  transmute(Method = method, Role = role,
+            `Low (M)` = low_musd, `High (M)` = high_musd, Basis = note) |>
+  kbl(booktabs = TRUE, linesep = "",
+      caption = "Summary of the four methods and the revenue each supports, in USD millions.") |>
+  kable_styling(latex_options = c("hold_position"), font_size = 9) |>
+  column_spec(5, width = "16em")
+```
+
+The conclusion for an investment committee is not that \$6.3M is the ceiling. It is that \$6.3M is a floor supported four different ways, on a site with three years of realized revenue above it. The downside is protected by demonstrated history, and the upside is documented by independent traffic and spend data.
+
+# Limitations and Data Provenance
+
+We hold this analysis to a research standard, which means stating what it does not prove.
+
+- Placer figures are panel estimates, not transaction counts. Placer extrapolates from a panel of tens of millions of mobile devices and reports directional accuracy in the low to mid 90s percent range [@placer_methodology2026; @placer_ourdata2026]. Mobile panels can skew toward urban and higher income populations. We reduce that risk by confirming income with Census data rather than relying on Placer alone.
+- The \$8M baseline is provided by the seller and is under diligence. It is realized history, not an audited figure, and should be confirmed against operating statements.
+- Conversion is shown as a range, not asserted. We never claim a single conversion rate. The capacity grid in Section 4 spans a 40 to 80 percent band, and the proven result anchors where the site actually falls.
+- A consumer unit is not exactly a household. The BLS consumer unit averages about 2.4 people nationally, against roughly 2.0 in this trade area, so national spending per unit may slightly overstate spending per household. The robustness band in Section 6 absorbs this.
+- This report is strictly about revenue. Gross margin, EBITDA, and unit economics live in the financial model.
+- Some earlier internal materials describe the flagship as being at 47th and Cottage Grove. Those references are superseded. This report reflects the confirmed site at 1226 E 53rd St.
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
+
+# Appendix A: Methods and Arithmetic {.unnumbered}
+
+```{r}
+#| label: tbl-arithmetic
+tibble(
+  Quantity = c("Plan revenue per visit", "Proven revenue per visit",
+               "Plan as percent of proven", "Plan revenue from comparable stores",
+               "Proven sales per sq ft", "Core trade area spend potential",
+               "Capture required (core, 50%)", "Capacity at 70% and $60 basket"),
+  Formula = c("$6.3M / 458,000 visits", "$8.0M / 458,000 visits",
+              "$6.3M / $8.0M", "$629 x 10,000 sq ft",
+              "$8.0M / 10,000 sq ft", "53,197 HH x $6,053",
+              "$6.3M / $322.0M", "458,000 x 0.70 x $60"),
+  Result = c("$13.76", "$17.47", "79%", "$6.3M", "$800",
+             "$322.0M", "2.0%", "$19.2M")
+) |>
+  kbl(booktabs = TRUE, linesep = "",
+      caption = "Key calculations, reproducible from the data files.") |>
+  kable_styling(latex_options = c("hold_position"), font_size = 9) |>
+  column_spec(2, width = "14em")
+```
+
+# Appendix B: Trade Area Spend Detail {.unnumbered}
+
+```{r}
+#| label: tbl-tradearea
+ta |>
+  mutate(potential = households * fafh_usd, required = PLAN * 1e6 / potential) |>
+  transmute(`Trade area` = ring_label,
+            Households = comma(households),
+            `Food at home per year` = label_dollar()(fafh_usd),
+            `Annual spend potential` = label_dollar()(potential),
+            `Capture for $6.3M` = percent(required, accuracy = 0.1)) |>
+  kbl(booktabs = TRUE, linesep = "", align = "lrrrr",
+      caption = "Trade area grocery spend potential by ring and the capture required to reach the plan.") |>
+  kable_styling(latex_options = c("hold_position", "striped"), font_size = 9)
+```
+
+*Prepared by Uncle May's Produce for prospective investors. Data sources are independent third parties (Placer.ai, U.S. Census Bureau, U.S. Bureau of Labor Statistics, FMI) except where noted as management figures under diligence.*

@@ -326,36 +326,63 @@ def main():
             sys.exit(1)
 
     # --- Step 4: Add email steps ---
+    # Apollo architecture: emailer_step -> emailer_touch -> emailer_template.
+    # Working flow (verified 2026-05-23):
+    #   1. POST emailer_steps WITHOUT subject/body. Apollo auto-creates an
+    #      emailer_touch + empty emailer_template attached to the step.
+    #   2. GET emailer_campaigns/{id} to find the auto-created touch and its
+    #      emailer_template_id.
+    #   3. PUT emailer_templates/{tpl_id} with body_html + body_text + subject
+    #      to persist the email content.
+    # The earlier inline-body pattern (POST step with subject+body) silently
+    # drops the content. See archived campaign 6a11e4344aa547000c6f4d5e for
+    # an example of that failure mode.
     print(f"\n[4/5] Adding {len(EMAIL_STEPS)} email steps...")
     for step in EMAIL_STEPS:
         if DRY_RUN:
             print(f"  Step {step['position']}: \"{step['subject']}\" (wait {step['wait_time']}d)")
             continue
 
+        # 1. Create step (no body/subject)
         result = apollo_post("emailer_steps", {
             "emailer_campaign_id": campaign_id,
             "position": step["position"],
             "wait_time": step["wait_time"],
             "wait_mode": step["wait_mode"],
             "type": "auto_email",
-            "subject": step["subject"],
-            "body": step["body"],
         })
-        if result:
-            step_data = result.get("emailer_step", result)
-            step_id = step_data.get("id")
-            template_id = step_data.get("emailer_template_id") or step_data.get("emailer_template", {}).get("id")
-            print(f"  Step {step['position']}: created (ID: {step_id})")
+        if not result:
+            print(f"  Step {step['position']}: step POST FAILED")
+            continue
+        step_data = result.get("emailer_step", result)
+        step_id = step_data.get("id")
+        print(f"  Step {step['position']}: step_id={step_id}")
 
-            # Update template to ensure body persists
-            if template_id:
-                apollo_put(f"emailer_templates/{template_id}", {
-                    "subject": step["subject"],
-                    "body": step["body"],
-                })
-                print(f"    Template updated: {template_id}")
+        # 2. Refetch campaign to find auto-created touch
+        time.sleep(0.5)
+        camp = apollo_get(f"emailer_campaigns/{campaign_id}")
+        if not camp:
+            print(f"    could not refetch campaign; template body NOT persisted")
+            continue
+        touches = camp.get("emailer_touches", [])
+        my_touch = next((t for t in touches if t.get("emailer_step_id") == step_id), None)
+        if not my_touch or not my_touch.get("emailer_template_id"):
+            print(f"    no auto-touch found for step; template body NOT persisted")
+            continue
+        template_id = my_touch["emailer_template_id"]
+
+        # 3. PUT the auto-created template with the actual content
+        upd = apollo_put(f"emailer_templates/{template_id}", {
+            "subject": step["subject"],
+            "body_html": step["body"].replace("\n", "<br>"),
+            "body_text": step["body"],
+        })
+        if upd:
+            tpl = upd.get("emailer_template", upd)
+            body_len = len(tpl.get("body_text") or "")
+            print(f"    Template {template_id} populated (body_text len={body_len})")
         else:
-            print(f"  Step {step['position']}: FAILED")
+            print(f"    Template {template_id} PUT FAILED")
         time.sleep(0.5)
 
     # --- Step 5: Add contacts to campaign ---

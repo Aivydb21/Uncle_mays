@@ -1,0 +1,4 @@
+ring_label,visit_capture_pct,households,fafh_usd
+Inner (30% of visits),30,24360,6053
+Core (50% of visits),50,53197,6053
+Broad (70% of visits),70,155534,6053

@@ -1,0 +1,11 @@
+direction,place,pct
+prior,Home,36.7
+prior,Work,10.0
+prior,Other,3.5
+prior,Trader Joe's,1.4
+prior,Walgreens,1.2
+post,Home,45.6
+post,Work,4.9
+post,Other,3.0
+post,Trader Joe's,1.4
+post,Walgreens,1.0
