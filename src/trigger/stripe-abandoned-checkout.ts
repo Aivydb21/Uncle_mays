@@ -82,46 +82,150 @@ async function hasLocalAbandonedSession(email: string): Promise<boolean> {
   }
 }
 
-interface StripeCheckoutSession {
+/**
+ * PaymentIntent-shaped session record.
+ *
+ * The site creates Stripe PaymentIntents directly (custom Stripe Elements
+ * checkout) rather than Stripe Checkout Sessions. An abandoned cart is a
+ * PaymentIntent that was created but never confirmed: status stays at
+ * `requires_payment_method` (or `requires_confirmation`) and the customer
+ * never returns. We treat those as the abandonment signal here.
+ *
+ * The `customer_details` shape is preserved from the old Checkout Session
+ * type so the rest of the processor (which only reads email/name) keeps
+ * working without changes.
+ */
+interface StripeAbandonedSession {
   id: string;
   customer_details?: {
     email?: string | null;
     name?: string | null;
   } | null;
   created: number;
-  expires_at: number;
   status: string;
-  url: string | null;
   amount_total: number | null;
   currency: string | null;
 }
 
-async function fetchStripeExpiredSessions(
-  apiKey: string,
-  afterTimestamp: number,
-  beforeTimestamp: number
-): Promise<StripeCheckoutSession[]> {
-  const url = new URL("https://api.stripe.com/v1/checkout/sessions");
-  url.searchParams.set("limit", "100");
-  url.searchParams.set("status", "expired");
+interface StripePaymentIntent {
+  id: string;
+  amount: number;
+  currency: string;
+  created: number;
+  status: string;
+  receipt_email: string | null;
+  customer: string | null;
+  metadata: Record<string, string> | null;
+}
 
+interface StripeCustomer {
+  id: string;
+  email: string | null;
+  name: string | null;
+}
+
+async function stripeGet(
+  apiKey: string,
+  path: string,
+  query: Record<string, string>
+): Promise<any> {
+  const url = new URL(`https://api.stripe.com${path}`);
+  for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
   const authHeader = `Basic ${btoa(apiKey + ":")}`;
   const res = await fetch(url.toString(), {
     headers: { Authorization: authHeader },
   });
-
   if (!res.ok) {
     const err = await res.text();
     throw new Error(`Stripe API error (${res.status}): ${err}`);
   }
+  return res.json();
+}
 
-  const data = await res.json();
-  const sessions: StripeCheckoutSession[] = data.data || [];
+/**
+ * Pull abandoned PaymentIntents in a created-at window, hydrate the customer
+ * email/name, and return them in the legacy CheckoutSession shape.
+ *
+ * "Abandoned" = the PI was created in the window but the customer never
+ * confirmed it. We look at the PI's current `status`: anything that still
+ * requires customer action (`requires_payment_method`, `requires_confirmation`,
+ * `requires_action`) is an abandonment candidate, since a successful checkout
+ * would have moved the PI to `succeeded` / `processing`. Cancelled PIs and
+ * 0-amount PIs are excluded.
+ */
+async function fetchStripeAbandonedSessions(
+  apiKey: string,
+  afterTimestamp: number,
+  beforeTimestamp: number
+): Promise<StripeAbandonedSession[]> {
+  const ABANDONED_STATUSES = new Set([
+    "requires_payment_method",
+    "requires_confirmation",
+    "requires_action",
+  ]);
 
-  // Filter to sessions created in our time window
-  return sessions.filter(
-    (s) => s.created >= afterTimestamp && s.created <= beforeTimestamp
-  );
+  const out: StripeAbandonedSession[] = [];
+  const customerCache = new Map<string, StripeCustomer | null>();
+  let hasMore = true;
+  let startingAfter: string | undefined;
+  let pages = 0;
+
+  while (hasMore && pages < 10) {
+    pages++;
+    const query: Record<string, string> = {
+      limit: "100",
+      "created[gte]": String(afterTimestamp),
+      "created[lte]": String(beforeTimestamp),
+    };
+    if (startingAfter) query.starting_after = startingAfter;
+
+    const data = await stripeGet(apiKey, "/v1/payment_intents", query);
+    const intents: StripePaymentIntent[] = data.data || [];
+    hasMore = !!data.has_more;
+    if (intents.length > 0) startingAfter = intents[intents.length - 1].id;
+
+    for (const pi of intents) {
+      if (!ABANDONED_STATUSES.has(pi.status)) continue;
+      if (!pi.amount || pi.amount <= 0) continue;
+
+      let email =
+        pi.receipt_email ||
+        pi.metadata?.customer_email ||
+        null;
+      let name = pi.metadata?.customer_name || null;
+
+      if ((!email || !name) && pi.customer) {
+        let customer = customerCache.get(pi.customer);
+        if (customer === undefined) {
+          try {
+            customer = (await stripeGet(
+              apiKey,
+              `/v1/customers/${pi.customer}`,
+              {}
+            )) as StripeCustomer;
+          } catch {
+            customer = null;
+          }
+          customerCache.set(pi.customer, customer);
+        }
+        if (customer) {
+          email = email || customer.email;
+          name = name || customer.name;
+        }
+      }
+
+      out.push({
+        id: pi.id,
+        customer_details: { email, name },
+        created: pi.created,
+        status: pi.status,
+        amount_total: pi.amount,
+        currency: pi.currency,
+      });
+    }
+  }
+
+  return out;
 }
 
 async function upsertMailchimpContact(
@@ -333,12 +437,20 @@ function parseNameParts(fullName: string): { first: string; last: string } {
 /**
  * Stripe Abandoned Checkout Recovery , 3-step sequence.
  *
- * Polls Stripe API every 30 minutes for expired checkout sessions.
+ * Polls Stripe every 30 minutes for abandoned PaymentIntents. The site
+ * builds custom PaymentIntents (not Stripe Checkout Sessions); an
+ * abandoned cart is a PI that was created in the window but still has
+ * status `requires_payment_method` (or `requires_confirmation` /
+ * `requires_action`) at fetch time. This processor was rewritten 2026-06-22
+ * (UNC-1753) after the previous Checkout-Session query reported 0 sessions
+ * for weeks despite real abandoned carts (e.g. Lauren Wycoff, $79.55,
+ * 2026-06-10, pi_3TgqipG67LsNxpTo0KtVV2Ek).
+ *
  * Step 0 (the +2h "feedback ask") was retired 2026-05-02.
  *
- * - Email 1 (recovery):  expired 24-48 hours ago
- * - Email 2 (recovery):  expired 48-72 hours ago
- * - Email 3 (recovery):  expired 72-96 hours ago
+ * - Email 1 (recovery):  created 24-48 hours ago
+ * - Email 2 (recovery):  created 48-72 hours ago
+ * - Email 3 (recovery):  created 72-96 hours ago
  *
  * Each window is independent; Mailchimp tag dedup prevents duplicates.
  */
@@ -378,7 +490,7 @@ export const stripeAbandonedCheckoutProcessor = schedules.task({
       windowEnd: number,
       windowLabel: string
     ) {
-      const sessions = await fetchStripeExpiredSessions(stripeKey, windowStart, windowEnd);
+      const sessions = await fetchStripeAbandonedSessions(stripeKey, windowStart, windowEnd);
       console.log(`Found ${sessions.length} sessions for Email ${emailNumber} (${windowLabel})`);
 
       for (const session of sessions) {
