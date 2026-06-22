@@ -45,3 +45,6 @@ __pycache__/
 
 # Local Airtable enrichment scratch dir (raw extracts, not for the repo)
 _airtable_dump/
+
+# Trigger.dev local dev cache (lock/pid/tmp)
+.trigger/
