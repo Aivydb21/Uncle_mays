@@ -75,10 +75,13 @@ interface SectionResult<T> {
 
 export const ceoDailyDigest = schedules.task({
   id: "ceo-daily-digest",
-  // 14:00 UTC = 09:00 CDT (summer) / 08:00 CST (winter). Working hours so
-  // the Tailscale-hosted Paperclip API on the CEO's laptop is reachable.
+  // 15:00 UTC = 10:00 CDT (summer) / 09:00 CST (winter). Bumped from 14:00
+  // UTC (UNC-1773) to widen the wake-up margin on the Tailscale-hosted
+  // Paperclip API — the laptop was mid-wake when 14:00 hit and returning
+  // 502s. Combined with the per-call retry below, this gives the digest
+  // two layers of resilience.
   // Runs 7 days a week per CEO directive (2026-05-16).
-  cron: "0 14 * * *",
+  cron: "0 15 * * *",
   // Generous ceiling per CEO directive (2026-05-16): completing the daily
   // information pull matters more than wall time. 1h is more than enough
   // headroom for GitHub + Mailchimp + Paperclip queries even on slow days.
@@ -225,10 +228,11 @@ async function fetchStalledIssues(updatedBefore: Date): Promise<PaperclipIssue[]
 
 async function fetchPendingApprovals(): Promise<PaperclipApproval[]> {
   const { apiUrl, apiKey, companyId } = paperclipEnv();
-  const res = await fetch(`${apiUrl}/companies/${companyId}/approvals?status=pending`, {
-    headers: { Authorization: `Bearer ${apiKey}` },
-  });
-  if (!res.ok) throw new Error(`Paperclip approvals ${res.status}: ${await res.text()}`);
+  const res = await paperclipFetchWithRetry(
+    "Paperclip approvals",
+    `${apiUrl}/companies/${companyId}/approvals?status=pending`,
+    { headers: { Authorization: `Bearer ${apiKey}` } }
+  );
   const json = (await res.json()) as { approvals?: PaperclipApproval[]; data?: PaperclipApproval[] };
   return json.approvals || json.data || [];
 }
@@ -244,13 +248,39 @@ function paperclipEnv() {
   return { apiUrl, apiKey, companyId };
 }
 
+// 3-attempt linear backoff (5s, 10s) mirrors the galileo-daily-briefing
+// pattern (UNC-1773). Retries on any non-ok response or network error —
+// transient 502s from the Tailscale-hosted Paperclip API (laptop mid-wake)
+// are the main failure mode we're absorbing.
+async function paperclipFetchWithRetry(
+  label: string,
+  url: string,
+  init: RequestInit
+): Promise<Response> {
+  const maxAttempts = 3;
+  let lastErr = "";
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const res = await fetch(url, init);
+      if (res.ok) return res;
+      lastErr = `HTTP ${res.status}: ${await res.text().catch(() => "")}`;
+    } catch (err) {
+      lastErr = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
+    }
+    if (attempt < maxAttempts) {
+      await new Promise((r) => setTimeout(r, attempt * 5_000));
+    }
+  }
+  throw new Error(`${label} failed after ${maxAttempts} attempts: ${lastErr}`);
+}
+
 async function fetchPaperclipIssues(opts: { pageSize: number }): Promise<PaperclipIssue[]> {
   const { apiUrl, apiKey, companyId } = paperclipEnv();
-  const res = await fetch(
+  const res = await paperclipFetchWithRetry(
+    "Paperclip issues",
     `${apiUrl}/companies/${companyId}/issues?pageSize=${opts.pageSize}&sort=updatedAt&order=desc`,
     { headers: { Authorization: `Bearer ${apiKey}` } }
   );
-  if (!res.ok) throw new Error(`Paperclip issues ${res.status}: ${await res.text()}`);
   const json = (await res.json()) as { issues?: PaperclipIssue[]; data?: PaperclipIssue[] };
   return json.issues || json.data || [];
 }
@@ -259,25 +289,25 @@ async function createCeoTask(title: string, description: string): Promise<void> 
   const { apiUrl, apiKey, companyId } = paperclipEnv();
   const ceoAgentId = process.env.PAPERCLIP_CEO_AGENT_ID || CEO_AGENT_ID;
 
-  const res = await fetch(`${apiUrl}/companies/${companyId}/issues`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      title,
-      description,
-      assigneeAgentId: ceoAgentId,
-      status: "todo",
-      priority: "medium",
-      labels: ["ceo-digest"],
-    }),
-  });
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`Failed to create CEO digest task: ${res.status} ${body}`);
-  }
+  await paperclipFetchWithRetry(
+    "Create CEO digest task",
+    `${apiUrl}/companies/${companyId}/issues`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title,
+        description,
+        assigneeAgentId: ceoAgentId,
+        status: "todo",
+        priority: "medium",
+        labels: ["ceo-digest"],
+      }),
+    }
+  );
 }
 
 // --- Rendering ---
