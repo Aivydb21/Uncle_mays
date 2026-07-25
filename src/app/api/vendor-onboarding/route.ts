@@ -216,13 +216,12 @@ function thankYouHtml(body: SubmissionBody): string {
   return `
     <div style="font-family:-apple-system,Segoe UI,system-ui,sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a">
       <p style="font-size:16px;line-height:1.5">${firstName},</p>
-      <p style="font-size:16px;line-height:1.5">Thanks for sending through your application to stock products at Uncle May's. I've got it.</p>
-      <p style="font-size:16px;line-height:1.5">Here's what happens next: within 5 business days, either I or my COO Zoe Rowell will reach out with a next step. Usually that's a small sample order so we can photograph your product and add it to the catalog. If we're not a fit right now, we'll tell you that directly so you can move on.</p>
-      <p style="font-size:16px;line-height:1.5">We keep your profile on file either way. If anything about your business changes &mdash; new products, new capacity, new certifications &mdash; let us know and we'll update the record.</p>
-      <p style="font-size:16px;line-height:1.5">Questions in the meantime: just reply to this email, or call me at (312) 972-2595.</p>
-      <p style="font-size:16px;line-height:1.5;margin-top:24px">Anthony Ivy<br/>Founder, Uncle May's Produce</p>
+      <p style="font-size:16px;line-height:1.5">Thanks for sending through your application to stock products at Uncle May's. We've received it.</p>
+      <p style="font-size:16px;line-height:1.5">We review every application, and if there's a potential fit we'll follow up about next steps. We keep your profile on file either way, so if anything about your business changes, new products, new capacity, or new certifications, just let us know and we'll update the record.</p>
+      <p style="font-size:16px;line-height:1.5">Any questions in the meantime, just reply to this email.</p>
+      <p style="font-size:16px;line-height:1.5;margin-top:24px">The Uncle May's Produce Team</p>
       <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-      <p style="font-size:12px;color:#888">Uncle May's Produce &middot; Hyde Park, Chicago, IL &middot; anthony@unclemays.com &middot; (312) 972-2595</p>
+      <p style="font-size:12px;color:#888">Uncle May's Produce &middot; Hyde Park, Chicago, IL &middot; info@unclemays.com</p>
     </div>
   `;
 }
